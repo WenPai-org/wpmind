@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-    define( 'WPMIND_VERSION', '1.5.1' );
+    define( 'WPMIND_VERSION', '1.5.2' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
     define( 'WPMIND_PLUGIN_FILE', __FILE__ );

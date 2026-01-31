@@ -88,8 +88,14 @@ class CircuitBreaker
     public function recordSuccess(): void
     {
         $data = $this->getData();
+        $now = time();
+
+        // 记录带时间戳的请求
+        $data['requests'][] = ['success' => true, 'time' => $now];
+        $data['requests'] = $this->filterRecentRequests($data['requests'] ?? [], $now);
+
         $data['successes'] = ($data['successes'] ?? 0) + 1;
-        $data['last_success'] = time();
+        $data['last_success'] = $now;
         $data['consecutive_failures'] = 0;
 
         // 半开状态下成功次数达标，恢复到关闭状态
@@ -110,12 +116,20 @@ class CircuitBreaker
     public function recordFailure(): void
     {
         $data = $this->getData();
+        $now = time();
+
+        // 记录带时间戳的请求
+        $data['requests'][] = ['success' => false, 'time' => $now];
+        $data['requests'] = $this->filterRecentRequests($data['requests'] ?? [], $now);
+
         $data['failures'] = ($data['failures'] ?? 0) + 1;
         $data['consecutive_failures'] = ($data['consecutive_failures'] ?? 0) + 1;
-        $data['last_failure'] = time();
+        $data['last_failure'] = $now;
 
         // 半开状态下失败，立即回到开启状态
         if (($data['state'] ?? self::STATE_CLOSED) === self::STATE_HALF_OPEN) {
+            $data['half_open_failures'] = ($data['half_open_failures'] ?? 0) + 1;
+            $this->saveData($data);
             $this->transitionTo(self::STATE_OPEN);
             return;
         }
@@ -170,19 +184,29 @@ class CircuitBreaker
             return true;
         }
 
-        // 失败率超过阈值 (需要足够的样本)
-        $failures = $data['failures'] ?? 0;
-        $successes = $data['successes'] ?? 0;
-        $total = $failures + $successes;
-
-        if ($total >= self::MIN_REQUESTS) {
-            $failureRate = $failures / $total;
+        // 基于时间窗口内的失败率判断
+        $requests = $data['requests'] ?? [];
+        if (count($requests) >= self::MIN_REQUESTS) {
+            $failures = count(array_filter($requests, fn($r) => !$r['success']));
+            $failureRate = $failures / count($requests);
             if ($failureRate >= self::FAILURE_RATE) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * 过滤出时间窗口内的请求
+     */
+    private function filterRecentRequests(array $requests, int $now): array
+    {
+        $cutoff = $now - self::WINDOW_SIZE;
+        return array_values(array_filter(
+            $requests,
+            fn($r) => ($r['time'] ?? 0) >= $cutoff
+        ));
     }
 
     /**
@@ -255,7 +279,8 @@ class CircuitBreaker
 
     private function getData(): array
     {
-        return get_transient($this->transientKey) ?: [];
+        $data = get_transient($this->transientKey);
+        return is_array($data) ? $data : [];
     }
 
     private function saveData(array $data): void

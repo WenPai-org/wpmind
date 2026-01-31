@@ -35,9 +35,12 @@
 
             var $toast = $('<div class="wpmind-toast wpmind-toast-' + type + '">' +
                 '<span class="dashicons ' + icons[type] + '"></span>' +
-                '<span class="wpmind-toast-message">' + message + '</span>' +
+                '<span class="wpmind-toast-message"></span>' +
                 '<button type="button" class="wpmind-toast-close">&times;</button>' +
                 '</div>');
+
+            // 使用 .text() 防止 XSS
+            $toast.find('.wpmind-toast-message').text(message);
 
             this.container.append($toast);
 

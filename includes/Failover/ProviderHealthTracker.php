@@ -59,11 +59,12 @@ class ProviderHealthTracker
         }
 
         // 计算平均延迟（只计算成功的请求）
-        $successfulLatencies = array_filter(
-            array_column($provider['history'], 'latency'),
-            fn($l, $k) => $provider['history'][$k]['success'],
-            ARRAY_FILTER_USE_BOTH
-        );
+        $successfulLatencies = [];
+        foreach ($provider['history'] as $record) {
+            if ($record['success']) {
+                $successfulLatencies[] = $record['latency'];
+            }
+        }
 
         if (!empty($successfulLatencies)) {
             $provider['avg_latency'] = (int) round(
@@ -154,7 +155,8 @@ class ProviderHealthTracker
      */
     public static function getAllHealth(): array
     {
-        return get_transient(self::TRANSIENT_KEY) ?: [];
+        $data = get_transient(self::TRANSIENT_KEY);
+        return is_array($data) ? $data : [];
     }
 
     /**
