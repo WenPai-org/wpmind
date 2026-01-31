@@ -1020,18 +1020,19 @@ input.is-invalid {
 }
 
 .wpmind-usage-card {
-    background: var(--wpmind-gray-50);
+    background: #fff;
     border: 1px solid var(--wpmind-gray-200);
     border-radius: 0;
     overflow: hidden;
 }
 
 .wpmind-usage-card-header {
-    background: var(--wpmind-primary);
-    color: #fff;
+    background: var(--wpmind-gray-50);
+    color: var(--wpmind-gray-700);
     padding: var(--wpmind-space-3) var(--wpmind-space-4);
     font-size: var(--wpmind-text-sm);
     font-weight: 600;
+    border-bottom: 1px solid var(--wpmind-gray-200);
 }
 
 .wpmind-usage-card-body {
@@ -1039,6 +1040,7 @@ input.is-invalid {
     display: flex;
     justify-content: space-between;
     gap: var(--wpmind-space-3);
+    background: #fff;
 }
 
 .wpmind-usage-stat {
