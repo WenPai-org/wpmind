@@ -1,5 +1,31 @@
 # WPMind 更新日志
 
+## [1.5.3] - 2026-01-31
+
+### 🎨 UI 改进
+- **WordPress 原生通知样式**: Toast 通知改用 WordPress 原生 `.notice` 类
+- 支持 `notice-success/error/warning/info` 四种类型
+- 使用 `slideDown/slideUp` 动画效果
+- 移除自定义 Toast CSS 样式，保持与 WordPress 后台一致
+
+---
+
+## [1.5.2] - 2026-01-31
+
+### 🐛 修复 (Codex 审查)
+- **时间窗口过滤**: CircuitBreaker 现在只统计最近 60 秒内的请求计算失败率
+- **类型安全**: `getData()` 和 `getAllHealth()` 添加 `is_array()` 类型检查
+- **半开状态计数**: `recordFailure()` 在半开状态下正确递增 `half_open_failures`
+- **延迟计算修复**: ProviderHealthTracker 使用 `foreach` 替代有问题的 `array_filter`
+- **XSS 防护**: Toast 组件使用 `.text()` 方法防止 XSS 攻击
+
+### 🎨 UI 改进
+- **自定义 Dialog**: 使用自定义确认对话框替代浏览器原生 `confirm()`
+- **事件委托**: 使用 `$(document).on()` 修复动态元素点击问题
+- 移除所有 `alert()` 和 `confirm()` 调用
+
+---
+
 ## [1.5.1] - 2026-01-31
 
 ### 🐛 修复
