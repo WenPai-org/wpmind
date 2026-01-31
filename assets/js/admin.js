@@ -615,6 +615,80 @@
     }
 
     /**
+     * 预算设置管理
+     */
+    function initBudgetSettings() {
+        // 切换预算设置面板显示
+        $('#wpmind_budget_enabled').on('change', function() {
+            $('#wpmind-budget-settings').toggle(this.checked);
+        });
+
+        // 切换邮件字段显示
+        $('input[name="email_alert"]').on('change', function() {
+            $('.wpmind-budget-email-field').toggle(this.checked);
+        });
+
+        // 保存预算设置
+        $('#wpmind-save-budget').on('click', function(e) {
+            e.preventDefault();
+
+            var $button = $(this);
+            if ($button.prop('disabled')) return;
+
+            var originalText = $button.text();
+            $button.prop('disabled', true).html('<span class="dashicons dashicons-update wpmind-spinning"></span> 保存中');
+
+            // 收集设置数据
+            var settings = {
+                enabled: $('#wpmind_budget_enabled').is(':checked'),
+                global: {
+                    daily_limit_usd: parseFloat($('input[name="daily_limit_usd"]').val()) || 0,
+                    monthly_limit_usd: parseFloat($('input[name="monthly_limit_usd"]').val()) || 0,
+                    daily_limit_cny: parseFloat($('input[name="daily_limit_cny"]').val()) || 0,
+                    monthly_limit_cny: parseFloat($('input[name="monthly_limit_cny"]').val()) || 0,
+                    alert_threshold: parseInt($('input[name="alert_threshold"]').val()) || 80
+                },
+                enforcement_mode: $('select[name="enforcement_mode"]').val() || 'alert',
+                notifications: {
+                    admin_notice: $('input[name="admin_notice"]').is(':checked'),
+                    email_alert: $('input[name="email_alert"]').is(':checked'),
+                    email_address: $('input[name="alert_email"]').val() || ''
+                }
+            };
+
+            if (typeof wpmindData === 'undefined') {
+                Toast.error('配置错误');
+                $button.prop('disabled', false).text(originalText);
+                return;
+            }
+
+            $.ajax({
+                url: wpmindData.ajaxurl || ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'wpmind_save_budget_settings',
+                    settings: JSON.stringify(settings),
+                    nonce: wpmindData.nonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Toast.success('预算设置已保存');
+                    } else {
+                        var msg = (response.data && response.data.message) || '保存失败';
+                        Toast.error(msg);
+                    }
+                },
+                error: function() {
+                    Toast.error('保存失败，请重试');
+                },
+                complete: function() {
+                    $button.prop('disabled', false).text(originalText);
+                }
+            });
+        });
+    }
+
+    /**
      * 清除用量统计
      */
     function initUsageClear() {
@@ -687,6 +761,7 @@
         initResetBreakers();
         initUsageRefresh();
         initUsageClear();
+        initBudgetSettings();
     });
 
 })(jQuery);

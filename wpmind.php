@@ -3,7 +3,7 @@
  * Plugin Name: WPMind
  * Plugin URI: https://linuxjoy.com/plugins/wpmind
  * Description: 文派心思 - WordPress AI 自定义端点扩展，支持国内外多种 AI 服务
- * Version: 1.6.7
+ * Version: 1.7.0
  * Author: LinuxJoy
  * Author URI: https://linuxjoy.com
  * License: GPL-2.0-or-later
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-    define( 'WPMIND_VERSION', '1.6.7' );
+    define( 'WPMIND_VERSION', '1.7.0' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
     define( 'WPMIND_PLUGIN_FILE', __FILE__ );
@@ -261,6 +261,8 @@ final class WPMind {
         add_action( 'wp_ajax_wpmind_reset_circuit_breaker', [ $this, 'ajax_reset_circuit_breaker' ] );
         add_action( 'wp_ajax_wpmind_get_usage_stats', [ $this, 'ajax_get_usage_stats' ] );
         add_action( 'wp_ajax_wpmind_clear_usage_stats', [ $this, 'ajax_clear_usage_stats' ] );
+        add_action( 'wp_ajax_wpmind_save_budget_settings', [ $this, 'ajax_save_budget_settings' ] );
+        add_action( 'wp_ajax_wpmind_get_budget_status', [ $this, 'ajax_get_budget_status' ] );
 
         // AI 过滤器
         add_filter( 'ai_experiments_preferred_models', [ $this, 'filter_preferred_models' ] );
@@ -638,6 +640,9 @@ final class WPMind {
 
         // 记录用量
         Usage\UsageTracker::record( $provider, $model, $input_tokens, $output_tokens, $latency_ms );
+
+        // 检查预算并发送告警
+        Budget\BudgetAlert::instance()->checkAndAlert();
     }
 
     /**
@@ -896,6 +901,86 @@ final class WPMind {
 
         Usage\UsageTracker::clearAll();
         wp_send_json_success( [ 'message' => __( '用量统计已清除', 'wpmind' ) ] );
+    }
+
+    /**
+     * AJAX 保存预算设置
+     *
+     * @since 1.7.0
+     */
+    public function ajax_save_budget_settings(): void {
+        check_ajax_referer( 'wpmind_ajax', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+        }
+
+        // 解析 JSON 数据
+        $json_input = isset( $_POST['settings'] ) ? stripslashes( $_POST['settings'] ) : '';
+        $input = json_decode( $json_input, true );
+
+        if ( ! is_array( $input ) ) {
+            wp_send_json_error( [ 'message' => __( '无效的数据格式', 'wpmind' ) ] );
+        }
+
+        // 构建设置数组
+        $settings = [];
+        $settings['enabled'] = ! empty( $input['enabled'] );
+
+        $settings['global'] = [
+            'daily_limit_usd'   => (float) ( $input['global']['daily_limit_usd'] ?? 0 ),
+            'daily_limit_cny'   => (float) ( $input['global']['daily_limit_cny'] ?? 0 ),
+            'monthly_limit_usd' => (float) ( $input['global']['monthly_limit_usd'] ?? 0 ),
+            'monthly_limit_cny' => (float) ( $input['global']['monthly_limit_cny'] ?? 0 ),
+            'alert_threshold'   => (int) ( $input['global']['alert_threshold'] ?? 80 ),
+        ];
+
+        $settings['enforcement_mode'] = sanitize_text_field( $input['enforcement_mode'] ?? 'alert' );
+
+        $settings['notifications'] = [
+            'admin_notice'  => ! empty( $input['notifications']['admin_notice'] ),
+            'email_alert'   => ! empty( $input['notifications']['email_alert'] ),
+            'email_address' => sanitize_email( $input['notifications']['email_address'] ?? '' ),
+        ];
+
+        // 按服务商设置
+        $settings['providers'] = [];
+        if ( ! empty( $input['providers'] ) && is_array( $input['providers'] ) ) {
+            foreach ( $input['providers'] as $provider => $limits ) {
+                $provider = sanitize_key( $provider );
+                $settings['providers'][ $provider ] = [
+                    'daily_limit'   => (float) ( $limits['daily_limit'] ?? 0 ),
+                    'monthly_limit' => (float) ( $limits['monthly_limit'] ?? 0 ),
+                ];
+            }
+        }
+
+        $manager = Budget\BudgetManager::instance();
+        $result = $manager->saveSettings( $settings );
+
+        if ( $result ) {
+            wp_send_json_success( [ 'message' => __( '预算设置已保存', 'wpmind' ) ] );
+        } else {
+            wp_send_json_error( [ 'message' => __( '保存失败', 'wpmind' ) ] );
+        }
+    }
+
+    /**
+     * AJAX 获取预算状态
+     *
+     * @since 1.7.0
+     */
+    public function ajax_get_budget_status(): void {
+        check_ajax_referer( 'wpmind_ajax', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+        }
+
+        $checker = Budget\BudgetChecker::instance();
+        $summary = $checker->getSummary();
+
+        wp_send_json_success( $summary );
     }
 
     /**

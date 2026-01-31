@@ -36,7 +36,9 @@
     border: 1px solid #c3c4c7;
     border-radius: 4px;
     padding: 0;
-    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    transition:
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
 }
 
 .wpmind-endpoint-card:hover {
@@ -530,7 +532,9 @@ input.is-invalid {
     border: 1px solid #e0e0e0;
     border-radius: 6px;
     overflow: hidden;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .wpmind-provider-usage-item:hover {
@@ -657,8 +661,12 @@ input.is-invalid {
 }
 
 @keyframes wpmind-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .wpmind-reset-all-breakers {
@@ -675,7 +683,7 @@ input.is-invalid {
 
 .wpmind-status-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
     gap: 12px;
 }
 
@@ -721,8 +729,13 @@ input.is-invalid {
 }
 
 @keyframes wpmind-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
 }
 
 .wpmind-status-name {
@@ -901,5 +914,263 @@ input.is-invalid {
 
     .wpmind-dialog.is-visible {
         transform: translateY(-50%) scale(1);
+    }
+}
+
+/* ========================================
+   Budget Panel - 预算设置面板
+   ======================================== */
+.wpmind-budget-panel {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.wpmind-budget-panel .title {
+    margin: 0 0 16px 0;
+    padding: 0 0 12px 0;
+    border: none;
+    border-bottom: 1px solid #f0f0f1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.wpmind-budget-panel .title .dashicons {
+    color: #2271b1;
+}
+
+.wpmind-budget-status-badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-left: auto;
+}
+
+.wpmind-budget-status-badge.wpmind-budget-enabled {
+    background: #d4edda;
+    color: #155724;
+}
+
+.wpmind-budget-toggle-row {
+    margin-bottom: 20px;
+}
+
+.wpmind-budget-toggle-row .description {
+    margin-top: 8px;
+    margin-left: 50px;
+}
+
+.wpmind-budget-settings {
+    border-top: 1px solid #f0f0f1;
+    padding-top: 20px;
+}
+
+.wpmind-budget-section {
+    margin-bottom: 24px;
+}
+
+.wpmind-budget-section:last-child {
+    margin-bottom: 0;
+}
+
+.wpmind-budget-section h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1d2327;
+    margin: 0 0 12px 0;
+    padding: 0;
+}
+
+.wpmind-budget-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.wpmind-budget-row {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.wpmind-budget-field {
+    flex: 1;
+    min-width: 180px;
+}
+
+.wpmind-budget-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1d2327;
+    margin-bottom: 6px;
+}
+
+.wpmind-budget-input-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.wpmind-budget-currency {
+    font-size: 14px;
+    font-weight: 600;
+    color: #50575e;
+    min-width: 16px;
+}
+
+.wpmind-budget-suffix {
+    font-size: 13px;
+    color: #50575e;
+}
+
+.wpmind-budget-field input[type="number"] {
+    width: 100px;
+}
+
+.wpmind-budget-field select {
+    width: 100%;
+    max-width: 400px;
+}
+
+.wpmind-budget-field .description {
+    margin-top: 4px;
+    font-size: 12px;
+}
+
+/* Budget Progress Bar */
+.wpmind-budget-progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.wpmind-budget-progress {
+    flex: 1;
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.wpmind-budget-progress-bar {
+    height: 100%;
+    background: #2271b1;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.wpmind-budget-progress-bar.wpmind-budget-warning {
+    background: #dba617;
+}
+
+.wpmind-budget-progress-bar.wpmind-budget-exceeded {
+    background: #d63638;
+}
+
+.wpmind-budget-percentage {
+    font-size: 11px;
+    font-weight: 600;
+    color: #50575e;
+    min-width: 40px;
+    text-align: right;
+}
+
+/* Budget Checkboxes */
+.wpmind-budget-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.wpmind-budget-checkboxes label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.wpmind-budget-email-field {
+    margin-left: 24px;
+    margin-top: 8px;
+}
+
+/* Budget Actions */
+.wpmind-budget-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f1;
+}
+
+.wpmind-budget-actions .spinner {
+    float: none;
+    margin: 0;
+}
+
+/* Budget Status Classes */
+.wpmind-budget-ok {
+    color: #00a32a;
+}
+
+.wpmind-budget-warning {
+    color: #dba617;
+}
+
+.wpmind-budget-exceeded {
+    color: #d63638;
+}
+
+/* Budget Badge */
+.wpmind-budget-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+}
+
+.wpmind-budget-badge.wpmind-budget-ok {
+    background: #d4edda;
+    color: #155724;
+}
+
+.wpmind-budget-badge.wpmind-budget-warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.wpmind-budget-badge.wpmind-budget-exceeded {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Responsive */
+@media (max-width: 782px) {
+    .wpmind-budget-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .wpmind-budget-row {
+        flex-direction: column;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .wpmind-budget-grid {
+        grid-template-columns: 1fr;
     }
 }

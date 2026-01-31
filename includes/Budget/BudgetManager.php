@@ -1,0 +1,272 @@
+<?php
+/**
+ * Budget Manager - 预算管理器
+ *
+ * 管理 AI 服务的费用预算配置
+ *
+ * @package WPMind
+ * @since 1.7.0
+ */
+
+declare(strict_types=1);
+
+namespace WPMind\Budget;
+
+class BudgetManager
+{
+    private const OPTION_KEY = 'wpmind_budget_settings';
+
+    /**
+     * 强制模式常量
+     */
+    public const MODE_ALERT    = 'alert';    // 仅告警
+    public const MODE_DISABLE  = 'disable';  // 禁用服务
+    public const MODE_DOWNGRADE = 'downgrade'; // 降级到更便宜的模型
+
+    /**
+     * 单例实例
+     */
+    private static ?BudgetManager $instance = null;
+
+    /**
+     * 预算配置缓存
+     */
+    private ?array $settings = null;
+
+    /**
+     * 获取单例实例
+     */
+    public static function instance(): BudgetManager
+    {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
+
+    /**
+     * 私有构造函数
+     */
+    private function __construct() {}
+
+    /**
+     * 获取默认预算配置
+     */
+    public function getDefaults(): array
+    {
+        return [
+            'enabled' => false,
+            'global' => [
+                'daily_limit_usd'   => 0,      // 0 表示不限制
+                'daily_limit_cny'   => 0,
+                'monthly_limit_usd' => 0,
+                'monthly_limit_cny' => 0,
+                'alert_threshold'   => 80,     // 80% 时告警
+            ],
+            'enforcement_mode' => self::MODE_ALERT,
+            'providers' => [],
+            'notifications' => [
+                'admin_notice'  => true,
+                'email_alert'   => false,
+                'email_address' => '',
+            ],
+        ];
+    }
+
+    /**
+     * 获取预算配置
+     */
+    public function getSettings(): array
+    {
+        if (null === $this->settings) {
+            $saved = get_option(self::OPTION_KEY, []);
+            if (!is_array($saved)) {
+                $saved = [];
+            }
+            $this->settings = wp_parse_args($saved, $this->getDefaults());
+        }
+        return $this->settings;
+    }
+
+    /**
+     * 保存预算配置
+     */
+    public function saveSettings(array $settings): bool
+    {
+        $sanitized = $this->sanitizeSettings($settings);
+        $result = update_option(self::OPTION_KEY, $sanitized, false);
+        $this->settings = null; // 清除缓存
+        return $result;
+    }
+
+    /**
+     * 清理预算配置
+     */
+    private function sanitizeSettings(array $input): array
+    {
+        $defaults = $this->getDefaults();
+        $sanitized = [];
+
+        // 启用状态
+        $sanitized['enabled'] = !empty($input['enabled']);
+
+        // 全局设置
+        $sanitized['global'] = [
+            'daily_limit_usd'   => $this->sanitizeAmount($input['global']['daily_limit_usd'] ?? 0),
+            'daily_limit_cny'   => $this->sanitizeAmount($input['global']['daily_limit_cny'] ?? 0),
+            'monthly_limit_usd' => $this->sanitizeAmount($input['global']['monthly_limit_usd'] ?? 0),
+            'monthly_limit_cny' => $this->sanitizeAmount($input['global']['monthly_limit_cny'] ?? 0),
+            'alert_threshold'   => $this->sanitizeThreshold($input['global']['alert_threshold'] ?? 80),
+        ];
+
+        // 强制模式
+        $sanitized['enforcement_mode'] = $this->sanitizeMode($input['enforcement_mode'] ?? self::MODE_ALERT);
+
+        // 按服务商设置
+        $sanitized['providers'] = [];
+        if (!empty($input['providers']) && is_array($input['providers'])) {
+            foreach ($input['providers'] as $provider => $limits) {
+                $provider = sanitize_key($provider);
+                if (!empty($limits['daily_limit']) || !empty($limits['monthly_limit'])) {
+                    $sanitized['providers'][$provider] = [
+                        'daily_limit'   => $this->sanitizeAmount($limits['daily_limit'] ?? 0),
+                        'monthly_limit' => $this->sanitizeAmount($limits['monthly_limit'] ?? 0),
+                    ];
+                }
+            }
+        }
+
+        // 通知设置
+        $sanitized['notifications'] = [
+            'admin_notice'  => !empty($input['notifications']['admin_notice']),
+            'email_alert'   => !empty($input['notifications']['email_alert']),
+            'email_address' => sanitize_email($input['notifications']['email_address'] ?? ''),
+        ];
+
+        return $sanitized;
+    }
+
+    /**
+     * 清理金额
+     */
+    private function sanitizeAmount($value): float
+    {
+        $amount = (float) $value;
+        return max(0, round($amount, 2));
+    }
+
+    /**
+     * 清理阈值
+     */
+    private function sanitizeThreshold($value): int
+    {
+        $threshold = (int) $value;
+        return max(1, min(100, $threshold));
+    }
+
+    /**
+     * 清理强制模式
+     */
+    private function sanitizeMode(string $mode): string
+    {
+        $allowed = [self::MODE_ALERT, self::MODE_DISABLE, self::MODE_DOWNGRADE];
+        return in_array($mode, $allowed, true) ? $mode : self::MODE_ALERT;
+    }
+
+    /**
+     * 检查预算功能是否启用
+     */
+    public function isEnabled(): bool
+    {
+        $settings = $this->getSettings();
+        return !empty($settings['enabled']);
+    }
+
+    /**
+     * 获取全局预算设置
+     */
+    public function getGlobalBudget(): array
+    {
+        $settings = $this->getSettings();
+        return $settings['global'] ?? $this->getDefaults()['global'];
+    }
+
+    /**
+     * 获取服务商预算设置
+     */
+    public function getProviderBudget(string $provider): ?array
+    {
+        $settings = $this->getSettings();
+        return $settings['providers'][$provider] ?? null;
+    }
+
+    /**
+     * 获取通知设置
+     */
+    public function getNotificationSettings(): array
+    {
+        $settings = $this->getSettings();
+        return $settings['notifications'] ?? $this->getDefaults()['notifications'];
+    }
+
+    /**
+     * 获取强制模式
+     */
+    public function getEnforcementMode(): string
+    {
+        $settings = $this->getSettings();
+        return $settings['enforcement_mode'] ?? self::MODE_ALERT;
+    }
+
+    /**
+     * 获取告警阈值
+     */
+    public function getAlertThreshold(): int
+    {
+        $global = $this->getGlobalBudget();
+        return $global['alert_threshold'] ?? 80;
+    }
+
+    /**
+     * 检查是否有任何限额设置
+     */
+    public function hasAnyLimits(): bool
+    {
+        $global = $this->getGlobalBudget();
+
+        if ($global['daily_limit_usd'] > 0 || $global['daily_limit_cny'] > 0) {
+            return true;
+        }
+        if ($global['monthly_limit_usd'] > 0 || $global['monthly_limit_cny'] > 0) {
+            return true;
+        }
+
+        $settings = $this->getSettings();
+        return !empty($settings['providers']);
+    }
+
+    /**
+     * 获取强制模式的显示名称
+     */
+    public static function getModeLabel(string $mode): string
+    {
+        $labels = [
+            self::MODE_ALERT    => __('仅告警', 'wpmind'),
+            self::MODE_DISABLE  => __('禁用服务', 'wpmind'),
+            self::MODE_DOWNGRADE => __('降级模型', 'wpmind'),
+        ];
+        return $labels[$mode] ?? $mode;
+    }
+
+    /**
+     * 获取所有强制模式选项
+     */
+    public static function getModeOptions(): array
+    {
+        return [
+            self::MODE_ALERT    => __('仅告警 - 超限时发送通知，不阻止请求', 'wpmind'),
+            self::MODE_DISABLE  => __('禁用服务 - 超限时禁用该服务商', 'wpmind'),
+            self::MODE_DOWNGRADE => __('降级模型 - 超限时自动切换到更便宜的模型', 'wpmind'),
+        ];
+    }
+}
