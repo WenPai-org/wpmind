@@ -18,6 +18,11 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 // 获取故障转移状态
 $failover_manager = \WPMind\Failover\FailoverManager::instance();
 $provider_status  = $failover_manager->getStatusSummary();
+
+// 获取用量统计
+$usage_stats = \WPMind\Usage\UsageTracker::getStats();
+$today_stats = \WPMind\Usage\UsageTracker::getTodayStats();
+$month_stats = \WPMind\Usage\UsageTracker::getMonthStats();
 ?>
 
 <div class="wrap wpmind-settings">
@@ -25,6 +30,73 @@ $provider_status  = $failover_manager->getStatusSummary();
     <p class="description">
         <?php esc_html_e( '配置自定义 AI 服务端点，支持国内外多种 AI 服务。', 'wpmind' ); ?>
     </p>
+
+    <!-- Token 用量统计面板 -->
+    <div class="wpmind-usage-panel">
+        <h2 class="title">
+            <?php esc_html_e( 'Token 用量统计', 'wpmind' ); ?>
+            <button type="button" class="button button-small wpmind-refresh-usage" title="<?php esc_attr_e( '刷新统计', 'wpmind' ); ?>">
+                <span class="dashicons dashicons-update"></span>
+            </button>
+            <button type="button" class="button button-small wpmind-clear-usage" title="<?php esc_attr_e( '清除统计', 'wpmind' ); ?>">
+                <span class="dashicons dashicons-trash"></span>
+                <?php esc_html_e( '清除', 'wpmind' ); ?>
+            </button>
+        </h2>
+        <div class="wpmind-usage-cards">
+            <div class="wpmind-usage-card">
+                <div class="wpmind-usage-card-header"><?php esc_html_e( '今日', 'wpmind' ); ?></div>
+                <div class="wpmind-usage-card-body">
+                    <div class="wpmind-usage-stat">
+                        <span class="wpmind-usage-value" id="today-tokens"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatTokens( $today_stats['input_tokens'] + $today_stats['output_tokens'] ) ); ?></span>
+                        <span class="wpmind-usage-label"><?php esc_html_e( 'Tokens', 'wpmind' ); ?></span>
+                    </div>
+                    <div class="wpmind-usage-stat">
+                        <span class="wpmind-usage-value" id="today-cost"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatCost( $today_stats['cost'] ) ); ?></span>
+                        <span class="wpmind-usage-label"><?php esc_html_e( '费用', 'wpmind' ); ?></span>
+                    </div>
+                    <div class="wpmind-usage-stat">
+                        <span class="wpmind-usage-value" id="today-requests"><?php echo esc_html( $today_stats['requests'] ); ?></span>
+                        <span class="wpmind-usage-label"><?php esc_html_e( '请求', 'wpmind' ); ?></span>
+                    </div>
+                </div>
+            </div>
+            <div class="wpmind-usage-card">
+                <div class="wpmind-usage-card-header"><?php esc_html_e( '本月', 'wpmind' ); ?></div>
+                <div class="wpmind-usage-card-body">
+                    <div class="wpmind-usage-stat">
+                        <span class="wpmind-usage-value" id="month-tokens"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatTokens( $month_stats['input_tokens'] + $month_stats['output_tokens'] ) ); ?></span>
+                        <span class="wpmind-usage-label"><?php esc_html_e( 'Tokens', 'wpmind' ); ?></span>
+                    </div>
+                    <div class="wpmind-usage-stat">
+                        <span class="wpmind-usage-value" id="month-cost"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatCost( $month_stats['cost'] ) ); ?></span>
+                        <span class="wpmind-usage-label"><?php esc_html_e( '费用', 'wpmind' ); ?></span>
+                    </div>
+                    <div class="wpmind-usage-stat">
+                        <span class="wpmind-usage-value" id="month-requests"><?php echo esc_html( $month_stats['requests'] ); ?></span>
+                        <span class="wpmind-usage-label"><?php esc_html_e( '请求', 'wpmind' ); ?></span>
+                    </div>
+                </div>
+            </div>
+            <div class="wpmind-usage-card">
+                <div class="wpmind-usage-card-header"><?php esc_html_e( '总计', 'wpmind' ); ?></div>
+                <div class="wpmind-usage-card-body">
+                    <div class="wpmind-usage-stat">
+                        <span class="wpmind-usage-value" id="total-tokens"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatTokens( ($usage_stats['total']['input_tokens'] ?? 0) + ($usage_stats['total']['output_tokens'] ?? 0) ) ); ?></span>
+                        <span class="wpmind-usage-label"><?php esc_html_e( 'Tokens', 'wpmind' ); ?></span>
+                    </div>
+                    <div class="wpmind-usage-stat">
+                        <span class="wpmind-usage-value" id="total-cost"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatCost( $usage_stats['total']['cost'] ?? 0 ) ); ?></span>
+                        <span class="wpmind-usage-label"><?php esc_html_e( '费用', 'wpmind' ); ?></span>
+                    </div>
+                    <div class="wpmind-usage-stat">
+                        <span class="wpmind-usage-value" id="total-requests"><?php echo esc_html( $usage_stats['total']['requests'] ?? 0 ); ?></span>
+                        <span class="wpmind-usage-label"><?php esc_html_e( '请求', 'wpmind' ); ?></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Provider 状态面板 -->
     <?php if ( ! empty( $provider_status ) ) : ?>

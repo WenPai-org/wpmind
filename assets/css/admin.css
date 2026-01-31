@@ -303,6 +303,111 @@ input.is-invalid {
     padding: 12px 16px;
 }
 
+/* ========================================
+   Usage Panel - Token 用量统计
+   ======================================== */
+.wpmind-usage-panel {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.wpmind-usage-panel .title {
+    margin: 0 0 16px 0;
+    padding: 0 0 12px 0;
+    border: none;
+    border-bottom: 1px solid #f0f0f1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.wpmind-usage-panel .title .button {
+    padding: 4px 12px;
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.wpmind-usage-panel .title .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+}
+
+.wpmind-clear-usage {
+    margin-left: auto;
+    color: #d63638;
+    border-color: #d63638;
+}
+
+.wpmind-clear-usage:hover {
+    background: #fcf0f1 !important;
+    border-color: #d63638 !important;
+    color: #d63638;
+}
+
+.wpmind-usage-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.wpmind-usage-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #f0f0f1 100%);
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.wpmind-usage-card-header {
+    background: linear-gradient(135deg, #2271b1 0%, #135e96 100%);
+    color: #fff;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.wpmind-usage-card-body {
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.wpmind-usage-stat {
+    text-align: center;
+    flex: 1;
+}
+
+.wpmind-usage-value {
+    display: block;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1d2327;
+    line-height: 1.2;
+}
+
+.wpmind-usage-label {
+    display: block;
+    font-size: 11px;
+    color: #646970;
+    margin-top: 4px;
+    text-transform: uppercase;
+}
+
 /* Status Panel */
 .wpmind-status-panel {
     background: #fff;

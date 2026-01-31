@@ -524,6 +524,155 @@
     }
 
     /**
+     * 刷新用量统计
+     */
+    function initUsageRefresh() {
+        $(document).on('click', '.wpmind-refresh-usage', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var $button = $(this);
+            if ($button.hasClass('is-loading')) return;
+
+            $button.addClass('is-loading');
+            $button.find('.dashicons').addClass('wpmind-spinning');
+
+            if (typeof wpmindData === 'undefined') {
+                Toast.error('配置错误');
+                $button.removeClass('is-loading');
+                $button.find('.dashicons').removeClass('wpmind-spinning');
+                return;
+            }
+
+            $.ajax({
+                url: wpmindData.ajaxurl || ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'wpmind_get_usage_stats',
+                    nonce: wpmindData.nonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        updateUsageDisplay(response.data);
+                        Toast.success('统计已刷新');
+                    }
+                },
+                error: function() {
+                    Toast.error('刷新失败');
+                },
+                complete: function() {
+                    $button.removeClass('is-loading');
+                    $button.find('.dashicons').removeClass('wpmind-spinning');
+                }
+            });
+        });
+    }
+
+    /**
+     * 更新用量显示
+     */
+    function updateUsageDisplay(data) {
+        var today = data.today || {};
+        var month = data.month || {};
+        var total = (data.stats && data.stats.total) || {};
+
+        $('#today-tokens').text(formatTokens(today.input_tokens + today.output_tokens));
+        $('#today-cost').text(formatCost(today.cost || 0));
+        $('#today-requests').text(today.requests || 0);
+
+        $('#month-tokens').text(formatTokens(month.input_tokens + month.output_tokens));
+        $('#month-cost').text(formatCost(month.cost || 0));
+        $('#month-requests').text(month.requests || 0);
+
+        $('#total-tokens').text(formatTokens((total.input_tokens || 0) + (total.output_tokens || 0)));
+        $('#total-cost').text(formatCost(total.cost || 0));
+        $('#total-requests').text(total.requests || 0);
+    }
+
+    /**
+     * 格式化 token 数量
+     */
+    function formatTokens(tokens) {
+        tokens = tokens || 0;
+        if (tokens >= 1000000) {
+            return (tokens / 1000000).toFixed(2) + 'M';
+        }
+        if (tokens >= 1000) {
+            return (tokens / 1000).toFixed(1) + 'K';
+        }
+        return tokens.toString();
+    }
+
+    /**
+     * 格式化成本
+     */
+    function formatCost(cost) {
+        cost = cost || 0;
+        if (cost < 0.01) {
+            return '$' + cost.toFixed(4);
+        }
+        return '$' + cost.toFixed(2);
+    }
+
+    /**
+     * 清除用量统计
+     */
+    function initUsageClear() {
+        $(document).on('click', '.wpmind-clear-usage', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var $button = $(this);
+
+            Dialog.show({
+                title: '清除统计',
+                message: '确定要清除所有用量统计数据吗？<br><small style="color:#666;">此操作不可恢复</small>',
+                type: 'danger',
+                confirmText: '确定清除',
+                cancelText: '取消',
+                onConfirm: function() {
+                    var originalHtml = $button.html();
+                    $button.prop('disabled', true).html('<span class="dashicons dashicons-update wpmind-spinning"></span>');
+
+                    if (typeof wpmindData === 'undefined') {
+                        Toast.error('配置错误');
+                        $button.prop('disabled', false).html(originalHtml);
+                        return;
+                    }
+
+                    $.ajax({
+                        url: wpmindData.ajaxurl || ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'wpmind_clear_usage_stats',
+                            nonce: wpmindData.nonce
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Toast.success('统计已清除');
+                                // 重置显示
+                                updateUsageDisplay({
+                                    today: { input_tokens: 0, output_tokens: 0, cost: 0, requests: 0 },
+                                    month: { input_tokens: 0, output_tokens: 0, cost: 0, requests: 0 },
+                                    stats: { total: { input_tokens: 0, output_tokens: 0, cost: 0, requests: 0 } }
+                                });
+                            } else {
+                                Toast.error('清除失败');
+                            }
+                        },
+                        error: function() {
+                            Toast.error('清除失败');
+                        },
+                        complete: function() {
+                            $button.prop('disabled', false).html(originalHtml);
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    /**
      * Initialize on document ready
      */
     $(function() {
@@ -536,6 +685,8 @@
         initAdvancedToggle();
         initStatusRefresh();
         initResetBreakers();
+        initUsageRefresh();
+        initUsageClear();
     });
 
 })(jQuery);

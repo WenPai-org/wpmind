@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-    define( 'WPMIND_VERSION', '1.5.3' );
+    define( 'WPMIND_VERSION', '1.6.0' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
     define( 'WPMIND_PLUGIN_FILE', __FILE__ );
@@ -259,6 +259,8 @@ final class WPMind {
         add_action( 'wp_ajax_wpmind_test_connection', [ $this, 'ajax_test_connection' ] );
         add_action( 'wp_ajax_wpmind_get_provider_status', [ $this, 'ajax_get_provider_status' ] );
         add_action( 'wp_ajax_wpmind_reset_circuit_breaker', [ $this, 'ajax_reset_circuit_breaker' ] );
+        add_action( 'wp_ajax_wpmind_get_usage_stats', [ $this, 'ajax_get_usage_stats' ] );
+        add_action( 'wp_ajax_wpmind_clear_usage_stats', [ $this, 'ajax_clear_usage_stats' ] );
 
         // AI 过滤器
         add_filter( 'ai_experiments_preferred_models', [ $this, 'filter_preferred_models' ] );
@@ -573,10 +575,54 @@ final class WPMind {
         if ( ! is_wp_error( $response ) ) {
             $status_code = wp_remote_retrieve_response_code( $response );
             $success = ( $status_code >= 200 && $status_code < 300 );
+
+            // 记录 Token 用量
+            if ( $success ) {
+                $this->track_token_usage( $response, $provider, $latency_ms );
+            }
         }
 
         // 记录结果
         Failover\FailoverManager::instance()->recordResult( $provider, $success, $latency_ms );
+    }
+
+    /**
+     * 追踪 Token 用量
+     *
+     * @param array  $response HTTP 响应
+     * @param string $provider Provider ID
+     * @param int    $latency_ms 延迟（毫秒）
+     * @since 1.6.0
+     */
+    private function track_token_usage( array $response, string $provider, int $latency_ms ): void {
+        $body = wp_remote_retrieve_body( $response );
+        if ( empty( $body ) ) {
+            return;
+        }
+
+        $data = json_decode( $body, true );
+        if ( ! is_array( $data ) ) {
+            return;
+        }
+
+        // 提取 usage 信息（OpenAI 兼容格式）
+        $usage = $data['usage'] ?? null;
+        if ( ! $usage ) {
+            return;
+        }
+
+        $input_tokens = (int) ( $usage['prompt_tokens'] ?? 0 );
+        $output_tokens = (int) ( $usage['completion_tokens'] ?? 0 );
+
+        if ( $input_tokens === 0 && $output_tokens === 0 ) {
+            return;
+        }
+
+        // 提取模型名称
+        $model = $data['model'] ?? 'unknown';
+
+        // 记录用量
+        Usage\UsageTracker::record( $provider, $model, $input_tokens, $output_tokens, $latency_ms );
     }
 
     /**
@@ -794,6 +840,47 @@ final class WPMind {
             $failover->resetProvider( $provider );
             wp_send_json_success( [ 'message' => __( '熔断器已重置', 'wpmind' ) ] );
         }
+    }
+
+    /**
+     * AJAX 获取用量统计
+     *
+     * @since 1.6.0
+     */
+    public function ajax_get_usage_stats(): void {
+        check_ajax_referer( 'wpmind_ajax', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+        }
+
+        $stats = Usage\UsageTracker::getStats();
+        $today = Usage\UsageTracker::getTodayStats();
+        $month = Usage\UsageTracker::getMonthStats();
+        $history = Usage\UsageTracker::getHistory( 20 );
+
+        wp_send_json_success( [
+            'stats'   => $stats,
+            'today'   => $today,
+            'month'   => $month,
+            'history' => $history,
+        ] );
+    }
+
+    /**
+     * AJAX 清除用量统计
+     *
+     * @since 1.6.0
+     */
+    public function ajax_clear_usage_stats(): void {
+        check_ajax_referer( 'wpmind_ajax', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+        }
+
+        Usage\UsageTracker::clearAll();
+        wp_send_json_success( [ 'message' => __( '用量统计已清除', 'wpmind' ) ] );
     }
 
     /**
