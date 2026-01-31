@@ -3,7 +3,7 @@
  * Plugin Name: WPMind
  * Plugin URI: https://linuxjoy.com/plugins/wpmind
  * Description: 文派心思 - WordPress AI 自定义端点扩展，支持国内外多种 AI 服务
- * Version: 1.3.1
+ * Version: 1.4.0
  * Author: LinuxJoy
  * Author URI: https://linuxjoy.com
  * License: GPL-2.0-or-later
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-    define( 'WPMIND_VERSION', '1.3.1' );
+    define( 'WPMIND_VERSION', '1.4.0' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
     define( 'WPMIND_PLUGIN_FILE', __FILE__ );
@@ -142,6 +142,7 @@ final class WPMind {
             'openai' => [
                 'name'         => 'OpenAI',
                 'display_name' => 'ChatGPT',
+                'icon'         => 'openai',
                 'base_url'     => 'https://api.openai.com/v1',
                 'models'       => [ 'gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-3.5-turbo' ],
                 'enabled'      => false,
@@ -151,6 +152,7 @@ final class WPMind {
             'anthropic' => [
                 'name'         => 'Anthropic',
                 'display_name' => 'Claude',
+                'icon'         => 'claude',
                 'base_url'     => 'https://api.anthropic.com/v1',
                 'models'       => [ 'claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022', 'claude-3-opus-20240229' ],
                 'enabled'      => false,
@@ -160,6 +162,7 @@ final class WPMind {
             'google' => [
                 'name'         => 'Google AI',
                 'display_name' => 'Gemini',
+                'icon'         => 'gemini',
                 'base_url'     => 'https://generativelanguage.googleapis.com/v1beta',
                 'models'       => [ 'gemini-2.0-flash-exp', 'gemini-1.5-pro', 'gemini-1.5-flash' ],
                 'enabled'      => false,
@@ -171,6 +174,7 @@ final class WPMind {
             'deepseek' => [
                 'name'         => 'DeepSeek',
                 'display_name' => 'DeepSeek',
+                'icon'         => 'deepseek',
                 'base_url'     => 'https://api.deepseek.com/v1',
                 'models'       => [ 'deepseek-chat', 'deepseek-coder', 'deepseek-reasoner' ],
                 'enabled'      => false,
@@ -179,6 +183,7 @@ final class WPMind {
             'qwen' => [
                 'name'         => '通义千问',
                 'display_name' => '通义千问',
+                'icon'         => 'qwen',
                 'base_url'     => 'https://dashscope.aliyuncs.com/compatible-mode/v1',
                 'models'       => [ 'qwen-turbo', 'qwen-plus', 'qwen-max' ],
                 'enabled'      => false,
@@ -187,6 +192,7 @@ final class WPMind {
             'zhipu' => [
                 'name'         => '智谱 AI',
                 'display_name' => '智谱清言',
+                'icon'         => 'zhipu',
                 'base_url'     => 'https://open.bigmodel.cn/api/paas/v4',
                 'models'       => [ 'glm-4', 'glm-4-flash', 'glm-4-plus' ],
                 'enabled'      => false,
@@ -195,6 +201,7 @@ final class WPMind {
             'moonshot' => [
                 'name'         => 'Moonshot (Kimi)',
                 'display_name' => 'Kimi',
+                'icon'         => 'kimi',
                 'base_url'     => 'https://api.moonshot.cn/v1',
                 'models'       => [ 'moonshot-v1-8k', 'moonshot-v1-32k', 'moonshot-v1-128k' ],
                 'enabled'      => false,
@@ -203,6 +210,7 @@ final class WPMind {
             'doubao' => [
                 'name'         => '豆包 (字节)',
                 'display_name' => '豆包',
+                'icon'         => 'doubao',
                 'base_url'     => 'https://ark.cn-beijing.volces.com/api/v3',
                 'models'       => [ 'doubao-pro-4k', 'doubao-pro-32k', 'doubao-pro-128k' ],
                 'enabled'      => false,
@@ -211,8 +219,27 @@ final class WPMind {
             'siliconflow' => [
                 'name'         => '硅基流动',
                 'display_name' => '硅基流动',
+                'icon'         => 'siliconcloud',
                 'base_url'     => 'https://api.siliconflow.cn/v1',
                 'models'       => [ 'deepseek-ai/DeepSeek-V3', 'Qwen/Qwen2.5-72B-Instruct' ],
+                'enabled'      => false,
+                'api_key'      => '',
+            ],
+            'baidu' => [
+                'name'         => '百度文心',
+                'display_name' => '文心一言',
+                'icon'         => 'wenxin',
+                'base_url'     => 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop',
+                'models'       => [ 'ernie-4.0-8k', 'ernie-3.5-8k', 'ernie-speed-8k' ],
+                'enabled'      => false,
+                'api_key'      => '',
+            ],
+            'minimax' => [
+                'name'         => 'MiniMax',
+                'display_name' => 'MiniMax',
+                'icon'         => 'minimax',
+                'base_url'     => 'https://api.minimax.chat/v1',
+                'models'       => [ 'abab6.5s-chat', 'abab6.5-chat', 'abab5.5-chat' ],
                 'enabled'      => false,
                 'api_key'      => '',
             ],

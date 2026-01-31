@@ -77,11 +77,18 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
             ?>
             <div class="wpmind-endpoint-card" id="endpoint-<?php echo esc_attr( $key ); ?>">
                 <div class="wpmind-endpoint-header">
-                    <?php if ( ! empty( $endpoint['is_official'] ) ) : ?>
-                        <span class="dashicons dashicons-admin-site"></span>
-                    <?php else : ?>
-                        <span class="dashicons dashicons-cloud"></span>
-                    <?php endif; ?>
+                    <?php
+                    // 使用 lobe-icons CDN 图标
+                    $icon_slug = $endpoint['icon'] ?? $key;
+                    $icon_url  = "https://registry.npmmirror.com/@lobehub/icons-static-png/latest/files/light/{$icon_slug}.png";
+                    ?>
+                    <img src="<?php echo esc_url( $icon_url ); ?>"
+                         alt="<?php echo esc_attr( $endpoint['name'] ); ?>"
+                         class="wpmind-provider-icon"
+                         width="24"
+                         height="24"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';">
+                    <span class="dashicons <?php echo ! empty( $endpoint['is_official'] ) ? 'dashicons-admin-site' : 'dashicons-cloud'; ?>" style="display:none;"></span>
                     <span class="wpmind-endpoint-name">
                         <?php echo esc_html( $endpoint['name'] ); ?>
                     </span>

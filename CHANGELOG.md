@@ -1,5 +1,39 @@
 # WPMind 更新日志
 
+## [1.4.0] - 2026-01-31
+
+### ✨ 新功能
+- **新增百度文心供应商**: 支持 ERNIE-4.0、ERNIE-3.5 等模型
+- **新增 MiniMax 供应商**: 支持 abab6.5s-chat、abab6.5-chat 等模型
+- **集成 lobe-icons**: 使用 LobeHub 提供的 AI 供应商图标
+- 为所有供应商添加 `icon` 配置字段
+
+### 🎨 UI 改进
+- 使用 CDN 加载供应商图标 (npmmirror.com)
+- 图标加载失败时自动回退到 dashicons
+- 优化图标显示样式
+
+### 🔧 技术改进
+- 添加百度和 MiniMax 的 API Key 验证规则
+- 更新供应商配置结构，支持自定义图标
+
+### 📝 供应商图标映射
+| 供应商 | 图标 |
+|--------|------|
+| OpenAI | openai |
+| Anthropic | claude |
+| Google AI | gemini |
+| DeepSeek | deepseek |
+| 通义千问 | qwen |
+| 智谱 AI | zhipu |
+| Moonshot | kimi |
+| 豆包 | doubao |
+| 硅基流动 | siliconcloud |
+| 百度文心 | wenxin |
+| MiniMax | minimax |
+
+---
+
 ## [1.3.1] - 2026-01-31
 
 ### 🐛 Bug 修复

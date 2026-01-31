@@ -20,7 +20,9 @@
         'zhipu': /^[A-Za-z0-9]{32}\.[A-Za-z0-9]{6}$/,
         'moonshot': /^sk-[A-Za-z0-9]{48,}$/,
         'doubao': /^[A-Za-z0-9-]{32,}$/,
-        'siliconflow': /^sk-[A-Za-z0-9]{48,}$/
+        'siliconflow': /^sk-[A-Za-z0-9]{48,}$/,
+        'baidu': /^[A-Za-z0-9]{24,}$/,
+        'minimax': /^[A-Za-z0-9]{32,}$/
     };
 
     /**

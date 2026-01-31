@@ -61,6 +61,15 @@
     color: #2271b1;
 }
 
+/* Provider Icon */
+.wpmind-provider-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
 .wpmind-endpoint-name {
     font-weight: 600;
     font-size: 14px;
