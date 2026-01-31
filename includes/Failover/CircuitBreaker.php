@@ -47,8 +47,10 @@ class CircuitBreaker
 
     /**
      * 检查是否允许请求通过
+     *
+     * @param bool $allowTransition 是否允许状态转换（默认 true）
      */
-    public function isAvailable(): bool
+    public function isAvailable(bool $allowTransition = true): bool
     {
         $state = $this->getState();
 
@@ -58,7 +60,9 @@ class CircuitBreaker
 
         if ($state === self::STATE_OPEN) {
             if ($this->shouldTransitionToHalfOpen()) {
-                $this->transitionTo(self::STATE_HALF_OPEN);
+                if ($allowTransition) {
+                    $this->transitionTo(self::STATE_HALF_OPEN);
+                }
                 return true;
             }
             return false;
@@ -66,6 +70,16 @@ class CircuitBreaker
 
         // 半开状态：检查是否还有测试配额
         return $this->canAllowHalfOpenRequest();
+    }
+
+    /**
+     * 检查是否可用（只读，不触发状态转换）
+     *
+     * 用于状态查询，不会修改熔断器状态
+     */
+    public function isAvailableReadOnly(): bool
+    {
+        return $this->isAvailable(false);
     }
 
     /**
@@ -246,6 +260,7 @@ class CircuitBreaker
 
     private function saveData(array $data): void
     {
-        set_transient($this->transientKey, $data, self::WINDOW_SIZE * 10);
+        // TTL 必须大于 RECOVERY_TIME，否则状态会过早重置
+        set_transient($this->transientKey, $data, self::RECOVERY_TIME * 2);
     }
 }

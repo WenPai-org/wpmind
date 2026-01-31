@@ -176,7 +176,7 @@ class FailoverManager
                 'display_name'  => $this->providers[$providerId]['display_name'] ?? $providerId,
                 'state'         => $cbStatus['state'],
                 'state_label'   => $cbStatus['state_label'],
-                'available'     => $breaker->isAvailable(),
+                'available'     => $breaker->isAvailableReadOnly(),
                 'health_score'  => $healthStatus['health_score'],
                 'avg_latency'   => $healthStatus['avg_latency'],
                 'success_rate'  => $healthStatus['success_rate'],

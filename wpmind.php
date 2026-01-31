@@ -3,7 +3,7 @@
  * Plugin Name: WPMind
  * Plugin URI: https://linuxjoy.com/plugins/wpmind
  * Description: 文派心思 - WordPress AI 自定义端点扩展，支持国内外多种 AI 服务
- * Version: 1.5.0
+ * Version: 1.5.1
  * Author: LinuxJoy
  * Author URI: https://linuxjoy.com
  * License: GPL-2.0-or-later
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-    define( 'WPMIND_VERSION', '1.5.0' );
+    define( 'WPMIND_VERSION', '1.5.1' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
     define( 'WPMIND_PLUGIN_FILE', __FILE__ );
@@ -265,6 +265,9 @@ final class WPMind {
         add_filter( 'wp_ai_client_default_request_timeout', [ $this, 'filter_request_timeout' ] );
         add_filter( 'mcp_adapter_default_server_config', [ $this, 'filter_mcp_config' ] );
 
+        // HTTP API 钩子 - 追踪 AI 请求结果
+        add_action( 'http_api_debug', [ $this, 'track_ai_request_result' ], 10, 5 );
+
         // 插件链接
         add_filter(
             'plugin_action_links_' . plugin_basename( WPMIND_PLUGIN_FILE ),
@@ -476,14 +479,23 @@ final class WPMind {
     /**
      * 过滤首选模型
      *
+     * 集成故障转移：排除熔断中的 Provider
+     *
      * @param array $models 现有模型列表
      * @return array 合并后的模型列表
      */
     public function filter_preferred_models( array $models ): array {
         $custom_models = [];
+        $failover = Failover\FailoverManager::instance();
 
         foreach ( $this->custom_endpoints as $key => $endpoint ) {
             if ( empty( $endpoint['enabled'] ) || empty( $endpoint['api_key'] ) ) {
+                continue;
+            }
+
+            // 检查熔断器状态，排除不可用的 Provider
+            $breaker = $failover->getCircuitBreaker( $key );
+            if ( $breaker && ! $breaker->isAvailable() ) {
                 continue;
             }
 
@@ -519,6 +531,78 @@ final class WPMind {
         $config['name'] = 'wpmind-mcp';
         $config['version'] = WPMIND_VERSION;
         return $config;
+    }
+
+    /**
+     * 追踪 AI 请求结果
+     *
+     * 通过 HTTP API 钩子监控发往 AI 服务的请求，记录成功/失败状态
+     *
+     * @param array|\WP_Error $response HTTP 响应或错误
+     * @param string          $context  请求上下文
+     * @param string          $class    传输类名
+     * @param array           $parsed_args 请求参数
+     * @param string          $url      请求 URL
+     * @since 1.5.0
+     */
+    public function track_ai_request_result( $response, string $context, string $class, array $parsed_args, string $url ): void {
+        // 只处理响应阶段
+        if ( $context !== 'response' ) {
+            return;
+        }
+
+        // 识别 AI Provider
+        $provider = $this->identify_provider_from_url( $url );
+        if ( ! $provider ) {
+            return;
+        }
+
+        // 计算延迟（从请求开始时间，如果可用）
+        $latency_ms = 0;
+        if ( isset( $parsed_args['_wpmind_start_time'] ) ) {
+            $latency_ms = (int) ( ( microtime( true ) - $parsed_args['_wpmind_start_time'] ) * 1000 );
+        }
+
+        // 判断成功/失败
+        $success = false;
+        if ( ! is_wp_error( $response ) ) {
+            $status_code = wp_remote_retrieve_response_code( $response );
+            $success = ( $status_code >= 200 && $status_code < 300 );
+        }
+
+        // 记录结果
+        Failover\FailoverManager::instance()->recordResult( $provider, $success, $latency_ms );
+    }
+
+    /**
+     * 从 URL 识别 AI Provider
+     *
+     * @param string $url 请求 URL
+     * @return string|null Provider ID 或 null
+     */
+    private function identify_provider_from_url( string $url ): ?string {
+        $url_patterns = [
+            'openai'     => 'api.openai.com',
+            'anthropic'  => 'api.anthropic.com',
+            'google'     => 'generativelanguage.googleapis.com',
+            'deepseek'   => 'api.deepseek.com',
+            'qwen'       => 'dashscope.aliyuncs.com',
+            'zhipu'      => 'open.bigmodel.cn',
+            'moonshot'   => 'api.moonshot.cn',
+            'doubao'     => 'ark.cn-beijing.volces.com',
+            'siliconflow' => 'api.siliconflow.cn',
+        ];
+
+        foreach ( $url_patterns as $provider => $pattern ) {
+            if ( str_contains( $url, $pattern ) ) {
+                // 确认该 Provider 已启用
+                if ( isset( $this->custom_endpoints[ $provider ] ) && ! empty( $this->custom_endpoints[ $provider ]['enabled'] ) ) {
+                    return $provider;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
