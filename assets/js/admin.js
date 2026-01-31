@@ -747,6 +747,272 @@
     }
 
     /**
+     * Analytics Dashboard 图表管理
+     */
+    var AnalyticsCharts = {
+        charts: {},
+
+        init: function() {
+            if (!$('#wpmind-usage-trend-chart').length) return;
+            if (typeof Chart === 'undefined') return;
+
+            this.loadData();
+            this.bindEvents();
+        },
+
+        bindEvents: function() {
+            var self = this;
+
+            // 时间范围切换
+            $('#wpmind-analytics-range').on('change', function() {
+                self.loadData();
+            });
+
+            // 刷新按钮
+            $('.wpmind-refresh-analytics').on('click', function(e) {
+                e.preventDefault();
+                var $btn = $(this);
+                $btn.find('.dashicons').addClass('wpmind-spinning');
+                self.loadData(function() {
+                    $btn.find('.dashicons').removeClass('wpmind-spinning');
+                });
+            });
+        },
+
+        loadData: function(callback) {
+            var self = this;
+            var range = $('#wpmind-analytics-range').val() || '7d';
+
+            if (typeof wpmindData === 'undefined') return;
+
+            $.ajax({
+                url: wpmindData.ajaxurl || ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'wpmind_get_analytics_data',
+                    range: range,
+                    nonce: wpmindData.nonce
+                },
+                success: function(response) {
+                    if (response.success && response.data) {
+                        self.renderCharts(response.data);
+                    }
+                },
+                complete: function() {
+                    if (typeof callback === 'function') callback();
+                }
+            });
+        },
+
+        renderCharts: function(data) {
+            this.renderTrendChart(data.trend);
+            this.renderProviderChart(data.providers);
+            this.renderCostChart(data.cost);
+            this.renderModelChart(data.models);
+        },
+
+        renderTrendChart: function(data) {
+            var ctx = document.getElementById('wpmind-usage-trend-chart');
+            if (!ctx) return;
+
+            if (this.charts.trend) {
+                this.charts.trend.destroy();
+            }
+
+            this.charts.trend = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Tokens',
+                        data: data.datasets.tokens,
+                        borderColor: '#2271b1',
+                        backgroundColor: 'rgba(34, 113, 177, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    }, {
+                        label: '请求数',
+                        data: data.datasets.requests,
+                        borderColor: '#00a32a',
+                        backgroundColor: 'rgba(0, 163, 42, 0.1)',
+                        fill: false,
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Tokens'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: '请求数'
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        }
+                    }
+                }
+            });
+        },
+
+        renderProviderChart: function(data) {
+            var ctx = document.getElementById('wpmind-provider-chart');
+            if (!ctx) return;
+
+            if (this.charts.provider) {
+                this.charts.provider.destroy();
+            }
+
+            if (!data.labels || data.labels.length === 0) {
+                return;
+            }
+
+            this.charts.provider = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.datasets.requests,
+                        backgroundColor: data.colors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        },
+                        title: {
+                            display: true,
+                            text: '请求分布'
+                        }
+                    }
+                }
+            });
+        },
+
+        renderCostChart: function(data) {
+            var ctx = document.getElementById('wpmind-cost-chart');
+            if (!ctx) return;
+
+            if (this.charts.cost) {
+                this.charts.cost.destroy();
+            }
+
+            this.charts.cost = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'USD',
+                        data: data.datasets.cost_usd,
+                        backgroundColor: 'rgba(34, 113, 177, 0.8)',
+                        borderColor: '#2271b1',
+                        borderWidth: 1
+                    }, {
+                        label: 'CNY',
+                        data: data.datasets.cost_cny,
+                        backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                        borderColor: '#ef4444',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '费用'
+                            }
+                        }
+                    }
+                }
+            });
+        },
+
+        renderModelChart: function(data) {
+            var ctx = document.getElementById('wpmind-model-chart');
+            if (!ctx) return;
+
+            if (this.charts.model) {
+                this.charts.model.destroy();
+            }
+
+            if (!data.labels || data.labels.length === 0) {
+                return;
+            }
+
+            this.charts.model = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: '请求数',
+                        data: data.datasets.requests,
+                        backgroundColor: 'rgba(34, 113, 177, 0.8)',
+                        borderColor: '#2271b1',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '请求数'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    };
+
+    /**
      * Initialize on document ready
      */
     $(function() {
@@ -762,6 +1028,7 @@
         initUsageRefresh();
         initUsageClear();
         initBudgetSettings();
+        AnalyticsCharts.init();
     });
 
 })(jQuery);

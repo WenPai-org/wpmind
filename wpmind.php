@@ -3,7 +3,7 @@
  * Plugin Name: WPMind
  * Plugin URI: https://linuxjoy.com/plugins/wpmind
  * Description: 文派心思 - WordPress AI 自定义端点扩展，支持国内外多种 AI 服务
- * Version: 1.7.0
+ * Version: 1.8.0
  * Author: LinuxJoy
  * Author URI: https://linuxjoy.com
  * License: GPL-2.0-or-later
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-    define( 'WPMIND_VERSION', '1.7.0' );
+    define( 'WPMIND_VERSION', '1.8.0' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
     define( 'WPMIND_PLUGIN_FILE', __FILE__ );
@@ -263,6 +263,7 @@ final class WPMind {
         add_action( 'wp_ajax_wpmind_clear_usage_stats', [ $this, 'ajax_clear_usage_stats' ] );
         add_action( 'wp_ajax_wpmind_save_budget_settings', [ $this, 'ajax_save_budget_settings' ] );
         add_action( 'wp_ajax_wpmind_get_budget_status', [ $this, 'ajax_get_budget_status' ] );
+        add_action( 'wp_ajax_wpmind_get_analytics_data', [ $this, 'ajax_get_analytics_data' ] );
 
         // AI 过滤器
         add_filter( 'ai_experiments_preferred_models', [ $this, 'filter_preferred_models' ] );
@@ -309,10 +310,19 @@ final class WPMind {
             WPMIND_VERSION
         );
 
+        // Chart.js 图表库
+        wp_enqueue_script(
+            'chartjs',
+            'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js',
+            [],
+            '4.5.0',
+            true
+        );
+
         wp_enqueue_script(
             'wpmind-admin',
             WPMIND_PLUGIN_URL . 'assets/js/admin.js',
-            [ 'jquery' ],
+            [ 'jquery', 'chartjs' ],
             WPMIND_VERSION,
             true
         );
@@ -981,6 +991,26 @@ final class WPMind {
         $summary = $checker->getSummary();
 
         wp_send_json_success( $summary );
+    }
+
+    /**
+     * AJAX 获取分析数据
+     *
+     * @since 1.8.0
+     */
+    public function ajax_get_analytics_data(): void {
+        check_ajax_referer( 'wpmind_ajax', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+        }
+
+        $range = isset( $_POST['range'] ) ? sanitize_text_field( $_POST['range'] ) : '7d';
+
+        $analytics = Analytics\AnalyticsManager::instance();
+        $data = $analytics->getAnalyticsData( $range );
+
+        wp_send_json_success( $data );
     }
 
     /**

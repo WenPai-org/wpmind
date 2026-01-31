@@ -186,6 +186,57 @@ $budget_summary = $budget_checker->getSummary();
         <?php endif; // end has_usage_data ?>
     </div>
 
+    <!-- 分析仪表板 -->
+    <?php if ( $has_usage_data ) : ?>
+    <div class="wpmind-analytics-panel">
+        <h2 class="title">
+            <span class="dashicons dashicons-chart-area"></span>
+            <?php esc_html_e( '分析仪表板', 'wpmind' ); ?>
+            <select id="wpmind-analytics-range" class="wpmind-analytics-range-select">
+                <option value="7d"><?php esc_html_e( '最近 7 天', 'wpmind' ); ?></option>
+                <option value="30d"><?php esc_html_e( '最近 30 天', 'wpmind' ); ?></option>
+            </select>
+            <button type="button" class="button button-small wpmind-refresh-analytics" title="<?php esc_attr_e( '刷新图表', 'wpmind' ); ?>">
+                <span class="dashicons dashicons-update"></span>
+            </button>
+        </h2>
+
+        <div class="wpmind-analytics-content">
+            <!-- 用量趋势图 -->
+            <div class="wpmind-chart-container">
+                <h3><?php esc_html_e( '用量趋势', 'wpmind' ); ?></h3>
+                <div class="wpmind-chart-wrapper">
+                    <canvas id="wpmind-usage-trend-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- 服务商对比图 -->
+            <div class="wpmind-chart-container">
+                <h3><?php esc_html_e( '服务商对比', 'wpmind' ); ?></h3>
+                <div class="wpmind-chart-wrapper">
+                    <canvas id="wpmind-provider-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- 成本分析图 -->
+            <div class="wpmind-chart-container">
+                <h3><?php esc_html_e( '成本趋势', 'wpmind' ); ?></h3>
+                <div class="wpmind-chart-wrapper">
+                    <canvas id="wpmind-cost-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- 模型使用分布 -->
+            <div class="wpmind-chart-container">
+                <h3><?php esc_html_e( '模型使用排行', 'wpmind' ); ?></h3>
+                <div class="wpmind-chart-wrapper">
+                    <canvas id="wpmind-model-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- 预算设置面板 -->
     <div class="wpmind-budget-panel">
         <h2 class="title">
