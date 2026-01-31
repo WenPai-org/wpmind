@@ -41,11 +41,14 @@ class AnalyticsManager
      * 获取用量趋势数据（按日）
      *
      * @param int $days 天数（默认 7 天）
+     * @param array|null $stats 预加载的统计数据
      * @return array
      */
-    public function getUsageTrend(int $days = 7): array
+    public function getUsageTrend(int $days = 7, ?array $stats = null): array
     {
-        $stats = UsageTracker::getStats();
+        if ($stats === null) {
+            $stats = UsageTracker::getStats();
+        }
         $daily = $stats['daily'] ?? [];
 
         $labels = [];
@@ -89,11 +92,14 @@ class AnalyticsManager
     /**
      * 获取服务商对比数据
      *
+     * @param array|null $stats 预加载的统计数据
      * @return array
      */
-    public function getProviderComparison(): array
+    public function getProviderComparison(?array $stats = null): array
     {
-        $stats = UsageTracker::getStats();
+        if ($stats === null) {
+            $stats = UsageTracker::getStats();
+        }
         $providers = $stats['providers'] ?? [];
 
         $labels = [];
@@ -125,11 +131,14 @@ class AnalyticsManager
      * 获取成本分析数据
      *
      * @param int $months 月数（默认 6 个月）
+     * @param array|null $stats 预加载的统计数据
      * @return array
      */
-    public function getCostAnalysis(int $months = 6): array
+    public function getCostAnalysis(int $months = 6, ?array $stats = null): array
     {
-        $stats = UsageTracker::getStats();
+        if ($stats === null) {
+            $stats = UsageTracker::getStats();
+        }
         $monthly = $stats['monthly'] ?? [];
 
         $labels = [];
@@ -164,11 +173,14 @@ class AnalyticsManager
     /**
      * 获取模型使用分布
      *
+     * @param array|null $stats 预加载的统计数据
      * @return array
      */
-    public function getModelDistribution(): array
+    public function getModelDistribution(?array $stats = null): array
     {
-        $stats = UsageTracker::getStats();
+        if ($stats === null) {
+            $stats = UsageTracker::getStats();
+        }
         $providers = $stats['providers'] ?? [];
 
         $models = [];
@@ -320,6 +332,12 @@ class AnalyticsManager
      */
     public function getAnalyticsData(string $range = '7d'): array
     {
+        // 白名单验证
+        $allowed_ranges = ['7d', '30d', '6m'];
+        if (!in_array($range, $allowed_ranges, true)) {
+            $range = '7d';
+        }
+
         $days = 7;
         $months = 6;
 
@@ -336,12 +354,15 @@ class AnalyticsManager
                 break;
         }
 
+        // 一次性获取统计数据，避免重复调用
+        $stats = UsageTracker::getStats();
+
         return [
             'summary' => $this->getDashboardSummary(),
-            'trend' => $this->getUsageTrend($days),
-            'providers' => $this->getProviderComparison(),
-            'cost' => $this->getCostAnalysis($months),
-            'models' => $this->getModelDistribution(),
+            'trend' => $this->getUsageTrend($days, $stats),
+            'providers' => $this->getProviderComparison($stats),
+            'cost' => $this->getCostAnalysis($months, $stats),
+            'models' => $this->getModelDistribution($stats),
             'latency' => $this->getLatencyMetrics(),
         ];
     }

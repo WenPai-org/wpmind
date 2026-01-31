@@ -785,6 +785,9 @@
 
             if (typeof wpmindData === 'undefined') return;
 
+            // 显示加载状态
+            $('.wpmind-chart-container').addClass('is-loading');
+
             $.ajax({
                 url: wpmindData.ajaxurl || ajaxurl,
                 type: 'POST',
@@ -796,9 +799,15 @@
                 success: function(response) {
                     if (response.success && response.data) {
                         self.renderCharts(response.data);
+                    } else {
+                        Toast.error('加载分析数据失败');
                     }
                 },
+                error: function() {
+                    Toast.error('加载分析数据失败，请稍后重试');
+                },
                 complete: function() {
+                    $('.wpmind-chart-container').removeClass('is-loading');
                     if (typeof callback === 'function') callback();
                 }
             });
