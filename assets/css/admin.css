@@ -408,6 +408,86 @@ input.is-invalid {
     text-transform: uppercase;
 }
 
+/* Provider Usage Grid - 各渠道用量统计 */
+.wpmind-usage-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1d2327;
+    margin: 20px 0 12px 0;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f1;
+}
+
+.wpmind-provider-usage-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.wpmind-provider-usage-item {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wpmind-provider-usage-item:hover {
+    border-color: #c3c4c7;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.wpmind-provider-usage-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #f0f0f1 100%);
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.wpmind-provider-usage-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.wpmind-provider-usage-currency {
+    font-size: 10px;
+    font-weight: 500;
+    color: #646970;
+    background: #fff;
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid #e0e0e0;
+}
+
+.wpmind-provider-usage-body {
+    padding: 10px 12px;
+}
+
+.wpmind-provider-usage-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.wpmind-provider-usage-row:not(:last-child) {
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.wpmind-provider-usage-row .wpmind-provider-usage-label {
+    font-size: 12px;
+    color: #646970;
+}
+
+.wpmind-provider-usage-row .wpmind-provider-usage-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
 /* Status Panel */
 .wpmind-status-panel {
     background: #fff;

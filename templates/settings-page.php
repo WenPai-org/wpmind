@@ -96,6 +96,38 @@ $month_stats = \WPMind\Usage\UsageTracker::getMonthStats();
                 </div>
             </div>
         </div>
+
+        <!-- 各渠道用量统计 -->
+        <?php if ( ! empty( $usage_stats['providers'] ) ) : ?>
+        <h3 class="wpmind-usage-section-title"><?php esc_html_e( '各渠道用量', 'wpmind' ); ?></h3>
+        <div class="wpmind-provider-usage-grid">
+            <?php foreach ( $usage_stats['providers'] as $provider_id => $provider_stats ) :
+                $currency = \WPMind\Usage\UsageTracker::getCurrency( $provider_id );
+                $display_name = \WPMind\Usage\UsageTracker::getProviderDisplayName( $provider_id );
+            ?>
+            <div class="wpmind-provider-usage-item">
+                <div class="wpmind-provider-usage-header">
+                    <span class="wpmind-provider-usage-name"><?php echo esc_html( $display_name ); ?></span>
+                    <span class="wpmind-provider-usage-currency"><?php echo esc_html( $currency ); ?></span>
+                </div>
+                <div class="wpmind-provider-usage-body">
+                    <div class="wpmind-provider-usage-row">
+                        <span class="wpmind-provider-usage-label"><?php esc_html_e( 'Tokens', 'wpmind' ); ?></span>
+                        <span class="wpmind-provider-usage-value"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatTokens( $provider_stats['total_input_tokens'] + $provider_stats['total_output_tokens'] ) ); ?></span>
+                    </div>
+                    <div class="wpmind-provider-usage-row">
+                        <span class="wpmind-provider-usage-label"><?php esc_html_e( '费用', 'wpmind' ); ?></span>
+                        <span class="wpmind-provider-usage-value"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatCost( $provider_stats['total_cost'], $currency ) ); ?></span>
+                    </div>
+                    <div class="wpmind-provider-usage-row">
+                        <span class="wpmind-provider-usage-label"><?php esc_html_e( '请求', 'wpmind' ); ?></span>
+                        <span class="wpmind-provider-usage-value"><?php echo esc_html( $provider_stats['request_count'] ); ?></span>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
     </div>
 
     <!-- Provider 状态面板 -->

@@ -19,11 +19,15 @@ class UsageTracker
     private const MAX_HISTORY = 1000; // 最多保留 1000 条记录
 
     /**
-     * 各服务商的定价 (USD per 1M tokens)
+     * 各服务商的定价 (per 1M tokens)
      * 数据来源: 各服务商官网 (2026-01)
+     *
+     * currency: USD 或 CNY
+     * 国内服务商使用人民币计价
      */
     private const PRICING = [
         'openai' => [
+            'currency' => 'USD',
             'gpt-4o' => ['input' => 2.50, 'output' => 10.00],
             'gpt-4o-mini' => ['input' => 0.15, 'output' => 0.60],
             'gpt-4-turbo' => ['input' => 10.00, 'output' => 30.00],
@@ -31,60 +35,70 @@ class UsageTracker
             'default' => ['input' => 2.50, 'output' => 10.00],
         ],
         'anthropic' => [
+            'currency' => 'USD',
             'claude-3-5-sonnet' => ['input' => 3.00, 'output' => 15.00],
             'claude-3-opus' => ['input' => 15.00, 'output' => 75.00],
             'claude-3-haiku' => ['input' => 0.25, 'output' => 1.25],
             'default' => ['input' => 3.00, 'output' => 15.00],
         ],
         'google' => [
+            'currency' => 'USD',
             'gemini-1.5-pro' => ['input' => 1.25, 'output' => 5.00],
             'gemini-1.5-flash' => ['input' => 0.075, 'output' => 0.30],
             'gemini-2.0-flash' => ['input' => 0.10, 'output' => 0.40],
             'default' => ['input' => 0.075, 'output' => 0.30],
         ],
         'deepseek' => [
-            'deepseek-chat' => ['input' => 0.14, 'output' => 0.28],
-            'deepseek-reasoner' => ['input' => 0.55, 'output' => 2.19],
-            'default' => ['input' => 0.14, 'output' => 0.28],
+            'currency' => 'CNY',
+            'deepseek-chat' => ['input' => 1.00, 'output' => 2.00],      // ¥1/¥2 per 1M
+            'deepseek-reasoner' => ['input' => 4.00, 'output' => 16.00], // ¥4/¥16 per 1M
+            'default' => ['input' => 1.00, 'output' => 2.00],
         ],
         'qwen' => [
-            'qwen-turbo' => ['input' => 0.30, 'output' => 0.60],
-            'qwen-plus' => ['input' => 0.80, 'output' => 2.00],
-            'qwen-max' => ['input' => 2.40, 'output' => 9.60],
-            'default' => ['input' => 0.30, 'output' => 0.60],
+            'currency' => 'CNY',
+            'qwen-turbo' => ['input' => 2.00, 'output' => 6.00],   // ¥0.002/¥0.006 per 1K
+            'qwen-plus' => ['input' => 4.00, 'output' => 12.00],   // ¥0.004/¥0.012 per 1K
+            'qwen-max' => ['input' => 20.00, 'output' => 60.00],   // ¥0.02/¥0.06 per 1K
+            'default' => ['input' => 2.00, 'output' => 6.00],
         ],
         'zhipu' => [
-            'glm-4' => ['input' => 1.40, 'output' => 1.40],
-            'glm-4-flash' => ['input' => 0.01, 'output' => 0.01],
-            'glm-4-plus' => ['input' => 0.70, 'output' => 0.70],
-            'default' => ['input' => 0.14, 'output' => 0.14],
+            'currency' => 'CNY',
+            'glm-4' => ['input' => 100.00, 'output' => 100.00],    // ¥0.1 per 1K
+            'glm-4-flash' => ['input' => 1.00, 'output' => 1.00],  // ¥0.001 per 1K (免费额度后)
+            'glm-4-plus' => ['input' => 50.00, 'output' => 50.00], // ¥0.05 per 1K
+            'default' => ['input' => 1.00, 'output' => 1.00],
         ],
         'moonshot' => [
-            'moonshot-v1-8k' => ['input' => 1.70, 'output' => 1.70],
-            'moonshot-v1-32k' => ['input' => 3.40, 'output' => 3.40],
-            'moonshot-v1-128k' => ['input' => 8.50, 'output' => 8.50],
-            'default' => ['input' => 1.70, 'output' => 1.70],
+            'currency' => 'CNY',
+            'moonshot-v1-8k' => ['input' => 12.00, 'output' => 12.00],   // ¥12 per 1M
+            'moonshot-v1-32k' => ['input' => 24.00, 'output' => 24.00],  // ¥24 per 1M
+            'moonshot-v1-128k' => ['input' => 60.00, 'output' => 60.00], // ¥60 per 1M
+            'default' => ['input' => 12.00, 'output' => 12.00],
         ],
         'doubao' => [
-            'doubao-pro-4k' => ['input' => 0.11, 'output' => 0.28],
-            'doubao-pro-32k' => ['input' => 0.11, 'output' => 0.28],
-            'doubao-pro-128k' => ['input' => 0.70, 'output' => 1.26],
-            'default' => ['input' => 0.11, 'output' => 0.28],
+            'currency' => 'CNY',
+            'doubao-pro-4k' => ['input' => 0.80, 'output' => 2.00],     // ¥0.0008/¥0.002 per 1K
+            'doubao-pro-32k' => ['input' => 0.80, 'output' => 2.00],
+            'doubao-pro-128k' => ['input' => 5.00, 'output' => 9.00],   // ¥0.005/¥0.009 per 1K
+            'default' => ['input' => 0.80, 'output' => 2.00],
         ],
         'siliconflow' => [
-            'deepseek-ai/DeepSeek-V3' => ['input' => 0.14, 'output' => 0.28],
-            'Qwen/Qwen2.5-72B-Instruct' => ['input' => 0.56, 'output' => 0.56],
-            'default' => ['input' => 0.14, 'output' => 0.28],
+            'currency' => 'CNY',
+            'deepseek-ai/DeepSeek-V3' => ['input' => 1.00, 'output' => 2.00],
+            'Qwen/Qwen2.5-72B-Instruct' => ['input' => 4.00, 'output' => 4.00],
+            'default' => ['input' => 1.00, 'output' => 2.00],
         ],
         'baidu' => [
-            'ernie-4.0' => ['input' => 4.20, 'output' => 8.40],
-            'ernie-3.5' => ['input' => 0.17, 'output' => 0.17],
-            'default' => ['input' => 0.17, 'output' => 0.17],
+            'currency' => 'CNY',
+            'ernie-4.0' => ['input' => 30.00, 'output' => 60.00],  // ¥0.03/¥0.06 per 1K
+            'ernie-3.5' => ['input' => 1.20, 'output' => 1.20],    // ¥0.0012 per 1K
+            'default' => ['input' => 1.20, 'output' => 1.20],
         ],
         'minimax' => [
-            'abab6.5s-chat' => ['input' => 0.14, 'output' => 0.14],
-            'abab6.5-chat' => ['input' => 4.20, 'output' => 4.20],
-            'default' => ['input' => 0.14, 'output' => 0.14],
+            'currency' => 'CNY',
+            'abab6.5s-chat' => ['input' => 1.00, 'output' => 1.00],
+            'abab6.5-chat' => ['input' => 30.00, 'output' => 30.00],
+            'default' => ['input' => 1.00, 'output' => 1.00],
         ],
     ];
 
@@ -124,7 +138,9 @@ class UsageTracker
     }
 
     /**
-     * 计算成本 (USD)
+     * 计算成本
+     *
+     * @return float 成本（按服务商货币计价）
      */
     public static function calculateCost(
         string $provider,
@@ -135,10 +151,21 @@ class UsageTracker
         $pricing = self::PRICING[$provider] ?? [];
         $modelPricing = $pricing[$model] ?? $pricing['default'] ?? ['input' => 0, 'output' => 0];
 
-        $inputCost = ($inputTokens / 1_000_000) * $modelPricing['input'];
-        $outputCost = ($outputTokens / 1_000_000) * $modelPricing['output'];
+        $inputCost = ($inputTokens / 1_000_000) * ($modelPricing['input'] ?? 0);
+        $outputCost = ($outputTokens / 1_000_000) * ($modelPricing['output'] ?? 0);
 
         return round($inputCost + $outputCost, 6);
+    }
+
+    /**
+     * 获取服务商的货币类型
+     *
+     * @param string $provider Provider ID
+     * @return string USD 或 CNY
+     */
+    public static function getCurrency(string $provider): string
+    {
+        return self::PRICING[$provider]['currency'] ?? 'USD';
     }
 
     /**
@@ -409,12 +436,39 @@ class UsageTracker
 
     /**
      * 格式化成本
+     *
+     * @param float $cost 成本
+     * @param string $currency 货币类型 (USD/CNY)
+     * @return string 格式化后的成本
      */
-    public static function formatCost(float $cost): string
+    public static function formatCost(float $cost, string $currency = 'USD'): string
     {
+        $symbol = $currency === 'CNY' ? '¥' : '$';
+
         if ($cost < 0.01) {
-            return '$' . number_format($cost, 4);
+            return $symbol . number_format($cost, 4);
         }
-        return '$' . number_format($cost, 2);
+        return $symbol . number_format($cost, 2);
+    }
+
+    /**
+     * 获取 Provider 的显示名称
+     */
+    public static function getProviderDisplayName(string $provider): string
+    {
+        $names = [
+            'openai' => 'OpenAI',
+            'anthropic' => 'Anthropic',
+            'google' => 'Google AI',
+            'deepseek' => 'DeepSeek',
+            'qwen' => '通义千问',
+            'zhipu' => '智谱 AI',
+            'moonshot' => 'Moonshot',
+            'doubao' => '豆包',
+            'siliconflow' => '硅基流动',
+            'baidu' => '百度文心',
+            'minimax' => 'MiniMax',
+        ];
+        return $names[$provider] ?? $provider;
     }
 }
