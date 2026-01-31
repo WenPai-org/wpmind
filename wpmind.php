@@ -493,9 +493,9 @@ final class WPMind {
                 continue;
             }
 
-            // 检查熔断器状态，排除不可用的 Provider
+            // 检查熔断器状态，排除不可用的 Provider（使用只读方法避免状态转换）
             $breaker = $failover->getCircuitBreaker( $key );
-            if ( $breaker && ! $breaker->isAvailable() ) {
+            if ( $breaker && ! $breaker->isAvailableReadOnly() ) {
                 continue;
             }
 
@@ -551,6 +551,11 @@ final class WPMind {
             return;
         }
 
+        // 跳过已标记的请求（避免与手动 recordResult 双重计数）
+        if ( ! empty( $parsed_args['_wpmind_skip_tracking'] ) ) {
+            return;
+        }
+
         // 识别 AI Provider
         $provider = $this->identify_provider_from_url( $url );
         if ( ! $provider ) {
@@ -577,25 +582,47 @@ final class WPMind {
     /**
      * 从 URL 识别 AI Provider
      *
+     * 支持默认域名和用户自定义的 base_url
+     *
      * @param string $url 请求 URL
      * @return string|null Provider ID 或 null
      */
     private function identify_provider_from_url( string $url ): ?string {
-        $url_patterns = [
-            'openai'     => 'api.openai.com',
-            'anthropic'  => 'api.anthropic.com',
-            'google'     => 'generativelanguage.googleapis.com',
-            'deepseek'   => 'api.deepseek.com',
-            'qwen'       => 'dashscope.aliyuncs.com',
-            'zhipu'      => 'open.bigmodel.cn',
-            'moonshot'   => 'api.moonshot.cn',
-            'doubao'     => 'ark.cn-beijing.volces.com',
+        // 默认域名模式
+        $default_patterns = [
+            'openai'      => 'api.openai.com',
+            'anthropic'   => 'api.anthropic.com',
+            'google'      => 'generativelanguage.googleapis.com',
+            'deepseek'    => 'api.deepseek.com',
+            'qwen'        => 'dashscope.aliyuncs.com',
+            'zhipu'       => 'open.bigmodel.cn',
+            'moonshot'    => 'api.moonshot.cn',
+            'doubao'      => 'ark.cn-beijing.volces.com',
             'siliconflow' => 'api.siliconflow.cn',
+            'baidu'       => 'aip.baidubce.com',
+            'minimax'     => 'api.minimax.chat',
         ];
 
-        foreach ( $url_patterns as $provider => $pattern ) {
+        // 首先检查用户自定义的 base_url
+        foreach ( $this->custom_endpoints as $provider => $config ) {
+            if ( empty( $config['enabled'] ) ) {
+                continue;
+            }
+
+            // 检查自定义 URL
+            if ( ! empty( $config['custom_url'] ) && str_contains( $url, wp_parse_url( $config['custom_url'], PHP_URL_HOST ) ) ) {
+                return $provider;
+            }
+
+            // 检查默认 base_url
+            if ( ! empty( $config['base_url'] ) && str_contains( $url, wp_parse_url( $config['base_url'], PHP_URL_HOST ) ) ) {
+                return $provider;
+            }
+        }
+
+        // 回退到默认域名模式
+        foreach ( $default_patterns as $provider => $pattern ) {
             if ( str_contains( $url, $pattern ) ) {
-                // 确认该 Provider 已启用
                 if ( isset( $this->custom_endpoints[ $provider ] ) && ! empty( $this->custom_endpoints[ $provider ]['enabled'] ) ) {
                     return $provider;
                 }
@@ -661,6 +688,7 @@ final class WPMind {
                     'Content-Type'  => 'application/json',
                 ],
                 'timeout' => 15,
+                '_wpmind_skip_tracking' => true, // 标记：跳过 http_api_debug 追踪，避免双重计数
             ] );
 
             if ( is_wp_error( $response ) ) {

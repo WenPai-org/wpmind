@@ -6,11 +6,14 @@
 - **Transient TTL 修复**: 将熔断器状态存储时间从 600s 增加到 2400s，避免状态过早重置
 - **状态查询优化**: 新增 `isAvailableReadOnly()` 方法，状态查询不再触发状态转换
 - **实际请求集成**: 故障转移现在集成到实际 AI 请求流程，不仅限于测试连接
+- **双重计数修复**: 测试连接请求添加 `_wpmind_skip_tracking` 标记，避免与 `http_api_debug` 钩子双重计数
+- **自定义 URL 支持**: `identify_provider_from_url()` 现在支持用户自定义的 base_url
 
 ### 🔧 技术改进
-- `filter_preferred_models` 现在会排除熔断中的 Provider
+- `filter_preferred_models` 现在会排除熔断中的 Provider（使用只读方法）
 - 新增 `http_api_debug` 钩子追踪 AI 请求结果
-- 新增 `identify_provider_from_url()` 方法识别请求目标
+- 新增 `identify_provider_from_url()` 方法识别请求目标，支持 11 个 Provider
+- 添加百度和 MiniMax 的默认域名模式
 
 ---
 
