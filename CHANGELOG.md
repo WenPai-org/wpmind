@@ -7,15 +7,20 @@
 - **新增 MiniMax 供应商**: 支持 abab6.5s-chat、abab6.5-chat 等模型
 - **集成 lobe-icons**: 使用 LobeHub 提供的 AI 供应商图标
 - 为所有供应商添加 `icon` 配置字段
+- **完整 Provider 类实现**: 为百度和 MiniMax 创建完整的 Provider 架构
+  - `includes/Providers/Baidu/` - 百度 ERNIE Provider
+  - `includes/Providers/MiniMax/` - MiniMax Provider
 
 ### 🎨 UI 改进
 - 使用 CDN 加载供应商图标 (npmmirror.com)
 - 图标加载失败时自动回退到 dashicons
 - 优化图标显示样式
+- 使用英文产品名称作为显示名称 (Qwen, ChatGLM, Doubao, SiliconFlow, ERNIE)
 
 ### 🔧 技术改进
 - 添加百度和 MiniMax 的 API Key 验证规则
 - 更新供应商配置结构，支持自定义图标
+- 更新 ProviderRegistrar 支持 8 个国内 Provider
 
 ### 📝 供应商图标映射
 | 供应商 | 图标 |

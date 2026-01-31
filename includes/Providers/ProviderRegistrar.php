@@ -18,6 +18,8 @@ use WPMind\Providers\Zhipu\ZhipuProvider;
 use WPMind\Providers\Moonshot\MoonshotProvider;
 use WPMind\Providers\Doubao\DoubaoProvider;
 use WPMind\Providers\SiliconFlow\SiliconFlowProvider;
+use WPMind\Providers\Baidu\BaiduProvider;
+use WPMind\Providers\MiniMax\MiniMaxProvider;
 
 /**
  * Provider 注册器
@@ -31,6 +33,8 @@ class ProviderRegistrar
         'moonshot'    => MoonshotProvider::class,
         'doubao'      => DoubaoProvider::class,
         'siliconflow' => SiliconFlowProvider::class,
+        'baidu'       => BaiduProvider::class,
+        'minimax'     => MiniMaxProvider::class,
     ];
 
     public static function registerProviders(ProviderRegistry $registry, array $endpoints): void
