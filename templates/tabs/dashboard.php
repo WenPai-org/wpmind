@@ -62,7 +62,10 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
 
     <div class="wpmind-usage-cards">
         <div class="wpmind-usage-card">
-            <div class="wpmind-usage-card-header"><?php esc_html_e( '今日', 'wpmind' ); ?></div>
+            <div class="wpmind-usage-card-header">
+                <span class="dashicons dashicons-calendar-alt"></span>
+                <?php esc_html_e( '今日', 'wpmind' ); ?>
+            </div>
             <div class="wpmind-usage-card-body">
                 <div class="wpmind-usage-stat">
                     <span class="wpmind-usage-value" id="today-tokens"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatTokens( $today_stats['input_tokens'] + $today_stats['output_tokens'] ) ); ?></span>
@@ -79,7 +82,10 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
             </div>
         </div>
         <div class="wpmind-usage-card">
-            <div class="wpmind-usage-card-header"><?php esc_html_e( '本周', 'wpmind' ); ?></div>
+            <div class="wpmind-usage-card-header">
+                <span class="dashicons dashicons-backup"></span>
+                <?php esc_html_e( '本周', 'wpmind' ); ?>
+            </div>
             <div class="wpmind-usage-card-body">
                 <div class="wpmind-usage-stat">
                     <span class="wpmind-usage-value" id="week-tokens"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatTokens( $week_stats['input_tokens'] + $week_stats['output_tokens'] ) ); ?></span>
@@ -96,7 +102,10 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
             </div>
         </div>
         <div class="wpmind-usage-card">
-            <div class="wpmind-usage-card-header"><?php esc_html_e( '本月', 'wpmind' ); ?></div>
+            <div class="wpmind-usage-card-header">
+                <span class="dashicons dashicons-calendar"></span>
+                <?php esc_html_e( '本月', 'wpmind' ); ?>
+            </div>
             <div class="wpmind-usage-card-body">
                 <div class="wpmind-usage-stat">
                     <span class="wpmind-usage-value" id="month-tokens"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatTokens( $month_stats['input_tokens'] + $month_stats['output_tokens'] ) ); ?></span>
@@ -113,7 +122,10 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
             </div>
         </div>
         <div class="wpmind-usage-card">
-            <div class="wpmind-usage-card-header"><?php esc_html_e( '总计', 'wpmind' ); ?></div>
+            <div class="wpmind-usage-card-header">
+                <span class="dashicons dashicons-chart-bar"></span>
+                <?php esc_html_e( '总计', 'wpmind' ); ?>
+            </div>
             <div class="wpmind-usage-card-body">
                 <div class="wpmind-usage-stat">
                     <span class="wpmind-usage-value" id="total-tokens"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatTokens( ($usage_stats['total']['input_tokens'] ?? 0) + ($usage_stats['total']['output_tokens'] ?? 0) ) ); ?></span>
