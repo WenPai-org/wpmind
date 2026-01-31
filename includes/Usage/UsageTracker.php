@@ -623,43 +623,32 @@ class UsageTracker
      */
     public static function getProviderIcon(string $provider): string
     {
+        // Remixicon 4.9.1 AI 品牌图标
         $icons = [
-            'openai'     => 'ri-openai-fill',
-            'anthropic'  => 'ri-robot-2-fill',      // Claude - 使用机器人图标
-            'google'     => 'ri-gemini-fill',
-            'deepseek'   => 'ri-brain-fill',        // DeepSeek - 使用大脑图标
-            'qwen'       => 'ri-sparkling-2-fill',  // 通义千问 - 使用闪光图标
-            'zhipu'      => 'ri-lightbulb-fill',    // 智谱 - 使用灯泡图标
-            'moonshot'   => 'ri-moon-fill',         // Moonshot/Kimi - 使用月亮图标
-            'doubao'     => 'ri-fire-fill',         // 豆包 - 使用火焰图标
-            'siliconflow' => 'ri-cpu-fill',         // 硅基流动 - 使用 CPU 图标
-            'baidu'      => 'ri-baidu-fill',        // 百度文心
-            'minimax'    => 'ri-magic-fill',        // MiniMax - 使用魔法图标
+            'openai'      => 'ri-openai-fill',       // OpenAI 品牌图标
+            'anthropic'   => 'ri-claude-fill',       // Claude 品牌图标
+            'google'      => 'ri-gemini-fill',       // Gemini 品牌图标
+            'deepseek'    => 'ri-deepseek-fill',     // DeepSeek 品牌图标
+            'qwen'        => 'ri-qwen-ai-fill',      // 通义千问 品牌图标
+            'zhipu'       => 'ri-zhipu-ai-fill',     // 智谱 AI 品牌图标
+            'moonshot'    => 'ri-moon-fill',         // Moonshot/Kimi - 月亮图标
+            'doubao'      => 'ri-fire-fill',         // 豆包 - 火焰图标
+            'siliconflow' => 'ri-cpu-fill',          // 硅基流动 - CPU 图标
+            'baidu'       => 'ri-baidu-fill',        // 百度文心 - 品牌图标
+            'minimax'     => 'ri-sparkling-fill',    // MiniMax - 闪光图标
         ];
         return $icons[$provider] ?? 'ri-robot-fill';
     }
 
     /**
-     * 获取 Provider 的品牌颜色
+     * 获取 Provider 的图标颜色
      *
      * @param string $provider Provider ID
      * @return string 十六进制颜色值
      */
     public static function getProviderColor(string $provider): string
     {
-        $colors = [
-            'openai'     => '#10a37f',  // OpenAI 绿色
-            'anthropic'  => '#d4a27f',  // Claude 橙棕色
-            'google'     => '#4285f4',  // Google 蓝色
-            'deepseek'   => '#0066ff',  // DeepSeek 蓝色
-            'qwen'       => '#6366f1',  // 通义千问 紫色
-            'zhipu'      => '#1e40af',  // 智谱 深蓝色
-            'moonshot'   => '#6b7280',  // Moonshot 灰色
-            'doubao'     => '#ef4444',  // 豆包 红色
-            'siliconflow' => '#8b5cf6', // 硅基流动 紫色
-            'baidu'      => '#2932e1',  // 百度 蓝色
-            'minimax'    => '#f59e0b',  // MiniMax 橙色
-        ];
-        return $colors[$provider] ?? '#6b7280';
+        // 统一使用单色，与 WordPress 后台风格一致
+        return '#50575e';
     }
 }

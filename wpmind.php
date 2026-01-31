@@ -3,7 +3,7 @@
  * Plugin Name: WPMind
  * Plugin URI: https://linuxjoy.com/plugins/wpmind
  * Description: 文派心思 - WordPress AI 自定义端点扩展，支持国内外多种 AI 服务
- * Version: 1.6.6
+ * Version: 1.6.7
  * Author: LinuxJoy
  * Author URI: https://linuxjoy.com
  * License: GPL-2.0-or-later
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-    define( 'WPMIND_VERSION', '1.6.6' );
+    define( 'WPMIND_VERSION', '1.6.7' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
     define( 'WPMIND_PLUGIN_FILE', __FILE__ );
@@ -295,9 +295,9 @@ final class WPMind {
         // Remixicon 图标库
         wp_enqueue_style(
             'remixicon',
-            'https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.min.css',
+            'https://cdn.jsdelivr.net/npm/remixicon@4.9.1/fonts/remixicon.min.css',
             [],
-            '4.6.0'
+            '4.9.1'
         );
 
         wp_enqueue_style(

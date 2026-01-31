@@ -1,5 +1,29 @@
 # WPMind 更新日志
 
+## [1.6.7] - 2026-02-01
+
+### 🎨 图标系统修正
+- **升级 Remixicon 到 4.9.1**: 使用最新版本的 Remixicon 图标库
+- **使用官方 AI 品牌图标**: Remixicon 4.9.1 新增了大量 AI 服务品牌图标
+  - OpenAI、Claude、Gemini、DeepSeek、Qwen、智谱 AI 等均有官方品牌图标
+
+### 📝 更新后的图标映射表
+| 服务商 | 图标 | 类型 |
+|--------|------|------|
+| OpenAI | `ri-openai-fill` | 品牌图标 |
+| Anthropic | `ri-claude-fill` | 品牌图标 |
+| Google | `ri-gemini-fill` | 品牌图标 |
+| DeepSeek | `ri-deepseek-fill` | 品牌图标 |
+| 通义千问 | `ri-qwen-ai-fill` | 品牌图标 |
+| 智谱 AI | `ri-zhipu-ai-fill` | 品牌图标 |
+| Moonshot | `ri-moon-fill` | 语义图标 |
+| 豆包 | `ri-fire-fill` | 语义图标 |
+| 硅基流动 | `ri-cpu-fill` | 语义图标 |
+| 百度文心 | `ri-baidu-fill` | 品牌图标 |
+| MiniMax | `ri-sparkling-fill` | 语义图标 |
+
+---
+
 ## [1.6.6] - 2026-02-01
 
 ### 🎨 图标系统升级
