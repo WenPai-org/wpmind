@@ -561,43 +561,65 @@ final class WPMind {
         // 确定使用的 Base URL
         $base_url = ! empty( $custom_url ) ? $custom_url : $endpoint['base_url'];
 
-        // 测试连接
+        // 测试连接（带重试）
         $test_url = trailingslashit( $base_url ) . 'models';
+        $max_retries = 2;
+        $last_error = null;
+        $last_status_code = 0;
 
-        $response = wp_remote_get( $test_url, [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $api_key,
-                'Content-Type'  => 'application/json',
-            ],
-            'timeout' => 10,
-        ] );
-
-        if ( is_wp_error( $response ) ) {
-            wp_send_json_error( [
-                'message' => sprintf(
-                    __( '连接失败：%s', 'wpmind' ),
-                    $response->get_error_message()
-                ),
+        for ( $attempt = 1; $attempt <= $max_retries; $attempt++ ) {
+            $response = wp_remote_get( $test_url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $api_key,
+                    'Content-Type'  => 'application/json',
+                ],
+                'timeout' => 15,
             ] );
-        }
 
-        $status_code = wp_remote_retrieve_response_code( $response );
-
-        if ( $status_code === 200 || $status_code === 401 ) {
-            // 200 = 成功，401 = API Key 错误但端点可访问
-            if ( $status_code === 401 ) {
-                wp_send_json_error( [ 'message' => __( 'API Key 无效', 'wpmind' ) ] );
-            } else {
-                wp_send_json_success( [ 'message' => __( '连接成功', 'wpmind' ) ] );
+            if ( is_wp_error( $response ) ) {
+                $last_error = $response;
+                // 检查是否应该重试
+                if ( $attempt < $max_retries ) {
+                    usleep( ErrorHandler::getRetryDelay( $attempt ) * 1000 );
+                    continue;
+                }
+                // 使用 ErrorHandler 获取友好的错误消息
+                wp_send_json_error( [
+                    'message' => ErrorHandler::getWpErrorMessage( $response, $provider ),
+                    'details' => $response->get_error_message(),
+                    'retried' => $attempt > 1,
+                ] );
             }
-        } else {
-            wp_send_json_error( [
-                'message' => sprintf(
-                    __( '连接失败：HTTP %d', 'wpmind' ),
-                    $status_code
-                ),
-            ] );
+
+            $last_status_code = wp_remote_retrieve_response_code( $response );
+
+            // 成功
+            if ( $last_status_code === 200 ) {
+                wp_send_json_success( [
+                    'message' => __( '连接成功', 'wpmind' ),
+                    'retried' => $attempt > 1,
+                ] );
+            }
+
+            // 不可重试的错误
+            if ( ! ErrorHandler::shouldRetry( $last_status_code ) ) {
+                break;
+            }
+
+            // 可重试的错误，等待后重试
+            if ( $attempt < $max_retries ) {
+                usleep( ErrorHandler::getRetryDelay( $attempt ) * 1000 );
+            }
         }
+
+        // 获取响应体以提取更详细的错误信息
+        $response_body = wp_remote_retrieve_body( $response );
+
+        wp_send_json_error( [
+            'message' => ErrorHandler::getErrorMessage( $last_status_code, $provider, $response_body ),
+            'code'    => $last_status_code,
+            'retried' => $max_retries > 1,
+        ] );
     }
 
     /**
@@ -726,8 +748,8 @@ add_action( 'plugins_loaded', __NAMESPACE__ . '\\wpmind' );
  * @since 1.3.0
  */
 spl_autoload_register( function ( string $class ): void {
-    // 只处理 WPMind\Providers 命名空间
-    $prefix = 'WPMind\\Providers\\';
+    // WPMind 根命名空间
+    $prefix = 'WPMind\\';
     $len = strlen( $prefix );
 
     if ( strncmp( $prefix, $class, $len ) !== 0 ) {
@@ -738,7 +760,7 @@ spl_autoload_register( function ( string $class ): void {
     $relative_class = substr( $class, $len );
 
     // 转换为文件路径
-    $file = WPMIND_PLUGIN_DIR . 'includes/Providers/' . str_replace( '\\', '/', $relative_class ) . '.php';
+    $file = WPMIND_PLUGIN_DIR . 'includes/' . str_replace( '\\', '/', $relative_class ) . '.php';
 
     if ( file_exists( $file ) ) {
         require $file;

@@ -106,11 +106,11 @@
 
             // 设置加载状态
             $button.addClass('is-testing').prop('disabled', true).text('测试中...');
-            $result.text('').removeClass('success error');
+            $result.text('').removeClass('success error warning').removeAttr('title');
 
             // 检查 wpmindData 是否存在
             if (typeof wpmindData === 'undefined') {
-                $result.text('✗ 配置错误').addClass('error');
+                $result.text('配置错误').addClass('error');
                 $button.removeClass('is-testing').prop('disabled', false).text('测试连接');
                 return;
             }
@@ -126,32 +126,41 @@
                     custom_url: customUrl,
                     nonce: wpmindData.nonce
                 },
-                timeout: 30000,
+                timeout: 45000, // 增加超时时间以支持重试
                 success: function(response) {
                     if (response.success) {
-                        $result.text('✓ 连接成功').addClass('success');
+                        var message = '连接成功';
+                        if (response.data && response.data.retried) {
+                            message += ' (重试后)';
+                        }
+                        $result.text(message).addClass('success');
                     } else {
-                        $result.text('✗ ' + (response.data.message || '连接失败')).addClass('error');
+                        var errorMsg = (response.data && response.data.message) || '连接失败';
+                        $result.text(errorMsg).addClass('error');
+                        // 如果有详细信息，添加到 title 属性
+                        if (response.data && response.data.details) {
+                            $result.attr('title', response.data.details);
+                        }
                     }
                 },
                 error: function(xhr, status, error) {
                     var message = '连接失败';
                     if (status === 'timeout') {
-                        message = '请求超时';
+                        message = '请求超时，请检查网络连接';
                     } else if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
                         message = xhr.responseJSON.data.message;
                     }
-                    $result.text('✗ ' + message).addClass('error');
+                    $result.text(message).addClass('error');
                 },
                 complete: function() {
                     $button.removeClass('is-testing').prop('disabled', false).text('测试连接');
 
-                    // 5秒后清除结果
+                    // 8秒后清除结果（增加时间让用户看清错误信息）
                     setTimeout(function() {
                         $result.fadeOut(function() {
-                            $(this).text('').removeClass('success error').show();
+                            $(this).text('').removeClass('success error warning').removeAttr('title').show();
                         });
-                    }, 5000);
+                    }, 8000);
                 }
             });
         });
