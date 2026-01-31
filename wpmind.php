@@ -568,6 +568,7 @@ final class WPMind {
         $max_retries = 2;
         $last_error = null;
         $last_status_code = 0;
+        $start_time = microtime( true );
 
         for ( $attempt = 1; $attempt <= $max_retries; $attempt++ ) {
             $response = wp_remote_get( $test_url, [
@@ -585,6 +586,11 @@ final class WPMind {
                     usleep( ErrorHandler::getRetryDelay( $attempt ) * 1000 );
                     continue;
                 }
+
+                // 记录失败到健康追踪
+                $latency_ms = (int) ( ( microtime( true ) - $start_time ) * 1000 );
+                Failover\FailoverManager::instance()->recordResult( $provider, false, $latency_ms );
+
                 // 使用 ErrorHandler 获取友好的错误消息
                 wp_send_json_error( [
                     'message' => ErrorHandler::getWpErrorMessage( $response, $provider ),
@@ -594,12 +600,17 @@ final class WPMind {
             }
 
             $last_status_code = wp_remote_retrieve_response_code( $response );
+            $latency_ms = (int) ( ( microtime( true ) - $start_time ) * 1000 );
 
             // 成功
             if ( $last_status_code === 200 ) {
+                // 记录成功到健康追踪
+                Failover\FailoverManager::instance()->recordResult( $provider, true, $latency_ms );
+
                 wp_send_json_success( [
                     'message' => __( '连接成功', 'wpmind' ),
                     'retried' => $attempt > 1,
+                    'latency' => $latency_ms,
                 ] );
             }
 
@@ -613,6 +624,10 @@ final class WPMind {
                 usleep( ErrorHandler::getRetryDelay( $attempt ) * 1000 );
             }
         }
+
+        // 记录失败到健康追踪
+        $latency_ms = (int) ( ( microtime( true ) - $start_time ) * 1000 );
+        Failover\FailoverManager::instance()->recordResult( $provider, false, $latency_ms );
 
         // 获取响应体以提取更详细的错误信息
         $response_body = wp_remote_retrieve_body( $response );

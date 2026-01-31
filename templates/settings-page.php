@@ -14,6 +14,10 @@ $wpmind_instance  = \WPMind\wpmind();
 $endpoints        = $wpmind_instance->get_custom_endpoints();
 $default_provider = get_option( 'wpmind_default_provider', '' );
 $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
+
+// 获取故障转移状态
+$failover_manager = \WPMind\Failover\FailoverManager::instance();
+$provider_status  = $failover_manager->getStatusSummary();
 ?>
 
 <div class="wrap wpmind-settings">
@@ -21,6 +25,39 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
     <p class="description">
         <?php esc_html_e( '配置自定义 AI 服务端点，支持国内外多种 AI 服务。', 'wpmind' ); ?>
     </p>
+
+    <!-- Provider 状态面板 -->
+    <?php if ( ! empty( $provider_status ) ) : ?>
+    <div class="wpmind-status-panel">
+        <h2 class="title">
+            <?php esc_html_e( '服务状态', 'wpmind' ); ?>
+            <button type="button" class="button button-small wpmind-refresh-status" title="<?php esc_attr_e( '刷新状态', 'wpmind' ); ?>">
+                <span class="dashicons dashicons-update"></span>
+            </button>
+            <button type="button" class="button button-small wpmind-reset-all-breakers" title="<?php esc_attr_e( '重置所有熔断器', 'wpmind' ); ?>">
+                <span class="dashicons dashicons-image-rotate"></span>
+                <?php esc_html_e( '重置', 'wpmind' ); ?>
+            </button>
+        </h2>
+        <div class="wpmind-status-grid" id="wpmind-status-grid">
+            <?php foreach ( $provider_status as $provider_id => $status ) : ?>
+            <div class="wpmind-status-item" data-provider="<?php echo esc_attr( $provider_id ); ?>">
+                <span class="wpmind-status-indicator wpmind-status-<?php echo esc_attr( $status['state'] ); ?>"></span>
+                <span class="wpmind-status-name"><?php echo esc_html( $status['display_name'] ); ?></span>
+                <span class="wpmind-status-label"><?php echo esc_html( $status['state_label'] ); ?></span>
+                <span class="wpmind-status-score" title="<?php esc_attr_e( '健康分数', 'wpmind' ); ?>">
+                    <?php echo esc_html( $status['health_score'] ); ?>%
+                </span>
+                <?php if ( $status['state'] === 'open' && $status['recovery_in'] ) : ?>
+                <span class="wpmind-status-recovery">
+                    <?php printf( esc_html__( '%d分钟后恢复', 'wpmind' ), ceil( $status['recovery_in'] / 60 ) ); ?>
+                </span>
+                <?php endif; ?>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <form method="post" action="options.php" id="wpmind-settings-form">
         <?php settings_fields( 'wpmind_settings' ); ?>

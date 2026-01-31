@@ -302,3 +302,101 @@ input.is-invalid {
 .wpmind-advanced-settings td {
     padding: 12px 16px;
 }
+
+/* Status Panel */
+.wpmind-status-panel {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    padding: 16px;
+    margin: 20px 0;
+}
+
+.wpmind-status-panel .title {
+    margin: 0 0 16px 0;
+    padding: 0;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.wpmind-status-panel .title .button {
+    padding: 0 8px;
+    min-height: 28px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.wpmind-status-panel .title .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.wpmind-refresh-status.is-loading .dashicons {
+    animation: wpmind-spin 1s linear infinite;
+}
+
+@keyframes wpmind-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.wpmind-status-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.wpmind-status-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #f6f7f7;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.wpmind-status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.wpmind-status-indicator.wpmind-status-closed {
+    background: #00a32a;
+}
+
+.wpmind-status-indicator.wpmind-status-open {
+    background: #d63638;
+}
+
+.wpmind-status-indicator.wpmind-status-half_open {
+    background: #dba617;
+}
+
+.wpmind-status-name {
+    font-weight: 500;
+}
+
+.wpmind-status-label {
+    color: #50575e;
+    font-size: 12px;
+}
+
+.wpmind-status-score {
+    background: #e0e0e0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.wpmind-status-recovery {
+    color: #d63638;
+    font-size: 11px;
+}

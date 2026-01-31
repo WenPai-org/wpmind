@@ -232,6 +232,103 @@
     }
 
     /**
+     * 刷新 Provider 状态
+     */
+    function initStatusRefresh() {
+        $('.wpmind-refresh-status').on('click', function(e) {
+            e.preventDefault();
+
+            var $button = $(this);
+            if ($button.hasClass('is-loading')) return;
+
+            $button.addClass('is-loading');
+
+            $.ajax({
+                url: wpmindData.ajaxurl || ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'wpmind_get_provider_status',
+                    nonce: wpmindData.nonce
+                },
+                success: function(response) {
+                    if (response.success && response.data.providers) {
+                        updateStatusGrid(response.data.providers);
+                    }
+                },
+                complete: function() {
+                    $button.removeClass('is-loading');
+                }
+            });
+        });
+    }
+
+    /**
+     * 更新状态网格
+     */
+    function updateStatusGrid(providers) {
+        var $grid = $('#wpmind-status-grid');
+
+        $.each(providers, function(providerId, status) {
+            var $item = $grid.find('[data-provider="' + providerId + '"]');
+            if ($item.length) {
+                $item.find('.wpmind-status-indicator')
+                    .removeClass('wpmind-status-closed wpmind-status-open wpmind-status-half_open')
+                    .addClass('wpmind-status-' + status.state);
+                $item.find('.wpmind-status-label').text(status.state_label);
+                $item.find('.wpmind-status-score').text(status.health_score + '%');
+
+                // 更新恢复时间
+                var $recovery = $item.find('.wpmind-status-recovery');
+                if (status.state === 'open' && status.recovery_in) {
+                    var minutes = Math.ceil(status.recovery_in / 60);
+                    if ($recovery.length) {
+                        $recovery.text(minutes + '分钟后恢复');
+                    } else {
+                        $item.append('<span class="wpmind-status-recovery">' + minutes + '分钟后恢复</span>');
+                    }
+                } else {
+                    $recovery.remove();
+                }
+            }
+        });
+    }
+
+    /**
+     * 重置熔断器
+     */
+    function initResetBreakers() {
+        $('.wpmind-reset-all-breakers').on('click', function(e) {
+            e.preventDefault();
+
+            if (!confirm('确定要重置所有熔断器吗？这将清除所有服务的健康状态记录。')) {
+                return;
+            }
+
+            var $button = $(this);
+            $button.prop('disabled', true);
+
+            $.ajax({
+                url: wpmindData.ajaxurl || ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'wpmind_reset_circuit_breaker',
+                    provider: 'all',
+                    nonce: wpmindData.nonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // 刷新状态
+                        $('.wpmind-refresh-status').trigger('click');
+                    }
+                },
+                complete: function() {
+                    $button.prop('disabled', false);
+                }
+            });
+        });
+    }
+
+    /**
      * Initialize on document ready
      */
     $(function() {
@@ -242,6 +339,8 @@
         initClearKeyHandler();
         initFormValidation();
         initAdvancedToggle();
+        initStatusRefresh();
+        initResetBreakers();
     });
 
 })(jQuery);
