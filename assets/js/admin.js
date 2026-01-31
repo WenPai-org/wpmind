@@ -1022,6 +1022,129 @@
     };
 
     /**
+     * Routing Panel 路由管理
+     */
+    var RoutingManager = {
+        init: function() {
+            if (!$('.wpmind-routing-panel').length) return;
+            this.bindEvents();
+        },
+
+        bindEvents: function() {
+            var self = this;
+
+            // 策略选择
+            $(document).on('change', 'input[name="routing_strategy"]', function() {
+                var strategy = $(this).val();
+                self.setStrategy(strategy);
+            });
+
+            // 刷新路由状态
+            $(document).on('click', '.wpmind-refresh-routing', function(e) {
+                e.preventDefault();
+                var $btn = $(this);
+                $btn.find('.dashicons').addClass('wpmind-spinning');
+                self.refreshStatus(function() {
+                    $btn.find('.dashicons').removeClass('wpmind-spinning');
+                });
+            });
+        },
+
+        setStrategy: function(strategy) {
+            if (typeof wpmindData === 'undefined') {
+                Toast.error('配置错误');
+                return;
+            }
+
+            // 更新 UI 状态
+            $('.wpmind-routing-strategy-option').removeClass('is-active');
+            $('input[name="routing_strategy"][value="' + strategy + '"]')
+                .closest('.wpmind-routing-strategy-option')
+                .addClass('is-active');
+
+            $.ajax({
+                url: wpmindData.ajaxurl || ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'wpmind_set_routing_strategy',
+                    strategy: strategy,
+                    nonce: wpmindData.nonce
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Toast.success('路由策略已更新');
+                        // 刷新得分显示
+                        RoutingManager.refreshStatus();
+                    } else {
+                        var msg = (response.data && response.data.message) || '更新失败';
+                        Toast.error(msg);
+                    }
+                },
+                error: function() {
+                    Toast.error('更新失败，请重试');
+                }
+            });
+        },
+
+        refreshStatus: function(callback) {
+            if (typeof wpmindData === 'undefined') {
+                if (typeof callback === 'function') callback();
+                return;
+            }
+
+            $.ajax({
+                url: wpmindData.ajaxurl || ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'wpmind_get_routing_status',
+                    nonce: wpmindData.nonce
+                },
+                success: function(response) {
+                    if (response.success && response.data) {
+                        RoutingManager.updateDisplay(response.data);
+                        Toast.success('路由状态已刷新');
+                    }
+                },
+                error: function() {
+                    Toast.error('刷新失败');
+                },
+                complete: function() {
+                    if (typeof callback === 'function') callback();
+                }
+            });
+        },
+
+        updateDisplay: function(data) {
+            // 更新得分排名
+            var $scores = $('#wpmind-routing-scores');
+            if ($scores.length && data.provider_scores) {
+                var html = '';
+                $.each(data.provider_scores, function(providerId, scoreData) {
+                    html += '<div class="wpmind-routing-score-item">';
+                    html += '<span class="wpmind-routing-rank">#' + scoreData.rank + '</span>';
+                    html += '<span class="wpmind-routing-provider-name">' + scoreData.name + '</span>';
+                    html += '<div class="wpmind-routing-score-bar">';
+                    html += '<div class="wpmind-routing-score-fill" style="width: ' + scoreData.score + '%;"></div>';
+                    html += '</div>';
+                    html += '<span class="wpmind-routing-score-value">' + scoreData.score.toFixed(1) + '</span>';
+                    html += '</div>';
+                });
+                $scores.html(html);
+            }
+
+            // 更新推荐 Provider
+            if (data.recommended && data.provider_scores && data.provider_scores[data.recommended]) {
+                $('#wpmind-recommended-provider').text(data.provider_scores[data.recommended].name);
+            }
+
+            // 更新故障转移链
+            if (data.failover_chain) {
+                $('#wpmind-failover-chain').text(data.failover_chain.join(' → '));
+            }
+        }
+    };
+
+    /**
      * Initialize on document ready
      */
     $(function() {
@@ -1038,6 +1161,7 @@
         initUsageClear();
         initBudgetSettings();
         AnalyticsCharts.init();
+        RoutingManager.init();
     });
 
 })(jQuery);

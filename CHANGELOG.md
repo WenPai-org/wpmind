@@ -1,5 +1,44 @@
 # WPMind 更新日志
 
+## [1.9.0] - 2026-02-01
+
+### ✨ 新功能：智能路由系统
+
+基于策略的 Provider 智能路由选择，自动优化 AI 服务调用：
+
+#### 🎯 路由策略
+- **成本优先**: 选择成本最低的 Provider，适合预算敏感场景
+- **延迟优先**: 选择响应最快的 Provider，适合实时性要求高的场景
+- **可用性优先**: 选择健康分数最高的 Provider，适合稳定性要求高的场景
+- **负载均衡**: 在多个 Provider 之间分散请求，避免单点过载
+
+#### 🔀 复合策略
+- **平衡策略**: 成本、延迟、可用性各占 1/3
+- **性能优先**: 延迟 50%，可用性 30%，成本 20%
+- **经济策略**: 成本 60%，可用性 30%，延迟 10%
+
+#### 📊 可视化
+- Provider 得分排名实时显示
+- 故障转移链可视化
+- 推荐 Provider 高亮显示
+
+#### 🏗️ 技术实现
+- 新增 `includes/Routing/` 目录
+  - `RoutingStrategyInterface.php`: 策略接口定义
+  - `RoutingContext.php`: 路由上下文封装
+  - `AbstractStrategy.php`: 策略基类
+  - `IntelligentRouter.php`: 智能路由器主类
+- 新增策略实现 `includes/Routing/Strategies/`
+  - `CostStrategy.php`: 成本优先策略
+  - `LatencyStrategy.php`: 延迟优先策略
+  - `AvailabilityStrategy.php`: 可用性优先策略
+  - `LoadBalancedStrategy.php`: 负载均衡策略
+  - `CompositeStrategy.php`: 复合策略
+- 新增 AJAX 接口: `wpmind_get_routing_status`, `wpmind_set_routing_strategy`, `wpmind_route_request`
+- 设置页面新增智能路由面板
+
+---
+
 ## [1.8.0] - 2026-02-01
 
 ### ✨ 新功能：分析仪表板

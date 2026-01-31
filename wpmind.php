@@ -3,7 +3,7 @@
  * Plugin Name: WPMind
  * Plugin URI: https://linuxjoy.com/plugins/wpmind
  * Description: 文派心思 - WordPress AI 自定义端点扩展，支持国内外多种 AI 服务
- * Version: 1.8.0
+ * Version: 1.9.0
  * Author: LinuxJoy
  * Author URI: https://linuxjoy.com
  * License: GPL-2.0-or-later
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-    define( 'WPMIND_VERSION', '1.8.0' );
+    define( 'WPMIND_VERSION', '1.9.0' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
     define( 'WPMIND_PLUGIN_FILE', __FILE__ );
@@ -264,6 +264,9 @@ final class WPMind {
         add_action( 'wp_ajax_wpmind_save_budget_settings', [ $this, 'ajax_save_budget_settings' ] );
         add_action( 'wp_ajax_wpmind_get_budget_status', [ $this, 'ajax_get_budget_status' ] );
         add_action( 'wp_ajax_wpmind_get_analytics_data', [ $this, 'ajax_get_analytics_data' ] );
+        add_action( 'wp_ajax_wpmind_get_routing_status', [ $this, 'ajax_get_routing_status' ] );
+        add_action( 'wp_ajax_wpmind_set_routing_strategy', [ $this, 'ajax_set_routing_strategy' ] );
+        add_action( 'wp_ajax_wpmind_route_request', [ $this, 'ajax_route_request' ] );
 
         // AI 过滤器
         add_filter( 'ai_experiments_preferred_models', [ $this, 'filter_preferred_models' ] );
@@ -1011,6 +1014,89 @@ final class WPMind {
         $data = $analytics->getAnalyticsData( $range );
 
         wp_send_json_success( $data );
+    }
+
+    /**
+     * AJAX 获取路由状态
+     *
+     * @since 1.9.0
+     */
+    public function ajax_get_routing_status(): void {
+        check_ajax_referer( 'wpmind_ajax', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+        }
+
+        $router = Routing\IntelligentRouter::instance();
+        $status = $router->getStatusSummary();
+
+        wp_send_json_success( $status );
+    }
+
+    /**
+     * AJAX 设置路由策略
+     *
+     * @since 1.9.0
+     */
+    public function ajax_set_routing_strategy(): void {
+        check_ajax_referer( 'wpmind_ajax', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+        }
+
+        $strategy = sanitize_text_field( $_POST['strategy'] ?? '' );
+
+        if ( empty( $strategy ) ) {
+            wp_send_json_error( [ 'message' => __( '请选择路由策略', 'wpmind' ) ] );
+        }
+
+        $router = Routing\IntelligentRouter::instance();
+        $result = $router->setStrategy( $strategy );
+
+        if ( $result ) {
+            wp_send_json_success( [
+                'message' => __( '路由策略已更新', 'wpmind' ),
+                'strategy' => $strategy,
+            ] );
+        } else {
+            wp_send_json_error( [ 'message' => __( '无效的路由策略', 'wpmind' ) ] );
+        }
+    }
+
+    /**
+     * AJAX 路由请求（获取推荐 Provider）
+     *
+     * @since 1.9.0
+     */
+    public function ajax_route_request(): void {
+        check_ajax_referer( 'wpmind_ajax', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+        }
+
+        $preferred = sanitize_text_field( $_POST['preferred'] ?? '' );
+        $excluded = isset( $_POST['excluded'] ) ? array_map( 'sanitize_text_field', (array) $_POST['excluded'] ) : [];
+        $input_tokens = absint( $_POST['input_tokens'] ?? 0 );
+        $output_tokens = absint( $_POST['output_tokens'] ?? 0 );
+
+        $context = Routing\RoutingContext::create()
+            ->withPreferredProvider( $preferred ?: null )
+            ->withExcludedProviders( $excluded )
+            ->withEstimatedTokens( $input_tokens, $output_tokens );
+
+        $router = Routing\IntelligentRouter::instance();
+        $selected = $router->route( $context );
+        $failoverChain = $router->getFailoverChain( $context );
+        $scores = $router->getProviderScores( $context );
+
+        wp_send_json_success( [
+            'selected' => $selected,
+            'failover_chain' => $failoverChain,
+            'scores' => $scores,
+        ] );
     }
 
     /**
