@@ -1,0 +1,24 @@
+# IDE
+.idea/
+.vscode/
+*.sublime-*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+vendor/
+
+# Build
+*.min.js
+*.min.css
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+*~
