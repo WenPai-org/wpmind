@@ -623,21 +623,21 @@ class UsageTracker
      */
     public static function getProviderIcon(string $provider): string
     {
-        // Remixicon 4.9.1 AI 品牌图标
+        // Remixicon 4.9.1 AI 品牌图标（空心版）
         $icons = [
-            'openai'      => 'ri-openai-fill',       // OpenAI 品牌图标
-            'anthropic'   => 'ri-claude-fill',       // Claude 品牌图标
-            'google'      => 'ri-gemini-fill',       // Gemini 品牌图标
-            'deepseek'    => 'ri-deepseek-fill',     // DeepSeek 品牌图标
-            'qwen'        => 'ri-qwen-ai-fill',      // 通义千问 品牌图标
-            'zhipu'       => 'ri-zhipu-ai-fill',     // 智谱 AI 品牌图标
-            'moonshot'    => 'ri-moon-fill',         // Moonshot/Kimi - 月亮图标
-            'doubao'      => 'ri-fire-fill',         // 豆包 - 火焰图标
-            'siliconflow' => 'ri-cpu-fill',          // 硅基流动 - CPU 图标
-            'baidu'       => 'ri-baidu-fill',        // 百度文心 - 品牌图标
-            'minimax'     => 'ri-sparkling-fill',    // MiniMax - 闪光图标
+            'openai'      => 'ri-openai-line',       // OpenAI 品牌图标
+            'anthropic'   => 'ri-claude-line',       // Claude 品牌图标
+            'google'      => 'ri-gemini-line',       // Gemini 品牌图标
+            'deepseek'    => 'ri-deepseek-line',     // DeepSeek 品牌图标
+            'qwen'        => 'ri-qwen-ai-line',      // 通义千问 品牌图标
+            'zhipu'       => 'ri-zhipu-ai-line',     // 智谱 AI 品牌图标
+            'moonshot'    => 'ri-moon-line',         // Moonshot/Kimi - 月亮图标
+            'doubao'      => 'ri-fire-line',         // 豆包 - 火焰图标
+            'siliconflow' => 'ri-cpu-line',          // 硅基流动 - CPU 图标
+            'baidu'       => 'ri-baidu-line',        // 百度文心 - 品牌图标
+            'minimax'     => 'ri-sparkling-line',    // MiniMax - 闪光图标
         ];
-        return $icons[$provider] ?? 'ri-robot-fill';
+        return $icons[$provider] ?? 'ri-robot-line';
     }
 
     /**

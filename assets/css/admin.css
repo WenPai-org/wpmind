@@ -410,14 +410,14 @@ input.is-invalid {
 }
 
 .wpmind-usage-card {
-    background: linear-gradient(135deg, #f8f9fa 0%, #f0f0f1 100%);
+    background: #f0f0f1;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     overflow: hidden;
 }
 
 .wpmind-usage-card-header {
-    background: linear-gradient(135deg, #2271b1 0%, #135e96 100%);
+    background: #2271b1;
     color: #fff;
     padding: 10px 16px;
     font-size: 13px;
@@ -543,7 +543,7 @@ input.is-invalid {
     align-items: center;
     gap: 8px;
     padding: 10px 12px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #f0f0f1 100%);
+    background: #f0f0f1;
     border-bottom: 1px solid #e0e0e0;
 }
 
@@ -684,7 +684,7 @@ input.is-invalid {
     align-items: center;
     gap: 10px;
     padding: 12px 16px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #f0f0f1 100%);
+    background: #f0f0f1;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     font-size: 13px;
@@ -705,18 +705,18 @@ input.is-invalid {
 }
 
 .wpmind-status-indicator.wpmind-status-closed {
-    background: linear-gradient(135deg, #00a32a 0%, #008a20 100%);
+    background: #00a32a;
     box-shadow: 0 0 0 3px rgba(0, 163, 42, 0.15);
 }
 
 .wpmind-status-indicator.wpmind-status-open {
-    background: linear-gradient(135deg, #d63638 0%, #b32d2e 100%);
+    background: #d63638;
     box-shadow: 0 0 0 3px rgba(214, 54, 56, 0.15);
     animation: wpmind-pulse 2s ease-in-out infinite;
 }
 
 .wpmind-status-indicator.wpmind-status-half_open {
-    background: linear-gradient(135deg, #dba617 0%, #c99a10 100%);
+    background: #dba617;
     box-shadow: 0 0 0 3px rgba(219, 166, 23, 0.15);
 }
 
@@ -741,7 +741,7 @@ input.is-invalid {
 
 .wpmind-status-score {
     margin-left: auto;
-    background: linear-gradient(135deg, #2271b1 0%, #135e96 100%);
+    background: #2271b1;
     color: #fff;
     padding: 3px 8px;
     border-radius: 4px;
