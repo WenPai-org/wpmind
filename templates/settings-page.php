@@ -16,7 +16,7 @@ defined( 'ABSPATH' ) || exit;
     <!-- 标题栏 -->
     <h1 class="wpmind-title">
         <span class="wpmind-title-left">
-            <span class="dashicons dashicons-superhero-alt"></span>
+            <img src="https://wpcy.com/wp-content/uploads/2025/07/wpmind-logo.webp" alt="WPMind" class="wpmind-logo">
             <?php esc_html_e( '文派心思', 'wpmind' ); ?>
             <span class="wpmind-version">v<?php echo esc_html( WPMIND_VERSION ); ?></span>
         </span>

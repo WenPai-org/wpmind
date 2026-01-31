@@ -122,14 +122,13 @@
 .wpmind-title-left {
     display: flex;
     align-items: center;
-    gap: var(--wpmind-space-2);
+    gap: var(--wpmind-space-3);
 }
 
-.wpmind-title-left .dashicons {
-    font-size: 28px;
-    width: 28px;
-    height: 28px;
-    color: var(--wpmind-primary);
+.wpmind-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
 }
 
 .wpmind-title-right {
