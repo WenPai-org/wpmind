@@ -9,21 +9,11 @@
     'use strict';
 
     /**
-     * API Key 格式验证规则
+     * API Key 验证已移除
+     *
+     * 原因：不同供应商的 Key 格式差异大，前端验证容易误判
+     * 解决方案：用户使用"测试连接"按钮进行真正的验证
      */
-    const apiKeyPatterns = {
-        'openai': /^sk-[A-Za-z0-9]{48,}$/,
-        'anthropic': /^sk-ant-[A-Za-z0-9-]{95,}$/,
-        'google': /^[A-Za-z0-9_-]{39}$/,
-        'deepseek': /^sk-[A-Za-z0-9]{48,}$/,
-        'qwen': /^sk-[A-Za-z0-9]{32,}$/,
-        'zhipu': /^[A-Za-z0-9]{32}\.[A-Za-z0-9]{6}$/,
-        'moonshot': /^sk-[A-Za-z0-9]{48,}$/,
-        'doubao': /^[A-Za-z0-9-]{32,}$/,
-        'siliconflow': /^sk-[A-Za-z0-9]{48,}$/,
-        'baidu': /^[A-Za-z0-9]{24,}$/,
-        'minimax': /^[A-Za-z0-9]{32,}$/
-    };
 
     /**
      * Toggle password visibility
@@ -50,37 +40,14 @@
     }
 
     /**
-     * API Key 格式验证
+     * API Key 输入处理（移除格式验证，只清理样式）
      */
     function initApiKeyValidation() {
         $('input[id^="api_key_"]').on('input', function() {
             var $input = $(this);
-            var $card = $input.closest('.wpmind-endpoint-card');
-            var providerId = $card.attr('id').replace('endpoint-', '');
-            var value = $input.val().trim();
-
-            // 移除之前的验证消息
+            // 移除之前的验证消息和样式
             $input.siblings('.wpmind-validation-message').remove();
-
-            if (!value) {
-                $input.removeClass('is-valid is-invalid');
-                return;
-            }
-
-            var pattern = apiKeyPatterns[providerId];
-            if (!pattern) {
-                // 没有验证规则，不验证
-                $input.removeClass('is-valid is-invalid');
-                return;
-            }
-
-            if (pattern.test(value)) {
-                $input.removeClass('is-invalid').addClass('is-valid');
-                $input.after('<span class="wpmind-validation-message success">✓ 格式正确</span>');
-            } else {
-                $input.removeClass('is-valid').addClass('is-invalid');
-                $input.after('<span class="wpmind-validation-message error">✗ 格式不正确</span>');
-            }
+            $input.removeClass('is-valid is-invalid');
         });
     }
 
@@ -212,7 +179,6 @@
     function initFormValidation() {
         $('#wpmind-settings-form').on('submit', function(e) {
             var hasEnabledWithoutKey = false;
-            var hasInvalidKey = false;
 
             $('.wpmind-endpoint-card').each(function() {
                 var $card = $(this);
@@ -221,13 +187,6 @@
                 var $clearCheckbox = $card.find('.wpmind-clear-checkbox');
                 var hasExistingKey = $apiKey.attr('placeholder') && $apiKey.attr('placeholder').length > 0;
                 var willClear = $clearCheckbox.is(':checked');
-
-                // 检查是否有无效的 API Key
-                if ($apiKey.hasClass('is-invalid')) {
-                    hasInvalidKey = true;
-                    $card.css('border-color', '#d63638');
-                    return false; // break
-                }
 
                 // 如果启用了但没有 key（新输入或已有）且不是要清除
                 if ($checkbox.is(':checked') && !$apiKey.val() && !hasExistingKey && !willClear) {
@@ -239,12 +198,6 @@
                     $card.css('border-color', '');
                 }
             });
-
-            if (hasInvalidKey) {
-                e.preventDefault();
-                alert('请修正 API Key 格式错误');
-                return false;
-            }
 
             if (hasEnabledWithoutKey) {
                 e.preventDefault();
