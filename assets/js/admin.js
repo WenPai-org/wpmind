@@ -9,11 +9,173 @@
     'use strict';
 
     /**
-     * API Key 验证已移除
-     *
-     * 原因：不同供应商的 Key 格式差异大，前端验证容易误判
-     * 解决方案：用户使用"测试连接"按钮进行真正的验证
+     * Toast 通知系统
      */
+    var Toast = {
+        container: null,
+
+        init: function() {
+            if (!this.container) {
+                this.container = $('<div class="wpmind-toast-container"></div>');
+                $('body').append(this.container);
+            }
+        },
+
+        show: function(message, type, duration) {
+            this.init();
+            type = type || 'info';
+            duration = duration || 3000;
+
+            var icons = {
+                success: 'dashicons-yes-alt',
+                error: 'dashicons-dismiss',
+                warning: 'dashicons-warning',
+                info: 'dashicons-info'
+            };
+
+            var $toast = $('<div class="wpmind-toast wpmind-toast-' + type + '">' +
+                '<span class="dashicons ' + icons[type] + '"></span>' +
+                '<span class="wpmind-toast-message">' + message + '</span>' +
+                '<button type="button" class="wpmind-toast-close">&times;</button>' +
+                '</div>');
+
+            this.container.append($toast);
+
+            // 动画显示
+            setTimeout(function() {
+                $toast.addClass('is-visible');
+            }, 10);
+
+            // 关闭按钮
+            $toast.find('.wpmind-toast-close').on('click', function() {
+                Toast.hide($toast);
+            });
+
+            // 自动关闭
+            if (duration > 0) {
+                setTimeout(function() {
+                    Toast.hide($toast);
+                }, duration);
+            }
+
+            return $toast;
+        },
+
+        hide: function($toast) {
+            $toast.removeClass('is-visible');
+            setTimeout(function() {
+                $toast.remove();
+            }, 300);
+        },
+
+        success: function(message, duration) {
+            return this.show(message, 'success', duration);
+        },
+
+        error: function(message, duration) {
+            return this.show(message, 'error', duration || 5000);
+        },
+
+        warning: function(message, duration) {
+            return this.show(message, 'warning', duration || 4000);
+        },
+
+        info: function(message, duration) {
+            return this.show(message, 'info', duration);
+        }
+    };
+
+    /**
+     * 确认对话框
+     */
+    var Dialog = {
+        show: function(options) {
+            var defaults = {
+                title: '确认操作',
+                message: '确定要执行此操作吗？',
+                confirmText: '确定',
+                cancelText: '取消',
+                type: 'warning',
+                onConfirm: function() {},
+                onCancel: function() {}
+            };
+
+            var settings = $.extend({}, defaults, options);
+
+            var icons = {
+                warning: 'dashicons-warning',
+                danger: 'dashicons-dismiss',
+                info: 'dashicons-info',
+                success: 'dashicons-yes-alt'
+            };
+
+            var $overlay = $('<div class="wpmind-dialog-overlay"></div>');
+            var $dialog = $('<div class="wpmind-dialog wpmind-dialog-' + settings.type + '">' +
+                '<div class="wpmind-dialog-header">' +
+                    '<span class="dashicons ' + icons[settings.type] + '"></span>' +
+                    '<span class="wpmind-dialog-title">' + settings.title + '</span>' +
+                '</div>' +
+                '<div class="wpmind-dialog-body">' +
+                    '<p>' + settings.message + '</p>' +
+                '</div>' +
+                '<div class="wpmind-dialog-footer">' +
+                    '<button type="button" class="button wpmind-dialog-cancel">' + settings.cancelText + '</button>' +
+                    '<button type="button" class="button button-primary wpmind-dialog-confirm">' + settings.confirmText + '</button>' +
+                '</div>' +
+                '</div>');
+
+            $('body').append($overlay).append($dialog);
+
+            // 动画显示
+            setTimeout(function() {
+                $overlay.addClass('is-visible');
+                $dialog.addClass('is-visible');
+            }, 10);
+
+            // 关闭函数
+            var close = function() {
+                $overlay.removeClass('is-visible');
+                $dialog.removeClass('is-visible');
+                setTimeout(function() {
+                    $overlay.remove();
+                    $dialog.remove();
+                }, 300);
+            };
+
+            // 事件绑定
+            $dialog.find('.wpmind-dialog-cancel').on('click', function() {
+                close();
+                settings.onCancel();
+            });
+
+            $dialog.find('.wpmind-dialog-confirm').on('click', function() {
+                close();
+                settings.onConfirm();
+            });
+
+            $overlay.on('click', function() {
+                close();
+                settings.onCancel();
+            });
+
+            // ESC 关闭
+            $(document).on('keydown.wpmind-dialog', function(e) {
+                if (e.keyCode === 27) {
+                    close();
+                    settings.onCancel();
+                    $(document).off('keydown.wpmind-dialog');
+                }
+            });
+        },
+
+        confirm: function(message, onConfirm, onCancel) {
+            this.show({
+                message: message,
+                onConfirm: onConfirm || function() {},
+                onCancel: onCancel || function() {}
+            });
+        }
+    };
 
     /**
      * Toggle password visibility
@@ -29,23 +191,20 @@
 
             if ($target.attr('type') === 'password') {
                 $target.attr('type', 'text');
-                $icon.removeClass('dashicons-visibility')
-                     .addClass('dashicons-hidden');
+                $icon.removeClass('dashicons-visibility').addClass('dashicons-hidden');
             } else {
                 $target.attr('type', 'password');
-                $icon.removeClass('dashicons-hidden')
-                     .addClass('dashicons-visibility');
+                $icon.removeClass('dashicons-hidden').addClass('dashicons-visibility');
             }
         });
     }
 
     /**
-     * API Key 输入处理（移除格式验证，只清理样式）
+     * API Key 输入处理
      */
     function initApiKeyValidation() {
         $('input[id^="api_key_"]').on('input', function() {
             var $input = $(this);
-            // 移除之前的验证消息和样式
             $input.siblings('.wpmind-validation-message').remove();
             $input.removeClass('is-valid is-invalid');
         });
@@ -63,26 +222,22 @@
             var $result = $button.siblings('.wpmind-test-result');
             var $card = $button.closest('.wpmind-endpoint-card');
 
-            // 获取 API Key（如果有输入）
             var $apiKeyInput = $card.find('input[name*="[api_key]"]');
             var apiKey = $apiKeyInput.val();
-
-            // 获取自定义端点（如果有）
             var $customUrlInput = $card.find('input[name*="[custom_base_url]"]');
             var customUrl = $customUrlInput.val();
 
             // 设置加载状态
-            $button.addClass('is-testing').prop('disabled', true).text('测试中...');
+            $button.addClass('is-testing').prop('disabled', true);
+            $button.html('<span class="dashicons dashicons-update wpmind-spinning"></span> 测试中');
             $result.text('').removeClass('success error warning').removeAttr('title');
 
-            // 检查 wpmindData 是否存在
             if (typeof wpmindData === 'undefined') {
                 $result.text('配置错误').addClass('error');
                 $button.removeClass('is-testing').prop('disabled', false).text('测试连接');
                 return;
             }
 
-            // 发送 AJAX 请求
             $.ajax({
                 url: wpmindData.ajaxurl || ajaxurl,
                 type: 'POST',
@@ -93,18 +248,18 @@
                     custom_url: customUrl,
                     nonce: wpmindData.nonce
                 },
-                timeout: 45000, // 增加超时时间以支持重试
+                timeout: 45000,
                 success: function(response) {
                     if (response.success) {
                         var message = '连接成功';
                         if (response.data && response.data.retried) {
                             message += ' (重试后)';
                         }
-                        $result.text(message).addClass('success');
+                        $result.html('<span class="dashicons dashicons-yes-alt"></span> ' + message).addClass('success');
+                        Toast.success(provider.toUpperCase() + ' ' + message);
                     } else {
                         var errorMsg = (response.data && response.data.message) || '连接失败';
-                        $result.text(errorMsg).addClass('error');
-                        // 如果有详细信息，添加到 title 属性
+                        $result.html('<span class="dashicons dashicons-dismiss"></span> ' + errorMsg).addClass('error');
                         if (response.data && response.data.details) {
                             $result.attr('title', response.data.details);
                         }
@@ -113,21 +268,17 @@
                 error: function(xhr, status, error) {
                     var message = '连接失败';
                     if (status === 'timeout') {
-                        message = '请求超时，请检查网络连接';
-                    } else if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
-                        message = xhr.responseJSON.data.message;
+                        message = '请求超时';
                     }
-                    $result.text(message).addClass('error');
+                    $result.html('<span class="dashicons dashicons-dismiss"></span> ' + message).addClass('error');
                 },
                 complete: function() {
                     $button.removeClass('is-testing').prop('disabled', false).text('测试连接');
-
-                    // 8秒后清除结果（增加时间让用户看清错误信息）
                     setTimeout(function() {
-                        $result.fadeOut(function() {
+                        $result.fadeOut(300, function() {
                             $(this).text('').removeClass('success error warning').removeAttr('title').show();
                         });
-                    }, 8000);
+                    }, 6000);
                 }
             });
         });
@@ -140,14 +291,13 @@
         $('.wpmind-endpoint-card input[type="checkbox"]').not('.wpmind-clear-checkbox').on('change', function() {
             var $card = $(this).closest('.wpmind-endpoint-card');
             var $header = $card.find('.wpmind-endpoint-header');
-            var $status = $header.find('.wpmind-status');
+            var $status = $header.find('.wpmind-status').not('.wpmind-status-official');
             var $apiKey = $card.find('input[type="password"], input[type="text"]').filter('[id^="api_key_"]');
             var hasKey = $apiKey.attr('placeholder') && $apiKey.attr('placeholder').length > 0;
 
             if (this.checked && (hasKey || $apiKey.val())) {
                 if (!$status.length) {
-                    $header.append('<span class="wpmind-status wpmind-status-active">' +
-                        (wpmindL10n.enabled || '已启用') + '</span>');
+                    $header.append('<span class="wpmind-status wpmind-status-active">已启用</span>');
                 }
             } else {
                 $status.remove();
@@ -164,7 +314,7 @@
             var $apiKeyInput = $card.find('input[id^="api_key_"]');
 
             if (this.checked) {
-                $apiKeyInput.prop('disabled', true).attr('placeholder', wpmindL10n.apiKeyCleared || 'API Key 将被清除');
+                $apiKeyInput.prop('disabled', true).attr('placeholder', 'API Key 将被清除');
                 $card.addClass('wpmind-card-warning');
             } else {
                 $apiKeyInput.prop('disabled', false).attr('placeholder', '••••••••••••••••');
@@ -179,29 +329,35 @@
     function initFormValidation() {
         $('#wpmind-settings-form').on('submit', function(e) {
             var hasEnabledWithoutKey = false;
+            var $problemCard = null;
 
             $('.wpmind-endpoint-card').each(function() {
                 var $card = $(this);
                 var $checkbox = $card.find('input[type="checkbox"]').not('.wpmind-clear-checkbox');
                 var $apiKey = $card.find('input[type="password"], input[type="text"]').filter('[id^="api_key_"]');
                 var $clearCheckbox = $card.find('.wpmind-clear-checkbox');
-                var hasExistingKey = $apiKey.attr('placeholder') && $apiKey.attr('placeholder').length > 0;
+                var hasExistingKey = $apiKey.attr('placeholder') && $apiKey.attr('placeholder').indexOf('•') !== -1;
                 var willClear = $clearCheckbox.is(':checked');
 
-                // 如果启用了但没有 key（新输入或已有）且不是要清除
+                $card.removeClass('wpmind-card-error');
+
                 if ($checkbox.is(':checked') && !$apiKey.val() && !hasExistingKey && !willClear) {
                     hasEnabledWithoutKey = true;
-                    $card.css('border-color', '#d63638');
-                    $apiKey.focus();
-                    return false; // break
-                } else {
-                    $card.css('border-color', '');
+                    $problemCard = $card;
+                    $card.addClass('wpmind-card-error');
+                    return false;
                 }
             });
 
             if (hasEnabledWithoutKey) {
                 e.preventDefault();
-                alert(wpmindL10n.apiKeyRequired || '请为已启用的服务填写 API Key');
+                Toast.error('请为已启用的服务填写 API Key');
+                if ($problemCard) {
+                    $('html, body').animate({
+                        scrollTop: $problemCard.offset().top - 100
+                    }, 300);
+                    $problemCard.find('input[id^="api_key_"]').focus();
+                }
                 return false;
             }
         });
@@ -222,11 +378,9 @@
             if ($advanced.is(':visible')) {
                 $advanced.slideUp(200);
                 $icon.removeClass('dashicons-arrow-up-alt2').addClass('dashicons-arrow-down-alt2');
-                $button.find('span:not(.dashicons)').text('高级设置');
             } else {
                 $advanced.slideDown(200);
                 $icon.removeClass('dashicons-arrow-down-alt2').addClass('dashicons-arrow-up-alt2');
-                $button.find('span:not(.dashicons)').text('收起');
             }
         });
     }
@@ -235,7 +389,6 @@
      * 刷新 Provider 状态
      */
     function initStatusRefresh() {
-        // 使用事件委托确保动态元素也能响应
         $(document).on('click', '.wpmind-refresh-status', function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -244,12 +397,11 @@
             if ($button.hasClass('is-loading')) return;
 
             $button.addClass('is-loading');
-            var $icon = $button.find('.dashicons');
 
-            // 检查 wpmindData 是否存在
             if (typeof wpmindData === 'undefined') {
                 console.error('WPMind: wpmindData not found');
                 $button.removeClass('is-loading');
+                Toast.error('配置错误');
                 return;
             }
 
@@ -263,19 +415,11 @@
                 success: function(response) {
                     if (response.success && response.data.providers) {
                         updateStatusGrid(response.data.providers);
-                        // 显示成功反馈
-                        $icon.removeClass('dashicons-update').addClass('dashicons-yes');
-                        setTimeout(function() {
-                            $icon.removeClass('dashicons-yes').addClass('dashicons-update');
-                        }, 1000);
+                        Toast.success('状态已刷新');
                     }
                 },
-                error: function(xhr, status, error) {
-                    console.error('WPMind: Status refresh failed', error);
-                    $icon.removeClass('dashicons-update').addClass('dashicons-warning');
-                    setTimeout(function() {
-                        $icon.removeClass('dashicons-warning').addClass('dashicons-update');
-                    }, 2000);
+                error: function() {
+                    Toast.error('刷新失败');
                 },
                 complete: function() {
                     $button.removeClass('is-loading');
@@ -293,31 +437,28 @@
         $.each(providers, function(providerId, status) {
             var $item = $grid.find('[data-provider="' + providerId + '"]');
             if ($item.length) {
-                // 添加更新动画
-                $item.css('opacity', '0.5');
+                $item.addClass('is-updating');
 
-                $item.find('.wpmind-status-indicator')
-                    .removeClass('wpmind-status-closed wpmind-status-open wpmind-status-half_open')
-                    .addClass('wpmind-status-' + status.state);
-                $item.find('.wpmind-status-label').text(status.state_label);
-                $item.find('.wpmind-status-score').text(status.health_score + '%');
-
-                // 更新恢复时间
-                var $recovery = $item.find('.wpmind-status-recovery');
-                if (status.state === 'open' && status.recovery_in) {
-                    var minutes = Math.ceil(status.recovery_in / 60);
-                    if ($recovery.length) {
-                        $recovery.text(minutes + '分钟后恢复');
-                    } else {
-                        $item.append('<span class="wpmind-status-recovery">' + minutes + '分钟后恢复</span>');
-                    }
-                } else {
-                    $recovery.remove();
-                }
-
-                // 恢复透明度
                 setTimeout(function() {
-                    $item.css('opacity', '1');
+                    $item.find('.wpmind-status-indicator')
+                        .removeClass('wpmind-status-closed wpmind-status-open wpmind-status-half_open')
+                        .addClass('wpmind-status-' + status.state);
+                    $item.find('.wpmind-status-label').text(status.state_label);
+                    $item.find('.wpmind-status-score').text(status.health_score + '%');
+
+                    var $recovery = $item.find('.wpmind-status-recovery');
+                    if (status.state === 'open' && status.recovery_in) {
+                        var minutes = Math.ceil(status.recovery_in / 60);
+                        if ($recovery.length) {
+                            $recovery.text(minutes + '分钟后恢复');
+                        } else {
+                            $item.append('<span class="wpmind-status-recovery">' + minutes + '分钟后恢复</span>');
+                        }
+                    } else {
+                        $recovery.remove();
+                    }
+
+                    $item.removeClass('is-updating');
                 }, 150);
             }
         });
@@ -327,51 +468,53 @@
      * 重置熔断器
      */
     function initResetBreakers() {
-        // 使用事件委托确保动态元素也能响应
         $(document).on('click', '.wpmind-reset-all-breakers', function(e) {
             e.preventDefault();
             e.stopPropagation();
 
-            if (!confirm('确定要重置所有熔断器吗？这将清除所有服务的健康状态记录。')) {
-                return;
-            }
-
             var $button = $(this);
-            var originalText = $button.html();
-            $button.prop('disabled', true).html('<span class="dashicons dashicons-update wpmind-spinning"></span> 重置中...');
 
-            // 检查 wpmindData 是否存在
-            if (typeof wpmindData === 'undefined') {
-                console.error('WPMind: wpmindData not found');
-                $button.prop('disabled', false).html(originalText);
-                return;
-            }
+            Dialog.show({
+                title: '重置熔断器',
+                message: '确定要重置所有熔断器吗？<br><small style="color:#666;">这将清除所有服务的健康状态记录</small>',
+                type: 'warning',
+                confirmText: '确定重置',
+                cancelText: '取消',
+                onConfirm: function() {
+                    var originalHtml = $button.html();
+                    $button.prop('disabled', true).html('<span class="dashicons dashicons-update wpmind-spinning"></span>');
 
-            $.ajax({
-                url: wpmindData.ajaxurl || ajaxurl,
-                type: 'POST',
-                data: {
-                    action: 'wpmind_reset_circuit_breaker',
-                    provider: 'all',
-                    nonce: wpmindData.nonce
-                },
-                success: function(response) {
-                    if (response.success) {
-                        // 显示成功
-                        $button.html('<span class="dashicons dashicons-yes"></span> 已重置');
-                        // 刷新状态
-                        setTimeout(function() {
-                            $('.wpmind-refresh-status').trigger('click');
-                        }, 500);
+                    if (typeof wpmindData === 'undefined') {
+                        Toast.error('配置错误');
+                        $button.prop('disabled', false).html(originalHtml);
+                        return;
                     }
-                },
-                error: function() {
-                    $button.html('<span class="dashicons dashicons-warning"></span> 失败');
-                },
-                complete: function() {
-                    setTimeout(function() {
-                        $button.prop('disabled', false).html(originalText);
-                    }, 1500);
+
+                    $.ajax({
+                        url: wpmindData.ajaxurl || ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'wpmind_reset_circuit_breaker',
+                            provider: 'all',
+                            nonce: wpmindData.nonce
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Toast.success('熔断器已重置');
+                                setTimeout(function() {
+                                    $('.wpmind-refresh-status').trigger('click');
+                                }, 300);
+                            } else {
+                                Toast.error('重置失败');
+                            }
+                        },
+                        error: function() {
+                            Toast.error('重置失败');
+                        },
+                        complete: function() {
+                            $button.prop('disabled', false).html(originalHtml);
+                        }
+                    });
                 }
             });
         });

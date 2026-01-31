@@ -473,3 +473,235 @@ input.is-invalid {
     background: #e7f3ff;
     color: #0073aa;
 }
+
+/* ========================================
+   Toast 通知系统
+   ======================================== */
+.wpmind-toast-container {
+    position: fixed;
+    top: 40px;
+    right: 20px;
+    z-index: 100100;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 360px;
+}
+
+.wpmind-toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    transform: translateX(120%);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wpmind-toast.is-visible {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.wpmind-toast .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.wpmind-toast-message {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #1d2327;
+}
+
+.wpmind-toast-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #8c8f94;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+}
+
+.wpmind-toast-close:hover {
+    background: #f0f0f1;
+    color: #50575e;
+}
+
+/* Toast 类型样式 */
+.wpmind-toast-success {
+    border-left: 4px solid #00a32a;
+}
+
+.wpmind-toast-success .dashicons {
+    color: #00a32a;
+}
+
+.wpmind-toast-error {
+    border-left: 4px solid #d63638;
+}
+
+.wpmind-toast-error .dashicons {
+    color: #d63638;
+}
+
+.wpmind-toast-warning {
+    border-left: 4px solid #dba617;
+}
+
+.wpmind-toast-warning .dashicons {
+    color: #dba617;
+}
+
+.wpmind-toast-info {
+    border-left: 4px solid #2271b1;
+}
+
+.wpmind-toast-info .dashicons {
+    color: #2271b1;
+}
+
+/* ========================================
+   Dialog 确认对话框
+   ======================================== */
+.wpmind-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100200;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.wpmind-dialog-overlay.is-visible {
+    opacity: 1;
+}
+
+.wpmind-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    z-index: 100201;
+    min-width: 360px;
+    max-width: 480px;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wpmind-dialog.is-visible {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+}
+
+.wpmind-dialog-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.wpmind-dialog-header .dashicons {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+}
+
+.wpmind-dialog-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.wpmind-dialog-body {
+    padding: 20px 24px;
+}
+
+.wpmind-dialog-body p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #50575e;
+}
+
+.wpmind-dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px 20px;
+    border-top: 1px solid #f0f0f1;
+}
+
+.wpmind-dialog-footer .button {
+    min-height: 36px;
+    padding: 0 20px;
+    font-size: 14px;
+    border-radius: 6px;
+}
+
+/* Dialog 类型样式 */
+.wpmind-dialog-warning .wpmind-dialog-header .dashicons {
+    color: #dba617;
+}
+
+.wpmind-dialog-danger .wpmind-dialog-header .dashicons {
+    color: #d63638;
+}
+
+.wpmind-dialog-danger .wpmind-dialog-confirm {
+    background: #d63638;
+    border-color: #d63638;
+}
+
+.wpmind-dialog-danger .wpmind-dialog-confirm:hover {
+    background: #b32d2e;
+    border-color: #b32d2e;
+}
+
+.wpmind-dialog-info .wpmind-dialog-header .dashicons {
+    color: #2271b1;
+}
+
+.wpmind-dialog-success .wpmind-dialog-header .dashicons {
+    color: #00a32a;
+}
+
+/* 响应式 */
+@media (max-width: 480px) {
+    .wpmind-toast-container {
+        left: 10px;
+        right: 10px;
+        max-width: none;
+    }
+
+    .wpmind-dialog {
+        min-width: auto;
+        left: 20px;
+        right: 20px;
+        transform: translateY(-50%) scale(0.9);
+    }
+
+    .wpmind-dialog.is-visible {
+        transform: translateY(-50%) scale(1);
+    }
+}
