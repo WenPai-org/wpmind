@@ -48,20 +48,21 @@
     --wpmind-space-10: 40px;
     --wpmind-space-12: 48px;
 
-    /* Typography */
+    /* Typography - 参考 block-visibility */
     --wpmind-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
     --wpmind-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 
     --wpmind-text-xs: 11px;
-    --wpmind-text-sm: 13px;
-    --wpmind-text-base: 14px;
-    --wpmind-text-lg: 16px;
+    --wpmind-text-sm: 12px;
+    --wpmind-text-base: 13px;
+    --wpmind-text-md: 14px;
+    --wpmind-text-lg: 15px;
     --wpmind-text-xl: 18px;
     --wpmind-text-2xl: 20px;
 
     --wpmind-leading-tight: 1.25;
-    --wpmind-leading-normal: 1.5;
-    --wpmind-leading-relaxed: 1.625;
+    --wpmind-leading-normal: 1.4;
+    --wpmind-leading-relaxed: 1.5;
 
     /* Border Radius - 古腾堡风格使用直角 */
     --wpmind-radius-sm: 0;
@@ -70,11 +71,11 @@
     --wpmind-radius-xl: 0;
     --wpmind-radius-full: 9999px;
 
-    /* Shadows - 古腾堡风格极简阴影 */
+    /* Shadows - block-visibility 风格 */
     --wpmind-shadow-sm: none;
-    --wpmind-shadow: 0 1px 1px rgb(0 0 0 / 0.04);
-    --wpmind-shadow-md: 0 1px 2px rgb(0 0 0 / 0.06);
-    --wpmind-shadow-lg: 0 2px 6px rgb(0 0 0 / 0.08);
+    --wpmind-shadow: 0 0 0 1px #ccd0d4, 0 1px 1px 1px rgba(0, 0, 0, 0.04);
+    --wpmind-shadow-md: 0 0 0 1px #ccd0d4, 0 1px 2px 1px rgba(0, 0, 0, 0.06);
+    --wpmind-shadow-lg: 0 0 0 1px #ccd0d4, 0 2px 6px 1px rgba(0, 0, 0, 0.08);
 
     /* Transitions */
     --wpmind-transition-fast: 150ms ease;
@@ -168,35 +169,38 @@
     color: inherit;
 }
 
-/* 主内容区 */
+/* 主内容区 - 参考 block-visibility 间距 */
 .wpmind-content {
-    margin: var(--wpmind-space-12) var(--wpmind-space-6);
+    margin: 0 auto;
+    max-width: 1024px;
+    padding: var(--wpmind-space-10) var(--wpmind-space-5);
 }
 
 /* Tab 卡片容器 */
 .wpmind-tabs-card {
     background: #fff;
-    border: 1px solid var(--wpmind-gray-200);
+    box-shadow: var(--wpmind-shadow);
 }
 
 /* ========================================
-   Tab Navigation - 标签导航（Slim SEO 风格）
+   Tab Navigation - 标签导航（block-visibility 风格）
    ======================================== */
 .wpmind-tab-list {
     display: flex;
     align-items: center;
-    gap: var(--wpmind-space-6);
-    padding: 0 var(--wpmind-space-6);
-    border-bottom: 1px solid var(--wpmind-gray-200);
+    justify-content: center;
+    gap: 0;
+    padding: 0;
+    box-shadow: var(--wpmind-shadow);
 }
 
 .wpmind-tab {
     display: inline-flex;
     align-items: center;
     gap: var(--wpmind-space-2);
-    padding: var(--wpmind-space-4) 0;
-    font-size: var(--wpmind-text-base);
-    font-weight: 500;
+    padding: var(--wpmind-space-4) var(--wpmind-space-5);
+    font-size: var(--wpmind-text-lg);
+    font-weight: 400;
     color: var(--wpmind-gray-600);
     background: transparent;
     border: none;
@@ -213,7 +217,7 @@
 .wpmind-tab-active,
 .wpmind-tab-active:hover {
     color: var(--wpmind-primary);
-    box-shadow: inset 0 0 0 1.5px transparent, inset 0 -3px 0 0 currentColor;
+    box-shadow: inset 0 -2px 0 0 var(--wpmind-primary);
 }
 
 .wpmind-tab .dashicons {
@@ -262,50 +266,50 @@
 }
 
 /* ========================================
-   Panel Component - 面板组件
+   Panel Component - 面板组件（block-visibility 风格）
    ======================================== */
 .wpmind-panel {
     background: #fff;
-    border: 1px solid var(--wpmind-gray-200);
-    border-radius: 0;
-    margin-bottom: var(--wpmind-space-5);
+    box-shadow: var(--wpmind-shadow);
+    margin-bottom: var(--wpmind-space-6);
 }
 
 .wpmind-panel-header {
     display: flex;
     align-items: center;
     gap: var(--wpmind-space-3);
-    padding: var(--wpmind-space-4) var(--wpmind-space-5);
-    border-bottom: 1px solid var(--wpmind-gray-100);
+    padding: var(--wpmind-space-4) var(--wpmind-space-6);
+    border-bottom: 1px solid #ccd0d4;
+    min-height: 54px;
+    box-sizing: border-box;
 }
 
 .wpmind-panel-header .dashicons {
-    color: var(--wpmind-primary);
-    font-size: var(--wpmind-text-xl);
-    width: 20px;
-    height: 20px;
+    color: var(--wpmind-gray-600);
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
 }
 
 .wpmind-panel-title {
-    font-size: var(--wpmind-text-lg);
-    font-weight: 600;
-    color: var(--wpmind-gray-900);
+    font-size: var(--wpmind-text-md);
+    font-weight: 500;
+    color: #1e1e1e;
     margin: 0;
     flex: 1;
 }
 
 .wpmind-panel-body {
-    padding: var(--wpmind-space-5);
+    padding: var(--wpmind-space-6);
 }
 
 .wpmind-panel-footer {
     display: flex;
     align-items: center;
     gap: var(--wpmind-space-3);
-    padding: var(--wpmind-space-4) var(--wpmind-space-5);
-    border-top: 1px solid var(--wpmind-gray-100);
+    padding: var(--wpmind-space-4) var(--wpmind-space-6);
+    border-top: 1px solid #ccd0d4;
     background: var(--wpmind-gray-50);
-    border-radius: 0 0 var(--wpmind-radius-lg) var(--wpmind-radius-lg);
 }
 
 /* ========================================
@@ -919,27 +923,26 @@ input.is-invalid {
 }
 
 /* ========================================
-   Usage Panel - Token 用量统计
+   Usage Panel - Token 用量统计（block-visibility 风格）
    ======================================== */
 .wpmind-usage-panel {
     background: #fff;
-    border: 1px solid var(--wpmind-gray-200);
-    border-radius: 0;
-    padding: var(--wpmind-space-5);
-    margin: var(--wpmind-space-5) 0;
+    box-shadow: var(--wpmind-shadow);
+    margin: var(--wpmind-space-6) 0;
 }
 
 .wpmind-usage-panel .title {
-    margin: 0 0 var(--wpmind-space-4) 0;
-    padding: 0 0 var(--wpmind-space-3) 0;
-    border: none;
-    border-bottom: 1px solid var(--wpmind-gray-100);
+    margin: 0;
+    padding: var(--wpmind-space-4) var(--wpmind-space-6);
+    border-bottom: 1px solid #ccd0d4;
     display: flex;
     align-items: center;
     gap: var(--wpmind-space-3);
-    font-size: var(--wpmind-text-lg);
-    font-weight: 600;
-    color: var(--wpmind-gray-900);
+    font-size: var(--wpmind-text-md);
+    font-weight: 500;
+    color: #1e1e1e;
+    min-height: 54px;
+    box-sizing: border-box;
 }
 
 .wpmind-usage-panel .title .button {
@@ -948,40 +951,40 @@ input.is-invalid {
     display: inline-flex;
     align-items: center;
     gap: var(--wpmind-space-2);
-    font-size: var(--wpmind-text-sm);
+    font-size: var(--wpmind-text-base);
     border-radius: 0;
     cursor: pointer;
     transition: all var(--wpmind-transition-fast);
 }
 
 .wpmind-usage-panel .title .dashicons {
-    font-size: var(--wpmind-text-xl);
+    font-size: 18px;
     width: 18px;
     height: 18px;
     line-height: 18px;
 }
 
 .wpmind-last-updated {
-    font-size: var(--wpmind-text-xs);
+    font-size: var(--wpmind-text-sm);
     font-weight: 400;
-    color: var(--wpmind-gray-500);
+    color: #757575;
     margin-right: auto;
 }
 
 .wpmind-usage-note {
-    font-size: var(--wpmind-text-xs);
-    color: var(--wpmind-gray-600);
-    margin: 0 0 var(--wpmind-space-4) 0;
-    padding: var(--wpmind-space-2) var(--wpmind-space-3);
+    font-size: var(--wpmind-text-sm);
+    color: #32373c;
+    line-height: var(--wpmind-leading-relaxed);
+    margin: 0 0 var(--wpmind-space-5) 0;
+    padding: var(--wpmind-space-3) var(--wpmind-space-4);
     background: var(--wpmind-info-light);
     border-left: 3px solid var(--wpmind-info);
-    border-radius: 0 var(--wpmind-radius-sm) var(--wpmind-radius-sm) 0;
 }
 
 .wpmind-usage-empty {
     text-align: center;
-    padding: var(--wpmind-space-10) var(--wpmind-space-5);
-    color: var(--wpmind-gray-500);
+    padding: var(--wpmind-space-10) var(--wpmind-space-6);
+    color: #757575;
 }
 
 .wpmind-usage-empty .dashicons {
@@ -1015,45 +1018,40 @@ input.is-invalid {
 .wpmind-usage-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: var(--wpmind-space-4);
+    gap: var(--wpmind-space-6);
+    padding: var(--wpmind-space-6);
 }
 
 .wpmind-usage-card {
     background: #fff;
-    border: 1px solid var(--wpmind-gray-200);
-    border-radius: 0;
+    box-shadow: var(--wpmind-shadow);
     overflow: hidden;
-    transition: border-color var(--wpmind-transition-fast);
-}
-
-.wpmind-usage-card:hover {
-    border-color: var(--wpmind-gray-300);
 }
 
 .wpmind-usage-card-header {
     display: flex;
     align-items: center;
     gap: var(--wpmind-space-2);
-    background: var(--wpmind-gray-50);
-    color: var(--wpmind-gray-700);
-    padding: var(--wpmind-space-3) var(--wpmind-space-4);
-    font-size: var(--wpmind-text-sm);
-    font-weight: 600;
-    border-bottom: 1px solid var(--wpmind-gray-200);
+    background: #fff;
+    color: #1e1e1e;
+    padding: var(--wpmind-space-4) var(--wpmind-space-5);
+    font-size: var(--wpmind-text-md);
+    font-weight: 500;
+    border-bottom: 1px solid #ccd0d4;
 }
 
 .wpmind-usage-card-header .dashicons {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-    color: var(--wpmind-gray-500);
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #757575;
 }
 
 .wpmind-usage-card-body {
-    padding: var(--wpmind-space-4);
+    padding: var(--wpmind-space-6);
     display: flex;
     justify-content: space-between;
-    gap: var(--wpmind-space-3);
+    gap: var(--wpmind-space-4);
     background: #fff;
 }
 
@@ -1064,72 +1062,65 @@ input.is-invalid {
 
 .wpmind-usage-value {
     display: block;
-    font-size: var(--wpmind-text-2xl);
-    font-weight: 700;
-    color: var(--wpmind-gray-900);
+    font-size: var(--wpmind-text-xl);
+    font-weight: 600;
+    color: #1e1e1e;
     line-height: var(--wpmind-leading-tight);
 }
 
 .wpmind-usage-value.wpmind-usage-cost {
-    font-size: var(--wpmind-text-base);
+    font-size: var(--wpmind-text-md);
 }
 
 .wpmind-usage-label {
     display: block;
     font-size: var(--wpmind-text-xs);
-    color: var(--wpmind-gray-500);
-    margin-top: var(--wpmind-space-1);
+    font-weight: 500;
+    color: #757575;
+    margin-top: var(--wpmind-space-2);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
 /* Provider Usage Grid */
 .wpmind-usage-section-title {
-    font-size: var(--wpmind-text-base);
-    font-weight: 600;
-    color: var(--wpmind-gray-900);
-    margin: var(--wpmind-space-5) 0 var(--wpmind-space-3) 0;
-    padding-top: var(--wpmind-space-4);
-    border-top: 1px solid var(--wpmind-gray-100);
+    font-size: var(--wpmind-text-xs);
+    font-weight: 500;
+    color: #1e1e1e;
+    margin: var(--wpmind-space-6) var(--wpmind-space-6) var(--wpmind-space-4);
+    text-transform: uppercase;
 }
 
 .wpmind-provider-usage-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: var(--wpmind-space-3);
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--wpmind-space-6);
+    padding: 0 var(--wpmind-space-6) var(--wpmind-space-6);
 }
 
 .wpmind-provider-usage-item {
     background: #fff;
-    border: 1px solid var(--wpmind-gray-200);
-    border-radius: 0;
+    box-shadow: var(--wpmind-shadow);
     overflow: hidden;
-    transition: all var(--wpmind-transition-normal);
-}
-
-.wpmind-provider-usage-item:hover {
-    border-color: var(--wpmind-gray-300);
-    box-shadow: var(--wpmind-shadow-sm);
 }
 
 .wpmind-provider-usage-header {
     display: flex;
     align-items: center;
     gap: var(--wpmind-space-2);
-    padding: var(--wpmind-space-3);
-    background: var(--wpmind-gray-50);
-    border-bottom: 1px solid var(--wpmind-gray-200);
+    padding: var(--wpmind-space-3) var(--wpmind-space-4);
+    background: #fff;
+    border-bottom: 1px solid #ccd0d4;
 }
 
 .wpmind-provider-usage-icon {
-    font-size: var(--wpmind-text-xl);
+    font-size: 18px;
     flex-shrink: 0;
 }
 
 .wpmind-provider-usage-name {
-    font-size: var(--wpmind-text-sm);
-    font-weight: 600;
-    color: var(--wpmind-gray-900);
+    font-size: var(--wpmind-text-md);
+    font-weight: 500;
+    color: #1e1e1e;
     flex: 1;
 }
 

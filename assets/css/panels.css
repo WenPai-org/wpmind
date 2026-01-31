@@ -6,27 +6,26 @@
  */
 
 /* ========================================
-   Status Panel - 服务状态面板
+   Status Panel - 服务状态面板（block-visibility 风格）
    ======================================== */
 .wpmind-status-panel {
     background: #fff;
-    border: 1px solid var(--wpmind-gray-200);
-    border-radius: 0;
-    padding: var(--wpmind-space-5);
-    margin: var(--wpmind-space-5) 0;
+    box-shadow: var(--wpmind-shadow);
+    margin: var(--wpmind-space-6) 0;
 }
 
 .wpmind-status-panel .title {
-    margin: 0 0 var(--wpmind-space-4) 0;
-    padding: 0 0 var(--wpmind-space-3) 0;
-    border: none;
-    border-bottom: 1px solid var(--wpmind-gray-100);
+    margin: 0;
+    padding: var(--wpmind-space-4) var(--wpmind-space-6);
+    border-bottom: 1px solid #ccd0d4;
     display: flex;
     align-items: center;
     gap: var(--wpmind-space-3);
-    font-size: var(--wpmind-text-lg);
-    font-weight: 600;
-    color: var(--wpmind-gray-900);
+    font-size: var(--wpmind-text-md);
+    font-weight: 500;
+    color: #1e1e1e;
+    min-height: 54px;
+    box-sizing: border-box;
 }
 
 .wpmind-status-panel .title .button {
@@ -35,7 +34,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--wpmind-space-2);
-    font-size: var(--wpmind-text-sm);
+    font-size: var(--wpmind-text-base);
     border-radius: 0;
     cursor: pointer;
     transition: all var(--wpmind-transition-fast);
@@ -47,7 +46,7 @@
 }
 
 .wpmind-status-panel .title .dashicons {
-    font-size: var(--wpmind-text-xl);
+    font-size: 18px;
     width: 18px;
     height: 18px;
     line-height: 18px;
@@ -77,7 +76,8 @@
 .wpmind-status-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: var(--wpmind-space-3);
+    gap: var(--wpmind-space-6);
+    padding: var(--wpmind-space-6);
 }
 
 .wpmind-status-item {
@@ -85,10 +85,9 @@
     align-items: center;
     gap: var(--wpmind-space-3);
     padding: var(--wpmind-space-3) var(--wpmind-space-4);
-    background: var(--wpmind-gray-50);
-    border: 1px solid var(--wpmind-gray-200);
-    border-radius: 0;
-    font-size: var(--wpmind-text-sm);
+    background: #fff;
+    box-shadow: var(--wpmind-shadow);
+    font-size: var(--wpmind-text-base);
     transition: all var(--wpmind-transition-normal);
 }
 
