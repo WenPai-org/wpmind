@@ -10,10 +10,143 @@
     max-width: 1200px;
 }
 
+.wpmind-settings > .description {
+    margin-bottom: 20px;
+}
+
 .wpmind-settings .title {
-    margin-top: 2em;
+    margin-top: 1.5em;
     padding-bottom: 0.5em;
     border-bottom: 1px solid #c3c4c7;
+}
+
+/* ========================================
+   Tab Navigation - Tab 导航
+   ======================================== */
+.wpmind-tabs {
+    margin-bottom: 0;
+    border-bottom: 1px solid #c3c4c7;
+}
+
+.wpmind-tabs .nav-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #50575e;
+    background: transparent;
+    border: 1px solid transparent;
+    border-bottom: none;
+    margin-left: 0;
+    margin-right: 4px;
+    border-radius: 4px 4px 0 0;
+    transition: all 0.15s ease;
+}
+
+.wpmind-tabs .nav-tab:hover {
+    background: #f0f0f1;
+    color: #1d2327;
+}
+
+.wpmind-tabs .nav-tab-active,
+.wpmind-tabs .nav-tab-active:hover {
+    background: #fff;
+    color: #1d2327;
+    border-color: #c3c4c7;
+    border-bottom-color: #fff;
+    margin-bottom: -1px;
+}
+
+.wpmind-tabs .nav-tab .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+}
+
+.wpmind-tabs .nav-tab-active .dashicons {
+    color: #2271b1;
+}
+
+/* Tab Content */
+.wpmind-tab-content {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    padding: 20px;
+    min-height: 400px;
+}
+
+.wpmind-tab-pane {
+    display: none;
+}
+
+.wpmind-tab-pane.active {
+    display: block;
+}
+
+/* Tab 内的面板样式调整 */
+.wpmind-tab-pane .wpmind-usage-panel,
+.wpmind-tab-pane .wpmind-analytics-panel,
+.wpmind-tab-pane .wpmind-status-panel,
+.wpmind-tab-pane .wpmind-routing-panel,
+.wpmind-tab-pane .wpmind-budget-panel {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0 0 30px 0;
+    background: transparent;
+}
+
+.wpmind-tab-pane .wpmind-usage-panel:last-child,
+.wpmind-tab-pane .wpmind-analytics-panel:last-child,
+.wpmind-tab-pane .wpmind-status-panel:last-child,
+.wpmind-tab-pane .wpmind-routing-panel:last-child,
+.wpmind-tab-pane .wpmind-budget-panel:last-child {
+    margin-bottom: 0;
+}
+
+.wpmind-tab-pane .title {
+    margin-top: 0;
+}
+
+/* 响应式 Tab */
+@media (max-width: 782px) {
+    .wpmind-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .wpmind-tabs .nav-tab {
+        flex: 1;
+        justify-content: center;
+        padding: 8px 12px;
+        font-size: 13px;
+        min-width: 0;
+    }
+
+    .wpmind-tabs .nav-tab .dashicons {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+    }
+
+    .wpmind-tab-content {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .wpmind-tabs .nav-tab {
+        flex-direction: column;
+        gap: 4px;
+        padding: 8px;
+        font-size: 12px;
+    }
 }
 
 /* Endpoints Grid */
