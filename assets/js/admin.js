@@ -795,6 +795,101 @@
     var AnalyticsCharts = {
         charts: {},
 
+        // 现代化配色方案
+        colors: {
+            primary: '#3858e9',
+            primaryLight: 'rgba(56, 88, 233, 0.1)',
+            secondary: '#10b981',
+            secondaryLight: 'rgba(16, 185, 129, 0.1)',
+            accent: '#f59e0b',
+            danger: '#ef4444',
+            gray: {
+                50: '#f9fafb',
+                100: '#f3f4f6',
+                200: '#e5e7eb',
+                300: '#d1d5db',
+                400: '#9ca3af',
+                500: '#6b7280',
+                600: '#4b5563',
+                700: '#374151',
+                800: '#1f2937',
+                900: '#111827'
+            }
+        },
+
+        // 全局图表默认配置
+        getDefaultOptions: function() {
+            var self = this;
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 750,
+                    easing: 'easeOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        align: 'end',
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            padding: 20,
+                            font: {
+                                family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                                size: 12,
+                                weight: '500'
+                            },
+                            color: self.colors.gray[600]
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: self.colors.gray[800],
+                        titleFont: {
+                            family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                            size: 13,
+                            weight: '600'
+                        },
+                        bodyFont: {
+                            family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                            size: 12
+                        },
+                        padding: 12,
+                        cornerRadius: 0,
+                        displayColors: true,
+                        boxPadding: 6
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                                size: 11
+                            },
+                            color: self.colors.gray[500]
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: self.colors.gray[100],
+                            drawBorder: false
+                        },
+                        ticks: {
+                            font: {
+                                family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                                size: 11
+                            },
+                            color: self.colors.gray[500]
+                        }
+                    }
+                }
+            };
+        },
+
         init: function() {
             if (!$('#wpmind-usage-trend-chart').length) return;
             if (typeof Chart === 'undefined') return;
@@ -871,6 +966,9 @@
                 this.charts.trend.destroy();
             }
 
+            var self = this;
+            var options = this.getDefaultOptions();
+
             this.charts.trend = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -878,32 +976,38 @@
                     datasets: [{
                         label: 'Tokens',
                         data: data.datasets.tokens,
-                        borderColor: '#2271b1',
-                        backgroundColor: 'rgba(34, 113, 177, 0.1)',
+                        borderColor: self.colors.primary,
+                        backgroundColor: self.colors.primaryLight,
                         fill: true,
                         tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: self.colors.primary,
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 2,
                         yAxisID: 'y'
                     }, {
                         label: '请求数',
                         data: data.datasets.requests,
-                        borderColor: '#00a32a',
-                        backgroundColor: 'rgba(0, 163, 42, 0.1)',
+                        borderColor: self.colors.secondary,
+                        backgroundColor: 'transparent',
                         fill: false,
                         tension: 0.4,
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: self.colors.secondary,
+                        pointHoverBorderColor: '#fff',
+                        pointHoverBorderWidth: 2,
                         yAxisID: 'y1'
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                options: $.extend(true, {}, options, {
                     interaction: {
                         mode: 'index',
                         intersect: false
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        }
                     },
                     scales: {
                         y: {
@@ -912,7 +1016,17 @@
                             position: 'left',
                             title: {
                                 display: true,
-                                text: 'Tokens'
+                                text: 'Tokens',
+                                font: { size: 11, weight: '500' },
+                                color: self.colors.gray[500]
+                            },
+                            grid: {
+                                color: self.colors.gray[100],
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: { size: 11 },
+                                color: self.colors.gray[500]
                             }
                         },
                         y1: {
@@ -921,14 +1035,20 @@
                             position: 'right',
                             title: {
                                 display: true,
-                                text: '请求数'
+                                text: '请求数',
+                                font: { size: 11, weight: '500' },
+                                color: self.colors.gray[500]
                             },
                             grid: {
                                 drawOnChartArea: false
+                            },
+                            ticks: {
+                                font: { size: 11 },
+                                color: self.colors.gray[500]
                             }
                         }
                     }
-                }
+                })
             });
         },
 
@@ -944,6 +1064,8 @@
                 return;
             }
 
+            var self = this;
+
             this.charts.provider = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
@@ -951,19 +1073,45 @@
                     datasets: [{
                         data: data.datasets.requests,
                         backgroundColor: data.colors,
-                        borderWidth: 0
+                        borderWidth: 0,
+                        hoverOffset: 8
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    cutout: '65%',
+                    animation: {
+                        animateRotate: true,
+                        animateScale: true
+                    },
                     plugins: {
                         legend: {
-                            position: 'right'
+                            position: 'right',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 16,
+                                font: {
+                                    family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                                    size: 12
+                                },
+                                color: self.colors.gray[600]
+                            }
                         },
-                        title: {
-                            display: true,
-                            text: '请求分布'
+                        tooltip: {
+                            backgroundColor: self.colors.gray[800],
+                            titleFont: { size: 13, weight: '600' },
+                            bodyFont: { size: 12 },
+                            padding: 12,
+                            cornerRadius: 0,
+                            callbacks: {
+                                label: function(context) {
+                                    var total = context.dataset.data.reduce(function(a, b) { return a + b; }, 0);
+                                    var percentage = ((context.raw / total) * 100).toFixed(1);
+                                    return context.label + ': ' + context.raw + ' (' + percentage + '%)';
+                                }
+                            }
                         }
                     }
                 }
@@ -978,6 +1126,9 @@
                 this.charts.cost.destroy();
             }
 
+            var self = this;
+            var options = this.getDefaultOptions();
+
             this.charts.cost = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -985,35 +1136,44 @@
                     datasets: [{
                         label: 'USD',
                         data: data.datasets.cost_usd,
-                        backgroundColor: 'rgba(34, 113, 177, 0.8)',
-                        borderColor: '#2271b1',
-                        borderWidth: 1
+                        backgroundColor: self.colors.primary,
+                        borderColor: self.colors.primary,
+                        borderWidth: 0,
+                        borderRadius: 0,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
                     }, {
                         label: 'CNY',
                         data: data.datasets.cost_cny,
-                        backgroundColor: 'rgba(239, 68, 68, 0.8)',
-                        borderColor: '#ef4444',
-                        borderWidth: 1
+                        backgroundColor: self.colors.danger,
+                        borderColor: self.colors.danger,
+                        borderWidth: 0,
+                        borderRadius: 0,
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        }
-                    },
+                options: $.extend(true, {}, options, {
                     scales: {
                         y: {
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: '费用'
+                                text: '费用',
+                                font: { size: 11, weight: '500' },
+                                color: self.colors.gray[500]
+                            },
+                            grid: {
+                                color: self.colors.gray[100],
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: { size: 11 },
+                                color: self.colors.gray[500]
                             }
                         }
                     }
-                }
+                })
             });
         },
 
@@ -1029,6 +1189,8 @@
                 return;
             }
 
+            var self = this;
+
             this.charts.model = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -1036,18 +1198,31 @@
                     datasets: [{
                         label: '请求数',
                         data: data.datasets.requests,
-                        backgroundColor: 'rgba(34, 113, 177, 0.8)',
-                        borderColor: '#2271b1',
-                        borderWidth: 1
+                        backgroundColor: self.colors.primary,
+                        borderColor: self.colors.primary,
+                        borderWidth: 0,
+                        borderRadius: 0,
+                        barPercentage: 0.6
                     }]
                 },
                 options: {
                     indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: {
+                        duration: 750,
+                        easing: 'easeOutQuart'
+                    },
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        tooltip: {
+                            backgroundColor: self.colors.gray[800],
+                            titleFont: { size: 13, weight: '600' },
+                            bodyFont: { size: 12 },
+                            padding: 12,
+                            cornerRadius: 0
                         }
                     },
                     scales: {
@@ -1055,7 +1230,26 @@
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: '请求数'
+                                text: '请求数',
+                                font: { size: 11, weight: '500' },
+                                color: self.colors.gray[500]
+                            },
+                            grid: {
+                                color: self.colors.gray[100],
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: { size: 11 },
+                                color: self.colors.gray[500]
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: { size: 11 },
+                                color: self.colors.gray[600]
                             }
                         }
                     }
