@@ -475,103 +475,14 @@ input.is-invalid {
 }
 
 /* ========================================
-   Toast 通知系统
+   WordPress 原生 Notice 通知样式微调
    ======================================== */
-.wpmind-toast-container {
-    position: fixed;
-    top: 40px;
-    right: 20px;
-    z-index: 100100;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-width: 360px;
+.wpmind-notice-container {
+    margin-bottom: 20px;
 }
 
-.wpmind-toast {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 16px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
-    transform: translateX(120%);
-    opacity: 0;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.wpmind-toast.is-visible {
-    transform: translateX(0);
-    opacity: 1;
-}
-
-.wpmind-toast .dashicons {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-}
-
-.wpmind-toast-message {
-    flex: 1;
-    font-size: 14px;
-    line-height: 1.4;
-    color: #1d2327;
-}
-
-.wpmind-toast-close {
-    background: none;
-    border: none;
-    font-size: 18px;
-    color: #8c8f94;
-    cursor: pointer;
-    padding: 0;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    transition: all 0.15s ease;
-}
-
-.wpmind-toast-close:hover {
-    background: #f0f0f1;
-    color: #50575e;
-}
-
-/* Toast 类型样式 */
-.wpmind-toast-success {
-    border-left: 4px solid #00a32a;
-}
-
-.wpmind-toast-success .dashicons {
-    color: #00a32a;
-}
-
-.wpmind-toast-error {
-    border-left: 4px solid #d63638;
-}
-
-.wpmind-toast-error .dashicons {
-    color: #d63638;
-}
-
-.wpmind-toast-warning {
-    border-left: 4px solid #dba617;
-}
-
-.wpmind-toast-warning .dashicons {
-    color: #dba617;
-}
-
-.wpmind-toast-info {
-    border-left: 4px solid #2271b1;
-}
-
-.wpmind-toast-info .dashicons {
-    color: #2271b1;
+.wpmind-notice-container .notice {
+    margin: 5px 0;
 }
 
 /* ========================================
@@ -688,12 +599,6 @@ input.is-invalid {
 
 /* 响应式 */
 @media (max-width: 480px) {
-    .wpmind-toast-container {
-        left: 10px;
-        right: 10px;
-        max-width: none;
-    }
-
     .wpmind-dialog {
         min-width: auto;
         left: 20px;

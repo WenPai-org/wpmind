@@ -9,15 +9,16 @@
     'use strict';
 
     /**
-     * Toast 通知系统
+     * Toast 通知系统 - 使用 WordPress 原生 notice 样式
      */
     var Toast = {
         container: null,
 
         init: function() {
             if (!this.container) {
-                this.container = $('<div class="wpmind-toast-container"></div>');
-                $('body').append(this.container);
+                // 在页面顶部创建通知容器
+                this.container = $('<div class="wpmind-notice-container"></div>');
+                $('.wrap.wpmind-settings').prepend(this.container);
             }
         },
 
@@ -26,49 +27,48 @@
             type = type || 'info';
             duration = duration || 3000;
 
-            var icons = {
-                success: 'dashicons-yes-alt',
-                error: 'dashicons-dismiss',
-                warning: 'dashicons-warning',
-                info: 'dashicons-info'
+            // WordPress 原生 notice 类型映射
+            var noticeType = {
+                success: 'notice-success',
+                error: 'notice-error',
+                warning: 'notice-warning',
+                info: 'notice-info'
             };
 
-            var $toast = $('<div class="wpmind-toast wpmind-toast-' + type + '">' +
-                '<span class="dashicons ' + icons[type] + '"></span>' +
-                '<span class="wpmind-toast-message"></span>' +
-                '<button type="button" class="wpmind-toast-close">&times;</button>' +
+            var $notice = $('<div class="notice ' + noticeType[type] + ' is-dismissible wpmind-notice">' +
+                '<p></p>' +
                 '</div>');
 
             // 使用 .text() 防止 XSS
-            $toast.find('.wpmind-toast-message').text(message);
+            $notice.find('p').text(message);
 
-            this.container.append($toast);
+            this.container.append($notice);
+
+            // 添加 WordPress 原生关闭按钮
+            $notice.append('<button type="button" class="notice-dismiss"><span class="screen-reader-text">关闭此通知</span></button>');
 
             // 动画显示
-            setTimeout(function() {
-                $toast.addClass('is-visible');
-            }, 10);
+            $notice.hide().slideDown(200);
 
-            // 关闭按钮
-            $toast.find('.wpmind-toast-close').on('click', function() {
-                Toast.hide($toast);
+            // 关闭按钮事件
+            $notice.find('.notice-dismiss').on('click', function() {
+                Toast.hide($notice);
             });
 
             // 自动关闭
             if (duration > 0) {
                 setTimeout(function() {
-                    Toast.hide($toast);
+                    Toast.hide($notice);
                 }, duration);
             }
 
-            return $toast;
+            return $notice;
         },
 
-        hide: function($toast) {
-            $toast.removeClass('is-visible');
-            setTimeout(function() {
-                $toast.remove();
-            }, 300);
+        hide: function($notice) {
+            $notice.slideUp(200, function() {
+                $(this).remove();
+            });
         },
 
         success: function(message, duration) {
