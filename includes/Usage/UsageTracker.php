@@ -188,6 +188,7 @@ class UsageTracker
 
         $today = date('Y-m-d');
         $month = date('Y-m');
+        $currency = self::getCurrency($provider);
 
         // 初始化结构
         if (!isset($stats['providers'][$provider])) {
@@ -204,7 +205,8 @@ class UsageTracker
             $stats['daily'][$today] = [
                 'input_tokens' => 0,
                 'output_tokens' => 0,
-                'cost' => 0,
+                'cost_usd' => 0,
+                'cost_cny' => 0,
                 'requests' => 0,
             ];
         }
@@ -213,7 +215,8 @@ class UsageTracker
             $stats['monthly'][$month] = [
                 'input_tokens' => 0,
                 'output_tokens' => 0,
-                'cost' => 0,
+                'cost_usd' => 0,
+                'cost_cny' => 0,
                 'requests' => 0,
             ];
         }
@@ -238,25 +241,44 @@ class UsageTracker
         $stats['providers'][$provider]['models'][$model]['cost'] += $cost;
         $stats['providers'][$provider]['models'][$model]['requests']++;
 
-        // 更新日统计
+        // 更新日统计（分货币）
         $stats['daily'][$today]['input_tokens'] += $inputTokens;
         $stats['daily'][$today]['output_tokens'] += $outputTokens;
-        $stats['daily'][$today]['cost'] += $cost;
+        if ($currency === 'CNY') {
+            $stats['daily'][$today]['cost_cny'] = ($stats['daily'][$today]['cost_cny'] ?? 0) + $cost;
+        } else {
+            $stats['daily'][$today]['cost_usd'] = ($stats['daily'][$today]['cost_usd'] ?? 0) + $cost;
+        }
         $stats['daily'][$today]['requests']++;
 
-        // 更新月统计
+        // 更新月统计（分货币）
         $stats['monthly'][$month]['input_tokens'] += $inputTokens;
         $stats['monthly'][$month]['output_tokens'] += $outputTokens;
-        $stats['monthly'][$month]['cost'] += $cost;
+        if ($currency === 'CNY') {
+            $stats['monthly'][$month]['cost_cny'] = ($stats['monthly'][$month]['cost_cny'] ?? 0) + $cost;
+        } else {
+            $stats['monthly'][$month]['cost_usd'] = ($stats['monthly'][$month]['cost_usd'] ?? 0) + $cost;
+        }
         $stats['monthly'][$month]['requests']++;
 
-        // 更新总计
-        $stats['total'] = [
-            'input_tokens' => ($stats['total']['input_tokens'] ?? 0) + $inputTokens,
-            'output_tokens' => ($stats['total']['output_tokens'] ?? 0) + $outputTokens,
-            'cost' => ($stats['total']['cost'] ?? 0) + $cost,
-            'requests' => ($stats['total']['requests'] ?? 0) + 1,
-        ];
+        // 更新总计（分货币）
+        if (!isset($stats['total'])) {
+            $stats['total'] = [
+                'input_tokens' => 0,
+                'output_tokens' => 0,
+                'cost_usd' => 0,
+                'cost_cny' => 0,
+                'requests' => 0,
+            ];
+        }
+        $stats['total']['input_tokens'] += $inputTokens;
+        $stats['total']['output_tokens'] += $outputTokens;
+        if ($currency === 'CNY') {
+            $stats['total']['cost_cny'] = ($stats['total']['cost_cny'] ?? 0) + $cost;
+        } else {
+            $stats['total']['cost_usd'] = ($stats['total']['cost_usd'] ?? 0) + $cost;
+        }
+        $stats['total']['requests']++;
 
         $stats['last_updated'] = time();
 
@@ -341,7 +363,8 @@ class UsageTracker
             'total' => [
                 'input_tokens' => 0,
                 'output_tokens' => 0,
-                'cost' => 0,
+                'cost_usd' => 0,
+                'cost_cny' => 0,
                 'requests' => 0,
             ],
         ];
@@ -358,7 +381,8 @@ class UsageTracker
         return $stats['daily'][$today] ?? [
             'input_tokens' => 0,
             'output_tokens' => 0,
-            'cost' => 0,
+            'cost_usd' => 0,
+            'cost_cny' => 0,
             'requests' => 0,
         ];
     }
@@ -378,7 +402,8 @@ class UsageTracker
         $result = [
             'input_tokens' => 0,
             'output_tokens' => 0,
-            'cost' => 0,
+            'cost_usd' => 0,
+            'cost_cny' => 0,
             'requests' => 0,
         ];
 
@@ -387,7 +412,8 @@ class UsageTracker
             if ($date >= $weekStart && $date <= $today) {
                 $result['input_tokens'] += $dayStats['input_tokens'] ?? 0;
                 $result['output_tokens'] += $dayStats['output_tokens'] ?? 0;
-                $result['cost'] += $dayStats['cost'] ?? 0;
+                $result['cost_usd'] += $dayStats['cost_usd'] ?? 0;
+                $result['cost_cny'] += $dayStats['cost_cny'] ?? 0;
                 $result['requests'] += $dayStats['requests'] ?? 0;
             }
         }
@@ -406,7 +432,8 @@ class UsageTracker
         return $stats['monthly'][$month] ?? [
             'input_tokens' => 0,
             'output_tokens' => 0,
-            'cost' => 0,
+            'cost_usd' => 0,
+            'cost_cny' => 0,
             'requests' => 0,
         ];
     }
@@ -481,6 +508,32 @@ class UsageTracker
             return $symbol . number_format($cost, 4);
         }
         return $symbol . number_format($cost, 2);
+    }
+
+    /**
+     * 格式化分货币费用显示
+     *
+     * @param float $costUsd USD 费用
+     * @param float $costCny CNY 费用
+     * @return string 格式化后的费用字符串，如 "$0.50 / ¥2.00"
+     */
+    public static function formatCostByCurrency(float $costUsd, float $costCny): string
+    {
+        $parts = [];
+
+        if ($costUsd > 0) {
+            $parts[] = self::formatCost($costUsd, 'USD');
+        }
+
+        if ($costCny > 0) {
+            $parts[] = self::formatCost($costCny, 'CNY');
+        }
+
+        if (empty($parts)) {
+            return '$0.00';
+        }
+
+        return implode(' / ', $parts);
     }
 
     /**

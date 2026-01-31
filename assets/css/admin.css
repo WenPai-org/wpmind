@@ -400,6 +400,12 @@ input.is-invalid {
     line-height: 1.2;
 }
 
+/* 费用显示（可能包含两种货币） */
+.wpmind-usage-value.wpmind-usage-cost {
+    font-size: 16px;
+    white-space: nowrap;
+}
+
 .wpmind-usage-label {
     display: block;
     font-size: 11px;

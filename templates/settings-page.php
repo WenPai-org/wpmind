@@ -53,7 +53,7 @@ $month_stats = \WPMind\Usage\UsageTracker::getMonthStats();
                         <span class="wpmind-usage-label"><?php esc_html_e( 'Tokens', 'wpmind' ); ?></span>
                     </div>
                     <div class="wpmind-usage-stat">
-                        <span class="wpmind-usage-value" id="today-cost"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatCost( $today_stats['cost'] ) ); ?></span>
+                        <span class="wpmind-usage-value wpmind-usage-cost" id="today-cost"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatCostByCurrency( $today_stats['cost_usd'] ?? 0, $today_stats['cost_cny'] ?? 0 ) ); ?></span>
                         <span class="wpmind-usage-label"><?php esc_html_e( '费用', 'wpmind' ); ?></span>
                     </div>
                     <div class="wpmind-usage-stat">
@@ -70,7 +70,7 @@ $month_stats = \WPMind\Usage\UsageTracker::getMonthStats();
                         <span class="wpmind-usage-label"><?php esc_html_e( 'Tokens', 'wpmind' ); ?></span>
                     </div>
                     <div class="wpmind-usage-stat">
-                        <span class="wpmind-usage-value" id="week-cost"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatCost( $week_stats['cost'] ) ); ?></span>
+                        <span class="wpmind-usage-value wpmind-usage-cost" id="week-cost"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatCostByCurrency( $week_stats['cost_usd'] ?? 0, $week_stats['cost_cny'] ?? 0 ) ); ?></span>
                         <span class="wpmind-usage-label"><?php esc_html_e( '费用', 'wpmind' ); ?></span>
                     </div>
                     <div class="wpmind-usage-stat">
@@ -87,7 +87,7 @@ $month_stats = \WPMind\Usage\UsageTracker::getMonthStats();
                         <span class="wpmind-usage-label"><?php esc_html_e( 'Tokens', 'wpmind' ); ?></span>
                     </div>
                     <div class="wpmind-usage-stat">
-                        <span class="wpmind-usage-value" id="month-cost"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatCost( $month_stats['cost'] ) ); ?></span>
+                        <span class="wpmind-usage-value wpmind-usage-cost" id="month-cost"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatCostByCurrency( $month_stats['cost_usd'] ?? 0, $month_stats['cost_cny'] ?? 0 ) ); ?></span>
                         <span class="wpmind-usage-label"><?php esc_html_e( '费用', 'wpmind' ); ?></span>
                     </div>
                     <div class="wpmind-usage-stat">
@@ -104,7 +104,7 @@ $month_stats = \WPMind\Usage\UsageTracker::getMonthStats();
                         <span class="wpmind-usage-label"><?php esc_html_e( 'Tokens', 'wpmind' ); ?></span>
                     </div>
                     <div class="wpmind-usage-stat">
-                        <span class="wpmind-usage-value" id="total-cost"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatCost( $usage_stats['total']['cost'] ?? 0 ) ); ?></span>
+                        <span class="wpmind-usage-value wpmind-usage-cost" id="total-cost"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatCostByCurrency( $usage_stats['total']['cost_usd'] ?? 0, $usage_stats['total']['cost_cny'] ?? 0 ) ); ?></span>
                         <span class="wpmind-usage-label"><?php esc_html_e( '费用', 'wpmind' ); ?></span>
                     </div>
                     <div class="wpmind-usage-stat">
