@@ -313,6 +313,20 @@ final class WPMind {
             WPMIND_VERSION
         );
 
+        wp_enqueue_style(
+            'wpmind-panels',
+            WPMIND_PLUGIN_URL . 'assets/css/panels.css',
+            [ 'wpmind-admin' ],
+            WPMIND_VERSION
+        );
+
+        wp_enqueue_style(
+            'wpmind-responsive',
+            WPMIND_PLUGIN_URL . 'assets/css/responsive.css',
+            [ 'wpmind-panels' ],
+            WPMIND_VERSION
+        );
+
         // Chart.js 图表库
         wp_enqueue_script(
             'chartjs',

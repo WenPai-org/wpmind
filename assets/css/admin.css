@@ -1,82 +1,171 @@
 /**
- * WPMind Admin Styles
+ * WPMind Admin Styles - Gutenberg Design System
  *
  * @package WPMind
- * @since 1.1.0
+ * @since 2.0.0
  */
 
-/* Settings Page Layout */
-.wpmind-settings {
-    max-width: 1200px;
-}
+/* ========================================
+   CSS Variables - 设计令牌
+   ======================================== */
+:root {
+    /* Primary Colors */
+    --wpmind-primary: #3858e9;
+    --wpmind-primary-hover: #1e40af;
+    --wpmind-primary-light: #eff6ff;
+    --wpmind-primary-dark: #1e3a8a;
 
-.wpmind-settings > .description {
-    margin-bottom: 20px;
-}
+    /* Gray Scale */
+    --wpmind-gray-50: #f9fafb;
+    --wpmind-gray-100: #f3f4f6;
+    --wpmind-gray-200: #e5e7eb;
+    --wpmind-gray-300: #d1d5db;
+    --wpmind-gray-400: #9ca3af;
+    --wpmind-gray-500: #6b7280;
+    --wpmind-gray-600: #4b5563;
+    --wpmind-gray-700: #374151;
+    --wpmind-gray-800: #1f2937;
+    --wpmind-gray-900: #111827;
 
-.wpmind-settings .title {
-    margin-top: 1.5em;
-    padding-bottom: 0.5em;
-    border-bottom: 1px solid #c3c4c7;
+    /* Status Colors */
+    --wpmind-success: #059669;
+    --wpmind-success-light: #d1fae5;
+    --wpmind-warning: #d97706;
+    --wpmind-warning-light: #fef3c7;
+    --wpmind-error: #dc2626;
+    --wpmind-error-light: #fee2e2;
+    --wpmind-info: #0284c7;
+    --wpmind-info-light: #e0f2fe;
+
+    /* Spacing (8px base grid) */
+    --wpmind-space-1: 4px;
+    --wpmind-space-2: 8px;
+    --wpmind-space-3: 12px;
+    --wpmind-space-4: 16px;
+    --wpmind-space-5: 20px;
+    --wpmind-space-6: 24px;
+    --wpmind-space-8: 32px;
+    --wpmind-space-10: 40px;
+    --wpmind-space-12: 48px;
+
+    /* Typography */
+    --wpmind-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    --wpmind-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+    --wpmind-text-xs: 11px;
+    --wpmind-text-sm: 13px;
+    --wpmind-text-base: 14px;
+    --wpmind-text-lg: 16px;
+    --wpmind-text-xl: 18px;
+    --wpmind-text-2xl: 20px;
+
+    --wpmind-leading-tight: 1.25;
+    --wpmind-leading-normal: 1.5;
+    --wpmind-leading-relaxed: 1.625;
+
+    /* Border Radius */
+    --wpmind-radius-sm: 4px;
+    --wpmind-radius-md: 6px;
+    --wpmind-radius-lg: 8px;
+    --wpmind-radius-xl: 12px;
+    --wpmind-radius-full: 9999px;
+
+    /* Shadows */
+    --wpmind-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --wpmind-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --wpmind-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --wpmind-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+    /* Transitions */
+    --wpmind-transition-fast: 150ms ease;
+    --wpmind-transition-normal: 200ms ease;
+    --wpmind-transition-slow: 300ms ease;
+
+    /* Border */
+    --wpmind-border-color: var(--wpmind-gray-200);
+    --wpmind-border: 1px solid var(--wpmind-border-color);
 }
 
 /* ========================================
-   Tab Navigation - Tab 导航
+   Base Layout - 基础布局
+   ======================================== */
+.wpmind-settings {
+    max-width: 1200px;
+    font-family: var(--wpmind-font-sans);
+}
+
+.wpmind-settings > .description {
+    margin-bottom: var(--wpmind-space-5);
+    color: var(--wpmind-gray-600);
+    font-size: var(--wpmind-text-base);
+}
+
+/* ========================================
+   Tab Navigation - 标签导航
    ======================================== */
 .wpmind-tabs {
+    display: flex;
+    gap: var(--wpmind-space-1);
     margin-bottom: 0;
-    border-bottom: 1px solid #c3c4c7;
+    border-bottom: 1px solid var(--wpmind-gray-200);
+    background: transparent;
 }
 
 .wpmind-tabs .nav-tab {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 10px 16px;
-    font-size: 14px;
+    gap: var(--wpmind-space-2);
+    padding: var(--wpmind-space-3) var(--wpmind-space-4);
+    font-size: var(--wpmind-text-base);
     font-weight: 500;
-    color: #50575e;
+    color: var(--wpmind-gray-600);
     background: transparent;
     border: 1px solid transparent;
     border-bottom: none;
-    margin-left: 0;
-    margin-right: 4px;
-    border-radius: 4px 4px 0 0;
-    transition: all 0.15s ease;
+    border-radius: var(--wpmind-radius-md) var(--wpmind-radius-md) 0 0;
+    transition: all var(--wpmind-transition-fast);
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .wpmind-tabs .nav-tab:hover {
-    background: #f0f0f1;
-    color: #1d2327;
+    background: var(--wpmind-gray-50);
+    color: var(--wpmind-gray-900);
 }
 
 .wpmind-tabs .nav-tab-active,
 .wpmind-tabs .nav-tab-active:hover {
     background: #fff;
-    color: #1d2327;
-    border-color: #c3c4c7;
+    color: var(--wpmind-gray-900);
+    border-color: var(--wpmind-gray-200);
     border-bottom-color: #fff;
     margin-bottom: -1px;
 }
 
 .wpmind-tabs .nav-tab .dashicons {
-    font-size: 18px;
+    font-size: var(--wpmind-text-xl);
     width: 18px;
     height: 18px;
     line-height: 18px;
+    color: var(--wpmind-gray-400);
+    transition: color var(--wpmind-transition-fast);
+}
+
+.wpmind-tabs .nav-tab:hover .dashicons {
+    color: var(--wpmind-gray-600);
 }
 
 .wpmind-tabs .nav-tab-active .dashicons {
-    color: #2271b1;
+    color: var(--wpmind-primary);
 }
 
-/* Tab Content */
+/* Tab Content Container */
 .wpmind-tab-content {
     background: #fff;
-    border: 1px solid #c3c4c7;
+    border: 1px solid var(--wpmind-gray-200);
     border-top: none;
-    border-radius: 0 0 4px 4px;
-    padding: 20px;
+    border-radius: 0 0 var(--wpmind-radius-lg) var(--wpmind-radius-lg);
+    padding: var(--wpmind-space-6);
     min-height: 400px;
 }
 
@@ -86,117 +175,488 @@
 
 .wpmind-tab-pane.active {
     display: block;
+    animation: wpmind-fade-in 0.2s ease;
 }
 
-/* Tab 内的面板样式调整 */
-.wpmind-tab-pane .wpmind-usage-panel,
-.wpmind-tab-pane .wpmind-analytics-panel,
-.wpmind-tab-pane .wpmind-status-panel,
-.wpmind-tab-pane .wpmind-routing-panel,
-.wpmind-tab-pane .wpmind-budget-panel {
+@keyframes wpmind-fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Tab 内面板样式重置 */
+.wpmind-tab-pane .wpmind-panel {
     border: none;
     box-shadow: none;
     padding: 0;
-    margin: 0 0 30px 0;
+    margin: 0 0 var(--wpmind-space-8) 0;
     background: transparent;
 }
 
-.wpmind-tab-pane .wpmind-usage-panel:last-child,
-.wpmind-tab-pane .wpmind-analytics-panel:last-child,
-.wpmind-tab-pane .wpmind-status-panel:last-child,
-.wpmind-tab-pane .wpmind-routing-panel:last-child,
-.wpmind-tab-pane .wpmind-budget-panel:last-child {
+.wpmind-tab-pane .wpmind-panel:last-child {
     margin-bottom: 0;
 }
 
-.wpmind-tab-pane .title {
-    margin-top: 0;
+/* ========================================
+   Panel Component - 面板组件
+   ======================================== */
+.wpmind-panel {
+    background: #fff;
+    border: 1px solid var(--wpmind-gray-200);
+    border-radius: var(--wpmind-radius-lg);
+    margin-bottom: var(--wpmind-space-5);
 }
 
-/* 响应式 Tab */
-@media (max-width: 782px) {
-    .wpmind-tabs {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 4px;
-    }
-
-    .wpmind-tabs .nav-tab {
-        flex: 1;
-        justify-content: center;
-        padding: 8px 12px;
-        font-size: 13px;
-        min-width: 0;
-    }
-
-    .wpmind-tabs .nav-tab .dashicons {
-        font-size: 16px;
-        width: 16px;
-        height: 16px;
-    }
-
-    .wpmind-tab-content {
-        padding: 15px;
-    }
+.wpmind-panel-header {
+    display: flex;
+    align-items: center;
+    gap: var(--wpmind-space-3);
+    padding: var(--wpmind-space-4) var(--wpmind-space-5);
+    border-bottom: 1px solid var(--wpmind-gray-100);
 }
 
-@media (max-width: 480px) {
-    .wpmind-tabs .nav-tab {
-        flex-direction: column;
-        gap: 4px;
-        padding: 8px;
-        font-size: 12px;
-    }
+.wpmind-panel-header .dashicons {
+    color: var(--wpmind-primary);
+    font-size: var(--wpmind-text-xl);
+    width: 20px;
+    height: 20px;
 }
 
-/* Endpoints Grid */
+.wpmind-panel-title {
+    font-size: var(--wpmind-text-lg);
+    font-weight: 600;
+    color: var(--wpmind-gray-900);
+    margin: 0;
+    flex: 1;
+}
+
+.wpmind-panel-body {
+    padding: var(--wpmind-space-5);
+}
+
+.wpmind-panel-footer {
+    display: flex;
+    align-items: center;
+    gap: var(--wpmind-space-3);
+    padding: var(--wpmind-space-4) var(--wpmind-space-5);
+    border-top: 1px solid var(--wpmind-gray-100);
+    background: var(--wpmind-gray-50);
+    border-radius: 0 0 var(--wpmind-radius-lg) var(--wpmind-radius-lg);
+}
+
+/* ========================================
+   Section Title - 区块标题
+   ======================================== */
+.wpmind-section-title {
+    display: flex;
+    align-items: center;
+    gap: var(--wpmind-space-2);
+    font-size: var(--wpmind-text-lg);
+    font-weight: 600;
+    color: var(--wpmind-gray-900);
+    margin: 0 0 var(--wpmind-space-4) 0;
+    padding-bottom: var(--wpmind-space-3);
+    border-bottom: 1px solid var(--wpmind-gray-100);
+}
+
+.wpmind-section-title .dashicons {
+    color: var(--wpmind-primary);
+}
+
+/* ========================================
+   Card Component - 卡片组件
+   ======================================== */
+.wpmind-card {
+    background: #fff;
+    border: 1px solid var(--wpmind-gray-200);
+    border-radius: var(--wpmind-radius-lg);
+    transition: all var(--wpmind-transition-normal);
+}
+
+.wpmind-card:hover {
+    border-color: var(--wpmind-gray-300);
+    box-shadow: var(--wpmind-shadow);
+}
+
+.wpmind-card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--wpmind-space-2);
+    padding: var(--wpmind-space-3) var(--wpmind-space-4);
+    background: var(--wpmind-gray-50);
+    border-bottom: 1px solid var(--wpmind-gray-200);
+    border-radius: var(--wpmind-radius-lg) var(--wpmind-radius-lg) 0 0;
+}
+
+.wpmind-card-body {
+    padding: var(--wpmind-space-4);
+}
+
+/* ========================================
+   Button Styles - 按钮样式
+   ======================================== */
+.wpmind-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--wpmind-space-2);
+    padding: var(--wpmind-space-2) var(--wpmind-space-4);
+    font-size: var(--wpmind-text-sm);
+    font-weight: 500;
+    line-height: 1.5;
+    border-radius: var(--wpmind-radius-md);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all var(--wpmind-transition-fast);
+    text-decoration: none;
+}
+
+.wpmind-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--wpmind-primary-light), 0 0 0 4px var(--wpmind-primary);
+}
+
+.wpmind-btn-primary {
+    background: var(--wpmind-primary);
+    color: #fff;
+    border-color: var(--wpmind-primary);
+}
+
+.wpmind-btn-primary:hover {
+    background: var(--wpmind-primary-hover);
+    border-color: var(--wpmind-primary-hover);
+}
+
+.wpmind-btn-secondary {
+    background: #fff;
+    color: var(--wpmind-gray-700);
+    border-color: var(--wpmind-gray-300);
+}
+
+.wpmind-btn-secondary:hover {
+    background: var(--wpmind-gray-50);
+    border-color: var(--wpmind-gray-400);
+}
+
+.wpmind-btn-danger {
+    background: #fff;
+    color: var(--wpmind-error);
+    border-color: var(--wpmind-error);
+}
+
+.wpmind-btn-danger:hover {
+    background: var(--wpmind-error-light);
+}
+
+.wpmind-btn-sm {
+    padding: var(--wpmind-space-1) var(--wpmind-space-3);
+    font-size: var(--wpmind-text-xs);
+}
+
+.wpmind-btn .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* ========================================
+   Badge Component - 徽章组件
+   ======================================== */
+.wpmind-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px var(--wpmind-space-2);
+    font-size: var(--wpmind-text-xs);
+    font-weight: 500;
+    border-radius: var(--wpmind-radius-full);
+    line-height: 1.4;
+}
+
+.wpmind-badge-success {
+    background: var(--wpmind-success-light);
+    color: var(--wpmind-success);
+}
+
+.wpmind-badge-warning {
+    background: var(--wpmind-warning-light);
+    color: var(--wpmind-warning);
+}
+
+.wpmind-badge-error {
+    background: var(--wpmind-error-light);
+    color: var(--wpmind-error);
+}
+
+.wpmind-badge-info {
+    background: var(--wpmind-info-light);
+    color: var(--wpmind-info);
+}
+
+.wpmind-badge-neutral {
+    background: var(--wpmind-gray-100);
+    color: var(--wpmind-gray-600);
+}
+
+/* ========================================
+   Form Elements - 表单元素
+   ======================================== */
+.wpmind-form-group {
+    margin-bottom: var(--wpmind-space-4);
+}
+
+.wpmind-form-label {
+    display: block;
+    font-size: var(--wpmind-text-sm);
+    font-weight: 500;
+    color: var(--wpmind-gray-700);
+    margin-bottom: var(--wpmind-space-2);
+}
+
+.wpmind-form-input,
+.wpmind-form-select {
+    width: 100%;
+    padding: var(--wpmind-space-2) var(--wpmind-space-3);
+    font-size: var(--wpmind-text-base);
+    line-height: 1.5;
+    color: var(--wpmind-gray-900);
+    background: #fff;
+    border: 1px solid var(--wpmind-gray-300);
+    border-radius: var(--wpmind-radius-md);
+    transition: all var(--wpmind-transition-fast);
+}
+
+.wpmind-form-input:focus,
+.wpmind-form-select:focus {
+    outline: none;
+    border-color: var(--wpmind-primary);
+    box-shadow: 0 0 0 3px var(--wpmind-primary-light);
+}
+
+.wpmind-form-input.is-valid {
+    border-color: var(--wpmind-success);
+}
+
+.wpmind-form-input.is-invalid {
+    border-color: var(--wpmind-error);
+}
+
+.wpmind-form-help {
+    margin-top: var(--wpmind-space-1);
+    font-size: var(--wpmind-text-xs);
+    color: var(--wpmind-gray-500);
+}
+
+/* Toggle Switch */
+.wpmind-toggle {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    gap: var(--wpmind-space-3);
+}
+
+.wpmind-toggle input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.wpmind-toggle-slider {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: var(--wpmind-gray-300);
+    border-radius: var(--wpmind-radius-full);
+    transition: background var(--wpmind-transition-fast);
+}
+
+.wpmind-toggle-slider::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    left: 3px;
+    top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform var(--wpmind-transition-fast);
+    box-shadow: var(--wpmind-shadow-sm);
+}
+
+.wpmind-toggle input:checked + .wpmind-toggle-slider {
+    background: var(--wpmind-primary);
+}
+
+.wpmind-toggle input:checked + .wpmind-toggle-slider::before {
+    transform: translateX(20px);
+}
+
+.wpmind-toggle input:focus + .wpmind-toggle-slider {
+    box-shadow: 0 0 0 3px var(--wpmind-primary-light);
+}
+
+.wpmind-toggle-label {
+    font-size: var(--wpmind-text-sm);
+    color: var(--wpmind-gray-700);
+}
+
+/* ========================================
+   Grid System - 网格系统
+   ======================================== */
+.wpmind-grid {
+    display: grid;
+    gap: var(--wpmind-space-4);
+}
+
+.wpmind-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.wpmind-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.wpmind-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.wpmind-grid-auto {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+/* ========================================
+   Status Indicator - 状态指示器
+   ======================================== */
+.wpmind-status-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.wpmind-status-dot-success {
+    background: var(--wpmind-success);
+    box-shadow: 0 0 0 3px var(--wpmind-success-light);
+}
+
+.wpmind-status-dot-warning {
+    background: var(--wpmind-warning);
+    box-shadow: 0 0 0 3px var(--wpmind-warning-light);
+}
+
+.wpmind-status-dot-error {
+    background: var(--wpmind-error);
+    box-shadow: 0 0 0 3px var(--wpmind-error-light);
+    animation: wpmind-pulse 2s ease-in-out infinite;
+}
+
+@keyframes wpmind-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ========================================
+   Progress Bar - 进度条
+   ======================================== */
+.wpmind-progress {
+    height: 8px;
+    background: var(--wpmind-gray-200);
+    border-radius: var(--wpmind-radius-full);
+    overflow: hidden;
+}
+
+.wpmind-progress-bar {
+    height: 100%;
+    background: var(--wpmind-primary);
+    border-radius: var(--wpmind-radius-full);
+    transition: width var(--wpmind-transition-slow);
+}
+
+.wpmind-progress-bar-success {
+    background: var(--wpmind-success);
+}
+
+.wpmind-progress-bar-warning {
+    background: var(--wpmind-warning);
+}
+
+.wpmind-progress-bar-error {
+    background: var(--wpmind-error);
+}
+
+/* ========================================
+   Spinner - 加载动画
+   ======================================== */
+@keyframes wpmind-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.wpmind-spinning {
+    animation: wpmind-spin 0.8s linear infinite;
+}
+
+/* ========================================
+   Empty State - 空状态
+   ======================================== */
+.wpmind-empty-state {
+    text-align: center;
+    padding: var(--wpmind-space-10) var(--wpmind-space-5);
+    color: var(--wpmind-gray-500);
+}
+
+.wpmind-empty-state .dashicons {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: var(--wpmind-gray-300);
+    margin-bottom: var(--wpmind-space-3);
+}
+
+.wpmind-empty-state p {
+    margin: var(--wpmind-space-2) 0;
+}
+
+/* ========================================
+   Endpoint Cards - AI 端点卡片
+   ======================================== */
 .wpmind-endpoints-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
-    gap: 20px;
-    margin: 20px 0;
+    gap: var(--wpmind-space-5);
+    margin: var(--wpmind-space-5) 0;
 }
 
-@media (max-width: 960px) {
-    .wpmind-endpoints-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Endpoint Card */
 .wpmind-endpoint-card {
     background: #fff;
-    border: 1px solid #c3c4c7;
-    border-radius: 4px;
-    padding: 0;
-    transition:
-        box-shadow 0.2s ease,
-        border-color 0.2s ease;
+    border: 1px solid var(--wpmind-gray-200);
+    border-radius: var(--wpmind-radius-lg);
+    overflow: hidden;
+    transition: all var(--wpmind-transition-normal);
 }
 
 .wpmind-endpoint-card:hover {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-color: var(--wpmind-gray-300);
+    box-shadow: var(--wpmind-shadow);
 }
 
 .wpmind-endpoint-card.wpmind-card-warning {
-    border-color: #dba617;
+    border-color: var(--wpmind-warning);
 }
 
 .wpmind-endpoint-header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
-    background: #f6f7f7;
-    border-bottom: 1px solid #c3c4c7;
-    border-radius: 4px 4px 0 0;
+    gap: var(--wpmind-space-2);
+    padding: var(--wpmind-space-3) var(--wpmind-space-4);
+    background: var(--wpmind-gray-50);
+    border-bottom: 1px solid var(--wpmind-gray-200);
 }
 
 .wpmind-endpoint-header .dashicons {
-    color: #2271b1;
+    color: var(--wpmind-primary);
 }
 
-/* Provider Icon */
 .wpmind-provider-icon {
     font-size: 24px;
     width: 24px;
@@ -209,27 +669,30 @@
 
 .wpmind-endpoint-name {
     font-weight: 600;
-    font-size: 14px;
+    font-size: var(--wpmind-text-base);
+    color: var(--wpmind-gray-900);
 }
 
 .wpmind-endpoint-key {
-    font-size: 11px;
-    background: #e0e0e0;
-    padding: 2px 6px;
-    border-radius: 3px;
-    color: #50575e;
+    font-size: var(--wpmind-text-xs);
+    background: var(--wpmind-gray-200);
+    padding: 2px var(--wpmind-space-2);
+    border-radius: var(--wpmind-radius-sm);
+    color: var(--wpmind-gray-600);
+    font-family: var(--wpmind-font-mono);
 }
 
 .wpmind-status {
     margin-left: auto;
-    font-size: 11px;
-    padding: 2px 8px;
-    border-radius: 3px;
+    font-size: var(--wpmind-text-xs);
+    font-weight: 500;
+    padding: 2px var(--wpmind-space-2);
+    border-radius: var(--wpmind-radius-full);
 }
 
 .wpmind-status-active {
-    background: #d4edda;
-    color: #155724;
+    background: var(--wpmind-success-light);
+    color: var(--wpmind-success);
 }
 
 /* Form Table in Card */
@@ -239,18 +702,20 @@
 
 .wpmind-endpoint-card .form-table th {
     width: 100px;
-    padding: 12px 10px 12px 16px;
-    font-weight: 400;
+    padding: var(--wpmind-space-3) var(--wpmind-space-3) var(--wpmind-space-3) var(--wpmind-space-4);
+    font-weight: 500;
+    font-size: var(--wpmind-text-sm);
+    color: var(--wpmind-gray-600);
 }
 
 .wpmind-endpoint-card .form-table td {
-    padding: 12px 16px 12px 0;
+    padding: var(--wpmind-space-3) var(--wpmind-space-4) var(--wpmind-space-3) 0;
 }
 
 /* API Key Field */
 .wpmind-api-key-field {
     display: flex;
-    gap: 4px;
+    gap: var(--wpmind-space-1);
 }
 
 .wpmind-api-key-field input {
@@ -258,7 +723,7 @@
 }
 
 .wpmind-toggle-key {
-    padding: 0 8px !important;
+    padding: 0 var(--wpmind-space-2) !important;
     min-height: 30px;
     display: flex;
     align-items: center;
@@ -271,157 +736,50 @@
     font-size: 20px;
 }
 
-/* Clear API Key */
 .wpmind-clear-key {
     display: block;
-    margin-top: 8px;
-    font-size: 12px;
-    color: #d63638;
+    margin-top: var(--wpmind-space-2);
+    font-size: var(--wpmind-text-xs);
+    color: var(--wpmind-error);
 }
 
 .wpmind-clear-key input {
-    margin-right: 4px;
+    margin-right: var(--wpmind-space-1);
 }
 
-/* Base URL */
 .wpmind-base-url {
-    font-size: 12px;
+    font-size: var(--wpmind-text-xs);
     word-break: break-all;
+    color: var(--wpmind-gray-600);
 }
 
-/* Models */
 .wpmind-models code {
     display: inline-block;
-    margin: 2px 4px 2px 0;
-    font-size: 11px;
+    margin: 2px var(--wpmind-space-1) 2px 0;
+    font-size: var(--wpmind-text-xs);
+    background: var(--wpmind-gray-100);
+    padding: 2px var(--wpmind-space-2);
+    border-radius: var(--wpmind-radius-sm);
 }
 
-/* Toggle Switch */
-.wpmind-toggle {
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-    gap: 10px;
-}
-
-.wpmind-toggle input {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.wpmind-toggle-slider {
-    position: relative;
-    width: 40px;
-    height: 20px;
-    background-color: #ccc;
-    border-radius: 20px;
-    transition: background-color 0.2s;
-}
-
-.wpmind-toggle-slider::before {
-    content: "";
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    left: 2px;
-    top: 2px;
-    background-color: white;
-    border-radius: 50%;
-    transition: transform 0.2s;
-}
-
-.wpmind-toggle input:checked + .wpmind-toggle-slider {
-    background-color: #2271b1;
-}
-
-.wpmind-toggle input:checked + .wpmind-toggle-slider::before {
-    transform: translateX(20px);
-}
-
-.wpmind-toggle input:focus + .wpmind-toggle-slider {
-    box-shadow: 0 0 0 2px #2271b1;
-}
-
-.wpmind-toggle-label {
-    font-size: 13px;
-    color: #50575e;
-}
-
-/* Submit Button Area */
-.wpmind-settings .submit {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #c3c4c7;
-}
-
-/* API Key Validation */
-input.is-valid {
-    border-color: #00a32a !important;
-}
-
-input.is-invalid {
-    border-color: #d63638 !important;
-}
-
-.wpmind-validation-message {
-    display: inline-block;
-    margin-left: 10px;
-    font-size: 13px;
-    font-weight: 500;
-}
-
-.wpmind-validation-message.success {
-    color: #00a32a;
-}
-
-.wpmind-validation-message.error {
-    color: #d63638;
-}
-
-/* Test Connection */
-.wpmind-test-connection {
-    margin-right: 10px;
-}
-
-.wpmind-test-connection.is-testing {
-    opacity: 0.6;
-    pointer-events: none;
-}
-
-.wpmind-test-result {
-    display: inline-block;
-    font-size: 13px;
-    font-weight: 500;
-}
-
-.wpmind-test-result.success {
-    color: #00a32a;
-}
-
-.wpmind-test-result.error {
-    color: #d63638;
-}
-
-/* Advanced Settings Toggle */
+/* Advanced Settings */
 .wpmind-advanced-row td {
-    padding: 8px 16px !important;
-    border-top: 1px solid #f0f0f1;
+    padding: var(--wpmind-space-2) var(--wpmind-space-4) !important;
+    border-top: 1px solid var(--wpmind-gray-100);
 }
 
 .wpmind-toggle-advanced {
     text-decoration: none;
-    color: #2271b1;
-    font-size: 13px;
+    color: var(--wpmind-primary);
+    font-size: var(--wpmind-text-sm);
     padding: 0;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--wpmind-space-1);
 }
 
 .wpmind-toggle-advanced:hover {
-    color: #135e96;
+    color: var(--wpmind-primary-hover);
 }
 
 .wpmind-toggle-advanced .dashicons {
@@ -432,12 +790,67 @@ input.is-invalid {
 
 .wpmind-advanced-settings {
     margin: 0;
-    background: #f9f9f9;
+    background: var(--wpmind-gray-50);
 }
 
 .wpmind-advanced-settings th,
 .wpmind-advanced-settings td {
-    padding: 12px 16px;
+    padding: var(--wpmind-space-3) var(--wpmind-space-4);
+}
+
+/* Test Connection */
+.wpmind-test-connection {
+    margin-right: var(--wpmind-space-3);
+}
+
+.wpmind-test-connection.is-testing {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.wpmind-test-result {
+    display: inline-block;
+    font-size: var(--wpmind-text-sm);
+    font-weight: 500;
+}
+
+.wpmind-test-result.success {
+    color: var(--wpmind-success);
+}
+
+.wpmind-test-result.error {
+    color: var(--wpmind-error);
+}
+
+/* Validation */
+input.is-valid {
+    border-color: var(--wpmind-success) !important;
+}
+
+input.is-invalid {
+    border-color: var(--wpmind-error) !important;
+}
+
+.wpmind-validation-message {
+    display: inline-block;
+    margin-left: var(--wpmind-space-3);
+    font-size: var(--wpmind-text-sm);
+    font-weight: 500;
+}
+
+.wpmind-validation-message.success {
+    color: var(--wpmind-success);
+}
+
+.wpmind-validation-message.error {
+    color: var(--wpmind-error);
+}
+
+/* Submit Button Area */
+.wpmind-settings .submit {
+    margin-top: var(--wpmind-space-5);
+    padding-top: var(--wpmind-space-5);
+    border-top: 1px solid var(--wpmind-gray-200);
 }
 
 /* ========================================
@@ -445,125 +858,121 @@ input.is-invalid {
    ======================================== */
 .wpmind-usage-panel {
     background: #fff;
-    border: 1px solid #c3c4c7;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    border: 1px solid var(--wpmind-gray-200);
+    border-radius: var(--wpmind-radius-lg);
+    padding: var(--wpmind-space-5);
+    margin: var(--wpmind-space-5) 0;
 }
 
 .wpmind-usage-panel .title {
-    margin: 0 0 16px 0;
-    padding: 0 0 12px 0;
+    margin: 0 0 var(--wpmind-space-4) 0;
+    padding: 0 0 var(--wpmind-space-3) 0;
     border: none;
-    border-bottom: 1px solid #f0f0f1;
+    border-bottom: 1px solid var(--wpmind-gray-100);
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-size: 15px;
+    gap: var(--wpmind-space-3);
+    font-size: var(--wpmind-text-lg);
     font-weight: 600;
-    color: #1d2327;
+    color: var(--wpmind-gray-900);
 }
 
 .wpmind-usage-panel .title .button {
-    padding: 4px 12px;
+    padding: var(--wpmind-space-1) var(--wpmind-space-3);
     min-height: 32px;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    border-radius: 4px;
+    gap: var(--wpmind-space-2);
+    font-size: var(--wpmind-text-sm);
+    border-radius: var(--wpmind-radius-md);
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all var(--wpmind-transition-fast);
 }
 
 .wpmind-usage-panel .title .dashicons {
-    font-size: 18px;
+    font-size: var(--wpmind-text-xl);
     width: 18px;
     height: 18px;
     line-height: 18px;
 }
 
-/* 上次更新时间 */
 .wpmind-last-updated {
-    font-size: 12px;
+    font-size: var(--wpmind-text-xs);
     font-weight: 400;
-    color: #646970;
+    color: var(--wpmind-gray-500);
     margin-right: auto;
 }
 
-/* 费用说明 */
 .wpmind-usage-note {
-    font-size: 12px;
-    color: #646970;
-    margin: 0 0 16px 0;
-    padding: 8px 12px;
-    background: #f0f6fc;
-    border-left: 3px solid #2271b1;
-    border-radius: 0 4px 4px 0;
+    font-size: var(--wpmind-text-xs);
+    color: var(--wpmind-gray-600);
+    margin: 0 0 var(--wpmind-space-4) 0;
+    padding: var(--wpmind-space-2) var(--wpmind-space-3);
+    background: var(--wpmind-info-light);
+    border-left: 3px solid var(--wpmind-info);
+    border-radius: 0 var(--wpmind-radius-sm) var(--wpmind-radius-sm) 0;
 }
 
-/* 空状态 */
 .wpmind-usage-empty {
     text-align: center;
-    padding: 40px 20px;
-    color: #646970;
+    padding: var(--wpmind-space-10) var(--wpmind-space-5);
+    color: var(--wpmind-gray-500);
 }
 
 .wpmind-usage-empty .dashicons {
     font-size: 48px;
     width: 48px;
     height: 48px;
-    color: #c3c4c7;
-    margin-bottom: 12px;
+    color: var(--wpmind-gray-300);
+    margin-bottom: var(--wpmind-space-3);
 }
 
 .wpmind-usage-empty p {
-    margin: 8px 0;
+    margin: var(--wpmind-space-2) 0;
 }
 
 .wpmind-usage-empty p.description {
-    font-size: 13px;
+    font-size: var(--wpmind-text-sm);
 }
 
 .wpmind-clear-usage {
     margin-left: auto;
-    color: #d63638;
-    border-color: #d63638;
+    color: var(--wpmind-error);
+    border-color: var(--wpmind-error);
 }
 
 .wpmind-clear-usage:hover {
-    background: #fcf0f1 !important;
-    border-color: #d63638 !important;
-    color: #d63638;
+    background: var(--wpmind-error-light) !important;
+    border-color: var(--wpmind-error) !important;
+    color: var(--wpmind-error);
 }
 
 .wpmind-usage-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
+    gap: var(--wpmind-space-4);
 }
 
 .wpmind-usage-card {
-    background: #f0f0f1;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    background: var(--wpmind-gray-50);
+    border: 1px solid var(--wpmind-gray-200);
+    border-radius: var(--wpmind-radius-lg);
     overflow: hidden;
 }
 
 .wpmind-usage-card-header {
-    background: #2271b1;
+    background: var(--wpmind-primary);
     color: #fff;
-    padding: 10px 16px;
-    font-size: 13px;
+    padding: var(--wpmind-space-3) var(--wpmind-space-4);
+    font-size: var(--wpmind-text-sm);
     font-weight: 600;
 }
 
 .wpmind-usage-card-body {
-    padding: 16px;
+    padding: var(--wpmind-space-4);
     display: flex;
     justify-content: space-between;
-    gap: 12px;
+    gap: var(--wpmind-space-3);
 }
 
 .wpmind-usage-stat {
@@ -573,1058 +982,108 @@ input.is-invalid {
 
 .wpmind-usage-value {
     display: block;
-    font-size: 20px;
+    font-size: var(--wpmind-text-2xl);
     font-weight: 700;
-    color: #1d2327;
-    line-height: 1.2;
+    color: var(--wpmind-gray-900);
+    line-height: var(--wpmind-leading-tight);
 }
 
-/* 费用显示（可能包含两种货币） */
 .wpmind-usage-value.wpmind-usage-cost {
-    font-size: 14px;
-}
-
-/* 响应式：小屏幕费用换行显示 */
-@media (max-width: 782px) {
-    .wpmind-usage-cards {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .wpmind-usage-card-body {
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .wpmind-usage-stat {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        text-align: left;
-    }
-
-    .wpmind-usage-value {
-        font-size: 16px;
-    }
-
-    .wpmind-usage-value.wpmind-usage-cost {
-        font-size: 13px;
-    }
-
-    .wpmind-usage-label {
-        margin-top: 0;
-        order: -1;
-    }
-
-    .wpmind-usage-panel .title {
-        flex-wrap: wrap;
-    }
-
-    .wpmind-last-updated {
-        width: 100%;
-        order: 10;
-        margin-top: 8px;
-    }
-}
-
-@media (max-width: 480px) {
-    .wpmind-usage-cards {
-        grid-template-columns: 1fr;
-    }
-
-    .wpmind-provider-usage-grid {
-        grid-template-columns: 1fr;
-    }
+    font-size: var(--wpmind-text-base);
 }
 
 .wpmind-usage-label {
     display: block;
-    font-size: 11px;
-    color: #646970;
-    margin-top: 4px;
+    font-size: var(--wpmind-text-xs);
+    color: var(--wpmind-gray-500);
+    margin-top: var(--wpmind-space-1);
     text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-/* Provider Usage Grid - 各渠道用量统计 */
+/* Provider Usage Grid */
 .wpmind-usage-section-title {
-    font-size: 14px;
+    font-size: var(--wpmind-text-base);
     font-weight: 600;
-    color: #1d2327;
-    margin: 20px 0 12px 0;
-    padding-top: 16px;
-    border-top: 1px solid #f0f0f1;
+    color: var(--wpmind-gray-900);
+    margin: var(--wpmind-space-5) 0 var(--wpmind-space-3) 0;
+    padding-top: var(--wpmind-space-4);
+    border-top: 1px solid var(--wpmind-gray-100);
 }
 
 .wpmind-provider-usage-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 12px;
+    gap: var(--wpmind-space-3);
 }
 
 .wpmind-provider-usage-item {
     background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
+    border: 1px solid var(--wpmind-gray-200);
+    border-radius: var(--wpmind-radius-md);
     overflow: hidden;
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
+    transition: all var(--wpmind-transition-normal);
 }
 
 .wpmind-provider-usage-item:hover {
-    border-color: #c3c4c7;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-color: var(--wpmind-gray-300);
+    box-shadow: var(--wpmind-shadow-sm);
 }
 
 .wpmind-provider-usage-header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 12px;
-    background: #f0f0f1;
-    border-bottom: 1px solid #e0e0e0;
+    gap: var(--wpmind-space-2);
+    padding: var(--wpmind-space-3);
+    background: var(--wpmind-gray-50);
+    border-bottom: 1px solid var(--wpmind-gray-200);
 }
 
 .wpmind-provider-usage-icon {
-    font-size: 18px;
+    font-size: var(--wpmind-text-xl);
     flex-shrink: 0;
 }
 
 .wpmind-provider-usage-name {
-    font-size: 13px;
+    font-size: var(--wpmind-text-sm);
     font-weight: 600;
-    color: #1d2327;
+    color: var(--wpmind-gray-900);
     flex: 1;
 }
 
 .wpmind-provider-usage-currency {
     font-size: 10px;
     font-weight: 500;
-    color: #646970;
+    color: var(--wpmind-gray-500);
     background: #fff;
-    padding: 2px 6px;
-    border-radius: 3px;
-    border: 1px solid #e0e0e0;
+    padding: 2px var(--wpmind-space-2);
+    border-radius: var(--wpmind-radius-sm);
+    border: 1px solid var(--wpmind-gray-200);
     margin-left: auto;
 }
 
 .wpmind-provider-usage-body {
-    padding: 10px 12px;
+    padding: var(--wpmind-space-3);
 }
 
 .wpmind-provider-usage-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 4px 0;
+    padding: var(--wpmind-space-1) 0;
 }
 
 .wpmind-provider-usage-row:not(:last-child) {
-    border-bottom: 1px solid #f0f0f1;
+    border-bottom: 1px solid var(--wpmind-gray-100);
 }
 
 .wpmind-provider-usage-row .wpmind-provider-usage-label {
-    font-size: 12px;
-    color: #646970;
+    font-size: var(--wpmind-text-xs);
+    color: var(--wpmind-gray-500);
 }
 
 .wpmind-provider-usage-row .wpmind-provider-usage-value {
-    font-size: 13px;
+    font-size: var(--wpmind-text-sm);
     font-weight: 600;
-    color: #1d2327;
-}
-
-/* Status Panel */
-.wpmind-status-panel {
-    background: #fff;
-    border: 1px solid #c3c4c7;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-}
-
-.wpmind-status-panel .title {
-    margin: 0 0 16px 0;
-    padding: 0 0 12px 0;
-    border: none;
-    border-bottom: 1px solid #f0f0f1;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 15px;
-    font-weight: 600;
-    color: #1d2327;
-}
-
-.wpmind-status-panel .title .button {
-    padding: 4px 12px;
-    min-height: 32px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-.wpmind-status-panel .title .button:hover {
-    background: #f0f0f1;
-    border-color: #8c8f94;
-}
-
-.wpmind-status-panel .title .button:active {
-    transform: scale(0.98);
-}
-
-.wpmind-status-panel .title .dashicons {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    line-height: 18px;
-}
-
-.wpmind-refresh-status.is-loading {
-    pointer-events: none;
-    opacity: 0.7;
-}
-
-.wpmind-refresh-status.is-loading .dashicons {
-    animation: wpmind-spin 0.8s linear infinite;
-}
-
-@keyframes wpmind-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.wpmind-reset-all-breakers {
-    margin-left: auto;
-    color: #d63638;
-    border-color: #d63638;
-}
-
-.wpmind-reset-all-breakers:hover {
-    background: #fcf0f1 !important;
-    border-color: #d63638 !important;
-    color: #d63638;
-}
-
-.wpmind-status-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-    gap: 12px;
-}
-
-.wpmind-status-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 16px;
-    background: #f0f0f1;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 13px;
-    transition: all 0.2s ease;
-}
-
-.wpmind-status-item:hover {
-    border-color: #c3c4c7;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.wpmind-status-indicator {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
-}
-
-.wpmind-status-indicator.wpmind-status-closed {
-    background: #00a32a;
-    box-shadow: 0 0 0 3px rgba(0, 163, 42, 0.15);
-}
-
-.wpmind-status-indicator.wpmind-status-open {
-    background: #d63638;
-    box-shadow: 0 0 0 3px rgba(214, 54, 56, 0.15);
-    animation: wpmind-pulse 2s ease-in-out infinite;
-}
-
-.wpmind-status-indicator.wpmind-status-half_open {
-    background: #dba617;
-    box-shadow: 0 0 0 3px rgba(219, 166, 23, 0.15);
-}
-
-@keyframes wpmind-pulse {
-    0%,
-    100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.6;
-    }
-}
-
-.wpmind-status-name {
-    font-weight: 600;
-    color: #1d2327;
-}
-
-.wpmind-status-label {
-    color: #646970;
-    font-size: 12px;
-    padding: 2px 8px;
-    background: #fff;
-    border-radius: 4px;
-    border: 1px solid #e0e0e0;
-}
-
-.wpmind-status-score {
-    margin-left: auto;
-    background: #2271b1;
-    color: #fff;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.wpmind-status-recovery {
-    color: #d63638;
-    font-size: 11px;
-    font-weight: 500;
-    margin-left: 4px;
-}
-
-/* Spinning animation for buttons */
-.wpmind-spinning {
-    animation: wpmind-spin 0.8s linear infinite;
-}
-
-/* Official status badge */
-.wpmind-status-official {
-    background: #e7f3ff;
-    color: #0073aa;
-}
-
-/* ========================================
-   WordPress 原生 Notice 通知样式微调
-   ======================================== */
-.wpmind-notice-container {
-    margin-bottom: 20px;
-}
-
-.wpmind-notice-container .notice {
-    margin: 5px 0;
-}
-
-/* ========================================
-   Dialog 确认对话框
-   ======================================== */
-.wpmind-dialog-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 100200;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.wpmind-dialog-overlay.is-visible {
-    opacity: 1;
-}
-
-.wpmind-dialog {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.9);
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    z-index: 100201;
-    min-width: 360px;
-    max-width: 480px;
-    opacity: 0;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.wpmind-dialog.is-visible {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 1;
-}
-
-.wpmind-dialog-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 20px 24px 16px;
-    border-bottom: 1px solid #f0f0f1;
-}
-
-.wpmind-dialog-header .dashicons {
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
-}
-
-.wpmind-dialog-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: #1d2327;
-}
-
-.wpmind-dialog-body {
-    padding: 20px 24px;
-}
-
-.wpmind-dialog-body p {
-    margin: 0;
-    font-size: 14px;
-    line-height: 1.6;
-    color: #50575e;
-}
-
-.wpmind-dialog-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    padding: 16px 24px 20px;
-    border-top: 1px solid #f0f0f1;
-}
-
-.wpmind-dialog-footer .button {
-    min-height: 36px;
-    padding: 0 20px;
-    font-size: 14px;
-    border-radius: 6px;
-}
-
-/* Dialog 类型样式 */
-.wpmind-dialog-warning .wpmind-dialog-header .dashicons {
-    color: #dba617;
-}
-
-.wpmind-dialog-danger .wpmind-dialog-header .dashicons {
-    color: #d63638;
-}
-
-.wpmind-dialog-danger .wpmind-dialog-confirm {
-    background: #d63638;
-    border-color: #d63638;
-}
-
-.wpmind-dialog-danger .wpmind-dialog-confirm:hover {
-    background: #b32d2e;
-    border-color: #b32d2e;
-}
-
-.wpmind-dialog-info .wpmind-dialog-header .dashicons {
-    color: #2271b1;
-}
-
-.wpmind-dialog-success .wpmind-dialog-header .dashicons {
-    color: #00a32a;
-}
-
-/* 响应式 */
-@media (max-width: 480px) {
-    .wpmind-dialog {
-        min-width: auto;
-        left: 20px;
-        right: 20px;
-        transform: translateY(-50%) scale(0.9);
-    }
-
-    .wpmind-dialog.is-visible {
-        transform: translateY(-50%) scale(1);
-    }
-}
-
-/* ========================================
-   Budget Panel - 预算设置面板
-   ======================================== */
-.wpmind-budget-panel {
-    background: #fff;
-    border: 1px solid #c3c4c7;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-}
-
-.wpmind-budget-panel .title {
-    margin: 0 0 16px 0;
-    padding: 0 0 12px 0;
-    border: none;
-    border-bottom: 1px solid #f0f0f1;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 15px;
-    font-weight: 600;
-    color: #1d2327;
-}
-
-.wpmind-budget-panel .title .dashicons {
-    color: #2271b1;
-}
-
-.wpmind-budget-status-badge {
-    font-size: 11px;
-    font-weight: 500;
-    padding: 2px 8px;
-    border-radius: 3px;
-    margin-left: auto;
-}
-
-.wpmind-budget-status-badge.wpmind-budget-enabled {
-    background: #d4edda;
-    color: #155724;
-}
-
-.wpmind-budget-toggle-row {
-    margin-bottom: 20px;
-}
-
-.wpmind-budget-toggle-row .description {
-    margin-top: 8px;
-    margin-left: 50px;
-}
-
-.wpmind-budget-settings {
-    border-top: 1px solid #f0f0f1;
-    padding-top: 20px;
-}
-
-.wpmind-budget-section {
-    margin-bottom: 24px;
-}
-
-.wpmind-budget-section:last-child {
-    margin-bottom: 0;
-}
-
-.wpmind-budget-section h3 {
-    font-size: 13px;
-    font-weight: 600;
-    color: #1d2327;
-    margin: 0 0 12px 0;
-    padding: 0;
-}
-
-.wpmind-budget-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 16px;
-}
-
-.wpmind-budget-row {
-    display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-}
-
-.wpmind-budget-field {
-    flex: 1;
-    min-width: 180px;
-}
-
-.wpmind-budget-field label {
-    display: block;
-    font-size: 13px;
-    font-weight: 500;
-    color: #1d2327;
-    margin-bottom: 6px;
-}
-
-.wpmind-budget-input-group {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.wpmind-budget-currency {
-    font-size: 14px;
-    font-weight: 600;
-    color: #50575e;
-    min-width: 16px;
-}
-
-.wpmind-budget-suffix {
-    font-size: 13px;
-    color: #50575e;
-}
-
-.wpmind-budget-field input[type="number"] {
-    width: 100px;
-}
-
-.wpmind-budget-field select {
-    width: 100%;
-    max-width: 400px;
-}
-
-.wpmind-budget-field .description {
-    margin-top: 4px;
-    font-size: 12px;
-}
-
-/* Budget Progress Bar */
-.wpmind-budget-progress-wrap {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 8px;
-}
-
-.wpmind-budget-progress {
-    flex: 1;
-    height: 6px;
-    background: #e0e0e0;
-    border-radius: 3px;
-    overflow: hidden;
-}
-
-.wpmind-budget-progress-bar {
-    height: 100%;
-    background: #2271b1;
-    border-radius: 3px;
-    transition: width 0.3s ease;
-}
-
-.wpmind-budget-progress-bar.wpmind-budget-warning {
-    background: #dba617;
-}
-
-.wpmind-budget-progress-bar.wpmind-budget-exceeded {
-    background: #d63638;
-}
-
-.wpmind-budget-percentage {
-    font-size: 11px;
-    font-weight: 600;
-    color: #50575e;
-    min-width: 40px;
-    text-align: right;
-}
-
-/* Budget Checkboxes */
-.wpmind-budget-checkboxes {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.wpmind-budget-checkboxes label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    cursor: pointer;
-}
-
-.wpmind-budget-email-field {
-    margin-left: 24px;
-    margin-top: 8px;
-}
-
-/* Budget Actions */
-.wpmind-budget-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 20px;
-    padding-top: 16px;
-    border-top: 1px solid #f0f0f1;
-}
-
-.wpmind-budget-actions .spinner {
-    float: none;
-    margin: 0;
-}
-
-/* Budget Status Classes */
-.wpmind-budget-ok {
-    color: #00a32a;
-}
-
-.wpmind-budget-warning {
-    color: #dba617;
-}
-
-.wpmind-budget-exceeded {
-    color: #d63638;
-}
-
-/* Budget Badge */
-.wpmind-budget-badge {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 500;
-    padding: 2px 8px;
-    border-radius: 3px;
-}
-
-.wpmind-budget-badge.wpmind-budget-ok {
-    background: #d4edda;
-    color: #155724;
-}
-
-.wpmind-budget-badge.wpmind-budget-warning {
-    background: #fff3cd;
-    color: #856404;
-}
-
-.wpmind-budget-badge.wpmind-budget-exceeded {
-    background: #f8d7da;
-    color: #721c24;
-}
-
-/* Responsive */
-@media (max-width: 782px) {
-    .wpmind-budget-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .wpmind-budget-row {
-        flex-direction: column;
-        gap: 16px;
-    }
-}
-
-@media (max-width: 480px) {
-    .wpmind-budget-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* ========================================
-   Analytics Dashboard 分析仪表板
-   ======================================== */
-.wpmind-analytics-panel {
-    background: #fff;
-    border: 1px solid #c3c4c7;
-    border-radius: 4px;
-    padding: 20px;
-    margin-bottom: 20px;
-}
-
-.wpmind-analytics-panel .title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0 0 20px 0;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #e0e0e0;
-}
-
-.wpmind-analytics-panel .title .dashicons {
-    color: #2271b1;
-}
-
-.wpmind-analytics-range-select {
-    margin-left: auto;
-    padding: 4px 8px;
-    border: 1px solid #c3c4c7;
-    border-radius: 4px;
-    font-size: 13px;
-}
-
-.wpmind-refresh-analytics {
-    padding: 4px 8px !important;
-}
-
-.wpmind-analytics-content {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-}
-
-.wpmind-chart-container {
-    background: #f9f9f9;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    padding: 16px;
-}
-
-.wpmind-chart-container h3 {
-    margin: 0 0 12px 0;
-    font-size: 14px;
-    font-weight: 600;
-    color: #1d2327;
-}
-
-.wpmind-chart-wrapper {
-    position: relative;
-    height: 250px;
-}
-
-.wpmind-chart-wrapper canvas {
-    max-width: 100%;
-}
-
-.wpmind-chart-container.is-loading {
-    position: relative;
-}
-
-.wpmind-chart-container.is-loading::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 24px;
-    height: 24px;
-    margin: -12px 0 0 -12px;
-    border: 3px solid #e0e0e0;
-    border-top-color: #2271b1;
-    border-radius: 50%;
-    animation: wpmind-spin 0.8s linear infinite;
-}
-
-.wpmind-chart-container.is-loading .wpmind-chart-wrapper {
-    opacity: 0.5;
-}
-
-/* Responsive */
-@media (max-width: 1200px) {
-    .wpmind-analytics-content {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 782px) {
-    .wpmind-analytics-panel .title {
-        flex-wrap: wrap;
-    }
-
-    .wpmind-analytics-range-select {
-        margin-left: 0;
-        order: 3;
-        width: 100%;
-        margin-top: 10px;
-    }
-
-    .wpmind-chart-wrapper {
-        height: 200px;
-    }
-}
-
-/* ========================================
-   Routing Panel - 智能路由面板
-   ======================================== */
-.wpmind-routing-panel {
-    background: #fff;
-    border: 1px solid #c3c4c7;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-}
-
-.wpmind-routing-panel .title {
-    margin: 0 0 16px 0;
-    padding: 0 0 12px 0;
-    border: none;
-    border-bottom: 1px solid #f0f0f1;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 15px;
-    font-weight: 600;
-    color: #1d2327;
-}
-
-.wpmind-routing-panel .title .dashicons {
-    color: #2271b1;
-}
-
-.wpmind-routing-content {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-.wpmind-routing-section h3 {
-    font-size: 13px;
-    font-weight: 600;
-    color: #1d2327;
-    margin: 0 0 12px 0;
-    padding: 0;
-}
-
-.wpmind-routing-section .description {
-    margin: 0 0 12px 0;
-    font-size: 12px;
-    color: #646970;
-}
-
-/* Strategy Selection */
-.wpmind-routing-strategies {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 12px;
-}
-
-.wpmind-routing-strategy-option {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 14px 16px;
-    background: #f9f9f9;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.wpmind-routing-strategy-option:hover {
-    border-color: #c3c4c7;
-    background: #f0f0f1;
-}
-
-.wpmind-routing-strategy-option.is-active {
-    border-color: #2271b1;
-    background: #f0f7fc;
-}
-
-.wpmind-routing-strategy-option input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-}
-
-.wpmind-routing-strategy-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: #1d2327;
-}
-
-.wpmind-routing-strategy-desc {
-    font-size: 12px;
-    color: #646970;
-    line-height: 1.4;
-}
-
-/* Provider Scores */
-.wpmind-routing-scores {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.wpmind-routing-score-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    background: #f9f9f9;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-}
-
-.wpmind-routing-rank {
-    font-size: 14px;
-    font-weight: 700;
-    color: #2271b1;
-    min-width: 28px;
-}
-
-.wpmind-routing-provider-name {
-    font-size: 13px;
-    font-weight: 600;
-    color: #1d2327;
-    min-width: 100px;
-}
-
-.wpmind-routing-score-bar {
-    flex: 1;
-    height: 8px;
-    background: #e0e0e0;
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.wpmind-routing-score-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #2271b1, #135e96);
-    border-radius: 4px;
-    transition: width 0.3s ease;
-}
-
-.wpmind-routing-score-value {
-    font-size: 13px;
-    font-weight: 600;
-    color: #50575e;
-    min-width: 40px;
-    text-align: right;
-}
-
-/* Recommended Provider */
-.wpmind-routing-recommended {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
-    background: #d4edda;
-    border: 1px solid #c3e6cb;
-    border-radius: 6px;
-    margin-bottom: 12px;
-}
-
-.wpmind-routing-recommended-label {
-    font-size: 13px;
-    color: #155724;
-}
-
-.wpmind-routing-recommended-value {
-    font-size: 14px;
-    color: #155724;
-}
-
-.wpmind-routing-failover {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    background: #f0f0f1;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-}
-
-.wpmind-routing-failover-label {
-    font-size: 12px;
-    color: #646970;
-}
-
-.wpmind-routing-failover-chain {
-    font-size: 12px;
-    font-family: monospace;
-    color: #1d2327;
-}
-
-/* Responsive */
-@media (max-width: 782px) {
-    .wpmind-routing-strategies {
-        grid-template-columns: 1fr;
-    }
-
-    .wpmind-routing-score-item {
-        flex-wrap: wrap;
-    }
-
-    .wpmind-routing-score-bar {
-        order: 4;
-        width: 100%;
-        margin-top: 8px;
-    }
+    color: var(--wpmind-gray-900);
 }
