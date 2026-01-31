@@ -182,7 +182,7 @@ final class WPMind {
             ],
             'qwen' => [
                 'name'         => '通义千问',
-                'display_name' => '通义千问',
+                'display_name' => 'Qwen',
                 'icon'         => 'qwen',
                 'base_url'     => 'https://dashscope.aliyuncs.com/compatible-mode/v1',
                 'models'       => [ 'qwen-turbo', 'qwen-plus', 'qwen-max' ],
@@ -191,7 +191,7 @@ final class WPMind {
             ],
             'zhipu' => [
                 'name'         => '智谱 AI',
-                'display_name' => '智谱清言',
+                'display_name' => 'ChatGLM',
                 'icon'         => 'zhipu',
                 'base_url'     => 'https://open.bigmodel.cn/api/paas/v4',
                 'models'       => [ 'glm-4', 'glm-4-flash', 'glm-4-plus' ],
@@ -199,7 +199,7 @@ final class WPMind {
                 'api_key'      => '',
             ],
             'moonshot' => [
-                'name'         => 'Moonshot (Kimi)',
+                'name'         => 'Moonshot',
                 'display_name' => 'Kimi',
                 'icon'         => 'kimi',
                 'base_url'     => 'https://api.moonshot.cn/v1',
@@ -208,8 +208,8 @@ final class WPMind {
                 'api_key'      => '',
             ],
             'doubao' => [
-                'name'         => '豆包 (字节)',
-                'display_name' => '豆包',
+                'name'         => '豆包',
+                'display_name' => 'Doubao',
                 'icon'         => 'doubao',
                 'base_url'     => 'https://ark.cn-beijing.volces.com/api/v3',
                 'models'       => [ 'doubao-pro-4k', 'doubao-pro-32k', 'doubao-pro-128k' ],
@@ -218,7 +218,7 @@ final class WPMind {
             ],
             'siliconflow' => [
                 'name'         => '硅基流动',
-                'display_name' => '硅基流动',
+                'display_name' => 'SiliconFlow',
                 'icon'         => 'siliconcloud',
                 'base_url'     => 'https://api.siliconflow.cn/v1',
                 'models'       => [ 'deepseek-ai/DeepSeek-V3', 'Qwen/Qwen2.5-72B-Instruct' ],
@@ -227,7 +227,7 @@ final class WPMind {
             ],
             'baidu' => [
                 'name'         => '百度文心',
-                'display_name' => '文心一言',
+                'display_name' => 'ERNIE',
                 'icon'         => 'wenxin',
                 'base_url'     => 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop',
                 'models'       => [ 'ernie-4.0-8k', 'ernie-3.5-8k', 'ernie-speed-8k' ],
