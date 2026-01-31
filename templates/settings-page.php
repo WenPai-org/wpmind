@@ -149,9 +149,12 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
             <?php foreach ( $usage_stats['providers'] as $provider_id => $provider_stats ) :
                 $currency = \WPMind\Usage\UsageTracker::getCurrency( $provider_id );
                 $display_name = \WPMind\Usage\UsageTracker::getProviderDisplayName( $provider_id );
+                $icon_class = \WPMind\Usage\UsageTracker::getProviderIcon( $provider_id );
+                $icon_color = \WPMind\Usage\UsageTracker::getProviderColor( $provider_id );
             ?>
             <div class="wpmind-provider-usage-item">
                 <div class="wpmind-provider-usage-header">
+                    <i class="<?php echo esc_attr( $icon_class ); ?> wpmind-provider-usage-icon" style="color: <?php echo esc_attr( $icon_color ); ?>;"></i>
                     <span class="wpmind-provider-usage-name"><?php echo esc_html( $display_name ); ?></span>
                     <span class="wpmind-provider-usage-currency"><?php echo esc_html( $currency ); ?></span>
                 </div>
@@ -260,23 +263,14 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
         <h2 class="title"><?php esc_html_e( 'AI 服务端点', 'wpmind' ); ?></h2>
 
         <div class="wpmind-endpoints-grid">
-            <?php foreach ( $endpoints as $key => $endpoint ) : 
+            <?php foreach ( $endpoints as $key => $endpoint ) :
                 $has_api_key = $wpmind_instance->has_api_key( $key );
+                $icon_class  = \WPMind\Usage\UsageTracker::getProviderIcon( $key );
+                $icon_color  = \WPMind\Usage\UsageTracker::getProviderColor( $key );
             ?>
             <div class="wpmind-endpoint-card" id="endpoint-<?php echo esc_attr( $key ); ?>">
                 <div class="wpmind-endpoint-header">
-                    <?php
-                    // 使用 lobe-icons CDN SVG 图标 (v1.77.0)
-                    $icon_slug = $endpoint['icon'] ?? $key;
-                    $icon_url  = "https://registry.npmmirror.com/@lobehub/icons-static-svg/1.77.0/files/icons/{$icon_slug}.svg";
-                    ?>
-                    <img src="<?php echo esc_url( $icon_url ); ?>"
-                         alt="<?php echo esc_attr( $endpoint['name'] ); ?>"
-                         class="wpmind-provider-icon"
-                         width="24"
-                         height="24"
-                         onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';">
-                    <span class="dashicons <?php echo ! empty( $endpoint['is_official'] ) ? 'dashicons-admin-site' : 'dashicons-cloud'; ?>" style="display:none;"></span>
+                    <i class="<?php echo esc_attr( $icon_class ); ?> wpmind-provider-icon" style="color: <?php echo esc_attr( $icon_color ); ?>;"></i>
                     <span class="wpmind-endpoint-name">
                         <?php echo esc_html( $endpoint['name'] ); ?>
                     </span>

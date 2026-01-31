@@ -1,5 +1,41 @@
 # WPMind 更新日志
 
+## [1.6.6] - 2026-02-01
+
+### 🎨 图标系统升级
+- **引入 Remixicon**: 使用 Remixicon 4.6.0 替代 lobe-icons
+  - 通过 jsDelivr CDN 加载
+  - 不再依赖外部 SVG 图标
+- **Provider 图标映射**: 为每个服务商配置专属图标
+  - OpenAI: `ri-openai-fill`
+  - Google: `ri-gemini-fill`
+  - 百度: `ri-baidu-fill`
+  - 其他服务商使用语义化图标
+- **品牌颜色**: 为每个服务商配置品牌色
+
+### 🔧 技术改进
+- 新增 `getProviderIcon()` 方法获取 Remixicon 图标类
+- 新增 `getProviderColor()` 方法获取品牌颜色
+- 移除 lobe-icons CDN 依赖和 `<img>` 标签
+- 使用 `<i>` 标签和 CSS 类显示图标
+
+### 📝 图标映射表
+| 服务商 | 图标 | 颜色 |
+|--------|------|------|
+| OpenAI | `ri-openai-fill` | #10a37f |
+| Anthropic | `ri-robot-2-fill` | #d4a27f |
+| Google | `ri-gemini-fill` | #4285f4 |
+| DeepSeek | `ri-brain-fill` | #0066ff |
+| 通义千问 | `ri-sparkling-2-fill` | #6366f1 |
+| 智谱 AI | `ri-lightbulb-fill` | #1e40af |
+| Moonshot | `ri-moon-fill` | #6b7280 |
+| 豆包 | `ri-fire-fill` | #ef4444 |
+| 硅基流动 | `ri-cpu-fill` | #8b5cf6 |
+| 百度文心 | `ri-baidu-fill` | #2932e1 |
+| MiniMax | `ri-magic-fill` | #f59e0b |
+
+---
+
 ## [1.6.5] - 2026-01-31
 
 ### 🐛 高优先级修复

@@ -63,11 +63,13 @@
 
 /* Provider Icon */
 .wpmind-provider-icon {
+    font-size: 24px;
     width: 24px;
     height: 24px;
-    border-radius: 4px;
-    object-fit: contain;
     flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .wpmind-endpoint-name {
@@ -539,16 +541,22 @@ input.is-invalid {
 .wpmind-provider-usage-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 8px;
     padding: 10px 12px;
     background: linear-gradient(135deg, #f8f9fa 0%, #f0f0f1 100%);
     border-bottom: 1px solid #e0e0e0;
+}
+
+.wpmind-provider-usage-icon {
+    font-size: 18px;
+    flex-shrink: 0;
 }
 
 .wpmind-provider-usage-name {
     font-size: 13px;
     font-weight: 600;
     color: #1d2327;
+    flex: 1;
 }
 
 .wpmind-provider-usage-currency {
@@ -559,6 +567,7 @@ input.is-invalid {
     padding: 2px 6px;
     border-radius: 3px;
     border: 1px solid #e0e0e0;
+    margin-left: auto;
 }
 
 .wpmind-provider-usage-body {
