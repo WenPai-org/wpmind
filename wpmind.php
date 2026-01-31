@@ -3,7 +3,7 @@
  * Plugin Name: WPMind
  * Plugin URI: https://linuxjoy.com/plugins/wpmind
  * Description: 文派心思 - WordPress AI 自定义端点扩展，支持国内外多种 AI 服务
- * Version: 1.4.1
+ * Version: 1.5.0
  * Author: LinuxJoy
  * Author URI: https://linuxjoy.com
  * License: GPL-2.0-or-later
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-    define( 'WPMIND_VERSION', '1.4.1' );
+    define( 'WPMIND_VERSION', '1.5.0' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
     define( 'WPMIND_PLUGIN_FILE', __FILE__ );
@@ -257,6 +257,8 @@ final class WPMind {
 
         // AJAX 处理
         add_action( 'wp_ajax_wpmind_test_connection', [ $this, 'ajax_test_connection' ] );
+        add_action( 'wp_ajax_wpmind_get_provider_status', [ $this, 'ajax_get_provider_status' ] );
+        add_action( 'wp_ajax_wpmind_reset_circuit_breaker', [ $this, 'ajax_reset_circuit_breaker' ] );
 
         // AI 过滤器
         add_filter( 'ai_experiments_preferred_models', [ $this, 'filter_preferred_models' ] );
@@ -620,6 +622,51 @@ final class WPMind {
             'code'    => $last_status_code,
             'retried' => $max_retries > 1,
         ] );
+    }
+
+    /**
+     * AJAX 获取 Provider 状态
+     *
+     * @since 1.5.0
+     */
+    public function ajax_get_provider_status(): void {
+        check_ajax_referer( 'wpmind_ajax', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+        }
+
+        $failover = Failover\FailoverManager::instance();
+        $status = $failover->getStatusSummary();
+
+        wp_send_json_success( [
+            'providers' => $status,
+            'available' => $failover->getAvailableProviders(),
+        ] );
+    }
+
+    /**
+     * AJAX 重置熔断器
+     *
+     * @since 1.5.0
+     */
+    public function ajax_reset_circuit_breaker(): void {
+        check_ajax_referer( 'wpmind_ajax', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+        }
+
+        $provider = sanitize_text_field( $_POST['provider'] ?? '' );
+        $failover = Failover\FailoverManager::instance();
+
+        if ( empty( $provider ) || $provider === 'all' ) {
+            $failover->resetAll();
+            wp_send_json_success( [ 'message' => __( '所有熔断器已重置', 'wpmind' ) ] );
+        } else {
+            $failover->resetProvider( $provider );
+            wp_send_json_success( [ 'message' => __( '熔断器已重置', 'wpmind' ) ] );
+        }
     }
 
     /**

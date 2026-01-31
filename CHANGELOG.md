@@ -1,5 +1,32 @@
 # WPMind 更新日志
 
+## [1.5.0] - 2026-01-31
+
+### ✨ 新功能
+- **故障转移机制**: 实现双层故障转移架构
+  - Layer 1: 软故障转移 - 单次请求失败时自动重试
+  - Layer 2: 熔断器 - 持续故障时自动切换到备用服务
+- **Circuit Breaker 熔断器**: 三状态模型 (Closed/Open/Half-Open)
+  - 连续失败 5 次或失败率 > 40% 触发熔断
+  - 20 分钟后自动恢复探测
+- **Provider 健康追踪**: 记录每个服务的成功率和延迟
+- **AJAX API**: 新增获取状态和重置熔断器接口
+
+### 📁 新增文件
+```
+includes/Failover/
+├── CircuitBreaker.php          # 熔断器核心类
+├── ProviderHealthTracker.php   # 健康状态追踪
+└── FailoverManager.php         # 故障转移管理器
+```
+
+### 🔧 技术改进
+- 基于 Salesforce Agentforce 实践的参数配置
+- 使用 WordPress transient 存储状态
+- 模块化设计，可独立禁用
+
+---
+
 ## [1.4.0] - 2026-01-31
 
 ### ✨ 新功能
