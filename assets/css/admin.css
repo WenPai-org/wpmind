@@ -347,6 +347,48 @@ input.is-invalid {
     line-height: 18px;
 }
 
+/* 上次更新时间 */
+.wpmind-last-updated {
+    font-size: 12px;
+    font-weight: 400;
+    color: #646970;
+    margin-right: auto;
+}
+
+/* 费用说明 */
+.wpmind-usage-note {
+    font-size: 12px;
+    color: #646970;
+    margin: 0 0 16px 0;
+    padding: 8px 12px;
+    background: #f0f6fc;
+    border-left: 3px solid #2271b1;
+    border-radius: 0 4px 4px 0;
+}
+
+/* 空状态 */
+.wpmind-usage-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #646970;
+}
+
+.wpmind-usage-empty .dashicons {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #c3c4c7;
+    margin-bottom: 12px;
+}
+
+.wpmind-usage-empty p {
+    margin: 8px 0;
+}
+
+.wpmind-usage-empty p.description {
+    font-size: 13px;
+}
+
 .wpmind-clear-usage {
     margin-left: auto;
     color: #d63638;
@@ -402,8 +444,59 @@ input.is-invalid {
 
 /* 费用显示（可能包含两种货币） */
 .wpmind-usage-value.wpmind-usage-cost {
-    font-size: 16px;
-    white-space: nowrap;
+    font-size: 14px;
+}
+
+/* 响应式：小屏幕费用换行显示 */
+@media (max-width: 782px) {
+    .wpmind-usage-cards {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .wpmind-usage-card-body {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .wpmind-usage-stat {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: left;
+    }
+
+    .wpmind-usage-value {
+        font-size: 16px;
+    }
+
+    .wpmind-usage-value.wpmind-usage-cost {
+        font-size: 13px;
+    }
+
+    .wpmind-usage-label {
+        margin-top: 0;
+        order: -1;
+    }
+
+    .wpmind-usage-panel .title {
+        flex-wrap: wrap;
+    }
+
+    .wpmind-last-updated {
+        width: 100%;
+        order: 10;
+        margin-top: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .wpmind-usage-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .wpmind-provider-usage-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .wpmind-usage-label {

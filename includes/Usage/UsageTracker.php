@@ -123,18 +123,16 @@ class UsageTracker
         $outputTokens = max(0, $outputTokens);
         $latencyMs = max(0, $latencyMs);
 
-        if ($inputTokens === 0 && $outputTokens === 0) {
-            return;
-        }
-
-        // 计算成本
+        // 计算成本（即使 tokens 为 0 也计算，可能有固定费用）
         $cost = self::calculateCost($provider, $model, $inputTokens, $outputTokens);
 
-        // 更新汇总统计
+        // 更新汇总统计（始终计入请求数，即使 tokens 为 0）
         self::updateStats($provider, $model, $inputTokens, $outputTokens, $cost);
 
-        // 添加到历史记录
-        self::addToHistory($provider, $model, $inputTokens, $outputTokens, $cost, $latencyMs);
+        // 只有有 token 使用时才添加到历史记录（避免历史记录膨胀）
+        if ($inputTokens > 0 || $outputTokens > 0) {
+            self::addToHistory($provider, $model, $inputTokens, $outputTokens, $cost, $latencyMs);
+        }
     }
 
     /**
@@ -169,7 +167,7 @@ class UsageTracker
     }
 
     /**
-     * 更新汇总统计
+     * 更新汇总统计（带并发锁）
      */
     private static function updateStats(
         string $provider,
@@ -178,133 +176,163 @@ class UsageTracker
         int $outputTokens,
         float $cost
     ): void {
-        // 使用对象缓存减少数据库读取
-        $cache_key = 'wpmind_usage_stats';
-        $stats = wp_cache_get($cache_key);
+        $lock_key = 'wpmind_usage_stats_lock';
+        $max_retries = 3;
+        $retry_delay = 50000; // 50ms
 
-        if (false === $stats) {
+        // 尝试获取锁
+        for ($i = 0; $i < $max_retries; $i++) {
+            if (false === get_transient($lock_key)) {
+                set_transient($lock_key, true, 5); // 5 秒锁超时
+                break;
+            }
+            usleep($retry_delay);
+        }
+
+        try {
+            // 直接从数据库读取（绕过缓存以确保数据一致性）
             $stats = get_option(self::OPTION_KEY, []);
-        }
 
-        $today = date('Y-m-d');
-        $month = date('Y-m');
-        $currency = self::getCurrency($provider);
-
-        // 初始化结构
-        if (!isset($stats['providers'][$provider])) {
-            $stats['providers'][$provider] = [
-                'total_input_tokens' => 0,
-                'total_output_tokens' => 0,
-                'total_cost' => 0,
-                'request_count' => 0,
-                'models' => [],
-            ];
-        }
-
-        if (!isset($stats['daily'][$today])) {
-            $stats['daily'][$today] = [
-                'input_tokens' => 0,
-                'output_tokens' => 0,
-                'cost_usd' => 0,
-                'cost_cny' => 0,
-                'requests' => 0,
-            ];
-        }
-
-        if (!isset($stats['monthly'][$month])) {
-            $stats['monthly'][$month] = [
-                'input_tokens' => 0,
-                'output_tokens' => 0,
-                'cost_usd' => 0,
-                'cost_cny' => 0,
-                'requests' => 0,
-            ];
-        }
-
-        // 更新 Provider 统计
-        $stats['providers'][$provider]['total_input_tokens'] += $inputTokens;
-        $stats['providers'][$provider]['total_output_tokens'] += $outputTokens;
-        $stats['providers'][$provider]['total_cost'] += $cost;
-        $stats['providers'][$provider]['request_count']++;
-
-        // 更新模型统计
-        if (!isset($stats['providers'][$provider]['models'][$model])) {
-            $stats['providers'][$provider]['models'][$model] = [
-                'input_tokens' => 0,
-                'output_tokens' => 0,
-                'cost' => 0,
-                'requests' => 0,
-            ];
-        }
-        $stats['providers'][$provider]['models'][$model]['input_tokens'] += $inputTokens;
-        $stats['providers'][$provider]['models'][$model]['output_tokens'] += $outputTokens;
-        $stats['providers'][$provider]['models'][$model]['cost'] += $cost;
-        $stats['providers'][$provider]['models'][$model]['requests']++;
-
-        // 更新日统计（分货币）
-        $stats['daily'][$today]['input_tokens'] += $inputTokens;
-        $stats['daily'][$today]['output_tokens'] += $outputTokens;
-        if ($currency === 'CNY') {
-            $stats['daily'][$today]['cost_cny'] = ($stats['daily'][$today]['cost_cny'] ?? 0) + $cost;
-        } else {
-            $stats['daily'][$today]['cost_usd'] = ($stats['daily'][$today]['cost_usd'] ?? 0) + $cost;
-        }
-        $stats['daily'][$today]['requests']++;
-
-        // 更新月统计（分货币）
-        $stats['monthly'][$month]['input_tokens'] += $inputTokens;
-        $stats['monthly'][$month]['output_tokens'] += $outputTokens;
-        if ($currency === 'CNY') {
-            $stats['monthly'][$month]['cost_cny'] = ($stats['monthly'][$month]['cost_cny'] ?? 0) + $cost;
-        } else {
-            $stats['monthly'][$month]['cost_usd'] = ($stats['monthly'][$month]['cost_usd'] ?? 0) + $cost;
-        }
-        $stats['monthly'][$month]['requests']++;
-
-        // 更新总计（分货币）
-        if (!isset($stats['total'])) {
-            $stats['total'] = [
-                'input_tokens' => 0,
-                'output_tokens' => 0,
-                'cost_usd' => 0,
-                'cost_cny' => 0,
-                'requests' => 0,
-            ];
-        }
-        $stats['total']['input_tokens'] += $inputTokens;
-        $stats['total']['output_tokens'] += $outputTokens;
-        if ($currency === 'CNY') {
-            $stats['total']['cost_cny'] = ($stats['total']['cost_cny'] ?? 0) + $cost;
-        } else {
-            $stats['total']['cost_usd'] = ($stats['total']['cost_usd'] ?? 0) + $cost;
-        }
-        $stats['total']['requests']++;
-
-        $stats['last_updated'] = time();
-
-        // 清理旧的日统计（保留 30 天）
-        $cutoffDate = date('Y-m-d', strtotime('-30 days'));
-        foreach (array_keys($stats['daily'] ?? []) as $date) {
-            if ($date < $cutoffDate) {
-                unset($stats['daily'][$date]);
+            // 类型安全检查
+            if (!is_array($stats)) {
+                $stats = [];
             }
-        }
 
-        // 清理旧的月统计（保留 12 个月）
-        $cutoffMonth = date('Y-m', strtotime('-12 months'));
-        foreach (array_keys($stats['monthly'] ?? []) as $m) {
-            if ($m < $cutoffMonth) {
-                unset($stats['monthly'][$m]);
+            // 使用 WordPress 时区
+            $today = wp_date('Y-m-d');
+            $month = wp_date('Y-m');
+            $currency = self::getCurrency($provider);
+
+            // 初始化结构
+            if (!isset($stats['providers']) || !is_array($stats['providers'])) {
+                $stats['providers'] = [];
             }
-        }
+            if (!isset($stats['providers'][$provider])) {
+                $stats['providers'][$provider] = [
+                    'total_input_tokens' => 0,
+                    'total_output_tokens' => 0,
+                    'total_cost' => 0,
+                    'request_count' => 0,
+                    'models' => [],
+                ];
+            }
 
-        // 保存到数据库和缓存
-        update_option(self::OPTION_KEY, $stats, false);
-        wp_cache_set($cache_key, $stats, '', 300); // 缓存 5 分钟
+            if (!isset($stats['daily']) || !is_array($stats['daily'])) {
+                $stats['daily'] = [];
+            }
+            if (!isset($stats['daily'][$today])) {
+                $stats['daily'][$today] = [
+                    'input_tokens' => 0,
+                    'output_tokens' => 0,
+                    'cost_usd' => 0,
+                    'cost_cny' => 0,
+                    'requests' => 0,
+                ];
+            }
+
+            if (!isset($stats['monthly']) || !is_array($stats['monthly'])) {
+                $stats['monthly'] = [];
+            }
+            if (!isset($stats['monthly'][$month])) {
+                $stats['monthly'][$month] = [
+                    'input_tokens' => 0,
+                    'output_tokens' => 0,
+                    'cost_usd' => 0,
+                    'cost_cny' => 0,
+                    'requests' => 0,
+                ];
+            }
+
+            // 更新 Provider 统计
+            $stats['providers'][$provider]['total_input_tokens'] += $inputTokens;
+            $stats['providers'][$provider]['total_output_tokens'] += $outputTokens;
+            $stats['providers'][$provider]['total_cost'] += $cost;
+            $stats['providers'][$provider]['request_count']++;
+
+            // 更新模型统计
+            if (!isset($stats['providers'][$provider]['models'][$model])) {
+                $stats['providers'][$provider]['models'][$model] = [
+                    'input_tokens' => 0,
+                    'output_tokens' => 0,
+                    'cost' => 0,
+                    'requests' => 0,
+                ];
+            }
+            $stats['providers'][$provider]['models'][$model]['input_tokens'] += $inputTokens;
+            $stats['providers'][$provider]['models'][$model]['output_tokens'] += $outputTokens;
+            $stats['providers'][$provider]['models'][$model]['cost'] += $cost;
+            $stats['providers'][$provider]['models'][$model]['requests']++;
+
+            // 更新日统计（分货币）
+            $stats['daily'][$today]['input_tokens'] += $inputTokens;
+            $stats['daily'][$today]['output_tokens'] += $outputTokens;
+            if ($currency === 'CNY') {
+                $stats['daily'][$today]['cost_cny'] = ($stats['daily'][$today]['cost_cny'] ?? 0) + $cost;
+            } else {
+                $stats['daily'][$today]['cost_usd'] = ($stats['daily'][$today]['cost_usd'] ?? 0) + $cost;
+            }
+            $stats['daily'][$today]['requests']++;
+
+            // 更新月统计（分货币）
+            $stats['monthly'][$month]['input_tokens'] += $inputTokens;
+            $stats['monthly'][$month]['output_tokens'] += $outputTokens;
+            if ($currency === 'CNY') {
+                $stats['monthly'][$month]['cost_cny'] = ($stats['monthly'][$month]['cost_cny'] ?? 0) + $cost;
+            } else {
+                $stats['monthly'][$month]['cost_usd'] = ($stats['monthly'][$month]['cost_usd'] ?? 0) + $cost;
+            }
+            $stats['monthly'][$month]['requests']++;
+
+            // 更新总计（分货币）
+            if (!isset($stats['total']) || !is_array($stats['total'])) {
+                $stats['total'] = [
+                    'input_tokens' => 0,
+                    'output_tokens' => 0,
+                    'cost_usd' => 0,
+                    'cost_cny' => 0,
+                    'requests' => 0,
+                ];
+            }
+            $stats['total']['input_tokens'] = ($stats['total']['input_tokens'] ?? 0) + $inputTokens;
+            $stats['total']['output_tokens'] = ($stats['total']['output_tokens'] ?? 0) + $outputTokens;
+            if ($currency === 'CNY') {
+                $stats['total']['cost_cny'] = ($stats['total']['cost_cny'] ?? 0) + $cost;
+            } else {
+                $stats['total']['cost_usd'] = ($stats['total']['cost_usd'] ?? 0) + $cost;
+            }
+            $stats['total']['requests'] = ($stats['total']['requests'] ?? 0) + 1;
+
+            $stats['last_updated'] = time();
+
+            // 清理旧的日统计（保留 30 天）
+            $cutoffDate = wp_date('Y-m-d', strtotime('-30 days'));
+            foreach (array_keys($stats['daily'] ?? []) as $date) {
+                if ($date < $cutoffDate) {
+                    unset($stats['daily'][$date]);
+                }
+            }
+
+            // 清理旧的月统计（保留 12 个月）
+            $cutoffMonth = wp_date('Y-m', strtotime('-12 months'));
+            foreach (array_keys($stats['monthly'] ?? []) as $m) {
+                if ($m < $cutoffMonth) {
+                    unset($stats['monthly'][$m]);
+                }
+            }
+
+            // 保存到数据库
+            update_option(self::OPTION_KEY, $stats, false);
+
+            // 更新缓存
+            wp_cache_set('wpmind_usage_stats', $stats, '', 300);
+        } finally {
+            // 释放锁
+            delete_transient($lock_key);
+        }
     }
 
     /**
-     * 添加到历史记录
+     * 添加到历史记录（带并发锁）
      */
     private static function addToHistory(
         string $provider,
@@ -314,32 +342,52 @@ class UsageTracker
         float $cost,
         int $latencyMs
     ): void {
-        // 使用对象缓存
-        $cache_key = 'wpmind_usage_history';
-        $history = wp_cache_get($cache_key);
+        $lock_key = 'wpmind_usage_history_lock';
+        $max_retries = 3;
+        $retry_delay = 50000; // 50ms
 
-        if (false === $history) {
+        // 尝试获取锁
+        for ($i = 0; $i < $max_retries; $i++) {
+            if (false === get_transient($lock_key)) {
+                set_transient($lock_key, true, 5); // 5 秒锁超时
+                break;
+            }
+            usleep($retry_delay);
+        }
+
+        try {
+            // 直接从数据库读取
             $history = get_option(self::HISTORY_KEY, []);
+
+            // 类型安全检查
+            if (!is_array($history)) {
+                $history = [];
+            }
+
+            $history[] = [
+                'provider' => $provider,
+                'model' => $model,
+                'input_tokens' => $inputTokens,
+                'output_tokens' => $outputTokens,
+                'cost' => $cost,
+                'latency_ms' => $latencyMs,
+                'timestamp' => time(),
+            ];
+
+            // 保持历史记录大小
+            if (count($history) > self::MAX_HISTORY) {
+                $history = array_slice($history, -self::MAX_HISTORY);
+            }
+
+            // 保存到数据库
+            update_option(self::HISTORY_KEY, $history, false);
+
+            // 更新缓存
+            wp_cache_set('wpmind_usage_history', $history, '', 300);
+        } finally {
+            // 释放锁
+            delete_transient($lock_key);
         }
-
-        $history[] = [
-            'provider' => $provider,
-            'model' => $model,
-            'input_tokens' => $inputTokens,
-            'output_tokens' => $outputTokens,
-            'cost' => $cost,
-            'latency_ms' => $latencyMs,
-            'timestamp' => time(),
-        ];
-
-        // 保持历史记录大小
-        if (count($history) > self::MAX_HISTORY) {
-            $history = array_slice($history, -self::MAX_HISTORY);
-        }
-
-        // 保存到数据库和缓存
-        update_option(self::HISTORY_KEY, $history, false);
-        wp_cache_set($cache_key, $history, '', 300); // 缓存 5 分钟
     }
 
     /**
@@ -354,6 +402,11 @@ class UsageTracker
         if (false === $stats) {
             $stats = get_option(self::OPTION_KEY, []);
             wp_cache_set($cache_key, $stats, '', 300);
+        }
+
+        // 类型安全检查
+        if (!is_array($stats)) {
+            $stats = [];
         }
 
         return $stats ?: [
@@ -376,7 +429,7 @@ class UsageTracker
     public static function getTodayStats(): array
     {
         $stats = self::getStats();
-        $today = date('Y-m-d');
+        $today = wp_date('Y-m-d');
 
         return $stats['daily'][$today] ?? [
             'input_tokens' => 0,
@@ -395,9 +448,9 @@ class UsageTracker
         $stats = self::getStats();
         $daily = $stats['daily'] ?? [];
 
-        // 计算本周的日期范围（周一到今天）
-        $weekStart = date('Y-m-d', strtotime('monday this week'));
-        $today = date('Y-m-d');
+        // 使用 WordPress 时区计算本周的日期范围
+        $weekStart = wp_date('Y-m-d', strtotime('monday this week'));
+        $today = wp_date('Y-m-d');
 
         $result = [
             'input_tokens' => 0,
@@ -427,7 +480,7 @@ class UsageTracker
     public static function getMonthStats(): array
     {
         $stats = self::getStats();
-        $month = date('Y-m');
+        $month = wp_date('Y-m');
 
         return $stats['monthly'][$month] ?? [
             'input_tokens' => 0,
@@ -455,7 +508,12 @@ class UsageTracker
             wp_cache_set($cache_key, $history, '', 300);
         }
 
-        return array_slice(array_reverse($history ?: []), 0, $limit);
+        // 类型安全检查
+        if (!is_array($history)) {
+            $history = [];
+        }
+
+        return array_slice(array_reverse($history), 0, $limit);
     }
 
     /**

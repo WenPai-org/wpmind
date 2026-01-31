@@ -24,6 +24,8 @@ $usage_stats = \WPMind\Usage\UsageTracker::getStats();
 $today_stats = \WPMind\Usage\UsageTracker::getTodayStats();
 $week_stats  = \WPMind\Usage\UsageTracker::getWeekStats();
 $month_stats = \WPMind\Usage\UsageTracker::getMonthStats();
+$last_updated = $usage_stats['last_updated'] ?? 0;
+$has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
 ?>
 
 <div class="wrap wpmind-settings">
@@ -36,14 +38,39 @@ $month_stats = \WPMind\Usage\UsageTracker::getMonthStats();
     <div class="wpmind-usage-panel">
         <h2 class="title">
             <?php esc_html_e( 'Token 用量统计', 'wpmind' ); ?>
-            <button type="button" class="button button-small wpmind-refresh-usage" title="<?php esc_attr_e( '刷新统计', 'wpmind' ); ?>">
+            <?php if ( $last_updated > 0 ) : ?>
+            <span class="wpmind-last-updated" title="<?php esc_attr_e( '上次更新时间', 'wpmind' ); ?>">
+                <?php
+                printf(
+                    /* translators: %s: relative time */
+                    esc_html__( '更新于 %s', 'wpmind' ),
+                    esc_html( human_time_diff( $last_updated, time() ) . __( '前', 'wpmind' ) )
+                );
+                ?>
+            </span>
+            <?php endif; ?>
+            <button type="button" class="button button-small wpmind-refresh-usage" title="<?php esc_attr_e( '刷新统计', 'wpmind' ); ?>" aria-label="<?php esc_attr_e( '刷新用量统计', 'wpmind' ); ?>">
                 <span class="dashicons dashicons-update"></span>
             </button>
-            <button type="button" class="button button-small wpmind-clear-usage" title="<?php esc_attr_e( '清除统计', 'wpmind' ); ?>">
+            <button type="button" class="button button-small wpmind-clear-usage" title="<?php esc_attr_e( '清除统计', 'wpmind' ); ?>" aria-label="<?php esc_attr_e( '清除所有用量统计数据', 'wpmind' ); ?>">
                 <span class="dashicons dashicons-trash"></span>
                 <?php esc_html_e( '清除', 'wpmind' ); ?>
             </button>
         </h2>
+
+        <?php if ( ! $has_usage_data ) : ?>
+        <!-- 空状态提示 -->
+        <div class="wpmind-usage-empty">
+            <span class="dashicons dashicons-chart-bar"></span>
+            <p><?php esc_html_e( '暂无用量数据', 'wpmind' ); ?></p>
+            <p class="description"><?php esc_html_e( '当 AI 服务被调用时，用量统计将自动记录在这里。', 'wpmind' ); ?></p>
+        </div>
+        <?php else : ?>
+
+        <p class="wpmind-usage-note">
+            <?php esc_html_e( '费用为估算值，按各服务商官方定价计算（每百万 tokens）。实际费用以服务商账单为准。', 'wpmind' ); ?>
+        </p>
+
         <div class="wpmind-usage-cards">
             <div class="wpmind-usage-card">
                 <div class="wpmind-usage-card-header"><?php esc_html_e( '今日', 'wpmind' ); ?></div>
@@ -146,6 +173,8 @@ $month_stats = \WPMind\Usage\UsageTracker::getMonthStats();
             <?php endforeach; ?>
         </div>
         <?php endif; ?>
+
+        <?php endif; // end has_usage_data ?>
     </div>
 
     <!-- Provider 状态面板 -->
