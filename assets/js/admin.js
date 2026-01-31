@@ -235,13 +235,23 @@
      * 刷新 Provider 状态
      */
     function initStatusRefresh() {
-        $('.wpmind-refresh-status').on('click', function(e) {
+        // 使用事件委托确保动态元素也能响应
+        $(document).on('click', '.wpmind-refresh-status', function(e) {
             e.preventDefault();
+            e.stopPropagation();
 
             var $button = $(this);
             if ($button.hasClass('is-loading')) return;
 
             $button.addClass('is-loading');
+            var $icon = $button.find('.dashicons');
+
+            // 检查 wpmindData 是否存在
+            if (typeof wpmindData === 'undefined') {
+                console.error('WPMind: wpmindData not found');
+                $button.removeClass('is-loading');
+                return;
+            }
 
             $.ajax({
                 url: wpmindData.ajaxurl || ajaxurl,
@@ -253,7 +263,19 @@
                 success: function(response) {
                     if (response.success && response.data.providers) {
                         updateStatusGrid(response.data.providers);
+                        // 显示成功反馈
+                        $icon.removeClass('dashicons-update').addClass('dashicons-yes');
+                        setTimeout(function() {
+                            $icon.removeClass('dashicons-yes').addClass('dashicons-update');
+                        }, 1000);
                     }
+                },
+                error: function(xhr, status, error) {
+                    console.error('WPMind: Status refresh failed', error);
+                    $icon.removeClass('dashicons-update').addClass('dashicons-warning');
+                    setTimeout(function() {
+                        $icon.removeClass('dashicons-warning').addClass('dashicons-update');
+                    }, 2000);
                 },
                 complete: function() {
                     $button.removeClass('is-loading');
@@ -271,6 +293,9 @@
         $.each(providers, function(providerId, status) {
             var $item = $grid.find('[data-provider="' + providerId + '"]');
             if ($item.length) {
+                // 添加更新动画
+                $item.css('opacity', '0.5');
+
                 $item.find('.wpmind-status-indicator')
                     .removeClass('wpmind-status-closed wpmind-status-open wpmind-status-half_open')
                     .addClass('wpmind-status-' + status.state);
@@ -289,6 +314,11 @@
                 } else {
                     $recovery.remove();
                 }
+
+                // 恢复透明度
+                setTimeout(function() {
+                    $item.css('opacity', '1');
+                }, 150);
             }
         });
     }
@@ -297,15 +327,25 @@
      * 重置熔断器
      */
     function initResetBreakers() {
-        $('.wpmind-reset-all-breakers').on('click', function(e) {
+        // 使用事件委托确保动态元素也能响应
+        $(document).on('click', '.wpmind-reset-all-breakers', function(e) {
             e.preventDefault();
+            e.stopPropagation();
 
             if (!confirm('确定要重置所有熔断器吗？这将清除所有服务的健康状态记录。')) {
                 return;
             }
 
             var $button = $(this);
-            $button.prop('disabled', true);
+            var originalText = $button.html();
+            $button.prop('disabled', true).html('<span class="dashicons dashicons-update wpmind-spinning"></span> 重置中...');
+
+            // 检查 wpmindData 是否存在
+            if (typeof wpmindData === 'undefined') {
+                console.error('WPMind: wpmindData not found');
+                $button.prop('disabled', false).html(originalText);
+                return;
+            }
 
             $.ajax({
                 url: wpmindData.ajaxurl || ajaxurl,
@@ -317,12 +357,21 @@
                 },
                 success: function(response) {
                     if (response.success) {
+                        // 显示成功
+                        $button.html('<span class="dashicons dashicons-yes"></span> 已重置');
                         // 刷新状态
-                        $('.wpmind-refresh-status').trigger('click');
+                        setTimeout(function() {
+                            $('.wpmind-refresh-status').trigger('click');
+                        }, 500);
                     }
                 },
+                error: function() {
+                    $button.html('<span class="dashicons dashicons-warning"></span> 失败');
+                },
                 complete: function() {
-                    $button.prop('disabled', false);
+                    setTimeout(function() {
+                        $button.prop('disabled', false).html(originalText);
+                    }, 1500);
                 }
             });
         });

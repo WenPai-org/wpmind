@@ -307,36 +307,60 @@ input.is-invalid {
 .wpmind-status-panel {
     background: #fff;
     border: 1px solid #c3c4c7;
-    border-radius: 4px;
-    padding: 16px;
+    border-radius: 8px;
+    padding: 20px;
     margin: 20px 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .wpmind-status-panel .title {
     margin: 0 0 16px 0;
-    padding: 0;
+    padding: 0 0 12px 0;
     border: none;
+    border-bottom: 1px solid #f0f0f1;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1d2327;
 }
 
 .wpmind-status-panel .title .button {
-    padding: 0 8px;
-    min-height: 28px;
+    padding: 4px 12px;
+    min-height: 32px;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
+    font-size: 13px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.wpmind-status-panel .title .button:hover {
+    background: #f0f0f1;
+    border-color: #8c8f94;
+}
+
+.wpmind-status-panel .title .button:active {
+    transform: scale(0.98);
 }
 
 .wpmind-status-panel .title .dashicons {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+}
+
+.wpmind-refresh-status.is-loading {
+    pointer-events: none;
+    opacity: 0.7;
 }
 
 .wpmind-refresh-status.is-loading .dashicons {
-    animation: wpmind-spin 1s linear infinite;
+    animation: wpmind-spin 0.8s linear infinite;
 }
 
 @keyframes wpmind-spin {
@@ -344,59 +368,108 @@ input.is-invalid {
     to { transform: rotate(360deg); }
 }
 
+.wpmind-reset-all-breakers {
+    margin-left: auto;
+    color: #d63638;
+    border-color: #d63638;
+}
+
+.wpmind-reset-all-breakers:hover {
+    background: #fcf0f1 !important;
+    border-color: #d63638 !important;
+    color: #d63638;
+}
+
 .wpmind-status-grid {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 12px;
 }
 
 .wpmind-status-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    background: #f6f7f7;
-    border-radius: 4px;
+    gap: 10px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #f0f0f1 100%);
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
     font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.wpmind-status-item:hover {
+    border-color: #c3c4c7;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .wpmind-status-indicator {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     flex-shrink: 0;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
 }
 
 .wpmind-status-indicator.wpmind-status-closed {
-    background: #00a32a;
+    background: linear-gradient(135deg, #00a32a 0%, #008a20 100%);
+    box-shadow: 0 0 0 3px rgba(0, 163, 42, 0.15);
 }
 
 .wpmind-status-indicator.wpmind-status-open {
-    background: #d63638;
+    background: linear-gradient(135deg, #d63638 0%, #b32d2e 100%);
+    box-shadow: 0 0 0 3px rgba(214, 54, 56, 0.15);
+    animation: wpmind-pulse 2s ease-in-out infinite;
 }
 
 .wpmind-status-indicator.wpmind-status-half_open {
-    background: #dba617;
+    background: linear-gradient(135deg, #dba617 0%, #c99a10 100%);
+    box-shadow: 0 0 0 3px rgba(219, 166, 23, 0.15);
+}
+
+@keyframes wpmind-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
 }
 
 .wpmind-status-name {
-    font-weight: 500;
+    font-weight: 600;
+    color: #1d2327;
 }
 
 .wpmind-status-label {
-    color: #50575e;
+    color: #646970;
     font-size: 12px;
+    padding: 2px 8px;
+    background: #fff;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
 }
 
 .wpmind-status-score {
-    background: #e0e0e0;
-    padding: 2px 6px;
-    border-radius: 3px;
+    margin-left: auto;
+    background: linear-gradient(135deg, #2271b1 0%, #135e96 100%);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 4px;
     font-size: 11px;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .wpmind-status-recovery {
     color: #d63638;
     font-size: 11px;
+    font-weight: 500;
+    margin-left: 4px;
+}
+
+/* Spinning animation for buttons */
+.wpmind-spinning {
+    animation: wpmind-spin 0.8s linear infinite;
+}
+
+/* Official status badge */
+.wpmind-status-official {
+    background: #e7f3ff;
+    color: #0073aa;
 }
