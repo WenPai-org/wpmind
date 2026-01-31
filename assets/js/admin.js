@@ -1118,18 +1118,17 @@
             // 更新得分排名
             var $scores = $('#wpmind-routing-scores');
             if ($scores.length && data.provider_scores) {
-                var html = '';
+                $scores.empty();
                 $.each(data.provider_scores, function(providerId, scoreData) {
-                    html += '<div class="wpmind-routing-score-item">';
-                    html += '<span class="wpmind-routing-rank">#' + scoreData.rank + '</span>';
-                    html += '<span class="wpmind-routing-provider-name">' + scoreData.name + '</span>';
-                    html += '<div class="wpmind-routing-score-bar">';
-                    html += '<div class="wpmind-routing-score-fill" style="width: ' + scoreData.score + '%;"></div>';
-                    html += '</div>';
-                    html += '<span class="wpmind-routing-score-value">' + scoreData.score.toFixed(1) + '</span>';
-                    html += '</div>';
+                    var $item = $('<div class="wpmind-routing-score-item"></div>');
+                    $item.append($('<span class="wpmind-routing-rank"></span>').text('#' + scoreData.rank));
+                    $item.append($('<span class="wpmind-routing-provider-name"></span>').text(scoreData.name));
+                    var $bar = $('<div class="wpmind-routing-score-bar"></div>');
+                    $bar.append($('<div class="wpmind-routing-score-fill"></div>').css('width', scoreData.score + '%'));
+                    $item.append($bar);
+                    $item.append($('<span class="wpmind-routing-score-value"></span>').text(scoreData.score.toFixed(1)));
+                    $scores.append($item);
                 });
-                $scores.html(html);
             }
 
             // 更新推荐 Provider

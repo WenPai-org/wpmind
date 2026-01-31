@@ -105,10 +105,10 @@ class LoadBalancedStrategy extends AbstractStrategy
      */
     private function roundRobin(array $providers): string
     {
-        static $index = 0;
         $providers = array_values($providers);
+        $index = (int) get_transient('wpmind_round_robin_index') ?: 0;
         $selected = $providers[$index % count($providers)];
-        $index++;
+        set_transient('wpmind_round_robin_index', $index + 1, 3600);
         return $selected;
     }
 

@@ -165,19 +165,26 @@ class RoutingContext
     }
 
     /**
-     * 获取指定 Provider 的健康分数
+     * 获取指定 Provider 的健康分数（使用缓存）
      */
     public function getHealthScore(string $providerId): int
     {
-        return ProviderHealthTracker::getHealthScore($providerId);
+        $healthData = $this->getHealthData();
+        if (!isset($healthData[$providerId]) || empty($healthData[$providerId]['history'])) {
+            return 100;
+        }
+        $history = $healthData[$providerId]['history'];
+        $recentSuccesses = array_filter($history, fn($h) => $h['success']);
+        return (int) round((count($recentSuccesses) / count($history)) * 100);
     }
 
     /**
-     * 获取指定 Provider 的平均延迟
+     * 获取指定 Provider 的平均延迟（使用缓存）
      */
     public function getAverageLatency(string $providerId): int
     {
-        return ProviderHealthTracker::getAverageLatency($providerId);
+        $healthData = $this->getHealthData();
+        return $healthData[$providerId]['avg_latency'] ?? 0;
     }
 
     /**

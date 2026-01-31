@@ -1078,7 +1078,7 @@ final class WPMind {
         }
 
         $preferred = sanitize_text_field( $_POST['preferred'] ?? '' );
-        $excluded = isset( $_POST['excluded'] ) ? array_map( 'sanitize_text_field', (array) $_POST['excluded'] ) : [];
+        $excluded = isset( $_POST['excluded'] ) ? array_slice( array_map( 'sanitize_text_field', (array) $_POST['excluded'] ), 0, 50 ) : [];
         $input_tokens = absint( $_POST['input_tokens'] ?? 0 );
         $output_tokens = absint( $_POST['output_tokens'] ?? 0 );
 

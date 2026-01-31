@@ -98,7 +98,7 @@ class CostStrategy extends AbstractStrategy
             }
 
             // 成本相同时，健康分数高的优先
-            return $b['health'] - $a['health'];
+            return $b['health'] <=> $a['health'];
         });
 
         return array_keys($providerData);
