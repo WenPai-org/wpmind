@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-    define( 'WPMIND_VERSION', '1.6.0' );
+    define( 'WPMIND_VERSION', '1.6.1' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
     define( 'WPMIND_PLUGIN_FILE', __FILE__ );
@@ -605,14 +605,21 @@ final class WPMind {
             return;
         }
 
-        // 提取 usage 信息（OpenAI 兼容格式）
+        // 提取 usage 信息
         $usage = $data['usage'] ?? null;
         if ( ! $usage ) {
             return;
         }
 
-        $input_tokens = (int) ( $usage['prompt_tokens'] ?? 0 );
-        $output_tokens = (int) ( $usage['completion_tokens'] ?? 0 );
+        // 兼容不同 Provider 的格式
+        // OpenAI/国内服务: prompt_tokens / completion_tokens
+        // Anthropic: input_tokens / output_tokens
+        $input_tokens = (int) ( $usage['prompt_tokens'] ?? $usage['input_tokens'] ?? 0 );
+        $output_tokens = (int) ( $usage['completion_tokens'] ?? $usage['output_tokens'] ?? 0 );
+
+        // 验证 tokens 非负
+        $input_tokens = max( 0, $input_tokens );
+        $output_tokens = max( 0, $output_tokens );
 
         if ( $input_tokens === 0 && $output_tokens === 0 ) {
             return;

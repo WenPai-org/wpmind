@@ -104,6 +104,15 @@ class UsageTracker
         int $outputTokens,
         int $latencyMs = 0
     ): void {
+        // 输入验证：确保 tokens 非负
+        $inputTokens = max(0, $inputTokens);
+        $outputTokens = max(0, $outputTokens);
+        $latencyMs = max(0, $latencyMs);
+
+        if ($inputTokens === 0 && $outputTokens === 0) {
+            return;
+        }
+
         // 计算成本
         $cost = self::calculateCost($provider, $model, $inputTokens, $outputTokens);
 
@@ -142,7 +151,13 @@ class UsageTracker
         int $outputTokens,
         float $cost
     ): void {
-        $stats = get_option(self::OPTION_KEY, []);
+        // 使用对象缓存减少数据库读取
+        $cache_key = 'wpmind_usage_stats';
+        $stats = wp_cache_get($cache_key);
+
+        if (false === $stats) {
+            $stats = get_option(self::OPTION_KEY, []);
+        }
 
         $today = date('Y-m-d');
         $month = date('Y-m');
@@ -234,7 +249,9 @@ class UsageTracker
             }
         }
 
+        // 保存到数据库和缓存
         update_option(self::OPTION_KEY, $stats, false);
+        wp_cache_set($cache_key, $stats, '', 300); // 缓存 5 分钟
     }
 
     /**
@@ -248,7 +265,13 @@ class UsageTracker
         float $cost,
         int $latencyMs
     ): void {
-        $history = get_option(self::HISTORY_KEY, []);
+        // 使用对象缓存
+        $cache_key = 'wpmind_usage_history';
+        $history = wp_cache_get($cache_key);
+
+        if (false === $history) {
+            $history = get_option(self::HISTORY_KEY, []);
+        }
 
         $history[] = [
             'provider' => $provider,
@@ -265,7 +288,9 @@ class UsageTracker
             $history = array_slice($history, -self::MAX_HISTORY);
         }
 
+        // 保存到数据库和缓存
         update_option(self::HISTORY_KEY, $history, false);
+        wp_cache_set($cache_key, $history, '', 300); // 缓存 5 分钟
     }
 
     /**
@@ -273,7 +298,16 @@ class UsageTracker
      */
     public static function getStats(): array
     {
-        return get_option(self::OPTION_KEY, [
+        // 优先从缓存读取
+        $cache_key = 'wpmind_usage_stats';
+        $stats = wp_cache_get($cache_key);
+
+        if (false === $stats) {
+            $stats = get_option(self::OPTION_KEY, []);
+            wp_cache_set($cache_key, $stats, '', 300);
+        }
+
+        return $stats ?: [
             'providers' => [],
             'daily' => [],
             'monthly' => [],
@@ -283,7 +317,7 @@ class UsageTracker
                 'cost' => 0,
                 'requests' => 0,
             ],
-        ]);
+        ];
     }
 
     /**
@@ -326,8 +360,16 @@ class UsageTracker
      */
     public static function getHistory(int $limit = 50): array
     {
-        $history = get_option(self::HISTORY_KEY, []);
-        return array_slice(array_reverse($history), 0, $limit);
+        // 优先从缓存读取
+        $cache_key = 'wpmind_usage_history';
+        $history = wp_cache_get($cache_key);
+
+        if (false === $history) {
+            $history = get_option(self::HISTORY_KEY, []);
+            wp_cache_set($cache_key, $history, '', 300);
+        }
+
+        return array_slice(array_reverse($history ?: []), 0, $limit);
     }
 
     /**
@@ -345,6 +387,10 @@ class UsageTracker
     {
         delete_option(self::OPTION_KEY);
         delete_option(self::HISTORY_KEY);
+
+        // 清除缓存
+        wp_cache_delete('wpmind_usage_stats');
+        wp_cache_delete('wpmind_usage_history');
     }
 
     /**
