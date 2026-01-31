@@ -78,9 +78,9 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
             <div class="wpmind-endpoint-card" id="endpoint-<?php echo esc_attr( $key ); ?>">
                 <div class="wpmind-endpoint-header">
                     <?php
-                    // 使用 lobe-icons CDN SVG 图标
+                    // 使用 lobe-icons CDN SVG 图标 (v1.77.0)
                     $icon_slug = $endpoint['icon'] ?? $key;
-                    $icon_url  = "https://registry.npmmirror.com/@lobehub/icons-static-svg/latest/files/icons/{$icon_slug}.svg";
+                    $icon_url  = "https://registry.npmmirror.com/@lobehub/icons-static-svg/1.77.0/files/icons/{$icon_slug}.svg";
                     ?>
                     <img src="<?php echo esc_url( $icon_url ); ?>"
                          alt="<?php echo esc_attr( $endpoint['name'] ); ?>"
