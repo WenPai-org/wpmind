@@ -22,6 +22,7 @@ $provider_status  = $failover_manager->getStatusSummary();
 // 获取用量统计
 $usage_stats = \WPMind\Usage\UsageTracker::getStats();
 $today_stats = \WPMind\Usage\UsageTracker::getTodayStats();
+$week_stats  = \WPMind\Usage\UsageTracker::getWeekStats();
 $month_stats = \WPMind\Usage\UsageTracker::getMonthStats();
 ?>
 
@@ -57,6 +58,23 @@ $month_stats = \WPMind\Usage\UsageTracker::getMonthStats();
                     </div>
                     <div class="wpmind-usage-stat">
                         <span class="wpmind-usage-value" id="today-requests"><?php echo esc_html( $today_stats['requests'] ); ?></span>
+                        <span class="wpmind-usage-label"><?php esc_html_e( '请求', 'wpmind' ); ?></span>
+                    </div>
+                </div>
+            </div>
+            <div class="wpmind-usage-card">
+                <div class="wpmind-usage-card-header"><?php esc_html_e( '本周', 'wpmind' ); ?></div>
+                <div class="wpmind-usage-card-body">
+                    <div class="wpmind-usage-stat">
+                        <span class="wpmind-usage-value" id="week-tokens"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatTokens( $week_stats['input_tokens'] + $week_stats['output_tokens'] ) ); ?></span>
+                        <span class="wpmind-usage-label"><?php esc_html_e( 'Tokens', 'wpmind' ); ?></span>
+                    </div>
+                    <div class="wpmind-usage-stat">
+                        <span class="wpmind-usage-value" id="week-cost"><?php echo esc_html( \WPMind\Usage\UsageTracker::formatCost( $week_stats['cost'] ) ); ?></span>
+                        <span class="wpmind-usage-label"><?php esc_html_e( '费用', 'wpmind' ); ?></span>
+                    </div>
+                    <div class="wpmind-usage-stat">
+                        <span class="wpmind-usage-value" id="week-requests"><?php echo esc_html( $week_stats['requests'] ); ?></span>
                         <span class="wpmind-usage-label"><?php esc_html_e( '请求', 'wpmind' ); ?></span>
                     </div>
                 </div>

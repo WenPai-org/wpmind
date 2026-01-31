@@ -364,6 +364,38 @@ class UsageTracker
     }
 
     /**
+     * 获取本周统计（周一到周日）
+     */
+    public static function getWeekStats(): array
+    {
+        $stats = self::getStats();
+        $daily = $stats['daily'] ?? [];
+
+        // 计算本周的日期范围（周一到今天）
+        $weekStart = date('Y-m-d', strtotime('monday this week'));
+        $today = date('Y-m-d');
+
+        $result = [
+            'input_tokens' => 0,
+            'output_tokens' => 0,
+            'cost' => 0,
+            'requests' => 0,
+        ];
+
+        // 汇总本周每天的数据
+        foreach ($daily as $date => $dayStats) {
+            if ($date >= $weekStart && $date <= $today) {
+                $result['input_tokens'] += $dayStats['input_tokens'] ?? 0;
+                $result['output_tokens'] += $dayStats['output_tokens'] ?? 0;
+                $result['cost'] += $dayStats['cost'] ?? 0;
+                $result['requests'] += $dayStats['requests'] ?? 0;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * 获取本月统计
      */
     public static function getMonthStats(): array
