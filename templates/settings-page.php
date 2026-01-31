@@ -2,7 +2,7 @@
 /**
  * WPMind 设置页面模板
  *
- * Tab 导航结构：仪表板 | 服务配置 | 智能路由 | 预算管理
+ * 参考 Slim SEO 风格设计
  *
  * @package WPMind
  * @since 2.0.0
@@ -12,45 +12,64 @@
 defined( 'ABSPATH' ) || exit;
 ?>
 
-<div class="wrap wpmind-settings">
-    <h1><?php esc_html_e( '文派心思设置', 'wpmind' ); ?></h1>
-    <p class="description">
-        <?php esc_html_e( '配置自定义 AI 服务端点，支持国内外多种 AI 服务。', 'wpmind' ); ?>
-    </p>
+<div class="wrap wpmind-wrap">
+    <!-- 标题栏 -->
+    <h1 class="wpmind-title">
+        <span class="wpmind-title-left">
+            <span class="dashicons dashicons-superhero-alt"></span>
+            <?php esc_html_e( '文派心思', 'wpmind' ); ?>
+            <span class="wpmind-version">v<?php echo esc_html( WPMIND_VERSION ); ?></span>
+        </span>
 
-    <!-- Tab 导航 -->
-    <nav class="nav-tab-wrapper wpmind-tabs">
-        <a href="#dashboard" class="nav-tab nav-tab-active" data-tab="dashboard">
-            <span class="dashicons dashicons-chart-bar"></span>
-            <?php esc_html_e( '仪表板', 'wpmind' ); ?>
-        </a>
-        <a href="#services" class="nav-tab" data-tab="services">
-            <span class="dashicons dashicons-admin-plugins"></span>
-            <?php esc_html_e( '服务配置', 'wpmind' ); ?>
-        </a>
-        <a href="#routing" class="nav-tab" data-tab="routing">
-            <span class="dashicons dashicons-randomize"></span>
-            <?php esc_html_e( '智能路由', 'wpmind' ); ?>
-        </a>
-        <a href="#budget" class="nav-tab" data-tab="budget">
-            <span class="dashicons dashicons-money-alt"></span>
-            <?php esc_html_e( '预算管理', 'wpmind' ); ?>
-        </a>
-    </nav>
+        <span class="wpmind-title-right">
+            <a href="https://developer.wordpress.org/plugins/ai/" target="_blank" class="wpmind-title-link">
+                <span class="dashicons dashicons-book"></span>
+                <?php esc_html_e( '文档', 'wpmind' ); ?>
+            </a>
+            <a href="https://github.com/developer-jeremywang/wpmind" target="_blank" class="wpmind-title-link">
+                <span class="dashicons dashicons-editor-code"></span>
+                <?php esc_html_e( 'GitHub', 'wpmind' ); ?>
+            </a>
+            <a href="https://wpmind.developer.wang/support" target="_blank" class="wpmind-title-link">
+                <span class="dashicons dashicons-groups"></span>
+                <?php esc_html_e( '支持', 'wpmind' ); ?>
+            </a>
+        </span>
+    </h1>
 
-    <!-- Tab 内容 -->
-    <div class="wpmind-tab-content">
-        <div id="dashboard" class="wpmind-tab-pane active">
-            <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/dashboard.php'; ?>
-        </div>
-        <div id="services" class="wpmind-tab-pane">
-            <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/services.php'; ?>
-        </div>
-        <div id="routing" class="wpmind-tab-pane">
-            <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/routing.php'; ?>
-        </div>
-        <div id="budget" class="wpmind-tab-pane">
-            <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/budget.php'; ?>
+    <!-- 主内容区 -->
+    <div class="wpmind-content">
+        <!-- Tab 卡片 -->
+        <div class="wpmind-tabs-card">
+            <!-- Tab 导航 -->
+            <nav class="wpmind-tab-list">
+                <a href="#dashboard" class="wpmind-tab wpmind-tab-active" data-tab="dashboard">
+                    <?php esc_html_e( '仪表板', 'wpmind' ); ?>
+                </a>
+                <a href="#services" class="wpmind-tab" data-tab="services">
+                    <?php esc_html_e( '服务配置', 'wpmind' ); ?>
+                </a>
+                <a href="#routing" class="wpmind-tab" data-tab="routing">
+                    <?php esc_html_e( '智能路由', 'wpmind' ); ?>
+                </a>
+                <a href="#budget" class="wpmind-tab" data-tab="budget">
+                    <?php esc_html_e( '预算管理', 'wpmind' ); ?>
+                </a>
+            </nav>
+
+            <!-- Tab 内容 -->
+            <div id="dashboard" class="wpmind-tab-pane wpmind-tab-pane-active">
+                <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/dashboard.php'; ?>
+            </div>
+            <div id="services" class="wpmind-tab-pane">
+                <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/services.php'; ?>
+            </div>
+            <div id="routing" class="wpmind-tab-pane">
+                <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/routing.php'; ?>
+            </div>
+            <div id="budget" class="wpmind-tab-pane">
+                <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/budget.php'; ?>
+            </div>
         </div>
     </div>
 </div>

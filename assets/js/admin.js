@@ -12,7 +12,7 @@
      * Tab 导航管理
      */
     function initTabs() {
-        var $tabs = $('.wpmind-tabs .nav-tab');
+        var $tabs = $('.wpmind-tab');
         var $panes = $('.wpmind-tab-pane');
 
         if (!$tabs.length) return;
@@ -35,11 +35,11 @@
                 tabId = 'dashboard';
             }
 
-            $tabs.removeClass('nav-tab-active');
-            $tabs.filter('[data-tab="' + tabId + '"]').addClass('nav-tab-active');
+            $tabs.removeClass('wpmind-tab-active');
+            $tabs.filter('[data-tab="' + tabId + '"]').addClass('wpmind-tab-active');
 
-            $panes.removeClass('active').hide();
-            $('#' + tabId).addClass('active').show();
+            $panes.removeClass('wpmind-tab-pane-active');
+            $('#' + tabId).addClass('wpmind-tab-pane-active');
 
             // 懒加载图表（仅在首次切换到仪表板时）
             if (tabId === 'dashboard' && !window.wpmindChartsLoaded) {
@@ -61,7 +61,7 @@
             if (!this.container) {
                 // 在页面顶部创建通知容器
                 this.container = $('<div class="wpmind-notice-container"></div>');
-                $('.wrap.wpmind-settings').prepend(this.container);
+                $('.wrap.wpmind-wrap').prepend(this.container);
             }
         },
 

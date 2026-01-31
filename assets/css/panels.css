@@ -11,7 +11,7 @@
 .wpmind-status-panel {
     background: #fff;
     border: 1px solid var(--wpmind-gray-200);
-    border-radius: var(--wpmind-radius-lg);
+    border-radius: 0;
     padding: var(--wpmind-space-5);
     margin: var(--wpmind-space-5) 0;
 }
@@ -36,7 +36,7 @@
     align-items: center;
     gap: var(--wpmind-space-2);
     font-size: var(--wpmind-text-sm);
-    border-radius: var(--wpmind-radius-md);
+    border-radius: 0;
     cursor: pointer;
     transition: all var(--wpmind-transition-fast);
 }
@@ -87,7 +87,7 @@
     padding: var(--wpmind-space-3) var(--wpmind-space-4);
     background: var(--wpmind-gray-50);
     border: 1px solid var(--wpmind-gray-200);
-    border-radius: var(--wpmind-radius-lg);
+    border-radius: 0;
     font-size: var(--wpmind-text-sm);
     transition: all var(--wpmind-transition-normal);
 }
@@ -130,7 +130,7 @@
     font-size: var(--wpmind-text-xs);
     padding: 2px var(--wpmind-space-2);
     background: #fff;
-    border-radius: var(--wpmind-radius-sm);
+    border-radius: 0;
     border: 1px solid var(--wpmind-gray-200);
 }
 
@@ -139,7 +139,7 @@
     background: var(--wpmind-primary);
     color: #fff;
     padding: 3px var(--wpmind-space-2);
-    border-radius: var(--wpmind-radius-sm);
+    border-radius: 0;
     font-size: var(--wpmind-text-xs);
     font-weight: 600;
 }
@@ -162,7 +162,7 @@
 .wpmind-budget-panel {
     background: #fff;
     border: 1px solid var(--wpmind-gray-200);
-    border-radius: var(--wpmind-radius-lg);
+    border-radius: 0;
     padding: var(--wpmind-space-5);
     margin: var(--wpmind-space-5) 0;
 }
@@ -188,7 +188,7 @@
     font-size: var(--wpmind-text-xs);
     font-weight: 500;
     padding: 2px var(--wpmind-space-2);
-    border-radius: var(--wpmind-radius-sm);
+    border-radius: 0;
     margin-left: auto;
 }
 
@@ -296,14 +296,14 @@
     flex: 1;
     height: 6px;
     background: var(--wpmind-gray-200);
-    border-radius: var(--wpmind-radius-full);
+    border-radius: 0;
     overflow: hidden;
 }
 
 .wpmind-budget-progress-bar {
     height: 100%;
     background: var(--wpmind-primary);
-    border-radius: var(--wpmind-radius-full);
+    border-radius: 0;
     transition: width var(--wpmind-transition-slow);
 }
 
@@ -377,7 +377,7 @@
     font-size: var(--wpmind-text-xs);
     font-weight: 500;
     padding: 2px var(--wpmind-space-2);
-    border-radius: var(--wpmind-radius-sm);
+    border-radius: 0;
 }
 
 .wpmind-budget-badge.wpmind-budget-ok {
@@ -401,7 +401,7 @@
 .wpmind-analytics-panel {
     background: #fff;
     border: 1px solid var(--wpmind-gray-200);
-    border-radius: var(--wpmind-radius-lg);
+    border-radius: 0;
     padding: var(--wpmind-space-5);
     margin-bottom: var(--wpmind-space-5);
 }
@@ -423,7 +423,7 @@
     margin-left: auto;
     padding: var(--wpmind-space-1) var(--wpmind-space-2);
     border: 1px solid var(--wpmind-gray-300);
-    border-radius: var(--wpmind-radius-md);
+    border-radius: 0;
     font-size: var(--wpmind-text-sm);
 }
 
@@ -440,7 +440,7 @@
 .wpmind-chart-container {
     background: var(--wpmind-gray-50);
     border: 1px solid var(--wpmind-gray-200);
-    border-radius: var(--wpmind-radius-md);
+    border-radius: 0;
     padding: var(--wpmind-space-4);
 }
 
@@ -488,7 +488,7 @@
 .wpmind-routing-panel {
     background: #fff;
     border: 1px solid var(--wpmind-gray-200);
-    border-radius: var(--wpmind-radius-lg);
+    border-radius: 0;
     padding: var(--wpmind-space-5);
     margin: var(--wpmind-space-5) 0;
 }
@@ -544,7 +544,7 @@
     padding: var(--wpmind-space-4);
     background: var(--wpmind-gray-50);
     border: 2px solid var(--wpmind-gray-200);
-    border-radius: var(--wpmind-radius-lg);
+    border-radius: 0;
     cursor: pointer;
     transition: all var(--wpmind-transition-normal);
 }
@@ -591,7 +591,7 @@
     padding: var(--wpmind-space-3) var(--wpmind-space-4);
     background: var(--wpmind-gray-50);
     border: 1px solid var(--wpmind-gray-200);
-    border-radius: var(--wpmind-radius-md);
+    border-radius: 0;
 }
 
 .wpmind-routing-rank {
@@ -612,14 +612,14 @@
     flex: 1;
     height: 8px;
     background: var(--wpmind-gray-200);
-    border-radius: var(--wpmind-radius-full);
+    border-radius: 0;
     overflow: hidden;
 }
 
 .wpmind-routing-score-fill {
     height: 100%;
     background: linear-gradient(90deg, var(--wpmind-primary), var(--wpmind-primary-hover));
-    border-radius: var(--wpmind-radius-full);
+    border-radius: 0;
     transition: width var(--wpmind-transition-slow);
 }
 
@@ -639,7 +639,7 @@
     padding: var(--wpmind-space-3) var(--wpmind-space-4);
     background: var(--wpmind-success-light);
     border: 1px solid #a7f3d0;
-    border-radius: var(--wpmind-radius-md);
+    border-radius: 0;
     margin-bottom: var(--wpmind-space-3);
 }
 
@@ -661,7 +661,7 @@
     padding: var(--wpmind-space-3) var(--wpmind-space-4);
     background: var(--wpmind-gray-50);
     border: 1px solid var(--wpmind-gray-200);
-    border-radius: var(--wpmind-radius-md);
+    border-radius: 0;
 }
 
 .wpmind-routing-failover-label {
@@ -700,7 +700,7 @@
     left: 50%;
     transform: translate(-50%, -50%) scale(0.9);
     background: #fff;
-    border-radius: var(--wpmind-radius-xl);
+    border-radius: 0;
     box-shadow: var(--wpmind-shadow-lg);
     z-index: 100201;
     min-width: 360px;
@@ -757,7 +757,7 @@
     min-height: 36px;
     padding: 0 var(--wpmind-space-5);
     font-size: var(--wpmind-text-base);
-    border-radius: var(--wpmind-radius-md);
+    border-radius: 0;
 }
 
 /* Dialog Types */
