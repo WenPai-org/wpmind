@@ -1309,7 +1309,7 @@
             });
 
             // 策略卡片点击 - 备用方案
-            $(document).on('click', '.wpmind-strategy-tile', function (e) {
+            $(document).on('click', '.wpmind-strategy-item', function (e) {
                 var $radio = $(this).find('input[type="radio"]');
                 if (!$radio.prop('checked')) {
                     $radio.prop('checked', true).trigger('change');
@@ -1334,9 +1334,9 @@
             }
 
             // 更新 UI 状态
-            $('.wpmind-strategy-tile').removeClass('is-active');
+            $('.wpmind-strategy-item').removeClass('is-active');
             $('input[name="routing_strategy"][value="' + strategy + '"]')
-                .closest('.wpmind-strategy-tile')
+                .closest('.wpmind-strategy-item')
                 .addClass('is-active');
 
             $.ajax({

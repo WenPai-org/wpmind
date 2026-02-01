@@ -581,117 +581,134 @@
 
 /* Strategy Cards - 新设计 */
 /* Strategy Tiles - Gutenberg Compact Style */
-.wpmind-grid-compact {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--wpmind-space-2);
-}
-
-.wpmind-strategy-tile {
+/* Strategy List - Vertical Group Style */
+.wpmind-strategy-list {
     display: flex;
     flex-direction: column;
+    border: 1px solid var(--wpmind-gray-200);
+    border-radius: 4px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.wpmind-strategy-item {
+    display: flex;
     align-items: center;
-    justify-content: center;
-    padding: var(--wpmind-space-3);
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 2px;
+    padding: var(--wpmind-space-3) var(--wpmind-space-4);
     cursor: pointer;
+    border-bottom: 1px solid var(--wpmind-gray-100);
+    transition: background-color 0.15s ease;
+    gap: var(--wpmind-space-3);
     position: relative;
-    text-align: center;
-    min-height: 80px;
-    transition: all 0.2s ease;
 }
 
-.wpmind-strategy-tile:hover {
-    background: #f0f0f0;
-    border-color: #ccc;
+.wpmind-strategy-item:last-child {
+    border-bottom: none;
 }
 
-/* Active State - Gutenberg Selection Style */
-.wpmind-strategy-tile.is-active {
-    background: #fff;
-    box-shadow: inset 0 0 0 1.5px var(--wpmind-primary);
-    /* Outline effect */
-    border-color: transparent;
+.wpmind-strategy-item:hover {
+    background: var(--wpmind-gray-50);
 }
 
-.wpmind-strategy-tile input[type="radio"] {
+.wpmind-strategy-item.is-active {
+    background: var(--wpmind-primary-light);
+}
+
+.wpmind-strategy-item input[type="radio"] {
     position: absolute;
     opacity: 0;
     pointer-events: none;
 }
 
-/* Icon Box */
-.wpmind-strategy-icon-box {
-    margin-bottom: var(--wpmind-space-2);
-    color: var(--wpmind-gray-700);
+/* Icon */
+.wpmind-strategy-item-icon {
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: var(--wpmind-gray-100);
+    border-radius: 6px;
+    flex-shrink: 0;
+    color: var(--wpmind-gray-600);
 }
 
-.wpmind-strategy-tile:hover .wpmind-strategy-icon-box {
-    color: var(--wpmind-gray-900);
-}
-
-.wpmind-strategy-tile.is-active .wpmind-strategy-icon-box {
+.wpmind-strategy-item.is-active .wpmind-strategy-item-icon {
+    background: #fff;
     color: var(--wpmind-primary);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-.wpmind-strategy-icon-box .dashicons {
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
+.wpmind-strategy-item-icon .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
 }
 
-/* Title */
-.wpmind-strategy-title {
+/* Content */
+.wpmind-strategy-item-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.wpmind-strategy-item-title {
     font-size: 13px;
-    font-weight: 500;
-    color: var(--wpmind-gray-800);
-    line-height: 1.3;
-}
-
-.wpmind-strategy-tile.is-active .wpmind-strategy-title {
-    color: var(--wpmind-primary);
     font-weight: 600;
+    color: var(--wpmind-gray-800);
+    margin-bottom: 2px;
 }
 
-/* Check Badge (Optional visual indicator) */
-.wpmind-check-badge {
-    position: absolute;
-    top: 4px;
-    right: 4px;
+.wpmind-strategy-item-desc {
+    font-size: 12px;
+    color: var(--wpmind-gray-500);
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.wpmind-strategy-item.is-active .wpmind-strategy-item-title {
+    color: var(--wpmind-primary-dark);
+}
+
+.wpmind-strategy-item.is-active .wpmind-strategy-item-desc {
     color: var(--wpmind-primary);
-    width: 16px;
-    height: 16px;
+    opacity: 0.8;
+}
+
+/* Check Mark */
+.wpmind-strategy-item-check {
+    width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--wpmind-primary);
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.2s ease;
 }
 
-.wpmind-check-badge .dashicons {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
+.wpmind-strategy-item.is-active .wpmind-strategy-item-check {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.wpmind-strategy-item-check .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
 }
 
 /* Responsive */
-@media (max-width: 1024px) {
-    .wpmind-grid-compact {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
 @media (max-width: 600px) {
-    .wpmind-grid-compact {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .wpmind-strategy-tile {
-        padding: var(--wpmind-space-2);
-        min-height: 70px;
+    .wpmind-strategy-item-desc {
+        white-space: normal;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
     }
 }
 

@@ -45,25 +45,27 @@ $strategy_icons = array(
             <div class="wpmind-routing-section">
                 <h3 class="wpmind-routing-section-title"><?php esc_html_e( '路由策略', 'wpmind' ); ?></h3>
                 <p class="wpmind-routing-section-desc"><?php esc_html_e( '选择 AI 服务的路由策略', 'wpmind' ); ?></p>
-                <div class="wpmind-routing-strategies wpmind-grid-compact">
+                <div class="wpmind-strategy-list">
                     <?php foreach ( $available_strategies as $strategy_name => $strategy_info ) :
                         $icon = $strategy_icons[$strategy_name] ?? 'admin-generic';
                         $is_active = $current_strategy === $strategy_name;
                     ?>
-                    <label class="wpmind-strategy-tile <?php echo $is_active ? 'is-active' : ''; ?>" title="<?php echo esc_attr( $strategy_info['description'] ); ?>">
+                    <label class="wpmind-strategy-item <?php echo $is_active ? 'is-active' : ''; ?>">
                         <input type="radio" name="routing_strategy" value="<?php echo esc_attr( $strategy_name ); ?>"
                                <?php checked( $current_strategy, $strategy_name ); ?> hidden>
                         
-                        <div class="wpmind-strategy-icon-box">
+                        <div class="wpmind-strategy-item-icon">
                             <span class="dashicons dashicons-<?php echo esc_attr( $icon ); ?>"></span>
                         </div>
-                        <span class="wpmind-strategy-title"><?php echo esc_html( $strategy_info['display_name'] ); ?></span>
                         
-                        <?php if ( $is_active ) : ?>
-                        <span class="wpmind-check-badge">
+                        <div class="wpmind-strategy-item-content">
+                            <span class="wpmind-strategy-item-title"><?php echo esc_html( $strategy_info['display_name'] ); ?></span>
+                            <span class="wpmind-strategy-item-desc"><?php echo esc_html( $strategy_info['description'] ); ?></span>
+                        </div>
+                        
+                        <div class="wpmind-strategy-item-check">
                             <span class="dashicons dashicons-yes"></span>
-                        </span>
-                        <?php endif; ?>
+                        </div>
                     </label>
                     <?php endforeach; ?>
                 </div>
