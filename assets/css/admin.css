@@ -336,52 +336,48 @@
    ======================================== */
 .wpmind-card {
     background: #fff;
-    border: 1px solid var(--wpmind-gray-200);
-    border-radius: 0;
-    transition: all var(--wpmind-transition-normal);
-}
-
-.wpmind-card:hover {
-    border-color: var(--wpmind-gray-300);
     box-shadow: var(--wpmind-shadow);
 }
 
 .wpmind-card-header {
     display: flex;
     align-items: center;
-    gap: var(--wpmind-space-2);
-    padding: var(--wpmind-space-3) var(--wpmind-space-4);
-    background: var(--wpmind-gray-50);
-    border-bottom: 1px solid var(--wpmind-gray-200);
-    border-radius: 0;
+    gap: var(--wpmind-space-3);
+    padding: var(--wpmind-space-4) var(--wpmind-space-6);
+    background: #fff;
+    border-bottom: 1px solid #ccd0d4;
+    min-height: 54px;
+    box-sizing: border-box;
 }
 
 .wpmind-card-body {
-    padding: var(--wpmind-space-4);
+    padding: var(--wpmind-space-6);
 }
 
 /* ========================================
-   Button Styles - 按钮样式
+   Button Styles - 按钮样式（WordPress 风格）
    ======================================== */
 .wpmind-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: var(--wpmind-space-2);
-    padding: var(--wpmind-space-2) var(--wpmind-space-4);
-    font-size: var(--wpmind-text-sm);
-    font-weight: 500;
-    line-height: 1.5;
-    border-radius: 0;
-    border: 1px solid transparent;
+    padding: 0 var(--wpmind-space-4);
+    min-height: 36px;
+    font-size: var(--wpmind-text-base);
+    font-weight: 400;
+    line-height: 1;
+    border-radius: 2px;
+    border: 1px solid;
     cursor: pointer;
     transition: all var(--wpmind-transition-fast);
     text-decoration: none;
+    white-space: nowrap;
 }
 
 .wpmind-btn:focus {
     outline: none;
-    box-shadow: 0 0 0 2px var(--wpmind-primary-light), 0 0 0 4px var(--wpmind-primary);
+    box-shadow: 0 0 0 1px #fff, 0 0 0 3px var(--wpmind-primary);
 }
 
 .wpmind-btn-primary {
@@ -393,38 +389,64 @@
 .wpmind-btn-primary:hover {
     background: var(--wpmind-primary-hover);
     border-color: var(--wpmind-primary-hover);
+    color: #fff;
 }
 
 .wpmind-btn-secondary {
-    background: #fff;
-    color: var(--wpmind-gray-700);
-    border-color: var(--wpmind-gray-300);
+    background: #f6f7f7;
+    color: #2271b1;
+    border-color: #2271b1;
 }
 
 .wpmind-btn-secondary:hover {
-    background: var(--wpmind-gray-50);
-    border-color: var(--wpmind-gray-400);
+    background: #f0f0f1;
+    border-color: #0a4b78;
+    color: #0a4b78;
+}
+
+.wpmind-btn-tertiary {
+    background: transparent;
+    color: var(--wpmind-primary);
+    border-color: transparent;
+}
+
+.wpmind-btn-tertiary:hover {
+    background: rgba(0, 0, 0, 0.05);
 }
 
 .wpmind-btn-danger {
     background: #fff;
-    color: var(--wpmind-error);
-    border-color: var(--wpmind-error);
+    color: #b32d2e;
+    border-color: #b32d2e;
 }
 
 .wpmind-btn-danger:hover {
-    background: var(--wpmind-error-light);
+    background: #b32d2e;
+    color: #fff;
 }
 
 .wpmind-btn-sm {
-    padding: var(--wpmind-space-1) var(--wpmind-space-3);
-    font-size: var(--wpmind-text-xs);
+    padding: 0 var(--wpmind-space-3);
+    min-height: 32px;
+    font-size: var(--wpmind-text-sm);
+}
+
+.wpmind-btn-lg {
+    padding: 0 var(--wpmind-space-6);
+    min-height: 40px;
+    font-size: var(--wpmind-text-md);
 }
 
 .wpmind-btn .dashicons {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.wpmind-btn:disabled,
+.wpmind-btn.is-busy {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 /* ========================================
@@ -433,11 +455,11 @@
 .wpmind-badge {
     display: inline-flex;
     align-items: center;
-    padding: 2px var(--wpmind-space-2);
+    padding: 4px var(--wpmind-space-2);
     font-size: var(--wpmind-text-xs);
     font-weight: 500;
-    border-radius: 0;
-    line-height: 1.4;
+    border-radius: 2px;
+    line-height: 1;
 }
 
 .wpmind-badge-success {
@@ -466,30 +488,33 @@
 }
 
 /* ========================================
-   Form Elements - 表单元素
+   Form Elements - 表单元素（WordPress 风格）
    ======================================== */
 .wpmind-form-group {
-    margin-bottom: var(--wpmind-space-4);
+    margin-bottom: var(--wpmind-space-5);
 }
 
 .wpmind-form-label {
     display: block;
-    font-size: var(--wpmind-text-sm);
+    font-size: var(--wpmind-text-xs);
     font-weight: 500;
-    color: var(--wpmind-gray-700);
-    margin-bottom: var(--wpmind-space-2);
+    color: #1e1e1e;
+    margin-bottom: var(--wpmind-space-3);
+    text-transform: uppercase;
 }
 
 .wpmind-form-input,
 .wpmind-form-select {
     width: 100%;
-    padding: var(--wpmind-space-2) var(--wpmind-space-3);
+    max-width: 400px;
+    padding: 0 var(--wpmind-space-3);
+    min-height: 40px;
     font-size: var(--wpmind-text-base);
-    line-height: 1.5;
-    color: var(--wpmind-gray-900);
+    line-height: 40px;
+    color: #1e1e1e;
     background: #fff;
-    border: 1px solid var(--wpmind-gray-300);
-    border-radius: 0;
+    border: 1px solid #949494;
+    border-radius: 2px;
     transition: all var(--wpmind-transition-fast);
 }
 
@@ -497,7 +522,7 @@
 .wpmind-form-select:focus {
     outline: none;
     border-color: var(--wpmind-primary);
-    box-shadow: 0 0 0 3px var(--wpmind-primary-light);
+    box-shadow: 0 0 0 1px var(--wpmind-primary);
 }
 
 .wpmind-form-input.is-valid {
@@ -509,12 +534,13 @@
 }
 
 .wpmind-form-help {
-    margin-top: var(--wpmind-space-1);
-    font-size: var(--wpmind-text-xs);
-    color: var(--wpmind-gray-500);
+    margin-top: var(--wpmind-space-2);
+    font-size: var(--wpmind-text-sm);
+    color: #757575;
+    font-style: normal;
 }
 
-/* Toggle Switch */
+/* Toggle Switch - WordPress 风格 */
 .wpmind-toggle {
     display: inline-flex;
     align-items: center;
@@ -531,24 +557,24 @@
 
 .wpmind-toggle-slider {
     position: relative;
-    width: 44px;
-    height: 24px;
-    background: var(--wpmind-gray-300);
-    border-radius: 12px;
+    width: 36px;
+    height: 18px;
+    background: #949494;
+    border-radius: 9px;
     transition: background var(--wpmind-transition-fast);
 }
 
 .wpmind-toggle-slider::before {
     content: "";
     position: absolute;
-    width: 18px;
-    height: 18px;
+    width: 12px;
+    height: 12px;
     left: 3px;
     top: 3px;
     background: #fff;
     border-radius: 50%;
     transition: transform var(--wpmind-transition-fast);
-    box-shadow: var(--wpmind-shadow-sm);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .wpmind-toggle input:checked + .wpmind-toggle-slider {
@@ -556,16 +582,16 @@
 }
 
 .wpmind-toggle input:checked + .wpmind-toggle-slider::before {
-    transform: translateX(20px);
+    transform: translateX(18px);
 }
 
 .wpmind-toggle input:focus + .wpmind-toggle-slider {
-    box-shadow: 0 0 0 3px var(--wpmind-primary-light);
+    box-shadow: 0 0 0 1px #fff, 0 0 0 3px var(--wpmind-primary);
 }
 
 .wpmind-toggle-label {
-    font-size: var(--wpmind-text-sm);
-    color: var(--wpmind-gray-700);
+    font-size: var(--wpmind-text-base);
+    color: #1e1e1e;
 }
 
 /* ========================================
