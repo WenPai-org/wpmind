@@ -29,7 +29,6 @@
 }
 
 .wpmind-status-panel .title .button {
-    padding: var(--wpmind-space-1) var(--wpmind-space-3);
     min-height: 32px;
     display: inline-flex;
     align-items: center;
@@ -581,100 +580,119 @@
 }
 
 /* Strategy Cards - 新设计 */
-.wpmind-routing-strategies {
-    display: flex;
-    flex-direction: column;
+/* Strategy Tiles - Gutenberg Compact Style */
+.wpmind-grid-compact {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--wpmind-space-2);
 }
 
-.wpmind-routing-strategy-card {
+.wpmind-strategy-tile {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: var(--wpmind-space-3);
-    padding: var(--wpmind-space-3) var(--wpmind-space-4);
+    justify-content: center;
+    padding: var(--wpmind-space-3);
     background: #fff;
-    border: 1px solid var(--wpmind-gray-200);
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
     cursor: pointer;
-    transition: all var(--wpmind-transition-normal);
     position: relative;
+    text-align: center;
+    min-height: 80px;
+    transition: all 0.2s ease;
 }
 
-.wpmind-routing-strategy-card:hover {
-    border-color: var(--wpmind-gray-300);
-    background: var(--wpmind-gray-50);
+.wpmind-strategy-tile:hover {
+    background: #f0f0f0;
+    border-color: #ccc;
 }
 
-.wpmind-routing-strategy-card.is-active {
-    border-color: var(--wpmind-primary);
-    background: var(--wpmind-primary-light);
-    border-left-width: 3px;
+/* Active State - Gutenberg Selection Style */
+.wpmind-strategy-tile.is-active {
+    background: #fff;
+    box-shadow: inset 0 0 0 1.5px var(--wpmind-primary);
+    /* Outline effect */
+    border-color: transparent;
 }
 
-.wpmind-routing-strategy-card input[type="radio"] {
+.wpmind-strategy-tile input[type="radio"] {
     position: absolute;
     opacity: 0;
     pointer-events: none;
 }
 
-.wpmind-routing-strategy-icon {
+/* Icon Box */
+.wpmind-strategy-icon-box {
+    margin-bottom: var(--wpmind-space-2);
+    color: var(--wpmind-gray-700);
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    background: var(--wpmind-gray-100);
-    border-radius: 2px;
-    flex-shrink: 0;
 }
 
-.wpmind-routing-strategy-card.is-active .wpmind-routing-strategy-icon {
-    background: var(--wpmind-primary);
-}
-
-.wpmind-routing-strategy-icon .dashicons {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    color: var(--wpmind-gray-600);
-}
-
-.wpmind-routing-strategy-card.is-active .wpmind-routing-strategy-icon .dashicons {
-    color: #fff;
-}
-
-.wpmind-routing-strategy-content {
-    flex: 1;
-    min-width: 0;
-}
-
-.wpmind-routing-strategy-name {
-    display: block;
-    font-size: var(--wpmind-text-sm);
-    font-weight: 600;
+.wpmind-strategy-tile:hover .wpmind-strategy-icon-box {
     color: var(--wpmind-gray-900);
-    margin-bottom: 2px;
 }
 
-.wpmind-routing-strategy-desc {
-    display: block;
-    font-size: var(--wpmind-text-xs);
-    color: var(--wpmind-gray-500);
-    line-height: var(--wpmind-leading-normal);
-}
-
-.wpmind-routing-strategy-check {
-    display: none;
+.wpmind-strategy-tile.is-active .wpmind-strategy-icon-box {
     color: var(--wpmind-primary);
 }
 
-.wpmind-routing-strategy-card.is-active .wpmind-routing-strategy-check {
-    display: flex;
+.wpmind-strategy-icon-box .dashicons {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
 }
 
-.wpmind-routing-strategy-check .dashicons {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
+/* Title */
+.wpmind-strategy-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--wpmind-gray-800);
+    line-height: 1.3;
+}
+
+.wpmind-strategy-tile.is-active .wpmind-strategy-title {
+    color: var(--wpmind-primary);
+    font-weight: 600;
+}
+
+/* Check Badge (Optional visual indicator) */
+.wpmind-check-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    color: var(--wpmind-primary);
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wpmind-check-badge .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .wpmind-grid-compact {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .wpmind-grid-compact {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .wpmind-strategy-tile {
+        padding: var(--wpmind-space-2);
+        min-height: 70px;
+    }
 }
 
 /* Status Card - 推荐 Provider 卡片 */

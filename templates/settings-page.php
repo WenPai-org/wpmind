@@ -2,7 +2,7 @@
 /**
  * WPMind 设置页面模板
  *
- * 参考 Slim SEO 风格设计
+ * 参考 Gutenberg 风格设计
  *
  * @package WPMind
  * @since 2.0.0
@@ -22,15 +22,15 @@ defined( 'ABSPATH' ) || exit;
         </span>
 
         <span class="wpmind-title-right">
-            <a href="https://developer.wordpress.org/plugins/ai/" target="_blank" class="wpmind-title-link">
+            <a href="https://wpcy.com/mind/" target="_blank" class="wpmind-title-link">
                 <span class="dashicons dashicons-book"></span>
                 <?php esc_html_e( '文档', 'wpmind' ); ?>
             </a>
-            <a href="https://github.com/developer-jeremywang/wpmind" target="_blank" class="wpmind-title-link">
+            <a href="https://github.com/WenPai-org/wpmind" target="_blank" class="wpmind-title-link">
                 <span class="dashicons dashicons-editor-code"></span>
                 <?php esc_html_e( 'GitHub', 'wpmind' ); ?>
             </a>
-            <a href="https://wpmind.developer.wang/support" target="_blank" class="wpmind-title-link">
+            <a href="https://wpcy.com/c/wpmind" target="_blank" class="wpmind-title-link">
                 <span class="dashicons dashicons-groups"></span>
                 <?php esc_html_e( '支持', 'wpmind' ); ?>
             </a>

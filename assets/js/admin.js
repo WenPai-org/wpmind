@@ -5,7 +5,7 @@
  * @since 1.1.0
  */
 
-(function($) {
+(function ($) {
     'use strict';
 
     /**
@@ -22,7 +22,7 @@
         switchTab(hash);
 
         // Tab 点击事件
-        $tabs.on('click', function(e) {
+        $tabs.on('click', function (e) {
             e.preventDefault();
             var tabId = $(this).data('tab');
             switchTab(tabId);
@@ -57,7 +57,7 @@
     var Toast = {
         container: null,
 
-        init: function() {
+        init: function () {
             if (!this.container) {
                 // 在页面顶部创建通知容器
                 this.container = $('<div class="wpmind-notice-container"></div>');
@@ -65,7 +65,7 @@
             }
         },
 
-        show: function(message, type, duration) {
+        show: function (message, type, duration) {
             this.init();
             type = type || 'info';
             duration = duration || 3000;
@@ -94,13 +94,13 @@
             $notice.hide().slideDown(200);
 
             // 关闭按钮事件
-            $notice.find('.notice-dismiss').on('click', function() {
+            $notice.find('.notice-dismiss').on('click', function () {
                 Toast.hide($notice);
             });
 
             // 自动关闭
             if (duration > 0) {
-                setTimeout(function() {
+                setTimeout(function () {
                     Toast.hide($notice);
                 }, duration);
             }
@@ -108,25 +108,25 @@
             return $notice;
         },
 
-        hide: function($notice) {
-            $notice.slideUp(200, function() {
+        hide: function ($notice) {
+            $notice.slideUp(200, function () {
                 $(this).remove();
             });
         },
 
-        success: function(message, duration) {
+        success: function (message, duration) {
             return this.show(message, 'success', duration);
         },
 
-        error: function(message, duration) {
+        error: function (message, duration) {
             return this.show(message, 'error', duration || 5000);
         },
 
-        warning: function(message, duration) {
+        warning: function (message, duration) {
             return this.show(message, 'warning', duration || 4000);
         },
 
-        info: function(message, duration) {
+        info: function (message, duration) {
             return this.show(message, 'info', duration);
         }
     };
@@ -135,15 +135,15 @@
      * 确认对话框
      */
     var Dialog = {
-        show: function(options) {
+        show: function (options) {
             var defaults = {
                 title: '确认操作',
                 message: '确定要执行此操作吗？',
                 confirmText: '确定',
                 cancelText: '取消',
                 type: 'warning',
-                onConfirm: function() {},
-                onCancel: function() {}
+                onConfirm: function () { },
+                onCancel: function () { }
             };
 
             var settings = $.extend({}, defaults, options);
@@ -158,54 +158,54 @@
             var $overlay = $('<div class="wpmind-dialog-overlay"></div>');
             var $dialog = $('<div class="wpmind-dialog wpmind-dialog-' + settings.type + '">' +
                 '<div class="wpmind-dialog-header">' +
-                    '<span class="dashicons ' + icons[settings.type] + '"></span>' +
-                    '<span class="wpmind-dialog-title">' + settings.title + '</span>' +
+                '<span class="dashicons ' + icons[settings.type] + '"></span>' +
+                '<span class="wpmind-dialog-title">' + settings.title + '</span>' +
                 '</div>' +
                 '<div class="wpmind-dialog-body">' +
-                    '<p>' + settings.message + '</p>' +
+                '<p>' + settings.message + '</p>' +
                 '</div>' +
                 '<div class="wpmind-dialog-footer">' +
-                    '<button type="button" class="button wpmind-dialog-cancel">' + settings.cancelText + '</button>' +
-                    '<button type="button" class="button button-primary wpmind-dialog-confirm">' + settings.confirmText + '</button>' +
+                '<button type="button" class="button wpmind-dialog-cancel">' + settings.cancelText + '</button>' +
+                '<button type="button" class="button button-primary wpmind-dialog-confirm">' + settings.confirmText + '</button>' +
                 '</div>' +
                 '</div>');
 
             $('body').append($overlay).append($dialog);
 
             // 动画显示
-            setTimeout(function() {
+            setTimeout(function () {
                 $overlay.addClass('is-visible');
                 $dialog.addClass('is-visible');
             }, 10);
 
             // 关闭函数
-            var close = function() {
+            var close = function () {
                 $overlay.removeClass('is-visible');
                 $dialog.removeClass('is-visible');
-                setTimeout(function() {
+                setTimeout(function () {
                     $overlay.remove();
                     $dialog.remove();
                 }, 300);
             };
 
             // 事件绑定
-            $dialog.find('.wpmind-dialog-cancel').on('click', function() {
+            $dialog.find('.wpmind-dialog-cancel').on('click', function () {
                 close();
                 settings.onCancel();
             });
 
-            $dialog.find('.wpmind-dialog-confirm').on('click', function() {
+            $dialog.find('.wpmind-dialog-confirm').on('click', function () {
                 close();
                 settings.onConfirm();
             });
 
-            $overlay.on('click', function() {
+            $overlay.on('click', function () {
                 close();
                 settings.onCancel();
             });
 
             // ESC 关闭
-            $(document).on('keydown.wpmind-dialog', function(e) {
+            $(document).on('keydown.wpmind-dialog', function (e) {
                 if (e.keyCode === 27) {
                     close();
                     settings.onCancel();
@@ -214,11 +214,11 @@
             });
         },
 
-        confirm: function(message, onConfirm, onCancel) {
+        confirm: function (message, onConfirm, onCancel) {
             this.show({
                 message: message,
-                onConfirm: onConfirm || function() {},
-                onCancel: onCancel || function() {}
+                onConfirm: onConfirm || function () { },
+                onCancel: onCancel || function () { }
             });
         }
     };
@@ -227,7 +227,7 @@
      * Toggle password visibility
      */
     function initPasswordToggle() {
-        $('.wpmind-toggle-key').on('click', function(e) {
+        $('.wpmind-toggle-key').on('click', function (e) {
             e.preventDefault();
 
             var $button = $(this);
@@ -250,7 +250,7 @@
      */
     function initEndpointCollapse() {
         // 点击 header 或 toggle 按钮折叠/展开
-        $(document).on('click', '.wpmind-endpoint-header', function(e) {
+        $(document).on('click', '.wpmind-endpoint-header', function (e) {
             // 如果点击的是内部的其他按钮或链接，不触发折叠
             if ($(e.target).closest('a, button:not(.wpmind-endpoint-toggle), input, select').length && !$(e.target).closest('.wpmind-endpoint-toggle').length) {
                 return;
@@ -270,7 +270,7 @@
         });
 
         // 阻止 toggle 按钮的默认行为（因为 header 已经处理了点击）
-        $(document).on('click', '.wpmind-endpoint-toggle', function(e) {
+        $(document).on('click', '.wpmind-endpoint-toggle', function (e) {
             e.stopPropagation();
             $(this).closest('.wpmind-endpoint-header').trigger('click');
         });
@@ -280,7 +280,7 @@
      * API Key 输入处理
      */
     function initApiKeyValidation() {
-        $('input[id^="api_key_"]').on('input', function() {
+        $('input[id^="api_key_"]').on('input', function () {
             var $input = $(this);
             $input.siblings('.wpmind-validation-message').remove();
             $input.removeClass('is-valid is-invalid');
@@ -291,7 +291,7 @@
      * 测试连接功能
      */
     function initTestConnection() {
-        $('.wpmind-test-connection').on('click', function(e) {
+        $('.wpmind-test-connection').on('click', function (e) {
             e.preventDefault();
 
             var $button = $(this);
@@ -326,7 +326,7 @@
                     nonce: wpmindData.nonce
                 },
                 timeout: 45000,
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         var message = '连接成功';
                         if (response.data && response.data.retried) {
@@ -342,17 +342,17 @@
                         }
                     }
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     var message = '连接失败';
                     if (status === 'timeout') {
                         message = '请求超时';
                     }
                     $result.html('<span class="dashicons dashicons-dismiss"></span> ' + message).addClass('error');
                 },
-                complete: function() {
+                complete: function () {
                     $button.removeClass('is-testing').prop('disabled', false).text('测试连接');
-                    setTimeout(function() {
-                        $result.fadeOut(300, function() {
+                    setTimeout(function () {
+                        $result.fadeOut(300, function () {
                             $(this).text('').removeClass('success error warning').removeAttr('title').show();
                         });
                     }, 6000);
@@ -365,7 +365,7 @@
      * Update card status when checkbox changes
      */
     function initStatusUpdate() {
-        $('.wpmind-endpoint-card input[type="checkbox"]').not('.wpmind-clear-checkbox').on('change', function() {
+        $('.wpmind-endpoint-card input[type="checkbox"]').not('.wpmind-clear-checkbox').on('change', function () {
             var $card = $(this).closest('.wpmind-endpoint-card');
             var $header = $card.find('.wpmind-endpoint-header');
             var $status = $header.find('.wpmind-status').not('.wpmind-status-official');
@@ -386,7 +386,7 @@
      * Handle clear API key checkbox
      */
     function initClearKeyHandler() {
-        $('.wpmind-clear-checkbox').on('change', function() {
+        $('.wpmind-clear-checkbox').on('change', function () {
             var $card = $(this).closest('.wpmind-endpoint-card');
             var $apiKeyInput = $card.find('input[id^="api_key_"]');
 
@@ -404,11 +404,11 @@
      * Form validation before submit
      */
     function initFormValidation() {
-        $('#wpmind-settings-form').on('submit', function(e) {
+        $('#wpmind-settings-form').on('submit', function (e) {
             var hasEnabledWithoutKey = false;
             var $problemCard = null;
 
-            $('.wpmind-endpoint-card').each(function() {
+            $('.wpmind-endpoint-card').each(function () {
                 var $card = $(this);
                 var $checkbox = $card.find('input[type="checkbox"]').not('.wpmind-clear-checkbox');
                 var $apiKey = $card.find('input[type="password"], input[type="text"]').filter('[id^="api_key_"]');
@@ -444,7 +444,7 @@
      * 折叠/展开高级设置
      */
     function initAdvancedToggle() {
-        $('.wpmind-toggle-advanced').on('click', function(e) {
+        $('.wpmind-toggle-advanced').on('click', function (e) {
             e.preventDefault();
 
             var $button = $(this);
@@ -466,7 +466,7 @@
      * 刷新 Provider 状态
      */
     function initStatusRefresh() {
-        $(document).on('click', '.wpmind-refresh-status', function(e) {
+        $(document).on('click', '.wpmind-refresh-status', function (e) {
             e.preventDefault();
             e.stopPropagation();
 
@@ -489,16 +489,16 @@
                     action: 'wpmind_get_provider_status',
                     nonce: wpmindData.nonce
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response.success && response.data.providers) {
                         updateStatusGrid(response.data.providers);
                         Toast.success('状态已刷新');
                     }
                 },
-                error: function() {
+                error: function () {
                     Toast.error('刷新失败');
                 },
-                complete: function() {
+                complete: function () {
                     $button.removeClass('is-loading');
                 }
             });
@@ -511,12 +511,12 @@
     function updateStatusGrid(providers) {
         var $grid = $('#wpmind-status-grid');
 
-        $.each(providers, function(providerId, status) {
+        $.each(providers, function (providerId, status) {
             var $item = $grid.find('[data-provider="' + providerId + '"]');
             if ($item.length) {
                 $item.addClass('is-updating');
 
-                setTimeout(function() {
+                setTimeout(function () {
                     $item.find('.wpmind-status-indicator')
                         .removeClass('wpmind-status-closed wpmind-status-open wpmind-status-half_open')
                         .addClass('wpmind-status-' + status.state);
@@ -545,7 +545,7 @@
      * 重置熔断器
      */
     function initResetBreakers() {
-        $(document).on('click', '.wpmind-reset-all-breakers', function(e) {
+        $(document).on('click', '.wpmind-reset-all-breakers', function (e) {
             e.preventDefault();
             e.stopPropagation();
 
@@ -557,7 +557,7 @@
                 type: 'warning',
                 confirmText: '确定重置',
                 cancelText: '取消',
-                onConfirm: function() {
+                onConfirm: function () {
                     var originalHtml = $button.html();
                     $button.prop('disabled', true).html('<span class="dashicons dashicons-update wpmind-spinning"></span>');
 
@@ -575,20 +575,20 @@
                             provider: 'all',
                             nonce: wpmindData.nonce
                         },
-                        success: function(response) {
+                        success: function (response) {
                             if (response.success) {
                                 Toast.success('熔断器已重置');
-                                setTimeout(function() {
+                                setTimeout(function () {
                                     $('.wpmind-refresh-status').trigger('click');
                                 }, 300);
                             } else {
                                 Toast.error('重置失败');
                             }
                         },
-                        error: function() {
+                        error: function () {
                             Toast.error('重置失败');
                         },
-                        complete: function() {
+                        complete: function () {
                             $button.prop('disabled', false).html(originalHtml);
                         }
                     });
@@ -601,7 +601,7 @@
      * 刷新用量统计
      */
     function initUsageRefresh() {
-        $(document).on('click', '.wpmind-refresh-usage', function(e) {
+        $(document).on('click', '.wpmind-refresh-usage', function (e) {
             e.preventDefault();
             e.stopPropagation();
 
@@ -625,16 +625,16 @@
                     action: 'wpmind_get_usage_stats',
                     nonce: wpmindData.nonce
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         updateUsageDisplay(response.data);
                         Toast.success('统计已刷新');
                     }
                 },
-                error: function() {
+                error: function () {
                     Toast.error('刷新失败');
                 },
-                complete: function() {
+                complete: function () {
                     $button.removeClass('is-loading');
                     $button.find('.dashicons').removeClass('wpmind-spinning');
                 }
@@ -693,17 +693,17 @@
      */
     function initBudgetSettings() {
         // 切换预算设置面板显示
-        $('#wpmind_budget_enabled').on('change', function() {
+        $('#wpmind_budget_enabled').on('change', function () {
             $('#wpmind-budget-settings').toggle(this.checked);
         });
 
         // 切换邮件字段显示
-        $('input[name="email_alert"]').on('change', function() {
+        $('input[name="email_alert"]').on('change', function () {
             $('.wpmind-budget-email-field').toggle(this.checked);
         });
 
         // 保存预算设置
-        $('#wpmind-save-budget').on('click', function(e) {
+        $('#wpmind-save-budget').on('click', function (e) {
             e.preventDefault();
 
             var $button = $(this);
@@ -744,7 +744,7 @@
                     settings: JSON.stringify(settings),
                     nonce: wpmindData.nonce
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         Toast.success('预算设置已保存');
                     } else {
@@ -752,10 +752,10 @@
                         Toast.error(msg);
                     }
                 },
-                error: function() {
+                error: function () {
                     Toast.error('保存失败，请重试');
                 },
-                complete: function() {
+                complete: function () {
                     $button.prop('disabled', false).text(originalText);
                 }
             });
@@ -766,7 +766,7 @@
      * 清除用量统计
      */
     function initUsageClear() {
-        $(document).on('click', '.wpmind-clear-usage', function(e) {
+        $(document).on('click', '.wpmind-clear-usage', function (e) {
             e.preventDefault();
             e.stopPropagation();
 
@@ -778,7 +778,7 @@
                 type: 'danger',
                 confirmText: '确定清除',
                 cancelText: '取消',
-                onConfirm: function() {
+                onConfirm: function () {
                     var originalHtml = $button.html();
                     $button.prop('disabled', true).html('<span class="dashicons dashicons-update wpmind-spinning"></span>');
 
@@ -795,7 +795,7 @@
                             action: 'wpmind_clear_usage_stats',
                             nonce: wpmindData.nonce
                         },
-                        success: function(response) {
+                        success: function (response) {
                             if (response.success) {
                                 Toast.success('统计已清除');
                                 // 重置显示
@@ -808,10 +808,10 @@
                                 Toast.error('清除失败');
                             }
                         },
-                        error: function() {
+                        error: function () {
                             Toast.error('清除失败');
                         },
-                        complete: function() {
+                        complete: function () {
                             $button.prop('disabled', false).html(originalHtml);
                         }
                     });
@@ -849,7 +849,7 @@
         },
 
         // 全局图表默认配置
-        getDefaultOptions: function() {
+        getDefaultOptions: function () {
             var self = this;
             return {
                 responsive: true,
@@ -921,7 +921,7 @@
             };
         },
 
-        init: function() {
+        init: function () {
             if (!$('#wpmind-usage-trend-chart').length) return;
             if (typeof Chart === 'undefined') return;
 
@@ -929,26 +929,26 @@
             this.bindEvents();
         },
 
-        bindEvents: function() {
+        bindEvents: function () {
             var self = this;
 
             // 时间范围切换
-            $('#wpmind-analytics-range').on('change', function() {
+            $('#wpmind-analytics-range').on('change', function () {
                 self.loadData();
             });
 
             // 刷新按钮
-            $('.wpmind-refresh-analytics').on('click', function(e) {
+            $('.wpmind-refresh-analytics').on('click', function (e) {
                 e.preventDefault();
                 var $btn = $(this);
                 $btn.find('.dashicons').addClass('wpmind-spinning');
-                self.loadData(function() {
+                self.loadData(function () {
                     $btn.find('.dashicons').removeClass('wpmind-spinning');
                 });
             });
         },
 
-        loadData: function(callback) {
+        loadData: function (callback) {
             var self = this;
             var range = $('#wpmind-analytics-range').val() || '7d';
 
@@ -965,31 +965,31 @@
                     range: range,
                     nonce: wpmindData.nonce
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response.success && response.data) {
                         self.renderCharts(response.data);
                     } else {
                         Toast.error('加载分析数据失败');
                     }
                 },
-                error: function() {
+                error: function () {
                     Toast.error('加载分析数据失败，请稍后重试');
                 },
-                complete: function() {
+                complete: function () {
                     $('.wpmind-chart-container').removeClass('is-loading');
                     if (typeof callback === 'function') callback();
                 }
             });
         },
 
-        renderCharts: function(data) {
+        renderCharts: function (data) {
             this.renderTrendChart(data.trend);
             this.renderProviderChart(data.providers);
             this.renderCostChart(data.cost);
             this.renderModelChart(data.models);
         },
 
-        renderTrendChart: function(data) {
+        renderTrendChart: function (data) {
             var ctx = document.getElementById('wpmind-usage-trend-chart');
             if (!ctx) return;
 
@@ -1083,7 +1083,7 @@
             });
         },
 
-        renderProviderChart: function(data) {
+        renderProviderChart: function (data) {
             var ctx = document.getElementById('wpmind-provider-chart');
             if (!ctx) return;
 
@@ -1137,8 +1137,8 @@
                             padding: 12,
                             cornerRadius: 0,
                             callbacks: {
-                                label: function(context) {
-                                    var total = context.dataset.data.reduce(function(a, b) { return a + b; }, 0);
+                                label: function (context) {
+                                    var total = context.dataset.data.reduce(function (a, b) { return a + b; }, 0);
                                     var percentage = ((context.raw / total) * 100).toFixed(1);
                                     return context.label + ': ' + context.raw + ' (' + percentage + '%)';
                                 }
@@ -1149,7 +1149,7 @@
             });
         },
 
-        renderCostChart: function(data) {
+        renderCostChart: function (data) {
             var ctx = document.getElementById('wpmind-cost-chart');
             if (!ctx) return;
 
@@ -1208,7 +1208,7 @@
             });
         },
 
-        renderModelChart: function(data) {
+        renderModelChart: function (data) {
             var ctx = document.getElementById('wpmind-model-chart');
             if (!ctx) return;
 
@@ -1293,23 +1293,23 @@
      * Routing Panel 路由管理
      */
     var RoutingManager = {
-        init: function() {
+        init: function () {
             if (!$('.wpmind-routing-panel').length) return;
             this.bindEvents();
         },
 
-        bindEvents: function() {
+        bindEvents: function () {
             var self = this;
 
             // 策略选择 - 监听 radio change 事件
-            $(document).on('change', 'input[name="routing_strategy"]', function() {
+            $(document).on('change', 'input[name="routing_strategy"]', function () {
                 console.log('Radio changed:', $(this).val());
                 var strategy = $(this).val();
                 self.setStrategy(strategy);
             });
 
             // 策略卡片点击 - 备用方案
-            $(document).on('click', '.wpmind-routing-strategy-card', function(e) {
+            $(document).on('click', '.wpmind-strategy-tile', function (e) {
                 var $radio = $(this).find('input[type="radio"]');
                 if (!$radio.prop('checked')) {
                     $radio.prop('checked', true).trigger('change');
@@ -1317,26 +1317,26 @@
             });
 
             // 刷新路由状态
-            $(document).on('click', '.wpmind-refresh-routing', function(e) {
+            $(document).on('click', '.wpmind-refresh-routing', function (e) {
                 e.preventDefault();
                 var $btn = $(this);
                 $btn.find('.dashicons').addClass('wpmind-spinning');
-                self.refreshStatus(function() {
+                self.refreshStatus(function () {
                     $btn.find('.dashicons').removeClass('wpmind-spinning');
                 });
             });
         },
 
-        setStrategy: function(strategy) {
+        setStrategy: function (strategy) {
             if (typeof wpmindData === 'undefined') {
                 Toast.error('配置错误');
                 return;
             }
 
             // 更新 UI 状态
-            $('.wpmind-routing-strategy-card').removeClass('is-active');
+            $('.wpmind-strategy-tile').removeClass('is-active');
             $('input[name="routing_strategy"][value="' + strategy + '"]')
-                .closest('.wpmind-routing-strategy-card')
+                .closest('.wpmind-strategy-tile')
                 .addClass('is-active');
 
             $.ajax({
@@ -1347,7 +1347,7 @@
                     strategy: strategy,
                     nonce: wpmindData.nonce
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         Toast.success('路由策略已更新');
                         // 刷新得分显示
@@ -1357,13 +1357,13 @@
                         Toast.error(msg);
                     }
                 },
-                error: function() {
+                error: function () {
                     Toast.error('更新失败，请重试');
                 }
             });
         },
 
-        refreshStatus: function(callback) {
+        refreshStatus: function (callback) {
             if (typeof wpmindData === 'undefined') {
                 if (typeof callback === 'function') callback();
                 return;
@@ -1376,27 +1376,27 @@
                     action: 'wpmind_get_routing_status',
                     nonce: wpmindData.nonce
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response.success && response.data) {
                         RoutingManager.updateDisplay(response.data);
                         Toast.success('路由状态已刷新');
                     }
                 },
-                error: function() {
+                error: function () {
                     Toast.error('刷新失败');
                 },
-                complete: function() {
+                complete: function () {
                     if (typeof callback === 'function') callback();
                 }
             });
         },
 
-        updateDisplay: function(data) {
+        updateDisplay: function (data) {
             // 更新得分排名
             var $scores = $('#wpmind-routing-scores');
             if ($scores.length && data.provider_scores) {
                 $scores.empty();
-                $.each(data.provider_scores, function(providerId, scoreData) {
+                $.each(data.provider_scores, function (providerId, scoreData) {
                     var isTop = scoreData.rank === 1;
                     var $item = $('<div class="wpmind-routing-score-item"></div>');
                     if (isTop) $item.addClass('is-top');
@@ -1422,7 +1422,7 @@
             var $failoverChain = $('#wpmind-failover-chain');
             if ($failoverChain.length && data.failover_chain && data.failover_chain.length) {
                 $failoverChain.empty();
-                $.each(data.failover_chain, function(index, provider) {
+                $.each(data.failover_chain, function (index, provider) {
                     var isFirst = index === 0;
                     var $node = $('<div class="wpmind-routing-failover-node"></div>');
                     if (isFirst) $node.addClass('is-active');
@@ -1444,7 +1444,7 @@
     /**
      * Initialize on document ready
      */
-    $(function() {
+    $(function () {
         initTabs();
         initPasswordToggle();
         initEndpointCollapse();

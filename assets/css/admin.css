@@ -9,11 +9,11 @@
    CSS Variables - 设计令牌
    ======================================== */
 :root {
-    /* Primary Colors */
-    --wpmind-primary: #3858e9;
-    --wpmind-primary-hover: #1e40af;
-    --wpmind-primary-light: #eff6ff;
-    --wpmind-primary-dark: #1e3a8a;
+    /* Primary Colors - WordPress Core Blue */
+    --wpmind-primary: #2271b1;
+    --wpmind-primary-hover: #135e96;
+    --wpmind-primary-light: #f0f6fc;
+    --wpmind-primary-dark: #0a4b78;
 
     /* Gray Scale */
     --wpmind-gray-50: #f9fafb;
@@ -238,7 +238,7 @@
     display: block;
 }
 
-.wpmind-tab-pane > :first-child {
+.wpmind-tab-pane> :first-child {
     margin-top: 0;
 }
 
@@ -577,15 +577,15 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.wpmind-toggle input:checked + .wpmind-toggle-slider {
+.wpmind-toggle input:checked+.wpmind-toggle-slider {
     background: var(--wpmind-primary);
 }
 
-.wpmind-toggle input:checked + .wpmind-toggle-slider::before {
+.wpmind-toggle input:checked+.wpmind-toggle-slider::before {
     transform: translateX(18px);
 }
 
-.wpmind-toggle input:focus + .wpmind-toggle-slider {
+.wpmind-toggle input:focus+.wpmind-toggle-slider {
     box-shadow: 0 0 0 1px #fff, 0 0 0 3px var(--wpmind-primary);
 }
 
@@ -646,8 +646,15 @@
 }
 
 @keyframes wpmind-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
 }
 
 /* ========================================
@@ -683,8 +690,13 @@
    Spinner - 加载动画
    ======================================== */
 @keyframes wpmind-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .wpmind-spinning {
@@ -996,7 +1008,6 @@ input.is-invalid {
 }
 
 .wpmind-usage-panel .title .button {
-    padding: var(--wpmind-space-1) var(--wpmind-space-3);
     min-height: 32px;
     display: inline-flex;
     align-items: center;

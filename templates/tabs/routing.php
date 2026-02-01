@@ -45,23 +45,25 @@ $strategy_icons = array(
             <div class="wpmind-routing-section">
                 <h3 class="wpmind-routing-section-title"><?php esc_html_e( '路由策略', 'wpmind' ); ?></h3>
                 <p class="wpmind-routing-section-desc"><?php esc_html_e( '选择 AI 服务的路由策略', 'wpmind' ); ?></p>
-                <div class="wpmind-routing-strategies">
+                <div class="wpmind-routing-strategies wpmind-grid-compact">
                     <?php foreach ( $available_strategies as $strategy_name => $strategy_info ) :
                         $icon = $strategy_icons[$strategy_name] ?? 'admin-generic';
+                        $is_active = $current_strategy === $strategy_name;
                     ?>
-                    <label class="wpmind-routing-strategy-card <?php echo $current_strategy === $strategy_name ? 'is-active' : ''; ?>">
+                    <label class="wpmind-strategy-tile <?php echo $is_active ? 'is-active' : ''; ?>" title="<?php echo esc_attr( $strategy_info['description'] ); ?>">
                         <input type="radio" name="routing_strategy" value="<?php echo esc_attr( $strategy_name ); ?>"
-                               <?php checked( $current_strategy, $strategy_name ); ?>>
-                        <span class="wpmind-routing-strategy-icon">
+                               <?php checked( $current_strategy, $strategy_name ); ?> hidden>
+                        
+                        <div class="wpmind-strategy-icon-box">
                             <span class="dashicons dashicons-<?php echo esc_attr( $icon ); ?>"></span>
+                        </div>
+                        <span class="wpmind-strategy-title"><?php echo esc_html( $strategy_info['display_name'] ); ?></span>
+                        
+                        <?php if ( $is_active ) : ?>
+                        <span class="wpmind-check-badge">
+                            <span class="dashicons dashicons-yes"></span>
                         </span>
-                        <span class="wpmind-routing-strategy-content">
-                            <span class="wpmind-routing-strategy-name"><?php echo esc_html( $strategy_info['display_name'] ); ?></span>
-                            <span class="wpmind-routing-strategy-desc"><?php echo esc_html( $strategy_info['description'] ); ?></span>
-                        </span>
-                        <span class="wpmind-routing-strategy-check">
-                            <span class="dashicons dashicons-yes-alt"></span>
-                        </span>
+                        <?php endif; ?>
                     </label>
                     <?php endforeach; ?>
                 </div>
