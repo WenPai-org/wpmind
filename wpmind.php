@@ -78,7 +78,22 @@ final class WPMind {
     private function __construct() {
         $this->load_textdomain();
         $this->load_custom_endpoints();
+        $this->load_public_api();
         $this->init_hooks();
+    }
+
+    /**
+     * 加载公共 API
+     *
+     * @since 2.5.0
+     */
+    private function load_public_api(): void {
+        // 加载公共 API 类
+        require_once WPMIND_PLUGIN_DIR . 'includes/API/PublicAPI.php';
+        require_once WPMIND_PLUGIN_DIR . 'includes/API/functions.php';
+
+        // 初始化 API 单例
+        \WPMind\API\PublicAPI::instance();
     }
 
     /**
