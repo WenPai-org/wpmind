@@ -1123,7 +1123,6 @@ input.is-invalid {
 
 .wpmind-usage-value {
     display: block;
-    font-size: var(--wpmind-text-xl);
     font-weight: 600;
     color: #1e1e1e;
     line-height: var(--wpmind-leading-tight);
