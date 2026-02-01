@@ -1301,10 +1301,19 @@
         bindEvents: function() {
             var self = this;
 
-            // 策略选择
+            // 策略选择 - 监听 radio change 事件
             $(document).on('change', 'input[name="routing_strategy"]', function() {
+                console.log('Radio changed:', $(this).val());
                 var strategy = $(this).val();
                 self.setStrategy(strategy);
+            });
+
+            // 策略卡片点击 - 备用方案
+            $(document).on('click', '.wpmind-routing-strategy-card', function(e) {
+                var $radio = $(this).find('input[type="radio"]');
+                if (!$radio.prop('checked')) {
+                    $radio.prop('checked', true).trigger('change');
+                }
             });
 
             // 刷新路由状态
@@ -1325,9 +1334,9 @@
             }
 
             // 更新 UI 状态
-            $('.wpmind-routing-strategy-option').removeClass('is-active');
+            $('.wpmind-routing-strategy-card').removeClass('is-active');
             $('input[name="routing_strategy"][value="' + strategy + '"]')
-                .closest('.wpmind-routing-strategy-option')
+                .closest('.wpmind-routing-strategy-card')
                 .addClass('is-active');
 
             $.ajax({
@@ -1388,8 +1397,10 @@
             if ($scores.length && data.provider_scores) {
                 $scores.empty();
                 $.each(data.provider_scores, function(providerId, scoreData) {
+                    var isTop = scoreData.rank === 1;
                     var $item = $('<div class="wpmind-routing-score-item"></div>');
-                    $item.append($('<span class="wpmind-routing-rank"></span>').text('#' + scoreData.rank));
+                    if (isTop) $item.addClass('is-top');
+                    $item.append($('<span class="wpmind-routing-rank"></span>').text(scoreData.rank));
                     $item.append($('<span class="wpmind-routing-provider-name"></span>').text(scoreData.name));
                     var $bar = $('<div class="wpmind-routing-score-bar"></div>');
                     $bar.append($('<div class="wpmind-routing-score-fill"></div>').css('width', scoreData.score + '%'));
@@ -1401,12 +1412,31 @@
 
             // 更新推荐 Provider
             if (data.recommended && data.provider_scores && data.provider_scores[data.recommended]) {
-                $('#wpmind-recommended-provider').text(data.provider_scores[data.recommended].name);
+                var recommendedData = data.provider_scores[data.recommended];
+                $('#wpmind-recommended-provider').text(recommendedData.name);
+                // 更新得分显示
+                $('.wpmind-routing-status-score-value').text(recommendedData.score.toFixed(1));
             }
 
-            // 更新故障转移链
-            if (data.failover_chain) {
-                $('#wpmind-failover-chain').text(data.failover_chain.join(' → '));
+            // 更新故障转移链 - 新的可视化结构
+            var $failoverChain = $('#wpmind-failover-chain');
+            if ($failoverChain.length && data.failover_chain && data.failover_chain.length) {
+                $failoverChain.empty();
+                $.each(data.failover_chain, function(index, provider) {
+                    var isFirst = index === 0;
+                    var $node = $('<div class="wpmind-routing-failover-node"></div>');
+                    if (isFirst) $node.addClass('is-active');
+                    $node.append('<span class="wpmind-routing-failover-dot"></span>');
+                    $node.append($('<span class="wpmind-routing-failover-name"></span>').text(provider));
+                    if (isFirst) {
+                        $node.append('<span class="wpmind-routing-failover-badge">主</span>');
+                    }
+                    $failoverChain.append($node);
+                    // 添加连接线（除了最后一个）
+                    if (index < data.failover_chain.length - 1) {
+                        $failoverChain.append('<div class="wpmind-routing-failover-line"></div>');
+                    }
+                });
             }
         }
     };

@@ -16,73 +16,131 @@ $router = \WPMind\Routing\IntelligentRouter::instance();
 $routing_status = $router->getStatusSummary();
 $current_strategy = $router->getCurrentStrategy();
 $available_strategies = $router->getAvailableStrategies();
+
+// 策略图标映射
+$strategy_icons = array(
+    'performance' => 'performance',
+    'cost'        => 'money-alt',
+    'balanced'    => 'image-filter',
+    'round_robin' => 'update',
+    'failover'    => 'shield',
+);
 ?>
 
 <div class="wpmind-routing-panel">
-    <h2 class="title">
-        <span class="dashicons dashicons-randomize"></span>
-        <?php esc_html_e( '智能路由', 'wpmind' ); ?>
+    <div class="wpmind-routing-header">
+        <h2 class="wpmind-routing-title">
+            <span class="dashicons dashicons-randomize"></span>
+            <?php esc_html_e( '智能路由', 'wpmind' ); ?>
+        </h2>
         <button type="button" class="button button-small wpmind-refresh-routing" title="<?php esc_attr_e( '刷新路由状态', 'wpmind' ); ?>">
             <span class="dashicons dashicons-update"></span>
+            <?php esc_html_e( '刷新', 'wpmind' ); ?>
         </button>
-    </h2>
+    </div>
 
-    <div class="wpmind-routing-content">
-        <!-- 策略选择 -->
-        <div class="wpmind-routing-section">
-            <h3><?php esc_html_e( '路由策略', 'wpmind' ); ?></h3>
-            <p class="description"><?php esc_html_e( '选择 AI 服务的路由策略，系统将根据策略自动选择最优的 Provider。', 'wpmind' ); ?></p>
-            <div class="wpmind-routing-strategies">
-                <?php foreach ( $available_strategies as $strategy_name => $strategy_info ) : ?>
-                <label class="wpmind-routing-strategy-option <?php echo $current_strategy === $strategy_name ? 'is-active' : ''; ?>">
-                    <input type="radio" name="routing_strategy" value="<?php echo esc_attr( $strategy_name ); ?>"
-                           <?php checked( $current_strategy, $strategy_name ); ?>>
-                    <span class="wpmind-routing-strategy-name"><?php echo esc_html( $strategy_info['display_name'] ); ?></span>
-                    <span class="wpmind-routing-strategy-desc"><?php echo esc_html( $strategy_info['description'] ); ?></span>
-                </label>
-                <?php endforeach; ?>
-            </div>
-        </div>
-
-        <!-- Provider 得分排名 -->
-        <?php if ( ! empty( $routing_status['provider_scores'] ) ) : ?>
-        <div class="wpmind-routing-section">
-            <h3><?php esc_html_e( 'Provider 排名', 'wpmind' ); ?></h3>
-            <p class="description"><?php esc_html_e( '基于当前策略的 Provider 得分排名，得分越高越优先被选中。', 'wpmind' ); ?></p>
-            <div class="wpmind-routing-scores" id="wpmind-routing-scores">
-                <?php foreach ( $routing_status['provider_scores'] as $provider_id => $score_data ) : ?>
-                <div class="wpmind-routing-score-item">
-                    <span class="wpmind-routing-rank">#<?php echo esc_html( $score_data['rank'] ); ?></span>
-                    <span class="wpmind-routing-provider-name"><?php echo esc_html( $score_data['name'] ); ?></span>
-                    <div class="wpmind-routing-score-bar">
-                        <div class="wpmind-routing-score-fill" style="width: <?php echo esc_attr( $score_data['score'] ); ?>%;"></div>
-                    </div>
-                    <span class="wpmind-routing-score-value"><?php echo esc_html( number_format( $score_data['score'], 1 ) ); ?></span>
+    <div class="wpmind-routing-grid">
+        <!-- 左栏：策略选择 -->
+        <div class="wpmind-routing-left">
+            <div class="wpmind-routing-section">
+                <h3 class="wpmind-routing-section-title"><?php esc_html_e( '路由策略', 'wpmind' ); ?></h3>
+                <p class="wpmind-routing-section-desc"><?php esc_html_e( '选择 AI 服务的路由策略', 'wpmind' ); ?></p>
+                <div class="wpmind-routing-strategies">
+                    <?php foreach ( $available_strategies as $strategy_name => $strategy_info ) :
+                        $icon = $strategy_icons[$strategy_name] ?? 'admin-generic';
+                    ?>
+                    <label class="wpmind-routing-strategy-card <?php echo $current_strategy === $strategy_name ? 'is-active' : ''; ?>">
+                        <input type="radio" name="routing_strategy" value="<?php echo esc_attr( $strategy_name ); ?>"
+                               <?php checked( $current_strategy, $strategy_name ); ?>>
+                        <span class="wpmind-routing-strategy-icon">
+                            <span class="dashicons dashicons-<?php echo esc_attr( $icon ); ?>"></span>
+                        </span>
+                        <span class="wpmind-routing-strategy-content">
+                            <span class="wpmind-routing-strategy-name"><?php echo esc_html( $strategy_info['display_name'] ); ?></span>
+                            <span class="wpmind-routing-strategy-desc"><?php echo esc_html( $strategy_info['description'] ); ?></span>
+                        </span>
+                        <span class="wpmind-routing-strategy-check">
+                            <span class="dashicons dashicons-yes-alt"></span>
+                        </span>
+                    </label>
+                    <?php endforeach; ?>
                 </div>
-                <?php endforeach; ?>
             </div>
         </div>
-        <?php endif; ?>
 
-        <!-- 推荐 Provider -->
-        <?php if ( ! empty( $routing_status['recommended'] ) ) : ?>
-        <div class="wpmind-routing-section">
-            <h3><?php esc_html_e( '当前推荐', 'wpmind' ); ?></h3>
-            <div class="wpmind-routing-recommended">
-                <span class="wpmind-routing-recommended-label"><?php esc_html_e( '推荐 Provider:', 'wpmind' ); ?></span>
-                <strong class="wpmind-routing-recommended-value" id="wpmind-recommended-provider">
-                    <?php echo esc_html( $routing_status['provider_scores'][$routing_status['recommended']]['name'] ?? $routing_status['recommended'] ); ?>
-                </strong>
+        <!-- 右栏：当前状态 -->
+        <div class="wpmind-routing-right">
+            <!-- 推荐 Provider 卡片 -->
+            <?php if ( ! empty( $routing_status['recommended'] ) ) :
+                $recommended_name = $routing_status['provider_scores'][$routing_status['recommended']]['name'] ?? $routing_status['recommended'];
+                $recommended_score = $routing_status['provider_scores'][$routing_status['recommended']]['score'] ?? 0;
+            ?>
+            <div class="wpmind-routing-status-card">
+                <div class="wpmind-routing-status-header">
+                    <span class="wpmind-routing-status-badge"><?php esc_html_e( '正在使用', 'wpmind' ); ?></span>
+                </div>
+                <div class="wpmind-routing-status-main">
+                    <span class="wpmind-routing-status-icon">
+                        <span class="dashicons dashicons-yes"></span>
+                    </span>
+                    <span class="wpmind-routing-status-provider" id="wpmind-recommended-provider">
+                        <?php echo esc_html( $recommended_name ); ?>
+                    </span>
+                </div>
+                <div class="wpmind-routing-status-score">
+                    <span class="wpmind-routing-status-score-label"><?php esc_html_e( '综合得分', 'wpmind' ); ?></span>
+                    <span class="wpmind-routing-status-score-value"><?php echo esc_html( number_format( $recommended_score, 1 ) ); ?></span>
+                </div>
             </div>
+            <?php endif; ?>
+
+            <!-- 故障转移链 -->
             <?php if ( ! empty( $routing_status['failover_chain'] ) ) : ?>
-            <div class="wpmind-routing-failover">
-                <span class="wpmind-routing-failover-label"><?php esc_html_e( '故障转移链:', 'wpmind' ); ?></span>
-                <span class="wpmind-routing-failover-chain" id="wpmind-failover-chain">
-                    <?php echo esc_html( implode( ' → ', $routing_status['failover_chain'] ) ); ?>
-                </span>
+            <div class="wpmind-routing-section">
+                <h3 class="wpmind-routing-section-title"><?php esc_html_e( '故障转移链', 'wpmind' ); ?></h3>
+                <div class="wpmind-routing-failover-flow" id="wpmind-failover-chain">
+                    <?php
+                    $chain = $routing_status['failover_chain'];
+                    $total = count( $chain );
+                    foreach ( $chain as $index => $provider ) :
+                        $is_first = $index === 0;
+                    ?>
+                    <div class="wpmind-routing-failover-node <?php echo $is_first ? 'is-active' : ''; ?>">
+                        <span class="wpmind-routing-failover-dot"></span>
+                        <span class="wpmind-routing-failover-name"><?php echo esc_html( $provider ); ?></span>
+                        <?php if ( $is_first ) : ?>
+                        <span class="wpmind-routing-failover-badge"><?php esc_html_e( '主', 'wpmind' ); ?></span>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ( $index < $total - 1 ) : ?>
+                    <div class="wpmind-routing-failover-line"></div>
+                    <?php endif; ?>
+                    <?php endforeach; ?>
+                </div>
             </div>
             <?php endif; ?>
         </div>
-        <?php endif; ?>
     </div>
+
+    <!-- Provider 排名 -->
+    <?php if ( ! empty( $routing_status['provider_scores'] ) ) : ?>
+    <div class="wpmind-routing-section wpmind-routing-ranking">
+        <h3 class="wpmind-routing-section-title"><?php esc_html_e( 'Provider 排名', 'wpmind' ); ?></h3>
+        <p class="wpmind-routing-section-desc"><?php esc_html_e( '基于当前策略的 Provider 得分排名，得分越高越优先被选中', 'wpmind' ); ?></p>
+        <div class="wpmind-routing-scores" id="wpmind-routing-scores">
+            <?php foreach ( $routing_status['provider_scores'] as $provider_id => $score_data ) :
+                $is_top = $score_data['rank'] === 1;
+            ?>
+            <div class="wpmind-routing-score-item <?php echo $is_top ? 'is-top' : ''; ?>">
+                <span class="wpmind-routing-rank"><?php echo esc_html( $score_data['rank'] ); ?></span>
+                <span class="wpmind-routing-provider-name"><?php echo esc_html( $score_data['name'] ); ?></span>
+                <div class="wpmind-routing-score-bar">
+                    <div class="wpmind-routing-score-fill" style="width: <?php echo esc_attr( $score_data['score'] ); ?>%;"></div>
+                </div>
+                <span class="wpmind-routing-score-value"><?php echo esc_html( number_format( $score_data['score'], 1 ) ); ?></span>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
 </div>
