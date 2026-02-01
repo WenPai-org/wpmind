@@ -17,6 +17,17 @@ $routing_status = $router->getStatusSummary();
 $current_strategy = $router->getCurrentStrategy();
 $available_strategies = $router->getAvailableStrategies();
 
+// 获取仪表板统计数据
+$analytics = \WPMind\Analytics\AnalyticsManager::instance();
+$dashboard = $analytics->getDashboardSummary();
+$latency_metrics = $analytics->getLatencyMetrics();
+
+// 构建 Provider 延迟映射
+$provider_latency = array();
+foreach ( $latency_metrics as $metric ) {
+    $provider_latency[ $metric['provider'] ] = $metric;
+}
+
 // 策略图标映射
 $strategy_icons = array(
     'performance' => 'performance',
@@ -37,6 +48,57 @@ $strategy_icons = array(
             <span class="dashicons dashicons-update"></span>
             <?php esc_html_e( '刷新', 'wpmind' ); ?>
         </button>
+    </div>
+
+    <!-- 路由统计仪表板 -->
+    <div class="wpmind-routing-stats">
+        <?php
+        $today_requests = $dashboard['today']['requests'] ?? 0;
+        $total_latency = 0;
+        $latency_count = 0;
+        foreach ( $latency_metrics as $metric ) {
+            $total_latency += $metric['avg_latency'] * $metric['sample_count'];
+            $latency_count += $metric['sample_count'];
+        }
+        $avg_latency = $latency_count > 0 ? round( $total_latency / $latency_count ) : 0;
+        $provider_count = count( $routing_status['provider_scores'] ?? [] );
+        ?>
+        <div class="wpmind-stat-card">
+            <div class="wpmind-stat-icon">
+                <span class="dashicons dashicons-chart-bar"></span>
+            </div>
+            <div class="wpmind-stat-content">
+                <span class="wpmind-stat-value"><?php echo esc_html( number_format( $today_requests ) ); ?></span>
+                <span class="wpmind-stat-label"><?php esc_html_e( '今日请求', 'wpmind' ); ?></span>
+            </div>
+        </div>
+        <div class="wpmind-stat-card">
+            <div class="wpmind-stat-icon">
+                <span class="dashicons dashicons-clock"></span>
+            </div>
+            <div class="wpmind-stat-content">
+                <span class="wpmind-stat-value"><?php echo esc_html( $avg_latency ); ?><small>ms</small></span>
+                <span class="wpmind-stat-label"><?php esc_html_e( '平均延迟', 'wpmind' ); ?></span>
+            </div>
+        </div>
+        <div class="wpmind-stat-card">
+            <div class="wpmind-stat-icon">
+                <span class="dashicons dashicons-cloud"></span>
+            </div>
+            <div class="wpmind-stat-content">
+                <span class="wpmind-stat-value"><?php echo esc_html( $provider_count ); ?></span>
+                <span class="wpmind-stat-label"><?php esc_html_e( '活跃 Provider', 'wpmind' ); ?></span>
+            </div>
+        </div>
+        <div class="wpmind-stat-card">
+            <div class="wpmind-stat-icon">
+                <span class="dashicons dashicons-money-alt"></span>
+            </div>
+            <div class="wpmind-stat-content">
+                <span class="wpmind-stat-value">¥<?php echo esc_html( number_format( $dashboard['today']['cost_cny'] ?? 0, 2 ) ); ?></span>
+                <span class="wpmind-stat-label"><?php esc_html_e( '今日成本', 'wpmind' ); ?></span>
+            </div>
+        </div>
     </div>
 
     <div class="wpmind-routing-grid">
@@ -134,10 +196,15 @@ $strategy_icons = array(
         <div class="wpmind-routing-scores" id="wpmind-routing-scores">
             <?php foreach ( $routing_status['provider_scores'] as $provider_id => $score_data ) :
                 $is_top = $score_data['rank'] === 1;
+                $latency_info = $provider_latency[ $provider_id ] ?? null;
+                $avg_latency = $latency_info ? $latency_info['avg_latency'] : null;
             ?>
             <div class="wpmind-routing-score-item <?php echo $is_top ? 'is-top' : ''; ?>">
                 <span class="wpmind-routing-rank"><?php echo esc_html( $score_data['rank'] ); ?></span>
                 <span class="wpmind-routing-provider-name"><?php echo esc_html( $score_data['name'] ); ?></span>
+                <?php if ( $avg_latency !== null ) : ?>
+                <span class="wpmind-routing-latency"><?php echo esc_html( $avg_latency ); ?>ms</span>
+                <?php endif; ?>
                 <div class="wpmind-routing-score-bar">
                     <div class="wpmind-routing-score-fill" style="width: <?php echo esc_attr( $score_data['score'] ); ?>%;"></div>
                 </div>
