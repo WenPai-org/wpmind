@@ -331,3 +331,97 @@ if (!function_exists('wpmind_count_tokens')) {
         return \WPMind\API\PublicAPI::instance()->count_tokens($content);
     }
 }
+
+// ============================================
+// v2.7.0 专用 API 全局函数
+// ============================================
+
+/**
+ * 文本摘要
+ *
+ * @since 2.7.0
+ * @param string $text    要摘要的文本
+ * @param array  $options 选项
+ * @return string|WP_Error
+ *
+ * @example
+ * $summary = wpmind_summarize('这是一篇很长的文章...', [
+ *     'style' => 'bullet',  // paragraph/bullet/title
+ *     'max_length' => 100,
+ * ]);
+ */
+if (!function_exists('wpmind_summarize')) {
+    function wpmind_summarize(string $text, array $options = []) {
+        if (!class_exists('WPMind\\API\\PublicAPI')) {
+            return new WP_Error('wpmind_not_available', __('WPMind 插件未激活', 'wpmind'));
+        }
+        return \WPMind\API\PublicAPI::instance()->summarize($text, $options);
+    }
+}
+
+/**
+ * 内容审核
+ *
+ * @since 2.7.0
+ * @param string $content 要审核的内容
+ * @param array  $options 选项
+ * @return array|WP_Error
+ *
+ * @example
+ * $result = wpmind_moderate('用户提交的评论...');
+ * if (!$result['safe']) {
+ *     // 内容不安全
+ * }
+ */
+if (!function_exists('wpmind_moderate')) {
+    function wpmind_moderate(string $content, array $options = []) {
+        if (!class_exists('WPMind\\API\\PublicAPI')) {
+            return new WP_Error('wpmind_not_available', __('WPMind 插件未激活', 'wpmind'));
+        }
+        return \WPMind\API\PublicAPI::instance()->moderate($content, $options);
+    }
+}
+
+/**
+ * 音频转录（语音转文字）
+ *
+ * @since 2.7.0
+ * @param string $audio_file 音频文件路径或 URL
+ * @param array  $options    选项
+ * @return array|WP_Error
+ *
+ * @example
+ * $result = wpmind_transcribe('/path/to/audio.mp3');
+ * echo $result['text'];
+ */
+if (!function_exists('wpmind_transcribe')) {
+    function wpmind_transcribe(string $audio_file, array $options = []) {
+        if (!class_exists('WPMind\\API\\PublicAPI')) {
+            return new WP_Error('wpmind_not_available', __('WPMind 插件未激活', 'wpmind'));
+        }
+        return \WPMind\API\PublicAPI::instance()->transcribe($audio_file, $options);
+    }
+}
+
+/**
+ * 文本转语音
+ *
+ * @since 2.7.0
+ * @param string $text    要转换的文本
+ * @param array  $options 选项
+ * @return array|WP_Error
+ *
+ * @example
+ * $result = wpmind_speech('欢迎使用 WordPress', [
+ *     'voice' => 'nova',
+ * ]);
+ * echo $result['url']; // 音频 URL
+ */
+if (!function_exists('wpmind_speech')) {
+    function wpmind_speech(string $text, array $options = []) {
+        if (!class_exists('WPMind\\API\\PublicAPI')) {
+            return new WP_Error('wpmind_not_available', __('WPMind 插件未激活', 'wpmind'));
+        }
+        return \WPMind\API\PublicAPI::instance()->speech($text, $options);
+    }
+}
