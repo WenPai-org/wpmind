@@ -168,9 +168,58 @@ function wpmind_run_api_test() {
         ];
     }
 
+    // ============================================
+    // v2.7.0 专用 API 测试
+    // ============================================
+
+    // 测试 8: wpmind_summarize()
+    if (function_exists('wpmind_summarize')) {
+        $start = microtime(true);
+        $long_text = '人工智能（Artificial Intelligence，简称AI）是计算机科学的一个分支，它企图了解智能的实质，并生产出一种新的能以人类智能相似的方式做出反应的智能机器。人工智能从诞生以来，理论和技术日益成熟，应用领域也在不断扩大。';
+        
+        $summarize_result = wpmind_summarize($long_text, [
+            'style' => 'title',
+            'cache_ttl' => 0,
+        ]);
+        $duration = round((microtime(true) - $start) * 1000);
+        
+        $results['summarize'] = [
+            'name' => 'wpmind_summarize()',
+            'exists' => true,
+            'success' => !is_wp_error($summarize_result),
+            'duration_ms' => $duration,
+            'result' => is_wp_error($summarize_result) ? [
+                'error' => $summarize_result->get_error_message(),
+            ] : $summarize_result,
+        ];
+    }
+
+    // 测试 9: wpmind_moderate()
+    if (function_exists('wpmind_moderate')) {
+        $start = microtime(true);
+        $moderate_result = wpmind_moderate('这是一段正常的文本内容，用于测试内容审核功能。', [
+            'categories' => ['spam', 'adult'],
+            'cache_ttl' => 0,
+        ]);
+        $duration = round((microtime(true) - $start) * 1000);
+        
+        $results['moderate'] = [
+            'name' => 'wpmind_moderate()',
+            'exists' => true,
+            'success' => !is_wp_error($moderate_result),
+            'duration_ms' => $duration,
+            'result' => is_wp_error($moderate_result) ? [
+                'error' => $moderate_result->get_error_message(),
+            ] : [
+                'safe' => $moderate_result['safe'],
+                'summary' => $moderate_result['summary'] ?? '',
+            ],
+        ];
+    }
+
     wp_send_json_success([
-        'message' => 'WPMind API 测试完成 (v2.5.0 + v2.6.0)',
-        'version' => '2.6.0',
+        'message' => 'WPMind API 测试完成 (v2.5.0 + v2.6.0 + v2.7.0)',
+        'version' => '2.7.0',
         'tests' => $results,
     ]);
 }

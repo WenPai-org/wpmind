@@ -133,6 +133,8 @@ class PublicAPI {
             'provider'    => 'auto',
             'json_mode'   => false,
             'cache_ttl'   => 0,
+            'tools'       => [],           // v2.7.0: Function Calling
+            'tool_choice' => 'auto',       // v2.7.0: auto/none/required/{type: function, function: {name: ...}}
         ];
         $options = wp_parse_args($options, $defaults);
 
@@ -148,6 +150,8 @@ class PublicAPI {
             'max_tokens'  => $options['max_tokens'],
             'temperature' => $options['temperature'],
             'json_mode'   => $options['json_mode'],
+            'tools'       => $options['tools'],
+            'tool_choice' => $options['tool_choice'],
         ];
 
         // 应用参数过滤
@@ -784,6 +788,423 @@ class PublicAPI {
     }
 
     // ============================================
+    // v2.7.0 专用 API
+    // ============================================
+
+    /**
+     * 文本摘要
+     *
+     * @since 2.7.0
+     * @param string $text    要摘要的文本
+     * @param array  $options 选项
+     * @return string|WP_Error
+     */
+    public function summarize(string $text, array $options = []) {
+        $defaults = [
+            'context'    => 'summarize',
+            'max_length' => 200,          // 摘要最大字数
+            'style'      => 'paragraph',  // paragraph（段落）/ bullet（要点）/ title（标题）
+            'language'   => 'auto',       // 输出语言
+            'cache_ttl'  => 3600,         // 缓存 1 小时
+        ];
+        $options = wp_parse_args($options, $defaults);
+
+        $context = $options['context'];
+
+        // 检查缓存
+        if ($options['cache_ttl'] > 0) {
+            $cache_key = $this->generate_cache_key('summarize', compact('text', 'options'));
+            $cached = get_transient($cache_key);
+            if ($cached !== false) {
+                return $cached;
+            }
+        }
+
+        // 构建 Prompt
+        $style_prompts = [
+            'paragraph' => '用一段简洁的文字总结以下内容',
+            'bullet'    => '用要点列表总结以下内容的关键信息',
+            'title'     => '为以下内容生成一个简洁的标题',
+        ];
+        $style_prompt = $style_prompts[$options['style']] ?? $style_prompts['paragraph'];
+
+        $length_hint = $options['style'] === 'title' 
+            ? '（不超过 20 个字）' 
+            : "（不超过 {$options['max_length']} 个字）";
+
+        $lang_hint = $options['language'] !== 'auto' 
+            ? "，用{$options['language']}输出" 
+            : '';
+
+        $prompt = "{$style_prompt}{$length_hint}{$lang_hint}：\n\n{$text}";
+
+        do_action('wpmind_before_request', 'summarize', compact('text', 'options'), $context);
+
+        $result = $this->chat($prompt, [
+            'context'     => $context,
+            'max_tokens'  => max(100, $options['max_length'] * 2),
+            'temperature' => 0.3,
+            'cache_ttl'   => 0,
+        ]);
+
+        if (is_wp_error($result)) {
+            do_action('wpmind_error', $result, 'summarize', compact('text', 'options'));
+            return $result;
+        }
+
+        $summary = trim($result['content']);
+
+        do_action('wpmind_after_request', 'summarize', $summary, compact('text', 'options'), $result['usage']);
+
+        // 缓存结果
+        if ($options['cache_ttl'] > 0) {
+            set_transient($cache_key, $summary, $options['cache_ttl']);
+        }
+
+        return $summary;
+    }
+
+    /**
+     * 内容审核
+     *
+     * @since 2.7.0
+     * @param string $content 要审核的内容
+     * @param array  $options 选项
+     * @return array|WP_Error
+     */
+    public function moderate(string $content, array $options = []) {
+        $defaults = [
+            'context'    => 'moderation',
+            'categories' => ['spam', 'adult', 'violence', 'hate', 'illegal'],
+            'threshold'  => 0.7,  // 判定阈值
+            'cache_ttl'  => 300,  // 缓存 5 分钟
+        ];
+        $options = wp_parse_args($options, $defaults);
+
+        $context = $options['context'];
+
+        // 检查缓存
+        if ($options['cache_ttl'] > 0) {
+            $cache_key = $this->generate_cache_key('moderate', compact('content', 'options'));
+            $cached = get_transient($cache_key);
+            if ($cached !== false) {
+                return $cached;
+            }
+        }
+
+        $categories = implode('、', $options['categories']);
+
+        $schema = [
+            'type' => 'object',
+            'required' => ['safe', 'categories'],
+            'properties' => [
+                'safe' => ['type' => 'boolean'],
+                'categories' => [
+                    'type' => 'object',
+                    'properties' => array_combine(
+                        $options['categories'],
+                        array_fill(0, count($options['categories']), [
+                            'type' => 'object',
+                            'properties' => [
+                                'flagged' => ['type' => 'boolean'],
+                                'score'   => ['type' => 'number'],
+                                'reason'  => ['type' => 'string'],
+                            ],
+                        ])
+                    ),
+                ],
+                'summary' => ['type' => 'string'],
+            ],
+        ];
+
+        $prompt = "请审核以下内容是否包含不当信息。检查类别：{$categories}。\n\n内容：\n{$content}";
+
+        do_action('wpmind_before_request', 'moderate', compact('content', 'options'), $context);
+
+        $result = $this->structured($prompt, $schema, [
+            'context'     => $context,
+            'temperature' => 0.1,
+            'retries'     => 2,
+        ]);
+
+        if (is_wp_error($result)) {
+            do_action('wpmind_error', $result, 'moderate', compact('content', 'options'));
+            return $result;
+        }
+
+        $moderation = [
+            'safe'       => $result['data']['safe'] ?? true,
+            'categories' => $result['data']['categories'] ?? [],
+            'summary'    => $result['data']['summary'] ?? '',
+            'provider'   => $result['provider'],
+            'model'      => $result['model'],
+            'usage'      => $result['usage'],
+        ];
+
+        do_action('wpmind_after_request', 'moderate', $moderation, compact('content', 'options'), $result['usage']);
+
+        // 缓存结果
+        if ($options['cache_ttl'] > 0) {
+            set_transient($cache_key, $moderation, $options['cache_ttl']);
+        }
+
+        return $moderation;
+    }
+
+    /**
+     * 音频转录（语音转文字）
+     *
+     * @since 2.7.0
+     * @param string $audio_file 音频文件路径或 URL
+     * @param array  $options    选项
+     * @return array|WP_Error
+     */
+    public function transcribe(string $audio_file, array $options = []) {
+        $defaults = [
+            'context'  => 'transcription',
+            'language' => 'auto',    // 语言提示
+            'prompt'   => '',        // 可选的提示词
+            'format'   => 'text',    // text/json/srt/vtt
+            'provider' => 'openai',  // 暂只支持 OpenAI Whisper
+        ];
+        $options = wp_parse_args($options, $defaults);
+
+        $context = $options['context'];
+
+        // 获取端点配置
+        $wpmind = \WPMind\WPMind::instance();
+        $endpoints = $wpmind->get_custom_endpoints();
+
+        $provider = $options['provider'];
+        if (!isset($endpoints[$provider])) {
+            return new WP_Error('wpmind_provider_not_found', 
+                sprintf(__('服务商 %s 未配置', 'wpmind'), $provider));
+        }
+
+        $endpoint = $endpoints[$provider];
+        $api_key = $endpoint['api_key'] ?? '';
+
+        if (empty($api_key)) {
+            return new WP_Error('wpmind_api_key_missing', 
+                sprintf(__('服务商 %s 未配置 API Key', 'wpmind'), $provider));
+        }
+
+        do_action('wpmind_before_request', 'transcribe', compact('audio_file', 'options'), $context);
+
+        // 确定是文件路径还是 URL
+        if (filter_var($audio_file, FILTER_VALIDATE_URL)) {
+            // 下载远程文件
+            $temp_file = download_url($audio_file);
+            if (is_wp_error($temp_file)) {
+                return $temp_file;
+            }
+            $file_path = $temp_file;
+            $is_temp = true;
+        } else {
+            $file_path = $audio_file;
+            $is_temp = false;
+        }
+
+        if (!file_exists($file_path)) {
+            return new WP_Error('wpmind_file_not_found', __('音频文件不存在', 'wpmind'));
+        }
+
+        // 准备请求
+        $base_url = $endpoint['custom_url'] ?? $endpoint['base_url'] ?? '';
+        $api_url = trailingslashit($base_url) . 'audio/transcriptions';
+
+        $boundary = wp_generate_password(24, false);
+        $body = '';
+
+        // 文件
+        $body .= "--{$boundary}\r\n";
+        $body .= "Content-Disposition: form-data; name=\"file\"; filename=\"audio.mp3\"\r\n";
+        $body .= "Content-Type: audio/mpeg\r\n\r\n";
+        $body .= file_get_contents($file_path) . "\r\n";
+
+        // 模型
+        $body .= "--{$boundary}\r\n";
+        $body .= "Content-Disposition: form-data; name=\"model\"\r\n\r\n";
+        $body .= "whisper-1\r\n";
+
+        // 语言
+        if ($options['language'] !== 'auto') {
+            $body .= "--{$boundary}\r\n";
+            $body .= "Content-Disposition: form-data; name=\"language\"\r\n\r\n";
+            $body .= "{$options['language']}\r\n";
+        }
+
+        // 提示词
+        if (!empty($options['prompt'])) {
+            $body .= "--{$boundary}\r\n";
+            $body .= "Content-Disposition: form-data; name=\"prompt\"\r\n\r\n";
+            $body .= "{$options['prompt']}\r\n";
+        }
+
+        // 格式
+        $response_format = $options['format'] === 'text' ? 'text' : $options['format'];
+        $body .= "--{$boundary}\r\n";
+        $body .= "Content-Disposition: form-data; name=\"response_format\"\r\n\r\n";
+        $body .= "{$response_format}\r\n";
+
+        $body .= "--{$boundary}--\r\n";
+
+        $response = wp_remote_post($api_url, [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $api_key,
+                'Content-Type'  => 'multipart/form-data; boundary=' . $boundary,
+            ],
+            'body'    => $body,
+            'timeout' => 120,
+        ]);
+
+        // 清理临时文件
+        if ($is_temp && file_exists($temp_file)) {
+            unlink($temp_file);
+        }
+
+        if (is_wp_error($response)) {
+            do_action('wpmind_error', $response, 'transcribe', compact('audio_file', 'options'));
+            return new WP_Error('wpmind_transcribe_failed', 
+                sprintf(__('转录请求失败: %s', 'wpmind'), $response->get_error_message()));
+        }
+
+        $status_code = wp_remote_retrieve_response_code($response);
+        $body = wp_remote_retrieve_body($response);
+
+        if ($status_code !== 200) {
+            $data = json_decode($body, true);
+            $error_message = $data['error']['message'] ?? $body;
+            return new WP_Error('wpmind_transcribe_error', 
+                sprintf(__('转录 API 错误 (%d): %s', 'wpmind'), $status_code, $error_message));
+        }
+
+        $result = [
+            'text'     => $options['format'] === 'text' ? $body : '',
+            'data'     => $options['format'] !== 'text' ? json_decode($body, true) : null,
+            'provider' => $provider,
+            'format'   => $options['format'],
+        ];
+
+        if ($options['format'] !== 'text' && is_array($result['data'])) {
+            $result['text'] = $result['data']['text'] ?? '';
+        }
+
+        do_action('wpmind_after_request', 'transcribe', $result, compact('audio_file', 'options'), []);
+
+        return $result;
+    }
+
+    /**
+     * 文本转语音
+     *
+     * @since 2.7.0
+     * @param string $text    要转换的文本
+     * @param array  $options 选项
+     * @return array|WP_Error 包含音频 URL 或二进制数据
+     */
+    public function speech(string $text, array $options = []) {
+        $defaults = [
+            'context'  => 'speech',
+            'voice'    => 'alloy',     // OpenAI: alloy/echo/fable/onyx/nova/shimmer
+            'model'    => 'tts-1',     // tts-1 / tts-1-hd
+            'speed'    => 1.0,         // 0.25 - 4.0
+            'format'   => 'mp3',       // mp3/opus/aac/flac
+            'save_to'  => '',          // 保存路径，空则返回 URL
+            'provider' => 'openai',
+        ];
+        $options = wp_parse_args($options, $defaults);
+
+        $context = $options['context'];
+
+        // 获取端点配置
+        $wpmind = \WPMind\WPMind::instance();
+        $endpoints = $wpmind->get_custom_endpoints();
+
+        $provider = $options['provider'];
+        if (!isset($endpoints[$provider])) {
+            return new WP_Error('wpmind_provider_not_found', 
+                sprintf(__('服务商 %s 未配置', 'wpmind'), $provider));
+        }
+
+        $endpoint = $endpoints[$provider];
+        $api_key = $endpoint['api_key'] ?? '';
+
+        if (empty($api_key)) {
+            return new WP_Error('wpmind_api_key_missing', 
+                sprintf(__('服务商 %s 未配置 API Key', 'wpmind'), $provider));
+        }
+
+        do_action('wpmind_before_request', 'speech', compact('text', 'options'), $context);
+
+        $base_url = $endpoint['custom_url'] ?? $endpoint['base_url'] ?? '';
+        $api_url = trailingslashit($base_url) . 'audio/speech';
+
+        $response = wp_remote_post($api_url, [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $api_key,
+                'Content-Type'  => 'application/json',
+            ],
+            'body'    => wp_json_encode([
+                'model'           => $options['model'],
+                'input'           => $text,
+                'voice'           => $options['voice'],
+                'speed'           => $options['speed'],
+                'response_format' => $options['format'],
+            ]),
+            'timeout' => 60,
+        ]);
+
+        if (is_wp_error($response)) {
+            do_action('wpmind_error', $response, 'speech', compact('text', 'options'));
+            return new WP_Error('wpmind_speech_failed', 
+                sprintf(__('语音合成请求失败: %s', 'wpmind'), $response->get_error_message()));
+        }
+
+        $status_code = wp_remote_retrieve_response_code($response);
+        $audio_data = wp_remote_retrieve_body($response);
+
+        if ($status_code !== 200) {
+            $data = json_decode($audio_data, true);
+            $error_message = $data['error']['message'] ?? __('未知错误', 'wpmind');
+            return new WP_Error('wpmind_speech_error', 
+                sprintf(__('语音合成 API 错误 (%d): %s', 'wpmind'), $status_code, $error_message));
+        }
+
+        $result = [
+            'provider' => $provider,
+            'model'    => $options['model'],
+            'voice'    => $options['voice'],
+            'format'   => $options['format'],
+            'size'     => strlen($audio_data),
+        ];
+
+        // 保存到文件或上传到媒体库
+        if (!empty($options['save_to'])) {
+            file_put_contents($options['save_to'], $audio_data);
+            $result['file'] = $options['save_to'];
+        } else {
+            // 上传到 WordPress 媒体库
+            $upload = wp_upload_bits(
+                'wpmind-speech-' . time() . '.' . $options['format'],
+                null,
+                $audio_data
+            );
+
+            if (!empty($upload['error'])) {
+                return new WP_Error('wpmind_upload_failed', $upload['error']);
+            }
+
+            $result['url'] = $upload['url'];
+            $result['file'] = $upload['file'];
+        }
+
+        do_action('wpmind_after_request', 'speech', $result, compact('text', 'options'), []);
+
+        return $result;
+    }
+
+    // ============================================
     // 私有辅助方法
     // ============================================
 
@@ -868,6 +1289,14 @@ class PublicAPI {
             $request_body['response_format'] = ['type' => 'json_object'];
         }
 
+        // v2.7.0: Function Calling / Tools
+        if (!empty($args['tools'])) {
+            $request_body['tools'] = $args['tools'];
+            if (!empty($args['tool_choice']) && $args['tool_choice'] !== 'auto') {
+                $request_body['tool_choice'] = $args['tool_choice'];
+            }
+        }
+
         // 确定 API URL
         $base_url = $endpoint['custom_url'] ?? $endpoint['base_url'] ?? '';
         $api_url = trailingslashit($base_url) . 'chat/completions';
@@ -937,18 +1366,37 @@ class PublicAPI {
      */
     private function parse_chat_response(array $response, string $provider, string $model): array {
         $content = '';
+        $tool_calls = [];
+        $finish_reason = '';
         $usage = [
             'prompt_tokens'     => 0,
             'completion_tokens' => 0,
             'total_tokens'      => 0,
         ];
 
+        $message = $response['choices'][0]['message'] ?? [];
+        $finish_reason = $response['choices'][0]['finish_reason'] ?? '';
+
         // 提取内容
-        if (isset($response['choices'][0]['message']['content'])) {
-            $content = $response['choices'][0]['message']['content'];
+        if (isset($message['content'])) {
+            $content = $message['content'];
         } elseif (isset($response['content'][0]['text'])) {
             // Anthropic 格式
             $content = $response['content'][0]['text'];
+        }
+
+        // v2.7.0: 提取 tool_calls
+        if (isset($message['tool_calls']) && is_array($message['tool_calls'])) {
+            foreach ($message['tool_calls'] as $call) {
+                $tool_calls[] = [
+                    'id'       => $call['id'] ?? '',
+                    'type'     => $call['type'] ?? 'function',
+                    'function' => [
+                        'name'      => $call['function']['name'] ?? '',
+                        'arguments' => $call['function']['arguments'] ?? '{}',
+                    ],
+                ];
+            }
         }
 
         // 提取用量
@@ -960,12 +1408,20 @@ class PublicAPI {
             ];
         }
 
-        return [
-            'content'  => $content,
-            'provider' => $provider,
-            'model'    => $model,
-            'usage'    => $usage,
+        $result = [
+            'content'       => $content,
+            'provider'      => $provider,
+            'model'         => $model,
+            'usage'         => $usage,
+            'finish_reason' => $finish_reason,
         ];
+
+        // 只有在有 tool_calls 时才添加
+        if (!empty($tool_calls)) {
+            $result['tool_calls'] = $tool_calls;
+        }
+
+        return $result;
     }
 
     /**
