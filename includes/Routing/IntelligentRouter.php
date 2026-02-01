@@ -83,8 +83,20 @@ class IntelligentRouter
      */
     private function loadSettings(): void
     {
-        $settings = get_option('wpmind_routing_settings', []);
-        $this->activeStrategy = $settings['strategy'] ?? 'balanced';
+        $settings = get_option('wpmind_routing_settings', array());
+        $strategy = $settings['strategy'] ?? 'balanced';
+        
+        // 验证策略是否存在，否则回退到默认
+        if ( ! isset( $this->strategies[ $strategy ] ) ) {
+            $strategy = 'balanced';
+            // 自动修复无效配置
+            if ( isset( $settings['strategy'] ) ) {
+                $settings['strategy'] = 'balanced';
+                update_option('wpmind_routing_settings', $settings);
+            }
+        }
+        
+        $this->activeStrategy = $strategy;
     }
 
     /**
@@ -151,7 +163,18 @@ class IntelligentRouter
     public function getStrategy(?string $name = null): ?RoutingStrategyInterface
     {
         $name = $name ?? $this->activeStrategy;
-        return $this->strategies[$name] ?? null;
+        
+        // 如果请求的策略不存在，尝试回退到 'balanced'
+        if ( ! isset( $this->strategies[ $name ] ) && $name !== 'balanced' ) {
+            // 如果 balanced 也不存在，返回第一个可用策略
+            if ( isset( $this->strategies['balanced'] ) ) {
+                $name = 'balanced';
+            } else {
+                $name = array_key_first( $this->strategies );
+            }
+        }
+        
+        return $this->strategies[ $name ] ?? null;
     }
 
     /**
