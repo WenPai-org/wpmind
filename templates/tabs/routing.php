@@ -28,23 +28,23 @@ foreach ( $latency_metrics as $metric ) {
     $provider_latency[ $metric['provider'] ] = $metric;
 }
 
-// 策略图标映射
+// 策略图标映射（使用 Remixicon 类名，不含 dashicons 前缀）
 $strategy_icons = array(
-    'balanced'      => 'image-filter',   // 平衡策略
-    'performance'   => 'performance',    // 性能优先
-    'economic'      => 'money-alt',      // 经济策略
-    'load_balanced' => 'update',         // 负载均衡
+    'balanced'      => 'ri-equalizer-line',      // 平衡策略
+    'performance'   => 'ri-speed-up-line',       // 性能优先
+    'economic'      => 'ri-money-cny-circle-line', // 经济策略
+    'load_balanced' => 'ri-loop-left-line',      // 负载均衡
 );
 ?>
 
 <div class="wpmind-routing-panel">
     <div class="wpmind-routing-header">
         <h2 class="wpmind-routing-title">
-            <span class="dashicons dashicons-randomize"></span>
+            <span class="dashicons ri-shuffle-line"></span>
             <?php esc_html_e( '智能路由', 'wpmind' ); ?>
         </h2>
         <button type="button" class="button button-small wpmind-refresh-routing" title="<?php esc_attr_e( '刷新路由状态', 'wpmind' ); ?>">
-            <span class="dashicons dashicons-update"></span>
+            <span class="dashicons ri-refresh-line"></span>
             <?php esc_html_e( '刷新', 'wpmind' ); ?>
         </button>
     </div>
@@ -64,7 +64,7 @@ $strategy_icons = array(
         ?>
         <div class="wpmind-stat-card">
             <div class="wpmind-stat-icon">
-                <span class="dashicons dashicons-chart-bar"></span>
+                <span class="dashicons ri-bar-chart-box-line"></span>
             </div>
             <div class="wpmind-stat-content">
                 <span class="wpmind-stat-value"><?php echo esc_html( number_format( $today_requests ) ); ?></span>
@@ -73,7 +73,7 @@ $strategy_icons = array(
         </div>
         <div class="wpmind-stat-card">
             <div class="wpmind-stat-icon">
-                <span class="dashicons dashicons-clock"></span>
+                <span class="dashicons ri-time-line"></span>
             </div>
             <div class="wpmind-stat-content">
                 <span class="wpmind-stat-value"><?php echo esc_html( $avg_latency ); ?><small>ms</small></span>
@@ -82,7 +82,7 @@ $strategy_icons = array(
         </div>
         <div class="wpmind-stat-card">
             <div class="wpmind-stat-icon">
-                <span class="dashicons dashicons-cloud"></span>
+                <span class="dashicons ri-cloud-line"></span>
             </div>
             <div class="wpmind-stat-content">
                 <span class="wpmind-stat-value"><?php echo esc_html( $provider_count ); ?></span>
@@ -91,7 +91,7 @@ $strategy_icons = array(
         </div>
         <div class="wpmind-stat-card">
             <div class="wpmind-stat-icon">
-                <span class="dashicons dashicons-money-alt"></span>
+                <span class="dashicons ri-money-cny-circle-line"></span>
             </div>
             <div class="wpmind-stat-content">
                 <span class="wpmind-stat-value">¥<?php echo esc_html( number_format( $dashboard['today']['cost_cny'] ?? 0, 2 ) ); ?></span>
@@ -116,7 +116,7 @@ $strategy_icons = array(
                                <?php checked( $current_strategy, $strategy_name ); ?> hidden>
                         
                         <div class="wpmind-strategy-item-icon">
-                            <span class="dashicons dashicons-<?php echo esc_attr( $icon ); ?>"></span>
+                            <span class="dashicons <?php echo esc_attr( $icon ); ?>"></span>
                         </div>
                         
                         <div class="wpmind-strategy-item-content">
@@ -125,7 +125,7 @@ $strategy_icons = array(
                         </div>
                         
                         <div class="wpmind-strategy-item-check">
-                            <span class="dashicons dashicons-yes"></span>
+                            <span class="dashicons ri-check-line"></span>
                         </div>
                     </label>
                     <?php endforeach; ?>
@@ -146,7 +146,7 @@ $strategy_icons = array(
                 </div>
                 <div class="wpmind-routing-status-main">
                     <span class="wpmind-routing-status-icon">
-                        <span class="dashicons dashicons-yes"></span>
+                        <span class="dashicons ri-check-line"></span>
                     </span>
                     <span class="wpmind-routing-status-provider" id="wpmind-recommended-provider">
                         <?php echo esc_html( $recommended_name ); ?>

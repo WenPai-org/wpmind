@@ -149,10 +149,10 @@
             var settings = $.extend({}, defaults, options);
 
             var icons = {
-                warning: 'dashicons-warning',
-                danger: 'dashicons-dismiss',
-                info: 'dashicons-info',
-                success: 'dashicons-yes-alt'
+                warning: 'ri-alert-line',
+                danger: 'ri-close-circle-line',
+                info: 'ri-information-line',
+                success: 'ri-checkbox-circle-line'
             };
 
             var $overlay = $('<div class="wpmind-dialog-overlay"></div>');
@@ -237,10 +237,10 @@
 
             if ($target.attr('type') === 'password') {
                 $target.attr('type', 'text');
-                $icon.removeClass('dashicons-visibility').addClass('dashicons-hidden');
+                $icon.removeClass('ri-eye-line').addClass('ri-eye-off-line');
             } else {
                 $target.attr('type', 'password');
-                $icon.removeClass('dashicons-hidden').addClass('dashicons-visibility');
+                $icon.removeClass('ri-eye-off-line').addClass('ri-eye-line');
             }
         });
     }
@@ -306,7 +306,7 @@
 
             // 设置加载状态
             $button.addClass('is-testing').prop('disabled', true);
-            $button.html('<span class="dashicons dashicons-update wpmind-spinning"></span> 测试中');
+            $button.html('<span class="dashicons ri-loader-4-line wpmind-spinning"></span> 测试中');
             $result.text('').removeClass('success error warning').removeAttr('title');
 
             if (typeof wpmindData === 'undefined') {
@@ -332,11 +332,11 @@
                         if (response.data && response.data.retried) {
                             message += ' (重试后)';
                         }
-                        $result.html('<span class="dashicons dashicons-yes-alt"></span> ' + message).addClass('success');
+                        $result.html('<span class="dashicons ri-checkbox-circle-line"></span> ' + message).addClass('success');
                         Toast.success(provider.toUpperCase() + ' ' + message);
                     } else {
                         var errorMsg = (response.data && response.data.message) || '连接失败';
-                        $result.html('<span class="dashicons dashicons-dismiss"></span> ' + errorMsg).addClass('error');
+                        $result.html('<span class="dashicons ri-close-circle-line"></span> ' + errorMsg).addClass('error');
                         if (response.data && response.data.details) {
                             $result.attr('title', response.data.details);
                         }
@@ -347,7 +347,7 @@
                     if (status === 'timeout') {
                         message = '请求超时';
                     }
-                    $result.html('<span class="dashicons dashicons-dismiss"></span> ' + message).addClass('error');
+                    $result.html('<span class="dashicons ri-close-circle-line"></span> ' + message).addClass('error');
                 },
                 complete: function () {
                     $button.removeClass('is-testing').prop('disabled', false).text('测试连接');
@@ -454,10 +454,10 @@
 
             if ($advanced.is(':visible')) {
                 $advanced.slideUp(200);
-                $icon.removeClass('dashicons-arrow-up-alt2').addClass('dashicons-arrow-down-alt2');
+                $icon.removeClass('ri-arrow-up-s-line').addClass('ri-arrow-down-s-line');
             } else {
                 $advanced.slideDown(200);
-                $icon.removeClass('dashicons-arrow-down-alt2').addClass('dashicons-arrow-up-alt2');
+                $icon.removeClass('ri-arrow-down-s-line').addClass('ri-arrow-up-s-line');
             }
         });
     }
@@ -559,7 +559,7 @@
                 cancelText: '取消',
                 onConfirm: function () {
                     var originalHtml = $button.html();
-                    $button.prop('disabled', true).html('<span class="dashicons dashicons-update wpmind-spinning"></span>');
+                    $button.prop('disabled', true).html('<span class="dashicons ri-loader-4-line wpmind-spinning"></span>');
 
                     if (typeof wpmindData === 'undefined') {
                         Toast.error('配置错误');
@@ -710,7 +710,7 @@
             if ($button.prop('disabled')) return;
 
             var originalText = $button.text();
-            $button.prop('disabled', true).html('<span class="dashicons dashicons-update wpmind-spinning"></span> 保存中');
+            $button.prop('disabled', true).html('<span class="dashicons ri-loader-4-line wpmind-spinning"></span> 保存中');
 
             // 收集设置数据
             var settings = {
@@ -780,7 +780,7 @@
                 cancelText: '取消',
                 onConfirm: function () {
                     var originalHtml = $button.html();
-                    $button.prop('disabled', true).html('<span class="dashicons dashicons-update wpmind-spinning"></span>');
+                    $button.prop('disabled', true).html('<span class="dashicons ri-loader-4-line wpmind-spinning"></span>');
 
                     if (typeof wpmindData === 'undefined') {
                         Toast.error('配置错误');

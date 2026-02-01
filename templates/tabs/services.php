@@ -76,7 +76,7 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
         <div class="wpmind-endpoint-card<?php echo ( ! empty( $endpoint['enabled'] ) && $has_api_key ) ? '' : ' is-collapsed'; ?>" id="endpoint-<?php echo esc_attr( $key ); ?>">
             <div class="wpmind-endpoint-header">
                 <button type="button" class="wpmind-endpoint-toggle" aria-expanded="<?php echo ( ! empty( $endpoint['enabled'] ) && $has_api_key ) ? 'true' : 'false'; ?>">
-                    <span class="dashicons dashicons-arrow-down-alt2"></span>
+                    <span class="dashicons ri-arrow-down-s-line"></span>
                 </button>
                 <i class="<?php echo esc_attr( $icon_class ); ?> wpmind-provider-icon" style="color: <?php echo esc_attr( $icon_color ); ?>;"></i>
                 <span class="wpmind-endpoint-name">
@@ -126,7 +126,7 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
                                     class="button wpmind-toggle-key"
                                     data-target="api_key_<?php echo esc_attr( $key ); ?>"
                                     aria-label="<?php esc_attr_e( '切换密码显示', 'wpmind' ); ?>">
-                                <span class="dashicons dashicons-visibility"></span>
+                                <span class="dashicons ri-eye-line"></span>
                             </button>
                         </div>
                         <?php if ( $has_api_key ) : ?>
@@ -160,7 +160,7 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
                 <tr class="wpmind-advanced-row">
                     <td colspan="2">
                         <button type="button" class="button button-link wpmind-toggle-advanced">
-                            <span class="dashicons dashicons-arrow-down-alt2"></span>
+                            <span class="dashicons ri-arrow-down-s-line"></span>
                             <?php esc_html_e( '高级设置', 'wpmind' ); ?>
                         </button>
                     </td>

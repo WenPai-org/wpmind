@@ -23,15 +23,15 @@ defined( 'ABSPATH' ) || exit;
 
         <span class="wpmind-title-right">
             <a href="https://wpcy.com/mind/" target="_blank" class="wpmind-title-link">
-                <span class="dashicons dashicons-book"></span>
+                <span class="dashicons ri-book-2-line"></span>
                 <?php esc_html_e( '文档', 'wpmind' ); ?>
             </a>
             <a href="https://github.com/WenPai-org/wpmind" target="_blank" class="wpmind-title-link">
-                <span class="dashicons dashicons-editor-code"></span>
+                <span class="dashicons ri-github-line"></span>
                 <?php esc_html_e( 'GitHub', 'wpmind' ); ?>
             </a>
             <a href="https://wpcy.com/c/wpmind" target="_blank" class="wpmind-title-link">
-                <span class="dashicons dashicons-groups"></span>
+                <span class="dashicons ri-team-line"></span>
                 <?php esc_html_e( '支持', 'wpmind' ); ?>
             </a>
         </span>

@@ -39,10 +39,10 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
         </span>
         <?php endif; ?>
         <button type="button" class="button button-small wpmind-refresh-usage" title="<?php esc_attr_e( '刷新统计', 'wpmind' ); ?>" aria-label="<?php esc_attr_e( '刷新用量统计', 'wpmind' ); ?>">
-            <span class="dashicons dashicons-update"></span>
+            <span class="dashicons ri-refresh-line"></span>
         </button>
         <button type="button" class="button button-small wpmind-clear-usage" title="<?php esc_attr_e( '清除统计', 'wpmind' ); ?>" aria-label="<?php esc_attr_e( '清除所有用量统计数据', 'wpmind' ); ?>">
-            <span class="dashicons dashicons-trash"></span>
+            <span class="dashicons ri-delete-bin-line"></span>
             <?php esc_html_e( '清除', 'wpmind' ); ?>
         </button>
     </h2>
@@ -50,7 +50,7 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
     <?php if ( ! $has_usage_data ) : ?>
     <!-- 空状态提示 -->
     <div class="wpmind-usage-empty">
-        <span class="dashicons dashicons-chart-bar"></span>
+        <span class="dashicons ri-bar-chart-box-line"></span>
         <p><?php esc_html_e( '暂无用量数据', 'wpmind' ); ?></p>
         <p class="description"><?php esc_html_e( '当 AI 服务被调用时，用量统计将自动记录在这里。', 'wpmind' ); ?></p>
     </div>
@@ -63,7 +63,7 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
     <div class="wpmind-usage-cards">
         <div class="wpmind-usage-card">
             <div class="wpmind-usage-card-header">
-                <span class="dashicons dashicons-calendar-alt"></span>
+                <span class="dashicons ri-calendar-line"></span>
                 <?php esc_html_e( '今日', 'wpmind' ); ?>
             </div>
             <div class="wpmind-usage-card-body">
@@ -83,7 +83,7 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
         </div>
         <div class="wpmind-usage-card">
             <div class="wpmind-usage-card-header">
-                <span class="dashicons dashicons-backup"></span>
+                <span class="dashicons ri-history-line"></span>
                 <?php esc_html_e( '本周', 'wpmind' ); ?>
             </div>
             <div class="wpmind-usage-card-body">
@@ -103,7 +103,7 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
         </div>
         <div class="wpmind-usage-card">
             <div class="wpmind-usage-card-header">
-                <span class="dashicons dashicons-calendar"></span>
+                <span class="dashicons ri-calendar-2-line"></span>
                 <?php esc_html_e( '本月', 'wpmind' ); ?>
             </div>
             <div class="wpmind-usage-card-body">
@@ -123,7 +123,7 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
         </div>
         <div class="wpmind-usage-card">
             <div class="wpmind-usage-card-header">
-                <span class="dashicons dashicons-chart-bar"></span>
+                <span class="dashicons ri-bar-chart-box-line"></span>
                 <?php esc_html_e( '总计', 'wpmind' ); ?>
             </div>
             <div class="wpmind-usage-card-body">
@@ -185,14 +185,14 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
 <?php if ( $has_usage_data ) : ?>
 <div class="wpmind-analytics-panel">
     <h2 class="title">
-        <span class="dashicons dashicons-chart-area"></span>
+        <span class="dashicons ri-line-chart-line"></span>
         <?php esc_html_e( '分析仪表板', 'wpmind' ); ?>
         <select id="wpmind-analytics-range" class="wpmind-analytics-range-select">
             <option value="7d"><?php esc_html_e( '最近 7 天', 'wpmind' ); ?></option>
             <option value="30d"><?php esc_html_e( '最近 30 天', 'wpmind' ); ?></option>
         </select>
         <button type="button" class="button button-small wpmind-refresh-analytics" title="<?php esc_attr_e( '刷新图表', 'wpmind' ); ?>">
-            <span class="dashicons dashicons-update"></span>
+            <span class="dashicons ri-refresh-line"></span>
         </button>
     </h2>
 
@@ -238,10 +238,10 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
     <h2 class="title">
         <?php esc_html_e( '服务状态', 'wpmind' ); ?>
         <button type="button" class="button button-small wpmind-refresh-status" title="<?php esc_attr_e( '刷新状态', 'wpmind' ); ?>">
-            <span class="dashicons dashicons-update"></span>
+            <span class="dashicons ri-refresh-line"></span>
         </button>
         <button type="button" class="button button-small wpmind-reset-all-breakers" title="<?php esc_attr_e( '重置所有熔断器', 'wpmind' ); ?>">
-            <span class="dashicons dashicons-image-rotate"></span>
+            <span class="dashicons ri-restart-line"></span>
             <?php esc_html_e( '重置', 'wpmind' ); ?>
         </button>
     </h2>

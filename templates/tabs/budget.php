@@ -20,7 +20,7 @@ $budget_summary = $budget_checker->getSummary();
 
 <div class="wpmind-budget-panel">
     <h2 class="title">
-        <span class="dashicons dashicons-money-alt"></span>
+        <span class="dashicons ri-money-cny-circle-line"></span>
         <?php esc_html_e( '预算限额', 'wpmind' ); ?>
         <?php if ( $budget_settings['enabled'] ) : ?>
         <span class="wpmind-budget-status-badge wpmind-budget-enabled"><?php esc_html_e( '已启用', 'wpmind' ); ?></span>
