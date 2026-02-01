@@ -15,76 +15,68 @@ defined( 'ABSPATH' ) || exit;
 $image_endpoints  = get_option( 'wpmind_image_endpoints', [] );
 $default_image_provider = get_option( 'wpmind_default_image_provider', '' );
 
-// 图像生成服务商定义（前8大模型）
+// 图像生成服务商定义（已通过 Gemini CLI 核实 2026-02-01）
 $available_providers = [
     'openai_gpt_image' => [
-        'name'         => 'GPT-Image 1.5',
-        'display_name' => 'openai-gpt-image',
+        'name'         => 'DALL-E 3 / GPT-Image',
+        'display_name' => 'openai-image',
         'description'  => 'OpenAI 图像生成，综合最均衡、文字渲染极强',
         'base_url'     => 'https://api.openai.com/v1/',
-        'models'       => [ 'gpt-image-1.5', 'dall-e-3' ],
+        'models'       => [ 'dall-e-3', 'gpt-image-1.5' ],
     ],
     'google_gemini_image' => [
-        'name'         => 'Gemini Pro Image',
-        'display_name' => 'gemini-image',
-        'description'  => 'Google Gemini 图像生成，文字最稳、复杂构图极强',
-        'base_url'     => 'https://generativelanguage.googleapis.com/v1/',
-        'models'       => [ 'gemini-3-pro-image', 'imagen-3' ],
+        'name'         => 'Imagen 3',
+        'display_name' => 'google-imagen',
+        'description'  => 'Google Imagen 图像生成，文字最稳、复杂构图极强',
+        'base_url'     => 'https://generativelanguage.googleapis.com/v1beta/',
+        'models'       => [ 'imagen-3.0-generate-001' ],
     ],
     'tencent_hunyuan' => [
-        'name'         => '混元图像 3.0',
+        'name'         => '混元图像',
         'display_name' => 'hunyuan-image',
-        'description'  => '腾讯混元，中文理解 & 文字渲染顶级、性价比高',
-        'base_url'     => 'https://hunyuan.cloud.tencent.com/hyllm/v1/',
-        'models'       => [ 'hunyuan-image-3.0', 'hunyuan-image-turbo' ],
+        'description'  => '腾讯混元，中文理解 & 文字渲染顶级（需 SDK 签名）',
+        'base_url'     => 'https://hunyuan.tencentcloudapi.com/',
+        'models'       => [ 'hunyuan-image-v3' ],
     ],
-    'bytedance_reve' => [
-        'name'         => 'Reve Image',
-        'display_name' => 'reve-image',
-        'description'  => '字节跳动 Reve，细节 & 艺术性很强',
+    'bytedance_doubao' => [
+        'name'         => 'Doubao Image / Seedream',
+        'display_name' => 'doubao-image',
+        'description'  => '火山引擎图像生成，性价比高、中文文化理解强',
         'base_url'     => 'https://ark.cn-beijing.volces.com/api/v3/',
-        'models'       => [ 'reve-image-v2', 'reve-image-turbo' ],
+        'models'       => [ 'doubao-image-v1', 'seedream-4.5' ],
     ],
     'flux' => [
-        'name'         => 'Flux.1 / Flux.2',
+        'name'         => 'Flux (Fal.ai)',
         'display_name' => 'flux',
-        'description'  => 'Black Forest Labs 开源天花板，手部/文字/提示遵循最强',
-        'base_url'     => 'https://api.fal.ai/v1/',
-        'models'       => [ 'flux-pro', 'flux-dev', 'flux-schnell' ],
-    ],
-    'bytedance_seedream' => [
-        'name'         => '即梦 Seedream 2.0',
-        'display_name' => 'seedream',
-        'description'  => '字节跳动即梦，中文提示 & 文化元素理解最懂',
-        'base_url'     => 'https://ark.cn-beijing.volces.com/api/v3/',
-        'models'       => [ 'seedream-2.0', 'seedream-turbo' ],
+        'description'  => 'Black Forest Labs 开源天花板，手部/文字/遵循最强',
+        'base_url'     => 'https://fal.run/fal-ai/',
+        'models'       => [ 'flux/dev', 'flux/schnell', 'flux-pro-1.1' ],
     ],
     'midjourney' => [
-        'name'         => 'Midjourney v7',
+        'name'         => 'Midjourney (第三方代理)',
         'display_name' => 'midjourney',
-        'description'  => 'Midjourney 艺术风格顶级，美感、风格化最强',
-        'base_url'     => 'https://api.midjourney.com/v1/',
-        'models'       => [ 'midjourney-v7', 'midjourney-v6.1' ],
+        'description'  => '⚠️ 无官方 API，需使用第三方代理服务，风险自担',
+        'base_url'     => '',
+        'models'       => [ 'v7', 'v6.1' ],
     ],
     'qwen_image' => [
         'name'         => '通义万相',
-        'display_name' => 'qwen-image',
+        'display_name' => 'wanx',
         'description'  => '阿里云通义万相，真实感极强，几乎无AI味',
         'base_url'     => 'https://dashscope.aliyuncs.com/api/v1/',
-        'models'       => [ 'wanx-v1', 'wanx2.1-t2i-turbo' ],
+        'models'       => [ 'wanx-v1', 'wanx-background-generation-v2' ],
     ],
 ];
 
-// 图标映射
+// 图标映射（单色风格，与文本服务一致）
 $provider_icons = [
-    'openai_gpt_image'    => [ 'icon' => 'ri-openai-line', 'color' => '#10a37f' ],
-    'google_gemini_image' => [ 'icon' => 'ri-google-line', 'color' => '#4285f4' ],
-    'tencent_hunyuan'     => [ 'icon' => 'ri-cloud-line', 'color' => '#006eff' ],
-    'bytedance_reve'      => [ 'icon' => 'ri-tiktok-line', 'color' => '#000000' ],
-    'flux'                => [ 'icon' => 'ri-sparkling-2-line', 'color' => '#7c3aed' ],
-    'bytedance_seedream'  => [ 'icon' => 'ri-magic-line', 'color' => '#fe2c55' ],
-    'midjourney'          => [ 'icon' => 'ri-palette-line', 'color' => '#5865f2' ],
-    'qwen_image'          => [ 'icon' => 'ri-rainbow-line', 'color' => '#ff6a00' ],
+    'openai_gpt_image'    => [ 'icon' => 'ri-openai-line', 'color' => '#50575e' ],
+    'google_gemini_image' => [ 'icon' => 'ri-gemini-line', 'color' => '#50575e' ],
+    'tencent_hunyuan'     => [ 'icon' => 'ri-cloud-line', 'color' => '#50575e' ],
+    'bytedance_doubao'    => [ 'icon' => 'ri-fire-line', 'color' => '#50575e' ],
+    'flux'                => [ 'icon' => 'ri-sparkling-2-line', 'color' => '#50575e' ],
+    'midjourney'          => [ 'icon' => 'ri-palette-line', 'color' => '#50575e' ],
+    'qwen_image'          => [ 'icon' => 'ri-rainbow-line', 'color' => '#50575e' ],
 ];
 
 /**

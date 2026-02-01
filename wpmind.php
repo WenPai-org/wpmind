@@ -538,9 +538,8 @@ final class WPMind {
             'openai_gpt_image',
             'google_gemini_image',
             'tencent_hunyuan',
-            'bytedance_reve',
+            'bytedance_doubao',
             'flux',
-            'bytedance_seedream',
             'midjourney',
             'qwen_image',
         ];
@@ -1042,15 +1041,14 @@ final class WPMind {
         $api_key = $config['api_key'];
         $custom_url = $config['custom_base_url'] ?? '';
 
-        // 服务商测试端点映射
+        // 服务商测试端点映射（已通过 Gemini CLI 核实 2026-02-01）
         $test_endpoints = [
             'openai_gpt_image'    => 'https://api.openai.com/v1/models',
-            'google_gemini_image' => 'https://generativelanguage.googleapis.com/v1/models',
-            'tencent_hunyuan'     => 'https://hunyuan.cloud.tencent.com/hyllm/v1/models',
-            'bytedance_reve'      => 'https://ark.cn-beijing.volces.com/api/v3/models',
-            'flux'                => 'https://api.fal.ai/v1/models',
-            'bytedance_seedream'  => 'https://ark.cn-beijing.volces.com/api/v3/models',
-            'midjourney'          => 'https://api.midjourney.com/v1/status',
+            'google_gemini_image' => 'https://generativelanguage.googleapis.com/v1beta/models',
+            'tencent_hunyuan'     => 'https://hunyuan.tencentcloudapi.com/',
+            'bytedance_doubao'    => 'https://ark.cn-beijing.volces.com/api/v3/models',
+            'flux'                => 'https://fal.run/fal-ai/flux/dev',
+            'midjourney'          => '', // 无官方 API
             'qwen_image'          => 'https://dashscope.aliyuncs.com/api/v1/models',
         ];
 
