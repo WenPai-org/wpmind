@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-    define( 'WPMIND_VERSION', '2.3.4' );
+    define( 'WPMIND_VERSION', '2.4.0' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
     define( 'WPMIND_PLUGIN_FILE', __FILE__ );
@@ -417,6 +417,17 @@ final class WPMind {
                 'default'           => '',
             ]
         );
+
+        // 图像服务设置
+        register_setting(
+            'wpmind_image_settings',
+            'wpmind_image_endpoints',
+            [
+                'type'              => 'array',
+                'sanitize_callback' => [ $this, 'sanitize_image_endpoints' ],
+                'default'           => [],
+            ]
+        );
     }
 
     /**
@@ -491,6 +502,63 @@ final class WPMind {
         if ( $api_key === '' ) {
             $existing = get_option( 'wpmind_custom_endpoints', [] );
             return $existing[ $endpoint_key ]['api_key'] ?? '';
+        }
+
+        return sanitize_text_field( $api_key );
+    }
+
+    /**
+     * 清理图像端点配置
+     *
+     * @param mixed $input 输入数据
+     * @return array 清理后的图像端点配置
+     * @since 2.4.0
+     */
+    public function sanitize_image_endpoints( $input ): array {
+        if ( ! is_array( $input ) ) {
+            return [];
+        }
+
+        $sanitized = [];
+        $available_providers = [
+            'zhipu_cogview',
+            'tongyi_wanxiang',
+            'wenxin_yige',
+            'stability_ai',
+        ];
+
+        foreach ( $available_providers as $key ) {
+            if ( ! isset( $input[ $key ] ) ) {
+                continue;
+            }
+
+            $provider_input = $input[ $key ];
+            $sanitized[ $key ] = [
+                'enabled'    => ! empty( $provider_input['enabled'] ),
+                'api_key'    => $this->sanitize_image_api_key( $provider_input, $key ),
+                'model'      => sanitize_text_field( $provider_input['model'] ?? '' ),
+                'custom_url' => esc_url_raw( $provider_input['custom_url'] ?? '' ),
+            ];
+        }
+
+        return $sanitized;
+    }
+
+    /**
+     * 清理图像服务 API Key
+     *
+     * @param array  $provider_input 服务商输入数据
+     * @param string $provider_key   服务商标识
+     * @return string 处理后的 API Key
+     * @since 2.4.0
+     */
+    private function sanitize_image_api_key( array $provider_input, string $provider_key ): string {
+        $api_key = trim( (string) ( $provider_input['api_key'] ?? '' ) );
+
+        // 如果是掩码值（********），保留原有值
+        if ( $api_key === '' || $api_key === '********' ) {
+            $existing = get_option( 'wpmind_image_endpoints', [] );
+            return $existing[ $provider_key ]['api_key'] ?? '';
         }
 
         return sanitize_text_field( $api_key );

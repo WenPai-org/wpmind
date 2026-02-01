@@ -47,7 +47,10 @@ defined( 'ABSPATH' ) || exit;
                     <?php esc_html_e( '仪表板', 'wpmind' ); ?>
                 </a>
                 <a href="#services" class="wpmind-tab" data-tab="services">
-                    <?php esc_html_e( '服务配置', 'wpmind' ); ?>
+                    <?php esc_html_e( '文本服务', 'wpmind' ); ?>
+                </a>
+                <a href="#images" class="wpmind-tab" data-tab="images">
+                    <?php esc_html_e( '图像服务', 'wpmind' ); ?>
                 </a>
                 <a href="#routing" class="wpmind-tab" data-tab="routing">
                     <?php esc_html_e( '智能路由', 'wpmind' ); ?>
@@ -63,6 +66,9 @@ defined( 'ABSPATH' ) || exit;
             </div>
             <div id="services" class="wpmind-tab-pane">
                 <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/services.php'; ?>
+            </div>
+            <div id="images" class="wpmind-tab-pane">
+                <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/images.php'; ?>
             </div>
             <div id="routing" class="wpmind-tab-pane">
                 <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/routing.php'; ?>
