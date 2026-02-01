@@ -273,6 +273,9 @@ final class WPMind {
         add_filter( 'ai_experiments_preferred_models', [ $this, 'filter_preferred_models' ] );
         add_filter( 'wp_ai_client_default_request_timeout', [ $this, 'filter_request_timeout' ] );
         add_filter( 'mcp_adapter_default_server_config', [ $this, 'filter_mcp_config' ] );
+        
+        // 图像生成能力
+        add_filter( 'ai_experiments_image_generation_handler', [ $this, 'handle_image_generation' ], 10, 2 );
 
         // HTTP API 钩子 - 追踪 AI 请求结果
         add_action( 'http_api_debug', [ $this, 'track_ai_request_result' ], 10, 5 );
@@ -666,6 +669,48 @@ final class WPMind {
         $config['name'] = 'wpmind-mcp';
         $config['version'] = WPMIND_VERSION;
         return $config;
+    }
+
+    /**
+     * 处理图像生成请求
+     *
+     * 连接 AI Experiments Image Generation 能力与 WPMind 图像路由器
+     *
+     * @param mixed  $result 原始结果
+     * @param string $prompt 图像生成提示词
+     * @return array 图像生成结果
+     * @since 2.4.0
+     */
+    public function handle_image_generation( $result, string $prompt ): array {
+        // 如果已有结果，直接返回
+        if ( ! empty( $result ) && is_array( $result ) && ! empty( $result['url'] ) ) {
+            return $result;
+        }
+
+        // 检查是否有可用的图像服务
+        $image_endpoints = get_option( 'wpmind_image_endpoints', [] );
+        $has_enabled = false;
+        
+        foreach ( $image_endpoints as $config ) {
+            if ( ! empty( $config['enabled'] ) && ! empty( $config['api_key'] ) ) {
+                $has_enabled = true;
+                break;
+            }
+        }
+
+        if ( ! $has_enabled ) {
+            return [
+                'success' => false,
+                'error'   => __( '没有配置图像生成服务', 'wpmind' ),
+            ];
+        }
+
+        // 使用图像路由器
+        $router = Providers\Image\ImageRouter::instance();
+        
+        return $router->generate( $prompt, [
+            'size' => '1024x1024',
+        ] );
     }
 
     /**
