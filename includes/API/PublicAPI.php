@@ -61,14 +61,19 @@ class PublicAPI {
      * @return bool
      */
     public function is_available(): bool {
-        // 检查是否有配置的端点
-        $endpoints = get_option('wpmind_endpoints', []);
+        // 使用 WPMind 实例获取端点配置
+        if (!class_exists('\\WPMind\\WPMind')) {
+            return false;
+        }
+
+        $wpmind = \WPMind\WPMind::instance();
+        $endpoints = $wpmind->get_custom_endpoints();
         
         if (empty($endpoints)) {
             return false;
         }
 
-        // 检查是否至少有一个启用的端点
+        // 检查是否至少有一个启用的端点且有 API Key
         foreach ($endpoints as $endpoint) {
             if (!empty($endpoint['enabled']) && !empty($endpoint['api_key'])) {
                 return true;
@@ -87,23 +92,26 @@ class PublicAPI {
         $endpoints = get_option('wpmind_endpoints', []);
         $default_provider = get_option('wpmind_default_provider', '');
 
-        // 获取用量统计
-        $usage_tracker = null;
-        if (class_exists('\\WPMind\\Usage\\UsageTracker')) {
-            $usage_tracker = \WPMind\Usage\UsageTracker::instance();
-        }
+        // 获取用量统计 - UsageTracker 是静态类
+        $today_tokens = 0;
+        $month_tokens = 0;
 
-        $usage = [
-            'today' => $usage_tracker ? $usage_tracker->get_today_usage() : 0,
-            'month' => $usage_tracker ? $usage_tracker->get_month_usage() : 0,
-            'limit' => 0,
-        ];
+        if (class_exists('\\WPMind\\Usage\\UsageTracker')) {
+            $today_stats = \WPMind\Usage\UsageTracker::getTodayStats();
+            $month_stats = \WPMind\Usage\UsageTracker::getMonthStats();
+            $today_tokens = $today_stats['total_tokens'] ?? 0;
+            $month_tokens = $month_stats['total_tokens'] ?? 0;
+        }
 
         return [
             'available' => $this->is_available(),
             'provider'  => $default_provider,
             'model'     => $this->get_current_model($default_provider),
-            'usage'     => $usage,
+            'usage'     => [
+                'today' => $today_tokens,
+                'month' => $month_tokens,
+                'limit' => 0,
+            ],
         ];
     }
 
@@ -354,7 +362,7 @@ class PublicAPI {
      */
     private function execute_chat_request(array $args, string $provider, string $model) {
         // 获取端点配置
-        $wpmind = \WPMind::instance();
+        $wpmind = \WPMind\WPMind::instance();
         $endpoints = $wpmind->get_custom_endpoints();
 
         if (!isset($endpoints[$provider])) {
@@ -375,8 +383,9 @@ class PublicAPI {
         }
 
         // 确定模型
-        if ($model === 'auto' || empty($model)) {
-            $model = $endpoint['model'] ?? 'gpt-3.5-turbo';
+        if ($model === 'auto' || empty($model) || $model === 'default') {
+            // models 是数组，取第一个
+            $model = $endpoint['models'][0] ?? 'gpt-3.5-turbo';
         }
 
         // 构建请求体
@@ -551,10 +560,16 @@ class PublicAPI {
      * @return string
      */
     private function get_current_model(string $provider): string {
-        $endpoints = get_option('wpmind_endpoints', []);
+        if (!class_exists('\\WPMind\\WPMind')) {
+            return 'default';
+        }
+
+        $wpmind = \WPMind\WPMind::instance();
+        $endpoints = $wpmind->get_custom_endpoints();
         
-        if (isset($endpoints[$provider]['model'])) {
-            return $endpoints[$provider]['model'];
+        // models 是数组，取第一个作为默认
+        if (isset($endpoints[$provider]['models']) && is_array($endpoints[$provider]['models'])) {
+            return $endpoints[$provider]['models'][0] ?? 'default';
         }
 
         return 'default';

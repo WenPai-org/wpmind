@@ -1080,7 +1080,6 @@ input.is-invalid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: var(--wpmind-space-6);
-    padding: var(--wpmind-space-6);
 }
 
 .wpmind-usage-card {
@@ -1154,7 +1153,6 @@ input.is-invalid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: var(--wpmind-space-6);
-    padding: 0 var(--wpmind-space-6) var(--wpmind-space-6);
 }
 
 .wpmind-provider-usage-item {
