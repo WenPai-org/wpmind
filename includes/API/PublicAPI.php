@@ -319,6 +319,474 @@ class PublicAPI {
         return $result;
     }
 
+    // ============================================
+    // v2.6.0 增强 API
+    // ============================================
+
+    /**
+     * 流式输出
+     *
+     * @since 2.6.0
+     * @param array|string $messages 消息
+     * @param callable     $callback 回调函数，接收每个 chunk
+     * @param array        $options  选项
+     * @return bool|WP_Error
+     */
+    public function stream($messages, callable $callback, array $options = []) {
+        // 默认选项
+        $defaults = [
+            'context'     => '',
+            'system'      => '',
+            'max_tokens'  => 2000,
+            'temperature' => 0.7,
+            'model'       => 'auto',
+            'provider'    => 'auto',
+        ];
+        $options = wp_parse_args($options, $defaults);
+
+        $context = $options['context'];
+        $normalized_messages = $this->normalize_messages($messages, $options);
+
+        // 选择服务商和模型
+        $provider = $options['provider'] === 'auto' 
+            ? get_option('wpmind_default_provider', 'deepseek') 
+            : $options['provider'];
+        $model = $options['model'] === 'auto' 
+            ? $this->get_current_model($provider) 
+            : $options['model'];
+
+        // 获取端点配置
+        $wpmind = \WPMind\WPMind::instance();
+        $endpoints = $wpmind->get_custom_endpoints();
+
+        if (!isset($endpoints[$provider])) {
+            return new WP_Error('wpmind_provider_not_found', 
+                sprintf(__('服务商 %s 未配置', 'wpmind'), $provider));
+        }
+
+        $endpoint = $endpoints[$provider];
+        $api_key = $endpoint['api_key'] ?? '';
+
+        if (empty($api_key)) {
+            return new WP_Error('wpmind_api_key_missing', 
+                sprintf(__('服务商 %s 未配置 API Key', 'wpmind'), $provider));
+        }
+
+        // 确定模型
+        if ($model === 'auto' || $model === 'default') {
+            $model = $endpoint['models'][0] ?? 'gpt-3.5-turbo';
+        }
+
+        do_action('wpmind_before_request', 'stream', compact('messages', 'options'), $context);
+
+        // 构建请求
+        $base_url = $endpoint['custom_url'] ?? $endpoint['base_url'] ?? '';
+        $api_url = trailingslashit($base_url) . 'chat/completions';
+
+        $request_body = [
+            'model'       => $model,
+            'messages'    => $normalized_messages,
+            'max_tokens'  => $options['max_tokens'],
+            'temperature' => $options['temperature'],
+            'stream'      => true,
+        ];
+
+        // 使用 PHP stream context 处理流式响应
+        $context_options = [
+            'http' => [
+                'method'  => 'POST',
+                'header'  => [
+                    'Content-Type: application/json',
+                    'Authorization: Bearer ' . $api_key,
+                ],
+                'content' => wp_json_encode($request_body),
+                'timeout' => 120,
+            ],
+            'ssl' => [
+                'verify_peer' => true,
+            ],
+        ];
+
+        $stream_context = stream_context_create($context_options);
+        $stream = @fopen($api_url, 'r', false, $stream_context);
+
+        if (!$stream) {
+            return new WP_Error('wpmind_stream_failed', __('无法建立流式连接', 'wpmind'));
+        }
+
+        $full_content = '';
+
+        while (!feof($stream)) {
+            $line = fgets($stream);
+            if (empty($line)) continue;
+
+            $line = trim($line);
+            if (strpos($line, 'data: ') !== 0) continue;
+
+            $data = substr($line, 6);
+            if ($data === '[DONE]') break;
+
+            $json = json_decode($data, true);
+            if (!$json) continue;
+
+            $delta = $json['choices'][0]['delta']['content'] ?? '';
+            if (!empty($delta)) {
+                $full_content .= $delta;
+                call_user_func($callback, $delta, $json);
+            }
+        }
+
+        fclose($stream);
+
+        do_action('wpmind_after_request', 'stream', ['content' => $full_content], compact('messages', 'options'), []);
+
+        return true;
+    }
+
+    /**
+     * 结构化输出（JSON Schema）
+     *
+     * @since 2.6.0
+     * @param array|string $messages   消息
+     * @param array        $schema     JSON Schema 定义
+     * @param array        $options    选项
+     * @return array|WP_Error
+     */
+    public function structured($messages, array $schema, array $options = []) {
+        // 默认选项
+        $defaults = [
+            'context'     => 'structured',
+            'max_tokens'  => 2000,
+            'temperature' => 0.3, // 结构化输出用较低温度
+            'retries'     => 3,   // 自动重试次数
+        ];
+        $options = wp_parse_args($options, $defaults);
+
+        $context = $options['context'];
+
+        // 构建带 Schema 说明的 System Prompt
+        $schema_json = wp_json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        $schema_prompt = "你必须返回严格符合以下 JSON Schema 的 JSON 对象。不要返回其他内容，只返回 JSON：\n\n```json\n{$schema_json}\n```";
+
+        // 如果是字符串，加上 schema 要求
+        if (is_string($messages)) {
+            $messages = [
+                ['role' => 'system', 'content' => $schema_prompt],
+                ['role' => 'user', 'content' => $messages],
+            ];
+        } else {
+            // 在消息开头添加 schema 说明
+            array_unshift($messages, ['role' => 'system', 'content' => $schema_prompt]);
+        }
+
+        $max_retries = $options['retries'];
+        $last_error = null;
+
+        for ($attempt = 1; $attempt <= $max_retries; $attempt++) {
+            $result = $this->chat($messages, [
+                'context'     => $context,
+                'max_tokens'  => $options['max_tokens'],
+                'temperature' => $options['temperature'],
+                'json_mode'   => true,
+                'cache_ttl'   => 0,
+            ]);
+
+            if (is_wp_error($result)) {
+                return $result;
+            }
+
+            $content = $result['content'];
+
+            // 尝试解析 JSON
+            $parsed = json_decode($content, true);
+
+            if (json_last_error() === JSON_ERROR_NONE) {
+                // 验证 Schema（简化验证）
+                if ($this->validate_schema($parsed, $schema)) {
+                    return [
+                        'data'     => $parsed,
+                        'provider' => $result['provider'],
+                        'model'    => $result['model'],
+                        'usage'    => $result['usage'],
+                        'attempts' => $attempt,
+                    ];
+                }
+            }
+
+            // 记录错误，准备重试
+            $last_error = json_last_error_msg();
+
+            // 添加修正提示
+            $messages[] = ['role' => 'assistant', 'content' => $content];
+            $messages[] = [
+                'role' => 'user', 
+                'content' => "JSON 解析失败或不符合 Schema: {$last_error}。请重新生成严格符合 Schema 的 JSON。",
+            ];
+        }
+
+        return new WP_Error(
+            'wpmind_structured_failed',
+            sprintf(__('结构化输出失败（尝试 %d 次）: %s', 'wpmind'), $max_retries, $last_error)
+        );
+    }
+
+    /**
+     * 批量处理
+     *
+     * @since 2.6.0
+     * @param array  $items          要处理的项目数组
+     * @param string $prompt_template Prompt 模板，使用 {{item}} 作为占位符
+     * @param array  $options         选项
+     * @return array|WP_Error
+     */
+    public function batch(array $items, string $prompt_template, array $options = []) {
+        // 默认选项
+        $defaults = [
+            'context'        => 'batch',
+            'max_tokens'     => 500,
+            'temperature'    => 0.7,
+            'concurrency'    => 1,      // 并发数（PHP 无真正并发，保留接口）
+            'delay_ms'       => 100,    // 请求间延迟（毫秒）
+            'stop_on_error'  => false,  // 遇错是否停止
+        ];
+        $options = wp_parse_args($options, $defaults);
+
+        $context = $options['context'];
+        $results = [];
+        $errors = [];
+
+        do_action('wpmind_before_request', 'batch', compact('items', 'prompt_template', 'options'), $context);
+
+        foreach ($items as $index => $item) {
+            // 替换占位符
+            $item_str = is_array($item) ? wp_json_encode($item, JSON_UNESCAPED_UNICODE) : (string)$item;
+            $prompt = str_replace('{{item}}', $item_str, $prompt_template);
+            $prompt = str_replace('{{index}}', (string)$index, $prompt);
+
+            // 执行请求
+            $result = $this->chat($prompt, [
+                'context'     => $context . '_item_' . $index,
+                'max_tokens'  => $options['max_tokens'],
+                'temperature' => $options['temperature'],
+                'cache_ttl'   => 0,
+            ]);
+
+            if (is_wp_error($result)) {
+                $errors[$index] = $result->get_error_message();
+                if ($options['stop_on_error']) {
+                    break;
+                }
+                $results[$index] = null;
+            } else {
+                $results[$index] = [
+                    'content' => $result['content'],
+                    'usage'   => $result['usage'],
+                ];
+            }
+
+            // 延迟
+            if ($options['delay_ms'] > 0 && $index < count($items) - 1) {
+                usleep($options['delay_ms'] * 1000);
+            }
+        }
+
+        $total_tokens = array_sum(array_map(function($r) {
+            return $r['usage']['total_tokens'] ?? 0;
+        }, array_filter($results)));
+
+        do_action('wpmind_after_request', 'batch', $results, compact('items', 'options'), ['total_tokens' => $total_tokens]);
+
+        return [
+            'results'      => $results,
+            'errors'       => $errors,
+            'total_items'  => count($items),
+            'success_count'=> count(array_filter($results)),
+            'error_count'  => count($errors),
+            'total_tokens' => $total_tokens,
+        ];
+    }
+
+    /**
+     * 文本嵌入向量
+     *
+     * @since 2.6.0
+     * @param string|array $texts   要嵌入的文本（单个或数组）
+     * @param array        $options 选项
+     * @return array|WP_Error
+     */
+    public function embed($texts, array $options = []) {
+        // 默认选项
+        $defaults = [
+            'context'  => 'embedding',
+            'model'    => 'auto',
+            'provider' => 'auto',
+        ];
+        $options = wp_parse_args($options, $defaults);
+
+        $context = $options['context'];
+
+        // 确保是数组
+        $input_texts = is_array($texts) ? $texts : [$texts];
+
+        // 选择服务商
+        $provider = $options['provider'] === 'auto' 
+            ? get_option('wpmind_default_provider', 'openai') 
+            : $options['provider'];
+
+        // 获取端点配置
+        $wpmind = \WPMind\WPMind::instance();
+        $endpoints = $wpmind->get_custom_endpoints();
+
+        if (!isset($endpoints[$provider])) {
+            return new WP_Error('wpmind_provider_not_found', 
+                sprintf(__('服务商 %s 未配置', 'wpmind'), $provider));
+        }
+
+        $endpoint = $endpoints[$provider];
+        $api_key = $endpoint['api_key'] ?? '';
+
+        if (empty($api_key)) {
+            return new WP_Error('wpmind_api_key_missing', 
+                sprintf(__('服务商 %s 未配置 API Key', 'wpmind'), $provider));
+        }
+
+        // 确定嵌入模型
+        $embed_model = $options['model'];
+        if ($embed_model === 'auto') {
+            // 根据服务商选择默认嵌入模型
+            $embed_models = [
+                'openai'   => 'text-embedding-3-small',
+                'deepseek' => 'text-embedding-3-small', // DeepSeek 兼容 OpenAI
+                'zhipu'    => 'embedding-2',
+                'qwen'     => 'text-embedding-v2',
+            ];
+            $embed_model = $embed_models[$provider] ?? 'text-embedding-3-small';
+        }
+
+        do_action('wpmind_before_request', 'embed', compact('texts', 'options'), $context);
+
+        // 构建请求
+        $base_url = $endpoint['custom_url'] ?? $endpoint['base_url'] ?? '';
+        $api_url = trailingslashit($base_url) . 'embeddings';
+
+        $response = wp_remote_post($api_url, [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $api_key,
+                'Content-Type'  => 'application/json',
+            ],
+            'body'    => wp_json_encode([
+                'model' => $embed_model,
+                'input' => $input_texts,
+            ]),
+            'timeout' => 60,
+        ]);
+
+        if (is_wp_error($response)) {
+            return new WP_Error('wpmind_embed_failed', 
+                sprintf(__('嵌入请求失败: %s', 'wpmind'), $response->get_error_message()));
+        }
+
+        $status_code = wp_remote_retrieve_response_code($response);
+        $body = wp_remote_retrieve_body($response);
+        $data = json_decode($body, true);
+
+        if ($status_code !== 200) {
+            $error_message = $data['error']['message'] ?? __('未知错误', 'wpmind');
+            return new WP_Error('wpmind_embed_error', 
+                sprintf(__('嵌入 API 错误 (%d): %s', 'wpmind'), $status_code, $error_message));
+        }
+
+        // 提取向量
+        $embeddings = [];
+        foreach ($data['data'] ?? [] as $item) {
+            $embeddings[] = $item['embedding'];
+        }
+
+        $usage = [
+            'prompt_tokens' => $data['usage']['prompt_tokens'] ?? 0,
+            'total_tokens'  => $data['usage']['total_tokens'] ?? 0,
+        ];
+
+        do_action('wpmind_after_request', 'embed', $embeddings, compact('texts', 'options'), $usage);
+
+        return [
+            'embeddings' => $embeddings,
+            'model'      => $embed_model,
+            'provider'   => $provider,
+            'usage'      => $usage,
+            'dimensions' => !empty($embeddings[0]) ? count($embeddings[0]) : 0,
+        ];
+    }
+
+    /**
+     * 计算 Token 数量（估算）
+     *
+     * @since 2.6.0
+     * @param string|array $content 文本内容或消息数组
+     * @return int
+     */
+    public function count_tokens($content): int {
+        // 如果是消息数组，提取文本
+        if (is_array($content)) {
+            $text = '';
+            foreach ($content as $msg) {
+                if (isset($msg['content'])) {
+                    $text .= $msg['content'] . ' ';
+                }
+            }
+            $content = $text;
+        }
+
+        // 简化的 token 估算（中文约 1.5 字符/token，英文约 4 字符/token）
+        $chinese_chars = preg_match_all('/[\x{4e00}-\x{9fff}]/u', $content, $matches);
+        $other_chars = mb_strlen($content) - $chinese_chars;
+        
+        $estimated_tokens = (int)($chinese_chars / 1.5 + $other_chars / 4);
+        
+        return max(1, $estimated_tokens);
+    }
+
+    /**
+     * 验证 JSON Schema（简化版）
+     *
+     * @param array $data   数据
+     * @param array $schema Schema
+     * @return bool
+     */
+    private function validate_schema(array $data, array $schema): bool {
+        // 检查必需字段
+        if (isset($schema['required'])) {
+            foreach ($schema['required'] as $field) {
+                if (!isset($data[$field])) {
+                    return false;
+                }
+            }
+        }
+
+        // 检查属性类型
+        if (isset($schema['properties'])) {
+            foreach ($schema['properties'] as $key => $prop) {
+                if (!isset($data[$key])) continue;
+                
+                $value = $data[$key];
+                $type = $prop['type'] ?? null;
+
+                if ($type === 'string' && !is_string($value)) return false;
+                if ($type === 'integer' && !is_int($value)) return false;
+                if ($type === 'number' && !is_numeric($value)) return false;
+                if ($type === 'boolean' && !is_bool($value)) return false;
+                if ($type === 'array' && !is_array($value)) return false;
+                if ($type === 'object' && !is_array($value)) return false;
+            }
+        }
+
+        return true;
+    }
+
+    // ============================================
+    // 私有辅助方法
+    // ============================================
+
     /**
      * 标准化消息格式
      *
