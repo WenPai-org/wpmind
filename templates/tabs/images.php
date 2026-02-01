@@ -52,13 +52,7 @@ $available_providers = [
         'base_url'     => 'https://fal.run/fal-ai/',
         'models'       => [ 'flux/dev', 'flux/schnell', 'flux-pro-1.1' ],
     ],
-    'midjourney' => [
-        'name'         => 'Midjourney (第三方代理)',
-        'display_name' => 'midjourney',
-        'description'  => '⚠️ 无官方 API，需使用第三方代理服务，风险自担',
-        'base_url'     => '',
-        'models'       => [ 'v7', 'v6.1' ],
-    ],
+
     'qwen_image' => [
         'name'         => '通义万相',
         'display_name' => 'wanx',
@@ -75,7 +69,7 @@ $provider_icons = [
     'tencent_hunyuan'     => [ 'icon' => 'ri-cloud-line', 'color' => '#50575e' ],
     'bytedance_doubao'    => [ 'icon' => 'ri-fire-line', 'color' => '#50575e' ],
     'flux'                => [ 'icon' => 'ri-sparkling-2-line', 'color' => '#50575e' ],
-    'midjourney'          => [ 'icon' => 'ri-palette-line', 'color' => '#50575e' ],
+
     'qwen_image'          => [ 'icon' => 'ri-rainbow-line', 'color' => '#50575e' ],
 ];
 

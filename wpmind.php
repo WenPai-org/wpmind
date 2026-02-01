@@ -540,7 +540,6 @@ final class WPMind {
             'tencent_hunyuan',
             'bytedance_doubao',
             'flux',
-            'midjourney',
             'qwen_image',
         ];
 
@@ -1048,7 +1047,6 @@ final class WPMind {
             'tencent_hunyuan'     => 'https://hunyuan.tencentcloudapi.com/',
             'bytedance_doubao'    => 'https://ark.cn-beijing.volces.com/api/v3/models',
             'flux'                => 'https://fal.run/fal-ai/flux/dev',
-            'midjourney'          => '', // 无官方 API
             'qwen_image'          => 'https://dashscope.aliyuncs.com/api/v1/models',
         ];
 
