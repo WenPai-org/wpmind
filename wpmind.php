@@ -94,6 +94,12 @@ final class WPMind {
 
         // 初始化 API 单例
         \WPMind\API\PublicAPI::instance();
+
+        // 开发环境：加载测试端点
+        if (defined('WP_DEBUG') && WP_DEBUG && file_exists(WPMIND_PLUGIN_DIR . 'tests/ajax-test-endpoint.php')) {
+            define('WPMIND_DEV_MODE', true);
+            require_once WPMIND_PLUGIN_DIR . 'tests/ajax-test-endpoint.php';
+        }
     }
 
     /**
