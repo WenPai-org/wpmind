@@ -207,3 +207,127 @@ add_filter('wpmind_translate', function($default, $text, $from = 'auto', $to = '
     }
     return $default;
 }, 10, 5);
+
+// ============================================
+// v2.6.0 增强 API 全局函数
+// ============================================
+
+/**
+ * 流式输出
+ *
+ * @since 2.6.0
+ * @param array|string $messages 消息
+ * @param callable     $callback 回调函数，每收到一个 chunk 调用一次
+ * @param array        $options  选项
+ * @return bool|WP_Error
+ *
+ * @example
+ * wpmind_stream('写一个故事', function($chunk, $json) {
+ *     echo $chunk;
+ *     flush();
+ * });
+ */
+if (!function_exists('wpmind_stream')) {
+    function wpmind_stream($messages, callable $callback, array $options = []) {
+        if (!class_exists('WPMind\\API\\PublicAPI')) {
+            return new WP_Error('wpmind_not_available', __('WPMind 插件未激活', 'wpmind'));
+        }
+        return \WPMind\API\PublicAPI::instance()->stream($messages, $callback, $options);
+    }
+}
+
+/**
+ * 结构化输出（JSON Schema）
+ *
+ * @since 2.6.0
+ * @param array|string $messages 消息
+ * @param array        $schema   JSON Schema 定义
+ * @param array        $options  选项
+ * @return array|WP_Error
+ *
+ * @example
+ * $result = wpmind_structured('提取这段文本的关键信息：...', [
+ *     'type' => 'object',
+ *     'required' => ['title', 'date', 'summary'],
+ *     'properties' => [
+ *         'title'   => ['type' => 'string'],
+ *         'date'    => ['type' => 'string'],
+ *         'summary' => ['type' => 'string'],
+ *     ],
+ * ]);
+ * // 返回: ['data' => ['title' => '...', 'date' => '...', 'summary' => '...'], ...]
+ */
+if (!function_exists('wpmind_structured')) {
+    function wpmind_structured($messages, array $schema, array $options = []) {
+        if (!class_exists('WPMind\\API\\PublicAPI')) {
+            return new WP_Error('wpmind_not_available', __('WPMind 插件未激活', 'wpmind'));
+        }
+        return \WPMind\API\PublicAPI::instance()->structured($messages, $schema, $options);
+    }
+}
+
+/**
+ * 批量处理
+ *
+ * @since 2.6.0
+ * @param array  $items          要处理的项目数组
+ * @param string $prompt_template Prompt 模板，{{item}} 为占位符
+ * @param array  $options         选项
+ * @return array|WP_Error
+ *
+ * @example
+ * $titles = ['标题1', '标题2', '标题3'];
+ * $result = wpmind_batch($titles, '将这个标题翻译成英文：{{item}}');
+ * // 返回: ['results' => [...], 'total_items' => 3, ...]
+ */
+if (!function_exists('wpmind_batch')) {
+    function wpmind_batch(array $items, string $prompt_template, array $options = []) {
+        if (!class_exists('WPMind\\API\\PublicAPI')) {
+            return new WP_Error('wpmind_not_available', __('WPMind 插件未激活', 'wpmind'));
+        }
+        return \WPMind\API\PublicAPI::instance()->batch($items, $prompt_template, $options);
+    }
+}
+
+/**
+ * 文本嵌入向量
+ *
+ * @since 2.6.0
+ * @param string|array $texts   要嵌入的文本
+ * @param array        $options 选项
+ * @return array|WP_Error
+ *
+ * @example
+ * $result = wpmind_embed('WordPress 是一个开源 CMS');
+ * // 返回: ['embeddings' => [[0.123, 0.456, ...]], 'dimensions' => 1536, ...]
+ */
+if (!function_exists('wpmind_embed')) {
+    function wpmind_embed($texts, array $options = []) {
+        if (!class_exists('WPMind\\API\\PublicAPI')) {
+            return new WP_Error('wpmind_not_available', __('WPMind 插件未激活', 'wpmind'));
+        }
+        return \WPMind\API\PublicAPI::instance()->embed($texts, $options);
+    }
+}
+
+/**
+ * 估算 Token 数量
+ *
+ * @since 2.6.0
+ * @param string|array $content 文本或消息数组
+ * @return int 估算的 token 数量
+ *
+ * @example
+ * $tokens = wpmind_count_tokens('这是一段中文文本');
+ * // 返回: 约 8
+ */
+if (!function_exists('wpmind_count_tokens')) {
+    function wpmind_count_tokens($content): int {
+        if (!class_exists('WPMind\\API\\PublicAPI')) {
+            // 简易估算
+            $text = is_array($content) ? json_encode($content) : $content;
+            return max(1, (int)(mb_strlen($text) / 3));
+        }
+        return \WPMind\API\PublicAPI::instance()->count_tokens($content);
+    }
+}

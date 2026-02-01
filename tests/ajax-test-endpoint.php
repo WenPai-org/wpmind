@@ -93,8 +93,84 @@ function wpmind_run_api_test() {
         ];
     }
 
+    // ============================================
+    // v2.6.0 增强 API 测试
+    // ============================================
+
+    // 测试 5: wpmind_count_tokens()
+    if (function_exists('wpmind_count_tokens')) {
+        $test_text = '这是一段测试文本，用于测试 token 计数功能。This is a test.';
+        $tokens = wpmind_count_tokens($test_text);
+        
+        $results['count_tokens'] = [
+            'name' => 'wpmind_count_tokens()',
+            'exists' => true,
+            'success' => $tokens > 0,
+            'result' => [
+                'text_length' => mb_strlen($test_text),
+                'estimated_tokens' => $tokens,
+            ],
+        ];
+    }
+
+    // 测试 6: wpmind_structured()
+    if (function_exists('wpmind_structured')) {
+        $start = microtime(true);
+        $structured_result = wpmind_structured('北京是中国首都，人口超过2000万', [
+            'type' => 'object',
+            'required' => ['city', 'country'],
+            'properties' => [
+                'city' => ['type' => 'string'],
+                'country' => ['type' => 'string'],
+                'population' => ['type' => 'string'],
+            ],
+        ], [
+            'retries' => 2,
+        ]);
+        $duration = round((microtime(true) - $start) * 1000);
+        
+        $results['structured'] = [
+            'name' => 'wpmind_structured()',
+            'exists' => true,
+            'success' => !is_wp_error($structured_result),
+            'duration_ms' => $duration,
+            'result' => is_wp_error($structured_result) ? [
+                'error' => $structured_result->get_error_message(),
+            ] : $structured_result,
+        ];
+    }
+
+    // 测试 7: wpmind_batch() - 只测试 2 个项目
+    if (function_exists('wpmind_batch')) {
+        $start = microtime(true);
+        $batch_result = wpmind_batch(
+            ['苹果', '香蕉'],
+            '用英文回答：{{item}} 的英文是什么？只回答单词。',
+            [
+                'max_tokens' => 20,
+                'delay_ms' => 50,
+            ]
+        );
+        $duration = round((microtime(true) - $start) * 1000);
+        
+        $results['batch'] = [
+            'name' => 'wpmind_batch()',
+            'exists' => true,
+            'success' => !is_wp_error($batch_result) && ($batch_result['success_count'] ?? 0) > 0,
+            'duration_ms' => $duration,
+            'result' => is_wp_error($batch_result) ? [
+                'error' => $batch_result->get_error_message(),
+            ] : [
+                'success_count' => $batch_result['success_count'],
+                'error_count' => $batch_result['error_count'],
+                'total_tokens' => $batch_result['total_tokens'],
+            ],
+        ];
+    }
+
     wp_send_json_success([
-        'message' => 'WPMind API 测试完成',
+        'message' => 'WPMind API 测试完成 (v2.5.0 + v2.6.0)',
+        'version' => '2.6.0',
         'tests' => $results,
     ]);
 }
