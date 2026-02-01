@@ -54,16 +54,13 @@ class IntelligentRouter
      */
     private function registerDefaultStrategies(): void
     {
+        // 复合策略（推荐）
+        $this->registerStrategy(CompositeStrategy::createBalanced());      // 平衡策略
+        $this->registerStrategy(CompositeStrategy::createPerformance());   // 性能优先
+        $this->registerStrategy(CompositeStrategy::createEconomic());      // 经济策略
+        
         // 基础策略
-        $this->registerStrategy(new CostStrategy());
-        $this->registerStrategy(new LatencyStrategy());
-        $this->registerStrategy(new AvailabilityStrategy());
-        $this->registerStrategy(new LoadBalancedStrategy());
-
-        // 复合策略
-        $this->registerStrategy(CompositeStrategy::createBalanced());
-        $this->registerStrategy(CompositeStrategy::createPerformance());
-        $this->registerStrategy(CompositeStrategy::createEconomic());
+        $this->registerStrategy(new LoadBalancedStrategy());               // 负载均衡
     }
 
     /**

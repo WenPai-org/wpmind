@@ -30,11 +30,10 @@ foreach ( $latency_metrics as $metric ) {
 
 // 策略图标映射
 $strategy_icons = array(
-    'performance' => 'performance',
-    'cost'        => 'money-alt',
-    'balanced'    => 'image-filter',
-    'round_robin' => 'update',
-    'failover'    => 'shield',
+    'balanced'      => 'image-filter',   // 平衡策略
+    'performance'   => 'performance',    // 性能优先
+    'economic'      => 'money-alt',      // 经济策略
+    'load_balanced' => 'update',         // 负载均衡
 );
 ?>
 
