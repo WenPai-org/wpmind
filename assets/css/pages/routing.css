@@ -1,0 +1,507 @@
+/**
+ * WPMind Routing Panel Styles
+ *
+ * @package WPMind
+ * @since 2.0.0
+ */
+
+/* Header */
+.wpmind-routing-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--wpmind-space-4) var(--wpmind-space-5);
+    border-bottom: 1px solid var(--wpmind-gray-100);
+    min-height: 54px;
+    box-sizing: border-box;
+}
+
+.wpmind-routing-title {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--wpmind-space-2);
+    font-size: var(--wpmind-text-md);
+    font-weight: 600;
+    color: var(--wpmind-gray-900);
+}
+
+.wpmind-routing-title .dashicons {
+    color: var(--wpmind-primary);
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.wpmind-refresh-routing {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.wpmind-refresh-routing .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
+/* Stats Dashboard */
+.wpmind-routing-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--wpmind-space-3);
+    padding: var(--wpmind-space-4) var(--wpmind-space-5);
+    background: var(--wpmind-gray-50);
+    border-bottom: 1px solid var(--wpmind-gray-100);
+}
+
+@media (max-width: 960px) {
+    .wpmind-routing-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .wpmind-routing-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+.wpmind-stat-card {
+    display: flex;
+    align-items: center;
+    gap: var(--wpmind-space-3);
+    padding: var(--wpmind-space-3);
+    background: #fff;
+    border: 1px solid var(--wpmind-gray-200);
+    border-radius: 4px;
+}
+
+.wpmind-stat-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--wpmind-gray-100);
+    border-radius: 6px;
+    color: var(--wpmind-gray-600);
+}
+
+.wpmind-stat-icon .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.wpmind-stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.wpmind-stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--wpmind-gray-900);
+    line-height: 1.2;
+}
+
+.wpmind-stat-value small {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--wpmind-gray-500);
+}
+
+.wpmind-stat-label {
+    font-size: 11px;
+    color: var(--wpmind-gray-500);
+}
+
+/* Grid Layout */
+.wpmind-routing-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: var(--wpmind-space-5);
+    padding: var(--wpmind-space-5);
+}
+
+@media (max-width: 960px) {
+    .wpmind-routing-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Section Styles */
+.wpmind-routing-section {
+    margin-bottom: var(--wpmind-space-4);
+}
+
+.wpmind-routing-section:last-child {
+    margin-bottom: 0;
+}
+
+.wpmind-routing-section-title {
+    font-size: var(--wpmind-text-sm);
+    font-weight: 600;
+    color: var(--wpmind-gray-900);
+    margin: 0 0 var(--wpmind-space-2) 0;
+    padding: 0;
+}
+
+.wpmind-routing-section-desc {
+    margin: 0 0 var(--wpmind-space-3) 0;
+    font-size: var(--wpmind-text-xs);
+    color: var(--wpmind-gray-500);
+}
+
+/* Strategy List - Vertical Group Style */
+.wpmind-strategy-list {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--wpmind-gray-200);
+    border-radius: 4px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.wpmind-strategy-item {
+    display: flex;
+    align-items: center;
+    padding: var(--wpmind-space-3) var(--wpmind-space-4);
+    cursor: pointer;
+    border-bottom: 1px solid var(--wpmind-gray-100);
+    transition: background-color 0.15s ease;
+    gap: var(--wpmind-space-3);
+    position: relative;
+}
+
+.wpmind-strategy-item:last-child {
+    border-bottom: none;
+}
+
+.wpmind-strategy-item:hover {
+    background: var(--wpmind-gray-50);
+}
+
+.wpmind-strategy-item.is-active {
+    background: var(--wpmind-primary-light);
+}
+
+.wpmind-strategy-item input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Icon */
+.wpmind-strategy-item-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--wpmind-gray-100);
+    border-radius: 6px;
+    flex-shrink: 0;
+    color: var(--wpmind-gray-600);
+}
+
+.wpmind-strategy-item.is-active .wpmind-strategy-item-icon {
+    background: #fff;
+    color: var(--wpmind-primary);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.wpmind-strategy-item-icon .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+/* Content */
+.wpmind-strategy-item-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.wpmind-strategy-item-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--wpmind-gray-800);
+    margin-bottom: 2px;
+}
+
+.wpmind-strategy-item-desc {
+    font-size: 12px;
+    color: var(--wpmind-gray-500);
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.wpmind-strategy-item.is-active .wpmind-strategy-item-title {
+    color: var(--wpmind-primary-dark);
+}
+
+.wpmind-strategy-item.is-active .wpmind-strategy-item-desc {
+    color: var(--wpmind-primary);
+    opacity: 0.8;
+}
+
+/* Check Mark */
+.wpmind-strategy-item-check {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--wpmind-primary);
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.2s ease;
+}
+
+.wpmind-strategy-item.is-active .wpmind-strategy-item-check {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.wpmind-strategy-item-check .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .wpmind-strategy-item-desc {
+        white-space: normal;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+}
+
+/* Status Card - 推荐 Provider 卡片 */
+.wpmind-routing-status-card {
+    background: linear-gradient(135deg, var(--wpmind-success-light) 0%, #d1fae5 100%);
+    border: 1px solid #a7f3d0;
+    padding: var(--wpmind-space-4);
+    margin-bottom: var(--wpmind-space-4);
+}
+
+.wpmind-routing-status-header {
+    margin-bottom: var(--wpmind-space-2);
+}
+
+.wpmind-routing-status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--wpmind-success);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 2px;
+}
+
+.wpmind-routing-status-main {
+    display: flex;
+    align-items: center;
+    gap: var(--wpmind-space-2);
+    margin-bottom: var(--wpmind-space-3);
+}
+
+.wpmind-routing-status-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--wpmind-success);
+    border-radius: 50%;
+}
+
+.wpmind-routing-status-icon .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #fff;
+}
+
+.wpmind-routing-status-provider {
+    font-size: var(--wpmind-text-lg);
+    font-weight: 700;
+    color: #065f46;
+}
+
+.wpmind-routing-status-score {
+    display: flex;
+    align-items: baseline;
+    gap: var(--wpmind-space-2);
+}
+
+.wpmind-routing-status-score-label {
+    font-size: var(--wpmind-text-xs);
+    color: #047857;
+}
+
+.wpmind-routing-status-score-value {
+    font-size: var(--wpmind-text-xl);
+    font-weight: 700;
+    color: #065f46;
+}
+
+/* Failover Flow - 故障转移链可视化 */
+.wpmind-routing-failover-flow {
+    display: flex;
+    flex-direction: column;
+    padding: var(--wpmind-space-3) 0;
+}
+
+.wpmind-routing-failover-node {
+    display: flex;
+    align-items: center;
+    gap: var(--wpmind-space-3);
+    padding: var(--wpmind-space-2) 0;
+    position: relative;
+}
+
+.wpmind-routing-failover-dot {
+    width: 12px;
+    height: 12px;
+    background: var(--wpmind-gray-300);
+    border-radius: 50%;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.wpmind-routing-failover-node.is-active .wpmind-routing-failover-dot {
+    background: var(--wpmind-success);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+}
+
+.wpmind-routing-failover-name {
+    font-size: var(--wpmind-text-sm);
+    color: var(--wpmind-gray-600);
+}
+
+.wpmind-routing-failover-node.is-active .wpmind-routing-failover-name {
+    font-weight: 600;
+    color: var(--wpmind-gray-900);
+}
+
+.wpmind-routing-failover-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    background: var(--wpmind-success);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 2px;
+}
+
+.wpmind-routing-failover-line {
+    width: 2px;
+    height: 16px;
+    background: var(--wpmind-gray-200);
+    margin-left: 5px;
+}
+
+/* Provider Scores - 排名区域 */
+.wpmind-routing-ranking {
+    padding: var(--wpmind-space-5);
+    border-top: 1px solid var(--wpmind-gray-100);
+    margin: 0;
+}
+
+.wpmind-routing-scores {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wpmind-space-2);
+}
+
+.wpmind-routing-score-item {
+    display: flex;
+    align-items: center;
+    gap: var(--wpmind-space-3);
+    padding: var(--wpmind-space-3) var(--wpmind-space-4);
+    background: var(--wpmind-gray-50);
+    border: 1px solid var(--wpmind-gray-200);
+}
+
+.wpmind-routing-score-item.is-top {
+    background: linear-gradient(90deg, #fef3c7 0%, #fef9c3 100%);
+    border-color: #fcd34d;
+}
+
+.wpmind-routing-rank {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: var(--wpmind-gray-200);
+    font-size: var(--wpmind-text-sm);
+    font-weight: 700;
+    color: var(--wpmind-gray-600);
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.wpmind-routing-score-item.is-top .wpmind-routing-rank {
+    background: #f59e0b;
+    color: #fff;
+}
+
+.wpmind-routing-provider-name {
+    font-size: var(--wpmind-text-sm);
+    font-weight: 600;
+    color: var(--wpmind-gray-900);
+    min-width: 100px;
+}
+
+.wpmind-routing-latency {
+    font-size: 11px;
+    color: var(--wpmind-gray-500);
+    background: var(--wpmind-gray-100);
+    padding: 2px 6px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.wpmind-routing-score-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--wpmind-gray-200);
+    overflow: hidden;
+}
+
+.wpmind-routing-score-fill {
+    height: 100%;
+    background: var(--wpmind-primary);
+    transition: width var(--wpmind-transition-slow);
+}
+
+.wpmind-routing-score-item.is-top .wpmind-routing-score-fill {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.wpmind-routing-score-value {
+    font-size: var(--wpmind-text-sm);
+    font-weight: 600;
+    color: var(--wpmind-gray-600);
+    min-width: 40px;
+    text-align: right;
+}
+
+.wpmind-routing-score-item.is-top .wpmind-routing-score-value {
+    color: #b45309;
+}

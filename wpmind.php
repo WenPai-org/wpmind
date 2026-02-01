@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-    define( 'WPMIND_VERSION', '2.3.3' );
+    define( 'WPMIND_VERSION', '2.3.4' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
     define( 'WPMIND_PLUGIN_FILE', __FILE__ );
@@ -321,9 +321,16 @@ final class WPMind {
         );
 
         wp_enqueue_style(
+            'wpmind-routing',
+            WPMIND_PLUGIN_URL . 'assets/css/pages/routing.css',
+            [ 'wpmind-panels' ],
+            WPMIND_VERSION
+        );
+
+        wp_enqueue_style(
             'wpmind-responsive',
             WPMIND_PLUGIN_URL . 'assets/css/responsive.css',
-            [ 'wpmind-panels' ],
+            [ 'wpmind-panels', 'wpmind-routing' ],
             WPMIND_VERSION
         );
 
