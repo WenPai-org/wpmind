@@ -73,24 +73,24 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
             $icon_class  = \WPMind\Usage\UsageTracker::getProviderIcon( $key );
             $icon_color  = \WPMind\Usage\UsageTracker::getProviderColor( $key );
         ?>
-        <div class="wpmind-endpoint-card" id="endpoint-<?php echo esc_attr( $key ); ?>">
+        <div class="wpmind-endpoint-card<?php echo ( ! empty( $endpoint['enabled'] ) && $has_api_key ) ? '' : ' is-collapsed'; ?>" id="endpoint-<?php echo esc_attr( $key ); ?>">
             <div class="wpmind-endpoint-header">
+                <button type="button" class="wpmind-endpoint-toggle" aria-expanded="<?php echo ( ! empty( $endpoint['enabled'] ) && $has_api_key ) ? 'true' : 'false'; ?>">
+                    <span class="dashicons dashicons-arrow-down-alt2"></span>
+                </button>
                 <i class="<?php echo esc_attr( $icon_class ); ?> wpmind-provider-icon" style="color: <?php echo esc_attr( $icon_color ); ?>;"></i>
                 <span class="wpmind-endpoint-name">
                     <?php echo esc_html( $endpoint['name'] ); ?>
                 </span>
                 <code class="wpmind-endpoint-key"><?php echo esc_html( $endpoint['display_name'] ?? $key ); ?></code>
-                <?php if ( ! empty( $endpoint['is_official'] ) ) : ?>
-                    <span class="wpmind-status wpmind-status-official">
-                        <?php esc_html_e( '官方服务', 'wpmind' ); ?>
-                    </span>
-                <?php elseif ( ! empty( $endpoint['enabled'] ) && $has_api_key ) : ?>
+                <?php if ( ! empty( $endpoint['enabled'] ) && $has_api_key ) : ?>
                     <span class="wpmind-status wpmind-status-active">
                         <?php esc_html_e( '已启用', 'wpmind' ); ?>
                     </span>
                 <?php endif; ?>
             </div>
 
+            <div class="wpmind-endpoint-body">
             <table class="form-table" role="presentation">
                 <tr>
                     <th scope="row"><?php esc_html_e( '启用', 'wpmind' ); ?></th>
@@ -193,6 +193,7 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
                     </td>
                 </tr>
             </table>
+            </div><!-- .wpmind-endpoint-body -->
         </div>
         <?php endforeach; ?>
     </div>

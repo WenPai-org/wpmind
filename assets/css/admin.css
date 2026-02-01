@@ -713,43 +713,67 @@
 }
 
 /* ========================================
-   Endpoint Cards - AI 端点卡片
+   Endpoint Cards - AI 端点卡片（可折叠）
    ======================================== */
 .wpmind-endpoints-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
-    gap: var(--wpmind-space-5);
-    margin: var(--wpmind-space-5) 0;
+    gap: var(--wpmind-space-6);
+    margin: var(--wpmind-space-6) 0;
 }
 
 .wpmind-endpoint-card {
     background: #fff;
-    border: 1px solid var(--wpmind-gray-200);
-    border-radius: 0;
-    overflow: hidden;
-    transition: all var(--wpmind-transition-normal);
-}
-
-.wpmind-endpoint-card:hover {
-    border-color: var(--wpmind-gray-300);
     box-shadow: var(--wpmind-shadow);
-}
-
-.wpmind-endpoint-card.wpmind-card-warning {
-    border-color: var(--wpmind-warning);
+    overflow: hidden;
 }
 
 .wpmind-endpoint-header {
     display: flex;
     align-items: center;
-    gap: var(--wpmind-space-2);
-    padding: var(--wpmind-space-3) var(--wpmind-space-4);
-    background: var(--wpmind-gray-50);
-    border-bottom: 1px solid var(--wpmind-gray-200);
+    gap: var(--wpmind-space-3);
+    padding: var(--wpmind-space-4) var(--wpmind-space-5);
+    background: #fff;
+    border-bottom: 1px solid #ccd0d4;
+    cursor: pointer;
+    user-select: none;
 }
 
-.wpmind-endpoint-header .dashicons {
-    color: var(--wpmind-primary);
+.wpmind-endpoint-header:hover {
+    background: #f9f9f9;
+}
+
+.wpmind-endpoint-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: transform var(--wpmind-transition-fast);
+}
+
+.wpmind-endpoint-toggle .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: #757575;
+    transition: transform var(--wpmind-transition-fast);
+}
+
+.wpmind-endpoint-card.is-collapsed .wpmind-endpoint-toggle .dashicons {
+    transform: rotate(-90deg);
+}
+
+.wpmind-endpoint-body {
+    transition: all var(--wpmind-transition-normal);
+}
+
+.wpmind-endpoint-card.is-collapsed .wpmind-endpoint-body {
+    display: none;
 }
 
 .wpmind-provider-icon {
@@ -763,17 +787,17 @@
 }
 
 .wpmind-endpoint-name {
-    font-weight: 600;
-    font-size: var(--wpmind-text-base);
-    color: var(--wpmind-gray-900);
+    font-weight: 500;
+    font-size: var(--wpmind-text-md);
+    color: #1e1e1e;
 }
 
 .wpmind-endpoint-key {
     font-size: var(--wpmind-text-xs);
-    background: var(--wpmind-gray-200);
-    padding: 2px var(--wpmind-space-2);
-    border-radius: 0;
-    color: var(--wpmind-gray-600);
+    background: #f0f0f1;
+    padding: 4px var(--wpmind-space-2);
+    border-radius: 2px;
+    color: #757575;
     font-family: var(--wpmind-font-mono);
 }
 

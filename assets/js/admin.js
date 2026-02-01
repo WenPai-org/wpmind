@@ -246,6 +246,37 @@
     }
 
     /**
+     * Endpoint Card 折叠功能
+     */
+    function initEndpointCollapse() {
+        // 点击 header 或 toggle 按钮折叠/展开
+        $(document).on('click', '.wpmind-endpoint-header', function(e) {
+            // 如果点击的是内部的其他按钮或链接，不触发折叠
+            if ($(e.target).closest('a, button:not(.wpmind-endpoint-toggle), input, select').length && !$(e.target).closest('.wpmind-endpoint-toggle').length) {
+                return;
+            }
+
+            var $card = $(this).closest('.wpmind-endpoint-card');
+            var $toggle = $(this).find('.wpmind-endpoint-toggle');
+            var isCollapsed = $card.hasClass('is-collapsed');
+
+            if (isCollapsed) {
+                $card.removeClass('is-collapsed');
+                $toggle.attr('aria-expanded', 'true');
+            } else {
+                $card.addClass('is-collapsed');
+                $toggle.attr('aria-expanded', 'false');
+            }
+        });
+
+        // 阻止 toggle 按钮的默认行为（因为 header 已经处理了点击）
+        $(document).on('click', '.wpmind-endpoint-toggle', function(e) {
+            e.stopPropagation();
+            $(this).closest('.wpmind-endpoint-header').trigger('click');
+        });
+    }
+
+    /**
      * API Key 输入处理
      */
     function initApiKeyValidation() {
@@ -1386,6 +1417,7 @@
     $(function() {
         initTabs();
         initPasswordToggle();
+        initEndpointCollapse();
         initApiKeyValidation();
         initTestConnection();
         initStatusUpdate();
