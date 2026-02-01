@@ -492,7 +492,7 @@
 }
 
 /* ========================================
-   Routing Panel - 智能路由面板 (重新设计)
+   Routing Panel - 智能路由面板
    ======================================== */
 .wpmind-routing-panel {
     background: #fff;
@@ -500,11 +500,6 @@
     padding: 0;
     margin: var(--wpmind-space-5) 0;
 }
-
-/* ========================================
-   Routing Panel - 智能路由面板
-   (Styles moved to assets/css/pages/routing.css)
-   ======================================== */
 
 
 

@@ -1,13 +1,13 @@
 <?php
 /**
  * Plugin Name: WPMind
- * Plugin URI: https://linuxjoy.com/plugins/wpmind
+ * Plugin URI: https://wpcy.com/mind
  * Description: 文派心思 - WordPress AI 自定义端点扩展，支持国内外多种 AI 服务
  * Version: 2.2.0
- * Author: LinuxJoy
- * Author URI: https://linuxjoy.com
+ * Author: 文派心思
+ * Author URI: https://wpcy.com/mind
  * License: GPL-2.0-or-later
- * License URI: https://spdx.org/licenses/GPL-2.0-or-later.html
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: wpmind
  * Domain Path: /languages
  * Requires at least: 6.4
