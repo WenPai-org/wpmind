@@ -362,6 +362,62 @@
     }
 
     /**
+     * 测试图像服务连接功能
+     */
+    function initImageTestConnection() {
+        $('.wpmind-test-image-connection').on('click', function (e) {
+            e.preventDefault();
+
+            var $button = $(this);
+            var provider = $button.data('provider');
+            var $result = $button.siblings('.wpmind-test-result');
+
+            // 设置加载状态
+            $button.addClass('is-testing').prop('disabled', true);
+            $button.html('<span class="dashicons ri-loader-4-line wpmind-spinning"></span> 测试中');
+            $result.text('').removeClass('success error');
+
+            if (typeof wpmindData === 'undefined') {
+                $result.text('配置错误').addClass('error');
+                $button.removeClass('is-testing').prop('disabled', false).text('测试连接');
+                return;
+            }
+
+            $.ajax({
+                url: wpmindData.ajaxurl || ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'wpmind_test_image_connection',
+                    provider: provider,
+                    nonce: wpmindData.nonce
+                },
+                timeout: 45000,
+                success: function (response) {
+                    if (response.success) {
+                        $result.html('<span class="dashicons ri-checkbox-circle-line"></span> 连接成功').addClass('success');
+                        Toast.success(provider + ' 连接成功');
+                    } else {
+                        var errorMsg = (response.data && response.data.message) || '连接失败';
+                        $result.html('<span class="dashicons ri-close-circle-line"></span> ' + errorMsg).addClass('error');
+                    }
+                },
+                error: function (xhr, status) {
+                    var message = status === 'timeout' ? '请求超时' : '连接失败';
+                    $result.html('<span class="dashicons ri-close-circle-line"></span> ' + message).addClass('error');
+                },
+                complete: function () {
+                    $button.removeClass('is-testing').prop('disabled', false).text('测试连接');
+                    setTimeout(function () {
+                        $result.fadeOut(300, function () {
+                            $(this).text('').removeClass('success error').show();
+                        });
+                    }, 6000);
+                }
+            });
+        });
+    }
+
+    /**
      * Update card status when checkbox changes
      */
     function initStatusUpdate() {
@@ -1450,6 +1506,7 @@
         initEndpointCollapse();
         initApiKeyValidation();
         initTestConnection();
+        initImageTestConnection();
         initStatusUpdate();
         initClearKeyHandler();
         initFormValidation();

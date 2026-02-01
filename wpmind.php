@@ -257,6 +257,7 @@ final class WPMind {
 
         // AJAX 处理
         add_action( 'wp_ajax_wpmind_test_connection', [ $this, 'ajax_test_connection' ] );
+        add_action( 'wp_ajax_wpmind_test_image_connection', [ $this, 'ajax_test_image_connection' ] );
         add_action( 'wp_ajax_wpmind_get_provider_status', [ $this, 'ajax_get_provider_status' ] );
         add_action( 'wp_ajax_wpmind_reset_circuit_breaker', [ $this, 'ajax_reset_circuit_breaker' ] );
         add_action( 'wp_ajax_wpmind_get_usage_stats', [ $this, 'ajax_get_usage_stats' ] );
@@ -428,6 +429,16 @@ final class WPMind {
                 'default'           => [],
             ]
         );
+
+        register_setting(
+            'wpmind_image_settings',
+            'wpmind_default_image_provider',
+            [
+                'type'              => 'string',
+                'sanitize_callback' => 'sanitize_text_field',
+                'default'           => '',
+            ]
+        );
     }
 
     /**
@@ -521,10 +532,14 @@ final class WPMind {
 
         $sanitized = [];
         $available_providers = [
-            'zhipu_cogview',
-            'tongyi_wanxiang',
-            'wenxin_yige',
-            'stability_ai',
+            'openai_gpt_image',
+            'google_gemini_image',
+            'tencent_hunyuan',
+            'bytedance_reve',
+            'flux',
+            'bytedance_seedream',
+            'midjourney',
+            'qwen_image',
         ];
 
         foreach ( $available_providers as $key ) {
@@ -533,11 +548,17 @@ final class WPMind {
             }
 
             $provider_input = $input[ $key ];
+            
+            // 处理清除 API Key
+            $api_key = $this->sanitize_image_api_key( $provider_input, $key );
+            if ( ! empty( $provider_input['clear_api_key'] ) ) {
+                $api_key = '';
+            }
+            
             $sanitized[ $key ] = [
-                'enabled'    => ! empty( $provider_input['enabled'] ),
-                'api_key'    => $this->sanitize_image_api_key( $provider_input, $key ),
-                'model'      => sanitize_text_field( $provider_input['model'] ?? '' ),
-                'custom_url' => esc_url_raw( $provider_input['custom_url'] ?? '' ),
+                'enabled'         => ! empty( $provider_input['enabled'] ),
+                'api_key'         => $api_key,
+                'custom_base_url' => esc_url_raw( $provider_input['custom_base_url'] ?? '' ),
             ];
         }
 
@@ -917,6 +938,123 @@ final class WPMind {
             'code'    => $last_status_code,
             'retried' => $max_retries > 1,
         ] );
+    }
+
+    /**
+     * AJAX 测试图像服务连接
+     *
+     * @since 2.4.0
+     */
+    public function ajax_test_image_connection(): void {
+        check_ajax_referer( 'wpmind_ajax', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+        }
+
+        $provider = sanitize_text_field( $_POST['provider'] ?? '' );
+
+        if ( empty( $provider ) ) {
+            wp_send_json_error( [ 'message' => __( '缺少服务标识', 'wpmind' ) ] );
+        }
+
+        // 获取图像端点配置
+        $image_endpoints = get_option( 'wpmind_image_endpoints', [] );
+        
+        if ( ! isset( $image_endpoints[ $provider ] ) ) {
+            wp_send_json_error( [ 'message' => __( '服务未配置', 'wpmind' ) ] );
+        }
+
+        $config = $image_endpoints[ $provider ];
+        
+        if ( empty( $config['api_key'] ) ) {
+            wp_send_json_error( [ 'message' => __( '请先配置 API Key', 'wpmind' ) ] );
+        }
+
+        // 根据不同的服务商进行测试
+        $result = $this->test_image_provider_connection( $provider, $config );
+
+        if ( $result['success'] ) {
+            wp_send_json_success( [
+                'message' => __( '连接成功', 'wpmind' ),
+            ] );
+        } else {
+            wp_send_json_error( [
+                'message' => $result['message'] ?? __( '连接失败', 'wpmind' ),
+            ] );
+        }
+    }
+
+    /**
+     * 测试图像服务商连接
+     *
+     * @param string $provider 服务商 ID
+     * @param array  $config 配置
+     * @return array
+     * @since 2.4.0
+     */
+    private function test_image_provider_connection( string $provider, array $config ): array {
+        $api_key = $config['api_key'];
+        $custom_url = $config['custom_base_url'] ?? '';
+
+        // 服务商测试端点映射
+        $test_endpoints = [
+            'openai_gpt_image'    => 'https://api.openai.com/v1/models',
+            'google_gemini_image' => 'https://generativelanguage.googleapis.com/v1/models',
+            'tencent_hunyuan'     => 'https://hunyuan.cloud.tencent.com/hyllm/v1/models',
+            'bytedance_reve'      => 'https://ark.cn-beijing.volces.com/api/v3/models',
+            'flux'                => 'https://api.fal.ai/v1/models',
+            'bytedance_seedream'  => 'https://ark.cn-beijing.volces.com/api/v3/models',
+            'midjourney'          => 'https://api.midjourney.com/v1/status',
+            'qwen_image'          => 'https://dashscope.aliyuncs.com/api/v1/models',
+        ];
+
+        $test_url = ! empty( $custom_url ) 
+            ? rtrim( $custom_url, '/' ) . '/models' 
+            : ( $test_endpoints[ $provider ] ?? '' );
+
+        if ( empty( $test_url ) ) {
+            return [ 'success' => false, 'message' => '未知的服务商' ];
+        }
+
+        // 特殊处理：部分服务商使用不同的认证方式
+        $headers = [
+            'Authorization' => 'Bearer ' . $api_key,
+            'Content-Type'  => 'application/json',
+        ];
+
+        // Google Gemini 使用 API Key 作为查询参数
+        if ( $provider === 'google_gemini_image' ) {
+            $test_url .= '?key=' . $api_key;
+            unset( $headers['Authorization'] );
+        }
+
+        $response = wp_remote_get( $test_url, [
+            'headers' => $headers,
+            'timeout' => 30,
+        ] );
+
+        if ( is_wp_error( $response ) ) {
+            return [
+                'success' => false,
+                'message' => $response->get_error_message(),
+            ];
+        }
+
+        $status_code = wp_remote_retrieve_response_code( $response );
+
+        if ( $status_code === 200 ) {
+            return [ 'success' => true, 'message' => '连接成功' ];
+        }
+
+        if ( $status_code === 401 || $status_code === 403 ) {
+            return [ 'success' => false, 'message' => 'API Key 无效或无权限' ];
+        }
+
+        return [
+            'success' => false,
+            'message' => '连接失败 (HTTP ' . $status_code . ')',
+        ];
     }
 
     /**
