@@ -61,8 +61,16 @@ class PublicAPI {
      * @return bool
      */
     public function is_available(): bool {
+        // 静态缓存：每个请求只检查一次
+        static $cached_result = null;
+        
+        if ($cached_result !== null) {
+            return $cached_result;
+        }
+        
         // 使用 WPMind 实例获取端点配置
         if (!class_exists('\\WPMind\\WPMind')) {
+            $cached_result = false;
             return false;
         }
 
@@ -70,16 +78,19 @@ class PublicAPI {
         $endpoints = $wpmind->get_custom_endpoints();
         
         if (empty($endpoints)) {
+            $cached_result = false;
             return false;
         }
 
         // 检查是否至少有一个启用的端点且有 API Key
         foreach ($endpoints as $endpoint) {
             if (!empty($endpoint['enabled']) && !empty($endpoint['api_key'])) {
+                $cached_result = true;
                 return true;
             }
         }
 
+        $cached_result = false;
         return false;
     }
 
