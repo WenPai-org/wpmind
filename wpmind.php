@@ -88,7 +88,8 @@ final class WPMind {
      * @since 2.5.0
      */
     private function load_public_api(): void {
-        // 加载公共 API 类
+        // 加载公共 API 类（ErrorHandler 必须在 PublicAPI 之前加载）
+        require_once WPMIND_PLUGIN_DIR . 'includes/API/ErrorHandler.php';
         require_once WPMIND_PLUGIN_DIR . 'includes/API/PublicAPI.php';
         require_once WPMIND_PLUGIN_DIR . 'includes/API/functions.php';
 
