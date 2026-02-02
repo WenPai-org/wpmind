@@ -1461,6 +1461,20 @@ class PublicAPI {
         $from_name = $lang_names[$from] ?? $from;
         $to_name = $lang_names[$to] ?? $to;
 
+        // 语义化拼音格式：AI 生成按词分隔的拼音
+        if ($options['format'] === 'pinyin') {
+            $prompt = "将以下中文文本转换为拼音，要求：
+1. 按词语分隔，不是按字分隔（如 '你好世界' 应为 'nihao-shijie' 而非 'ni-hao-shi-jie'）
+2. 词语之间用连字符 '-' 连接
+3. 同一词语内的拼音不加分隔符
+4. 全部小写，无声调
+5. 保留英文和数字原样
+6. 只返回拼音结果，不要其他解释
+
+文本：{$text}";
+            return $prompt;
+        }
+
         $prompt = "将以下{$from_name}文本翻译成{$to_name}";
 
         // Slug 格式特殊处理

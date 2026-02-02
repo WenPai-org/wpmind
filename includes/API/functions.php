@@ -147,6 +147,50 @@ if (!function_exists('wpmind_translate')) {
 }
 
 /**
+ * 将中文转换为语义化拼音
+ *
+ * 与普通拼音不同，语义化拼音按词语分隔而非按字分隔。
+ * 例如 "你好世界" 会转换为 "nihao-shijie" 而不是 "ni-hao-shi-jie"。
+ *
+ * @since 2.5.0
+ * @param string $text    要转换的中文文本
+ * @param array  $options {
+ *     可选参数
+ *     @type string $context   上下文标识，默认 'pinyin_conversion'
+ *     @type int    $cache_ttl 缓存时间（秒），默认 604800（7天）
+ * }
+ * @return string|WP_Error 成功返回拼音字符串，失败返回 WP_Error
+ * 
+ * @example
+ * $pinyin = wpmind_pinyin('你好世界');
+ * // 返回: "nihao-shijie"
+ * 
+ * @example 
+ * $pinyin = wpmind_pinyin('WordPress性能优化指南');
+ * // 返回: "WordPress-xingneng-youhua-zhinan"
+ */
+if (!function_exists('wpmind_pinyin')) {
+    function wpmind_pinyin(string $text, array $options = []) {
+        if (!class_exists('WPMind\\API\\PublicAPI')) {
+            return new WP_Error(
+                'wpmind_not_available',
+                __('WPMind 插件未激活', 'wpmind')
+            );
+        }
+        
+        // 设置 format 为 pinyin
+        $options = wp_parse_args($options, [
+            'context'   => 'pinyin_conversion',
+            'format'    => 'pinyin',
+            'cache_ttl' => 604800, // 7 天
+        ]);
+        
+        // 调用 translate 方法，但 format=pinyin 会触发拼音转换逻辑
+        return \WPMind\API\PublicAPI::instance()->translate($text, 'zh', 'zh', $options);
+    }
+}
+
+/**
  * 生成图像
  *
  * @since 2.5.0
