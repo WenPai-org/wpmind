@@ -262,8 +262,10 @@ class PublicAPI {
         $translated = trim($result['content']);
 
         // Slug 格式处理
+        // 注意：不能使用 sanitize_title()，因为它会触发 sanitize_title filter
+        // 如果其他插件（如 WPSlug）拦截该 filter 并调用 wpmind_translate，会导致无限循环
         if ($options['format'] === 'slug') {
-            $translated = sanitize_title($translated);
+            $translated = sanitize_title_with_dashes($translated, '', 'save');
         }
 
         // 应用响应过滤
