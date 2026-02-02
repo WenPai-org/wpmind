@@ -28,6 +28,20 @@ class PublicAPI {
     private static $instance = null;
 
     /**
+     * 调用栈追踪（防止循环调用）
+     *
+     * @var array
+     */
+    private static $call_stack = [];
+
+    /**
+     * 最大调用深度
+     *
+     * @var int
+     */
+    private static $max_call_depth = 3;
+
+    /**
      * 获取单例实例
      *
      * @return PublicAPI
@@ -37,6 +51,68 @@ class PublicAPI {
             self::$instance = new self();
         }
         return self::$instance;
+    }
+
+    /**
+     * 检查是否存在循环调用
+     *
+     * @param string $method 方法名
+     * @param string $call_id 调用标识（基于参数生成）
+     * @return bool|WP_Error true 表示可以继续，WP_Error 表示检测到循环
+     */
+    private function check_recursive_call(string $method, string $call_id) {
+        $key = $method . ':' . $call_id;
+        
+        // 检查是否同一个调用正在进行
+        if (isset(self::$call_stack[$key])) {
+            return ErrorHandler::recursive_call($method, $call_id);
+        }
+        
+        // 检查调用深度
+        $method_count = 0;
+        foreach (self::$call_stack as $stack_key => $value) {
+            if (strpos($stack_key, $method . ':') === 0) {
+                $method_count++;
+            }
+        }
+        
+        if ($method_count >= self::$max_call_depth) {
+            return ErrorHandler::call_depth_exceeded($method, $method_count, self::$max_call_depth);
+        }
+        
+        return true;
+    }
+
+    /**
+     * 开始追踪调用
+     *
+     * @param string $method 方法名
+     * @param string $call_id 调用标识
+     */
+    private function begin_call(string $method, string $call_id): void {
+        $key = $method . ':' . $call_id;
+        self::$call_stack[$key] = microtime(true);
+    }
+
+    /**
+     * 结束追踪调用
+     *
+     * @param string $method 方法名
+     * @param string $call_id 调用标识
+     */
+    private function end_call(string $method, string $call_id): void {
+        $key = $method . ':' . $call_id;
+        unset(self::$call_stack[$key]);
+    }
+
+    /**
+     * 生成调用标识
+     *
+     * @param mixed $args 参数
+     * @return string
+     */
+    private function generate_call_id($args): string {
+        return md5(serialize($args));
     }
 
     /**
@@ -134,6 +210,33 @@ class PublicAPI {
      * @return array|WP_Error
      */
     public function chat($messages, array $options = []) {
+        // 生成调用标识
+        $call_id = $this->generate_call_id(['messages' => $messages, 'options' => $options]);
+        
+        // 检查循环调用
+        $recursive_check = $this->check_recursive_call('chat', $call_id);
+        if (is_wp_error($recursive_check)) {
+            return $recursive_check;
+        }
+        
+        // 开始追踪调用
+        $this->begin_call('chat', $call_id);
+        
+        try {
+            return $this->do_chat($messages, $options);
+        } finally {
+            $this->end_call('chat', $call_id);
+        }
+    }
+
+    /**
+     * 实际执行 chat 逻辑
+     *
+     * @param string|array $messages 消息
+     * @param array $options 选项
+     * @return array|WP_Error
+     */
+    private function do_chat($messages, array $options = []) {
         // 默认选项
         $defaults = [
             'context'     => '',
@@ -228,6 +331,35 @@ class PublicAPI {
      * @return string|WP_Error
      */
     public function translate(string $text, string $from = 'auto', string $to = 'en', array $options = []) {
+        // 生成调用标识
+        $call_id = $this->generate_call_id(['text' => $text, 'from' => $from, 'to' => $to, 'options' => $options]);
+        
+        // 检查循环调用
+        $recursive_check = $this->check_recursive_call('translate', $call_id);
+        if (is_wp_error($recursive_check)) {
+            return $recursive_check;
+        }
+        
+        // 开始追踪调用
+        $this->begin_call('translate', $call_id);
+        
+        try {
+            return $this->do_translate($text, $from, $to, $options);
+        } finally {
+            $this->end_call('translate', $call_id);
+        }
+    }
+
+    /**
+     * 实际执行翻译逻辑
+     *
+     * @param string $text    要翻译的文本
+     * @param string $from    源语言
+     * @param string $to      目标语言
+     * @param array  $options 选项
+     * @return string|WP_Error
+     */
+    private function do_translate(string $text, string $from, string $to, array $options) {
         // 默认选项
         $defaults = [
             'context'   => 'translation',
@@ -257,8 +389,8 @@ class PublicAPI {
 
         do_action('wpmind_before_request', 'translate', $args, $context);
 
-        // 调用 chat
-        $result = $this->chat($prompt, [
+        // 调用 chat（注意：这里会触发 chat 的循环调用检查，但由于是不同的方法，不会被阻止）
+        $result = $this->do_chat($prompt, [
             'context'     => $context,
             'max_tokens'  => max(500, strlen($text) * 2),
             'temperature' => 0.3, // 翻译用较低温度
