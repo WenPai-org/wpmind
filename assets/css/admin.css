@@ -1314,3 +1314,84 @@ input.is-invalid {
     box-shadow: var(--wpmind-shadow-lg);
     border-color: var(--wpmind-primary);
 }
+
+/* Toast Notification Styles */
+.wpmind-notice-container {
+    position: sticky;
+    top: 32px;
+    z-index: 9999;
+    margin-bottom: var(--wpmind-space-4);
+}
+
+.wpmind-notice {
+    margin: 0 0 var(--wpmind-space-2) 0 !important;
+    padding: var(--wpmind-space-3) var(--wpmind-space-4) !important;
+    border-left-width: 4px !important;
+}
+
+.wpmind-notice p {
+    display: flex;
+    align-items: center;
+    gap: var(--wpmind-space-2);
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.wpmind-notice-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.wpmind-notice.notice-success .wpmind-notice-icon {
+    color: #00a32a;
+}
+
+.wpmind-notice.notice-error .wpmind-notice-icon {
+    color: #d63638;
+}
+
+.wpmind-notice.notice-warning .wpmind-notice-icon {
+    color: #dba617;
+}
+
+.wpmind-notice.notice-info .wpmind-notice-icon {
+    color: #72aee6;
+}
+
+.wpmind-notice-text {
+    flex: 1;
+}
+
+/* Test Result Styles */
+.wpmind-test-result {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wpmind-space-1);
+    font-size: var(--wpmind-text-sm);
+    padding: var(--wpmind-space-1) var(--wpmind-space-2);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.wpmind-test-result.success {
+    color: #00a32a;
+    background: rgba(0, 163, 42, 0.1);
+}
+
+.wpmind-test-result.error {
+    color: #d63638;
+    background: rgba(214, 54, 56, 0.1);
+}
+
+.wpmind-test-result.warning {
+    color: #dba617;
+    background: rgba(219, 166, 23, 0.1);
+}
+
+.wpmind-test-result .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
