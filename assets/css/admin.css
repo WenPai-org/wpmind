@@ -1218,3 +1218,99 @@ input.is-invalid {
     font-weight: 600;
     color: var(--wpmind-gray-900);
 }
+
+/* Manual Priority Section */
+.wpmind-routing-priority {
+    margin-top: var(--wpmind-space-6);
+}
+
+.wpmind-routing-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--wpmind-space-2);
+}
+
+.wpmind-routing-priority-actions {
+    display: flex;
+    gap: var(--wpmind-space-2);
+}
+
+.wpmind-priority-badge {
+    display: inline-block;
+    background: var(--wpmind-primary);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: var(--wpmind-space-2);
+}
+
+.wpmind-priority-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wpmind-space-2);
+    margin-top: var(--wpmind-space-4);
+}
+
+.wpmind-priority-item {
+    display: flex;
+    align-items: center;
+    gap: var(--wpmind-space-3);
+    padding: var(--wpmind-space-3) var(--wpmind-space-4);
+    background: #fff;
+    border: 1px solid var(--wpmind-gray-200);
+    cursor: move;
+    transition: all 0.15s ease;
+}
+
+.wpmind-priority-item:hover {
+    border-color: var(--wpmind-primary);
+    box-shadow: var(--wpmind-shadow);
+}
+
+.wpmind-priority-handle {
+    color: var(--wpmind-gray-400);
+    cursor: grab;
+}
+
+.wpmind-priority-handle:active {
+    cursor: grabbing;
+}
+
+.wpmind-priority-index {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: var(--wpmind-gray-100);
+    color: var(--wpmind-gray-600);
+    font-size: var(--wpmind-text-sm);
+    font-weight: 600;
+    border-radius: 50%;
+}
+
+.wpmind-priority-name {
+    flex: 1;
+    font-weight: 500;
+    color: var(--wpmind-gray-900);
+}
+
+.wpmind-priority-score {
+    font-size: var(--wpmind-text-sm);
+    color: var(--wpmind-gray-500);
+}
+
+.wpmind-priority-placeholder {
+    height: 48px;
+    background: var(--wpmind-primary-light);
+    border: 2px dashed var(--wpmind-primary);
+    margin: var(--wpmind-space-1) 0;
+}
+
+.wpmind-priority-item.ui-sortable-helper {
+    box-shadow: var(--wpmind-shadow-lg);
+    border-color: var(--wpmind-primary);
+}

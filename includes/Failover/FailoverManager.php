@@ -122,10 +122,34 @@ class FailoverManager
             return [];
         }
 
-        // 按健康分数排序
-        usort($available, function ($a, $b) {
-            return ProviderHealthTracker::getHealthScore($b) - ProviderHealthTracker::getHealthScore($a);
-        });
+        // 检查是否有手动优先级设置
+        $manual_priority = [];
+        if (class_exists('\\WPMind\\Routing\\IntelligentRouter')) {
+            $router = \WPMind\Routing\IntelligentRouter::instance();
+            $manual_priority = $router->getManualPriority();
+        }
+
+        if (!empty($manual_priority)) {
+            // 使用手动优先级排序
+            $sorted = [];
+            foreach ($manual_priority as $providerId) {
+                if (in_array($providerId, $available, true)) {
+                    $sorted[] = $providerId;
+                }
+            }
+            // 添加未在手动列表中的可用 Provider
+            foreach ($available as $providerId) {
+                if (!in_array($providerId, $sorted, true)) {
+                    $sorted[] = $providerId;
+                }
+            }
+            $available = $sorted;
+        } else {
+            // 按健康分数排序
+            usort($available, function ($a, $b) {
+                return ProviderHealthTracker::getHealthScore($b) - ProviderHealthTracker::getHealthScore($a);
+            });
+        }
 
         // 首选 Provider 放在最前面
         if ($preferredProvider && in_array($preferredProvider, $available, true)) {

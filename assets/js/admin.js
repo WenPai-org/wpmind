@@ -1391,6 +1391,156 @@
                     $btn.find('.dashicons').removeClass('wpmind-spinning');
                 });
             });
+
+            // 初始化拖拽排序
+            self.initSortable();
+
+            // 保存优先级
+            $(document).on('click', '.wpmind-save-priority', function (e) {
+                e.preventDefault();
+                self.savePriority();
+            });
+
+            // 清除优先级
+            $(document).on('click', '.wpmind-clear-priority', function (e) {
+                e.preventDefault();
+                self.clearPriority();
+            });
+        },
+
+        initSortable: function () {
+            var $list = $('#wpmind-priority-list');
+            if (!$list.length) return;
+
+            // 检查 jQuery UI sortable 是否可用
+            if (typeof $.fn.sortable !== 'function') {
+                console.warn('WPMind: jQuery UI Sortable not available');
+                return;
+            }
+
+            $list.sortable({
+                handle: '.wpmind-priority-handle',
+                placeholder: 'wpmind-priority-placeholder',
+                axis: 'y',
+                tolerance: 'pointer',
+                update: function () {
+                    // 更新序号显示
+                    $list.find('.wpmind-priority-item').each(function (index) {
+                        $(this).find('.wpmind-priority-index').text(index + 1);
+                    });
+                }
+            });
+        },
+
+        savePriority: function () {
+            var self = this;
+            if (typeof wpmindData === 'undefined') {
+                Toast.error('配置错误');
+                return;
+            }
+
+            var $list = $('#wpmind-priority-list');
+            var priority = [];
+            $list.find('.wpmind-priority-item').each(function () {
+                priority.push($(this).data('provider'));
+            });
+
+            if (priority.length === 0) {
+                Toast.warning('没有可排序的 Provider');
+                return;
+            }
+
+            var $btn = $('.wpmind-save-priority');
+            $btn.prop('disabled', true).find('.dashicons').addClass('wpmind-spinning');
+
+            $.ajax({
+                url: wpmindData.ajaxurl || ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'wpmind_set_provider_priority',
+                    priority: priority,
+                    nonce: wpmindData.nonce
+                },
+                success: function (response) {
+                    if (response.success) {
+                        Toast.success('优先级已保存');
+                        // 显示清除按钮
+                        if (!$('.wpmind-clear-priority').length) {
+                            $('.wpmind-routing-priority-actions').prepend(
+                                '<button type="button" class="button button-small wpmind-clear-priority" title="清除手动优先级">' +
+                                '<span class="dashicons ri-delete-bin-line"></span> 清除</button>'
+                            );
+                        }
+                        // 显示已启用标记
+                        if (!$('.wpmind-priority-badge').length) {
+                            $('.wpmind-routing-priority .wpmind-routing-section-desc').append(
+                                ' <span class="wpmind-priority-badge">已启用手动优先级</span>'
+                            );
+                        }
+                        // 刷新路由状态
+                        self.refreshStatus();
+                    } else {
+                        var msg = (response.data && response.data.message) || '保存失败';
+                        Toast.error(msg);
+                    }
+                },
+                error: function () {
+                    Toast.error('保存失败，请重试');
+                },
+                complete: function () {
+                    $btn.prop('disabled', false).find('.dashicons').removeClass('wpmind-spinning');
+                }
+            });
+        },
+
+        clearPriority: function () {
+            var self = this;
+            if (typeof wpmindData === 'undefined') {
+                Toast.error('配置错误');
+                return;
+            }
+
+            Dialog.show({
+                title: '清除手动优先级',
+                message: '确定要清除手动优先级设置吗？<br><small style="color:#666;">清除后将使用智能路由自动排序</small>',
+                type: 'warning',
+                confirmText: '确定清除',
+                cancelText: '取消',
+                onConfirm: function () {
+                    var $btn = $('.wpmind-clear-priority');
+                    $btn.prop('disabled', true).find('.dashicons').addClass('wpmind-spinning');
+
+                    $.ajax({
+                        url: wpmindData.ajaxurl || ajaxurl,
+                        type: 'POST',
+                        data: {
+                            action: 'wpmind_set_provider_priority',
+                            priority: [],
+                            clear: 1,
+                            nonce: wpmindData.nonce
+                        },
+                        success: function (response) {
+                            if (response.success) {
+                                Toast.success('手动优先级已清除');
+                                // 移除清除按钮和标记
+                                $('.wpmind-clear-priority').remove();
+                                $('.wpmind-priority-badge').remove();
+                                // 刷新路由状态
+                                self.refreshStatus();
+                            } else {
+                                var msg = (response.data && response.data.message) || '清除失败';
+                                Toast.error(msg);
+                            }
+                        },
+                        error: function () {
+                            Toast.error('清除失败，请重试');
+                        },
+                        complete: function () {
+                            $btn.prop('disabled', false).find('.dashicons').removeClass('wpmind-spinning');
+                        }
+                    });
+                }
+            });
         },
 
         setStrategy: function (strategy) {

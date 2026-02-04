@@ -299,4 +299,57 @@ class IntelligentRouter
         self::$instance = null;
         self::instance();
     }
+
+    /**
+     * 获取手动设置的 Provider 优先级
+     *
+     * @return array<string> Provider ID 列表，按优先级排序
+     */
+    public function getManualPriority(): array
+    {
+        $settings = get_option('wpmind_routing_settings', []);
+        return $settings['provider_priority'] ?? [];
+    }
+
+    /**
+     * 设置手动 Provider 优先级
+     *
+     * @param array<string> $priority Provider ID 列表，按优先级排序
+     * @return bool 是否设置成功
+     */
+    public function setManualPriority(array $priority): bool
+    {
+        // 验证所有 Provider ID 都有效
+        $valid_providers = array_keys($this->providers);
+        $priority = array_filter($priority, fn($id) => in_array($id, $valid_providers, true));
+
+        $settings = get_option('wpmind_routing_settings', []);
+        $settings['provider_priority'] = array_values($priority);
+
+        return update_option('wpmind_routing_settings', $settings);
+    }
+
+    /**
+     * 清除手动优先级设置
+     *
+     * @return bool 是否清除成功
+     */
+    public function clearManualPriority(): bool
+    {
+        $settings = get_option('wpmind_routing_settings', []);
+        unset($settings['provider_priority']);
+
+        return update_option('wpmind_routing_settings', $settings);
+    }
+
+    /**
+     * 检查是否启用了手动优先级
+     *
+     * @return bool
+     */
+    public function hasManualPriority(): bool
+    {
+        $priority = $this->getManualPriority();
+        return !empty($priority);
+    }
 }

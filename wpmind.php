@@ -290,6 +290,7 @@ final class WPMind {
         add_action( 'wp_ajax_wpmind_get_routing_status', [ $this, 'ajax_get_routing_status' ] );
         add_action( 'wp_ajax_wpmind_set_routing_strategy', [ $this, 'ajax_set_routing_strategy' ] );
         add_action( 'wp_ajax_wpmind_route_request', [ $this, 'ajax_route_request' ] );
+        add_action( 'wp_ajax_wpmind_set_provider_priority', [ $this, 'ajax_set_provider_priority' ] );
 
         // AI 过滤器
         add_filter( 'ai_experiments_preferred_models', [ $this, 'filter_preferred_models' ] );
@@ -372,7 +373,7 @@ final class WPMind {
         wp_enqueue_script(
             'wpmind-admin',
             WPMIND_PLUGIN_URL . 'assets/js/admin.js',
-            [ 'jquery', 'chartjs' ],
+            [ 'jquery', 'jquery-ui-sortable', 'chartjs' ],
             WPMIND_VERSION,
             true
         );
@@ -1352,6 +1353,44 @@ final class WPMind {
             ] );
         } else {
             wp_send_json_error( [ 'message' => __( '无效的路由策略', 'wpmind' ) ] );
+        }
+    }
+
+    /**
+     * AJAX 设置 Provider 优先级
+     *
+     * @since 2.3.0
+     */
+    public function ajax_set_provider_priority(): void {
+        check_ajax_referer( 'wpmind_ajax', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+        }
+
+        $priority = isset( $_POST['priority'] ) ? array_map( 'sanitize_text_field', (array) $_POST['priority'] ) : [];
+        $clear = ! empty( $_POST['clear'] );
+
+        $router = Routing\IntelligentRouter::instance();
+
+        if ( $clear ) {
+            $result = $router->clearManualPriority();
+            $message = __( '已清除手动优先级设置', 'wpmind' );
+        } else {
+            $result = $router->setManualPriority( $priority );
+            $message = __( 'Provider 优先级已更新', 'wpmind' );
+        }
+
+        if ( $result ) {
+            // 刷新 FailoverManager
+            Failover\FailoverManager::instance()->refresh();
+
+            wp_send_json_success( [
+                'message'  => $message,
+                'priority' => $router->getManualPriority(),
+            ] );
+        } else {
+            wp_send_json_error( [ 'message' => __( '保存失败', 'wpmind' ) ] );
         }
     }
 
