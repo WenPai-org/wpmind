@@ -1317,10 +1317,7 @@ input.is-invalid {
 
 /* Toast Notification Styles */
 .wpmind-notice-container {
-    position: sticky;
-    top: 32px;
-    z-index: 9999;
-    margin-bottom: var(--wpmind-space-4);
+    margin: var(--wpmind-space-4) 0;
 }
 
 .wpmind-notice {
