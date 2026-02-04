@@ -9,6 +9,16 @@
     'use strict';
 
     /**
+     * HTML 转义函数 - 防止 XSS
+     */
+    function escapeHtml(text) {
+        if (typeof text !== 'string') return '';
+        var div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    /**
      * Tab 导航管理
      */
     function initTabs() {
@@ -336,9 +346,9 @@
                         Toast.success(provider.toUpperCase() + ' ' + message);
                     } else {
                         var errorMsg = (response.data && response.data.message) || '连接失败';
-                        $result.html('<span class="dashicons ri-close-circle-line"></span> ' + errorMsg).addClass('error');
+                        $result.html('<span class="dashicons ri-close-circle-line"></span> ' + escapeHtml(errorMsg)).addClass('error');
                         if (response.data && response.data.details) {
-                            $result.attr('title', response.data.details);
+                            $result.attr('title', escapeHtml(response.data.details));
                         }
                     }
                 },
@@ -398,7 +408,7 @@
                         Toast.success(provider + ' 连接成功');
                     } else {
                         var errorMsg = (response.data && response.data.message) || '连接失败';
-                        $result.html('<span class="dashicons ri-close-circle-line"></span> ' + errorMsg).addClass('error');
+                        $result.html('<span class="dashicons ri-close-circle-line"></span> ' + escapeHtml(errorMsg)).addClass('error');
                     }
                 },
                 error: function (xhr, status) {

@@ -864,7 +864,7 @@ final class WPMind {
             }
 
             // 检查自定义 URL
-            if ( ! empty( $config['custom_url'] ) && str_contains( $url, wp_parse_url( $config['custom_url'], PHP_URL_HOST ) ) ) {
+            if ( ! empty( $config['custom_base_url'] ) && str_contains( $url, wp_parse_url( $config['custom_base_url'], PHP_URL_HOST ) ) ) {
                 return $provider;
             }
 

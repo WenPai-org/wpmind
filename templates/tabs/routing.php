@@ -113,7 +113,7 @@ $strategy_icons = array(
                     ?>
                     <label class="wpmind-strategy-item <?php echo $is_active ? 'is-active' : ''; ?>">
                         <input type="radio" name="routing_strategy" value="<?php echo esc_attr( $strategy_name ); ?>"
-                               <?php checked( $current_strategy, $strategy_name ); ?> hidden>
+                               <?php checked( $current_strategy, $strategy_name ); ?>>
                         
                         <div class="wpmind-strategy-item-icon">
                             <span class="dashicons <?php echo esc_attr( $icon ); ?>"></span>
