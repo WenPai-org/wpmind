@@ -792,7 +792,7 @@
                 notifications: {
                     admin_notice: $('input[name="admin_notice"]').is(':checked'),
                     email_alert: $('input[name="email_alert"]').is(':checked'),
-                    email_address: $('input[name="alert_email"]').val() || ''
+                    email_address: $('input[name="email_address"]').val() || ''
                 }
             };
 

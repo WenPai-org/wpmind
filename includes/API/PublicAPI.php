@@ -176,7 +176,7 @@ class PublicAPI {
      * @return array
      */
     public function get_status(): array {
-        $endpoints = get_option('wpmind_endpoints', []);
+        $endpoints = get_option('wpmind_custom_endpoints', []);
         $default_provider = get_option('wpmind_default_provider', '');
 
         // 获取用量统计 - UsageTracker 是静态类
