@@ -69,9 +69,9 @@
 
         init: function () {
             if (!this.container) {
-                // 在页面顶部创建通知容器
+                // 在 wpmind-title 下方创建通知容器
                 this.container = $('<div class="wpmind-notice-container"></div>');
-                $('.wrap.wpmind-wrap').prepend(this.container);
+                $('.wpmind-title').after(this.container);
             }
         },
 
