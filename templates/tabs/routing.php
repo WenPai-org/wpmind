@@ -187,6 +187,54 @@ $strategy_icons = array(
         </div>
     </div>
 
+    <!-- 手动优先级设置 -->
+    <?php
+    $manual_priority = $router->getManualPriority();
+    $has_manual_priority = ! empty( $manual_priority );
+    ?>
+    <div class="wpmind-routing-section wpmind-routing-priority">
+        <div class="wpmind-routing-section-header">
+            <h3 class="wpmind-routing-section-title"><?php esc_html_e( '手动优先级', 'wpmind' ); ?></h3>
+            <div class="wpmind-routing-priority-actions">
+                <?php if ( $has_manual_priority ) : ?>
+                <button type="button" class="button button-small wpmind-clear-priority" title="<?php esc_attr_e( '清除手动优先级', 'wpmind' ); ?>">
+                    <span class="dashicons ri-delete-bin-line"></span>
+                    <?php esc_html_e( '清除', 'wpmind' ); ?>
+                </button>
+                <?php endif; ?>
+                <button type="button" class="button button-primary button-small wpmind-save-priority" title="<?php esc_attr_e( '保存优先级', 'wpmind' ); ?>">
+                    <span class="dashicons ri-save-line"></span>
+                    <?php esc_html_e( '保存', 'wpmind' ); ?>
+                </button>
+            </div>
+        </div>
+        <p class="wpmind-routing-section-desc">
+            <?php esc_html_e( '拖拽调整 Provider 顺序，设置故障转移优先级。排在前面的 Provider 会优先使用。', 'wpmind' ); ?>
+            <?php if ( $has_manual_priority ) : ?>
+            <span class="wpmind-priority-badge"><?php esc_html_e( '已启用手动优先级', 'wpmind' ); ?></span>
+            <?php endif; ?>
+        </p>
+        <div class="wpmind-priority-list" id="wpmind-priority-list">
+            <?php
+            // 如果有手动优先级，按手动顺序显示；否则按得分排序
+            $display_order = $has_manual_priority ? $manual_priority : array_keys( $routing_status['provider_scores'] ?? [] );
+            $index = 1;
+            foreach ( $display_order as $provider_id ) :
+                $score_data = $routing_status['provider_scores'][ $provider_id ] ?? null;
+                if ( ! $score_data ) continue;
+            ?>
+            <div class="wpmind-priority-item" data-provider="<?php echo esc_attr( $provider_id ); ?>">
+                <span class="wpmind-priority-handle">
+                    <span class="dashicons ri-draggable"></span>
+                </span>
+                <span class="wpmind-priority-index"><?php echo esc_html( $index++ ); ?></span>
+                <span class="wpmind-priority-name"><?php echo esc_html( $score_data['name'] ); ?></span>
+                <span class="wpmind-priority-score"><?php echo esc_html( number_format( $score_data['score'], 1 ) ); ?></span>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
     <!-- Provider 排名 -->
     <?php if ( ! empty( $routing_status['provider_scores'] ) ) : ?>
     <div class="wpmind-routing-section wpmind-routing-ranking">

@@ -278,12 +278,26 @@ class PublicAPI {
         }
         $model = apply_filters('wpmind_select_model', $model, $context, get_current_user_id());
 
-        // 选择服务商
+        // 选择服务商（集成故障转移）
         $provider = $options['provider'];
+        $original_provider = $provider;
+
         if ($provider === 'auto') {
             $provider = get_option('wpmind_default_provider', 'openai');
         }
         $provider = apply_filters('wpmind_select_provider', $provider, $context);
+
+        // 使用 FailoverManager 检查 Provider 健康状态并获取故障转移链
+        $failover_chain = [$provider];
+        if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
+            $failover = \WPMind\Failover\FailoverManager::instance();
+            $failover_chain = $failover->getFailoverChain($provider);
+
+            // 如果首选 Provider 不可用，记录日志
+            if (!empty($failover_chain) && $failover_chain[0] !== $provider) {
+                do_action('wpmind_provider_failover', $provider, $failover_chain[0], $context);
+            }
+        }
 
         // 检查缓存
         if ($options['cache_ttl'] > 0) {
@@ -297,10 +311,37 @@ class PublicAPI {
         // 触发请求前 Action
         do_action('wpmind_before_request', 'chat', $args, $context);
 
-        // 执行请求
-        $result = $this->execute_chat_request($args, $provider, $model);
+        // 使用故障转移链依次尝试
+        $result = null;
+        $last_error = null;
+        $tried_providers = [];
 
-        // 错误处理
+        foreach ($failover_chain as $try_provider) {
+            $tried_providers[] = $try_provider;
+            $result = $this->execute_chat_request($args, $try_provider, $model);
+
+            if (!is_wp_error($result)) {
+                // 成功，如果使用了备用 Provider，添加标记
+                if ($try_provider !== $provider) {
+                    $result['failover'] = [
+                        'original_provider' => $provider,
+                        'actual_provider'   => $try_provider,
+                        'tried_providers'   => $tried_providers,
+                    ];
+                }
+                break;
+            }
+
+            $last_error = $result;
+
+            // 检查是否应该重试（某些错误不应该重试）
+            $error_code = $result->get_error_code();
+            if (in_array($error_code, ['wpmind_api_key_missing', 'wpmind_provider_not_found'], true)) {
+                continue; // 配置错误，尝试下一个 Provider
+            }
+        }
+
+        // 如果所有 Provider 都失败了
         if (is_wp_error($result)) {
             do_action('wpmind_error', $result, 'chat', $args);
             return $result;
