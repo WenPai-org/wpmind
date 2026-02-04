@@ -88,12 +88,20 @@
                 info: 'notice-info'
             };
 
+            // 图标映射
+            var icons = {
+                success: 'ri-checkbox-circle-line',
+                error: 'ri-close-circle-line',
+                warning: 'ri-alert-line',
+                info: 'ri-information-line'
+            };
+
             var $notice = $('<div class="notice ' + noticeType[type] + ' is-dismissible wpmind-notice">' +
-                '<p></p>' +
+                '<p><span class="dashicons ' + icons[type] + ' wpmind-notice-icon"></span><span class="wpmind-notice-text"></span></p>' +
                 '</div>');
 
             // 使用 .text() 防止 XSS
-            $notice.find('p').text(message);
+            $notice.find('.wpmind-notice-text').text(message);
 
             this.container.append($notice);
 
@@ -129,11 +137,12 @@
         },
 
         error: function (message, duration) {
-            return this.show(message, 'error', duration || 5000);
+            // 错误消息显示更长时间
+            return this.show(message, 'error', duration || 8000);
         },
 
         warning: function (message, duration) {
-            return this.show(message, 'warning', duration || 4000);
+            return this.show(message, 'warning', duration || 5000);
         },
 
         info: function (message, duration) {
@@ -339,33 +348,54 @@
                 success: function (response) {
                     if (response.success) {
                         var message = '连接成功';
-                        if (response.data && response.data.retried) {
-                            message += ' (重试后)';
+                        var extra = '';
+                        if (response.data) {
+                            if (response.data.retried) {
+                                extra += ' (重试后)';
+                            }
+                            if (response.data.latency) {
+                                extra += ' ' + response.data.latency + 'ms';
+                            }
                         }
-                        $result.html('<span class="dashicons ri-checkbox-circle-line"></span> ' + message).addClass('success');
+                        $result.html('<span class="dashicons ri-checkbox-circle-line"></span> ' + message + extra).addClass('success');
                         Toast.success(provider.toUpperCase() + ' ' + message);
                     } else {
                         var errorMsg = (response.data && response.data.message) || '连接失败';
-                        $result.html('<span class="dashicons ri-close-circle-line"></span> ' + escapeHtml(errorMsg)).addClass('error');
+                        var errorCode = (response.data && response.data.code) ? ' [' + response.data.code + ']' : '';
+                        var retryInfo = (response.data && response.data.retried) ? ' (已重试)' : '';
+
+                        $result.html(
+                            '<span class="dashicons ri-close-circle-line"></span> ' +
+                            escapeHtml(errorMsg) + errorCode + retryInfo
+                        ).addClass('error');
+
+                        // 显示详细信息提示
                         if (response.data && response.data.details) {
-                            $result.attr('title', escapeHtml(response.data.details));
+                            $result.attr('title', '详细信息: ' + escapeHtml(response.data.details));
                         }
+
+                        // Toast 也显示错误
+                        Toast.error(provider.toUpperCase() + ': ' + errorMsg);
                     }
                 },
                 error: function (xhr, status, error) {
                     var message = '连接失败';
                     if (status === 'timeout') {
-                        message = '请求超时';
+                        message = '请求超时，请检查网络连接';
+                    } else if (status === 'error') {
+                        message = '网络错误，请检查连接';
                     }
                     $result.html('<span class="dashicons ri-close-circle-line"></span> ' + message).addClass('error');
+                    Toast.error(provider.toUpperCase() + ': ' + message);
                 },
                 complete: function () {
                     $button.removeClass('is-testing').prop('disabled', false).text('测试连接');
+                    // 延长显示时间到 10 秒，让用户有足够时间阅读错误信息
                     setTimeout(function () {
                         $result.fadeOut(300, function () {
                             $(this).text('').removeClass('success error warning').removeAttr('title').show();
                         });
-                    }, 6000);
+                    }, 10000);
                 }
             });
         });
@@ -408,12 +438,15 @@
                         Toast.success(provider + ' 连接成功');
                     } else {
                         var errorMsg = (response.data && response.data.message) || '连接失败';
-                        $result.html('<span class="dashicons ri-close-circle-line"></span> ' + escapeHtml(errorMsg)).addClass('error');
+                        var errorCode = (response.data && response.data.code) ? ' [' + response.data.code + ']' : '';
+                        $result.html('<span class="dashicons ri-close-circle-line"></span> ' + escapeHtml(errorMsg) + errorCode).addClass('error');
+                        Toast.error(provider + ': ' + errorMsg);
                     }
                 },
                 error: function (xhr, status) {
-                    var message = status === 'timeout' ? '请求超时' : '连接失败';
+                    var message = status === 'timeout' ? '请求超时，请检查网络连接' : '网络错误，请检查连接';
                     $result.html('<span class="dashicons ri-close-circle-line"></span> ' + message).addClass('error');
+                    Toast.error(provider + ': ' + message);
                 },
                 complete: function () {
                     $button.removeClass('is-testing').prop('disabled', false).text('测试连接');
@@ -421,7 +454,7 @@
                         $result.fadeOut(300, function () {
                             $(this).text('').removeClass('success error').show();
                         });
-                    }, 6000);
+                    }, 10000);
                 }
             });
         });
