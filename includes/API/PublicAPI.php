@@ -529,7 +529,7 @@ class PublicAPI {
         do_action('wpmind_before_request', 'stream', compact('messages', 'options'), $context);
 
         // 构建请求
-        $base_url = $endpoint['custom_url'] ?? $endpoint['base_url'] ?? '';
+        $base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
         $api_url = trailingslashit($base_url) . 'chat/completions';
 
         $request_body = [
@@ -815,7 +815,7 @@ class PublicAPI {
         do_action('wpmind_before_request', 'embed', compact('texts', 'options'), $context);
 
         // 构建请求
-        $base_url = $endpoint['custom_url'] ?? $endpoint['base_url'] ?? '';
+        $base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
         $api_url = trailingslashit($base_url) . 'embeddings';
 
         $response = wp_remote_post($api_url, [
@@ -1155,7 +1155,7 @@ class PublicAPI {
         }
 
         // 准备请求
-        $base_url = $endpoint['custom_url'] ?? $endpoint['base_url'] ?? '';
+        $base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
         $api_url = trailingslashit($base_url) . 'audio/transcriptions';
 
         $boundary = wp_generate_password(24, false);
@@ -1282,7 +1282,7 @@ class PublicAPI {
 
         do_action('wpmind_before_request', 'speech', compact('text', 'options'), $context);
 
-        $base_url = $endpoint['custom_url'] ?? $endpoint['base_url'] ?? '';
+        $base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
         $api_url = trailingslashit($base_url) . 'audio/speech';
 
         $response = wp_remote_post($api_url, [
@@ -1443,7 +1443,7 @@ class PublicAPI {
         }
 
         // 确定 API URL
-        $base_url = $endpoint['custom_url'] ?? $endpoint['base_url'] ?? '';
+        $base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
         $api_url = trailingslashit($base_url) . 'chat/completions';
 
         // 发送请求
