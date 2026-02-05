@@ -7,7 +7,7 @@
 
 namespace WPMind\Tests\GEO;
 
-use WPMind\GEO\ChineseOptimizer;
+use WPMind\Modules\Geo\ChineseOptimizer;
 use PHPUnit\Framework\TestCase;
 
 /**

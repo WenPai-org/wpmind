@@ -4,7 +4,7 @@
  *
  * Injects GEO (Generative Engine Optimization) signals into Markdown content.
  *
- * @package WPMind\GEO
+ * @package WPMind\Modules\Geo
  * @since 3.0.0
  */
 

@@ -4,7 +4,7 @@
  *
  * Generates llms.txt file following the official specification.
  *
- * @package WPMind\GEO
+ * @package WPMind\Modules\Geo
  * @since 3.1.0
  * @see https://github.com/AnswerDotAI/llms-txt
  */

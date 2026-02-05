@@ -7,7 +7,7 @@
 
 namespace WPMind\Tests\GEO;
 
-use WPMind\GEO\GeoSignalInjector;
+use WPMind\Modules\Geo\GeoSignalInjector;
 use PHPUnit\Framework\TestCase;
 
 /**

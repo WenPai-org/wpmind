@@ -7,7 +7,7 @@
 
 namespace WPMind\Tests\GEO;
 
-use WPMind\GEO\HtmlToMarkdown;
+use WPMind\Modules\Geo\HtmlToMarkdown;
 use PHPUnit\Framework\TestCase;
 
 /**

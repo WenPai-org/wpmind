@@ -4,7 +4,7 @@
  *
  * Configuration options for MarkdownProcessor.
  *
- * @package WPMind\GEO
+ * @package WPMind\Modules\Geo
  * @since 3.1.0
  */
 
