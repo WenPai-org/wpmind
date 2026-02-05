@@ -58,6 +58,9 @@ defined( 'ABSPATH' ) || exit;
                 <a href="#budget" class="wpmind-tab" data-tab="budget">
                     <?php esc_html_e( '预算管理', 'wpmind' ); ?>
                 </a>
+                <a href="#geo" class="wpmind-tab" data-tab="geo">
+                    <?php esc_html_e( 'GEO 优化', 'wpmind' ); ?>
+                </a>
             </nav>
 
             <!-- Tab 内容 -->
@@ -75,6 +78,9 @@ defined( 'ABSPATH' ) || exit;
             </div>
             <div id="budget" class="wpmind-tab-pane">
                 <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/budget.php'; ?>
+            </div>
+            <div id="geo" class="wpmind-tab-pane">
+                <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/geo.php'; ?>
             </div>
         </div>
     </div>
