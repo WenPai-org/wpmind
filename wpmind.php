@@ -1620,6 +1620,10 @@ function activate(): void {
     if ( false === get_option( 'wpmind_request_timeout' ) ) {
         add_option( 'wpmind_request_timeout', 60, '', false ); // autoload = false
     }
+
+    // Schedule rewrite rules flush for after plugin is fully loaded.
+    // This ensures module routes are registered before flushing.
+    add_option( 'wpmind_flush_rewrite_rules', '1' );
 }
 register_activation_hook( WPMIND_PLUGIN_FILE, __NAMESPACE__ . '\\activate' );
 
@@ -1629,12 +1633,30 @@ register_activation_hook( WPMIND_PLUGIN_FILE, __NAMESPACE__ . '\\activate' );
  * @since 1.1.0
  */
 function deactivate(): void {
-    // 无需操作
+    // Flush rewrite rules to remove plugin routes.
+    flush_rewrite_rules();
 }
 register_deactivation_hook( WPMIND_PLUGIN_FILE, __NAMESPACE__ . '\\deactivate' );
 
 // 初始化插件
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\wpmind' );
+
+// Flush rewrite rules after plugin activation (delayed to ensure routes are registered).
+// Use admin_init for admin requests, or a later init priority for frontend.
+add_action( 'admin_init', function(): void {
+    if ( get_option( 'wpmind_flush_rewrite_rules' ) === '1' ) {
+        delete_option( 'wpmind_flush_rewrite_rules' );
+        flush_rewrite_rules();
+    }
+} );
+
+// Also check on frontend requests with high priority.
+add_action( 'wp_loaded', function(): void {
+    if ( get_option( 'wpmind_flush_rewrite_rules' ) === '1' ) {
+        delete_option( 'wpmind_flush_rewrite_rules' );
+        flush_rewrite_rules();
+    }
+} );
 
 /**
  * PSR-4 自动加载器
