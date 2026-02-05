@@ -37,7 +37,8 @@ defined( 'ABSPATH' ) || exit;
         </span>
     </h1>
 
-    <!-- 主内容区 -->\n    <div class="wpmind-content">
+    <!-- 主内容区 -->
+    <div class="wpmind-content">
         <?php
         // Get module loader instance for checking module status.
         $module_loader = \WPMind\Core\ModuleLoader::instance();
