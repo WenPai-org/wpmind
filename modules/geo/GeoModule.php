@@ -98,7 +98,9 @@ class GeoModule implements ModuleInterface {
 	 */
 	public function init(): void {
 		// Check if GEO is globally enabled.
-		if ( ! get_option( 'wpmind_geo_enabled', true ) ) {
+		// Support both legacy boolean and new string format.
+		$geo_enabled = get_option( 'wpmind_geo_enabled', '1' );
+		if ( $geo_enabled !== '1' && $geo_enabled !== true && $geo_enabled !== 1 ) {
 			return;
 		}
 
@@ -123,8 +125,14 @@ class GeoModule implements ModuleInterface {
 	 * Initialize module components.
 	 */
 	private function init_components(): void {
+		// Helper function to check if option is enabled.
+		$is_enabled = function( $option, $default = '1' ) {
+			$value = get_option( $option, $default );
+			return $value === '1' || $value === true || $value === 1;
+		};
+
 		// Markdown Feed.
-		if ( get_option( 'wpmind_standalone_markdown_feed', false ) ) {
+		if ( $is_enabled( 'wpmind_standalone_markdown_feed', '0' ) ) {
 			$this->components['markdown_feed'] = new MarkdownFeed();
 		}
 
@@ -132,12 +140,12 @@ class GeoModule implements ModuleInterface {
 		$this->components['markdown_enhancer'] = new MarkdownEnhancer();
 
 		// llms.txt Generator.
-		if ( get_option( 'wpmind_llms_txt_enabled', true ) ) {
+		if ( $is_enabled( 'wpmind_llms_txt_enabled', '1' ) ) {
 			$this->components['llms_txt'] = new LlmsTxtGenerator();
 		}
 
 		// Schema.org Generator.
-		if ( get_option( 'wpmind_schema_enabled', true ) ) {
+		if ( $is_enabled( 'wpmind_schema_enabled', '1' ) ) {
 			$this->components['schema'] = new SchemaGenerator();
 		}
 
@@ -174,19 +182,20 @@ class GeoModule implements ModuleInterface {
 		$settings = $_POST['settings'] ?? array();
 
 		// Sanitize and save settings.
+		// Use string '1'/'0' instead of boolean for reliable storage.
 		$options = array(
-			'wpmind_geo_enabled'             => isset( $settings['wpmind_geo_enabled'] ),
-			'wpmind_standalone_markdown_feed' => isset( $settings['wpmind_standalone_markdown_feed'] ),
-			'wpmind_chinese_optimize'        => isset( $settings['wpmind_chinese_optimize'] ),
-			'wpmind_geo_signals'             => isset( $settings['wpmind_geo_signals'] ),
-			'wpmind_crawler_tracking'        => isset( $settings['wpmind_crawler_tracking'] ),
-			'wpmind_llms_txt_enabled'        => isset( $settings['wpmind_llms_txt_enabled'] ),
-			'wpmind_schema_enabled'          => isset( $settings['wpmind_schema_enabled'] ),
+			'wpmind_geo_enabled'             => isset( $settings['wpmind_geo_enabled'] ) ? '1' : '0',
+			'wpmind_standalone_markdown_feed' => isset( $settings['wpmind_standalone_markdown_feed'] ) ? '1' : '0',
+			'wpmind_chinese_optimize'        => isset( $settings['wpmind_chinese_optimize'] ) ? '1' : '0',
+			'wpmind_geo_signals'             => isset( $settings['wpmind_geo_signals'] ) ? '1' : '0',
+			'wpmind_crawler_tracking'        => isset( $settings['wpmind_crawler_tracking'] ) ? '1' : '0',
+			'wpmind_llms_txt_enabled'        => isset( $settings['wpmind_llms_txt_enabled'] ) ? '1' : '0',
+			'wpmind_schema_enabled'          => isset( $settings['wpmind_schema_enabled'] ) ? '1' : '0',
 			'wpmind_schema_mode'             => sanitize_key( $settings['wpmind_schema_mode'] ?? 'auto' ),
 		);
 
 		foreach ( $options as $key => $value ) {
-			update_option( $key, $value );
+			update_option( $key, $value, false );
 		}
 
 		// Flush rewrite rules if markdown feed setting changed.

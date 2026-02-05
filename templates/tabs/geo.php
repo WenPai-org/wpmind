@@ -12,13 +12,19 @@
 defined( 'ABSPATH' ) || exit;
 
 // 获取当前设置
-$standalone_feed   = get_option( 'wpmind_standalone_markdown_feed', false );
-$geo_enabled       = get_option( 'wpmind_geo_enabled', true );
-$chinese_optimize  = get_option( 'wpmind_chinese_optimize', true );
-$geo_signals       = get_option( 'wpmind_geo_signals', true );
-$crawler_tracking  = get_option( 'wpmind_crawler_tracking', true );
-$llms_txt_enabled  = get_option( 'wpmind_llms_txt_enabled', true );
-$schema_enabled    = get_option( 'wpmind_schema_enabled', true );
+// Helper function to check if option is enabled (supports both boolean and string).
+$is_enabled = function( $option, $default = '1' ) {
+	$value = get_option( $option, $default );
+	return $value === '1' || $value === true || $value === 1;
+};
+
+$standalone_feed   = $is_enabled( 'wpmind_standalone_markdown_feed', '0' );
+$geo_enabled       = $is_enabled( 'wpmind_geo_enabled', '1' );
+$chinese_optimize  = $is_enabled( 'wpmind_chinese_optimize', '1' );
+$geo_signals       = $is_enabled( 'wpmind_geo_signals', '1' );
+$crawler_tracking  = $is_enabled( 'wpmind_crawler_tracking', '1' );
+$llms_txt_enabled  = $is_enabled( 'wpmind_llms_txt_enabled', '1' );
+$schema_enabled    = $is_enabled( 'wpmind_schema_enabled', '1' );
 $schema_mode       = get_option( 'wpmind_schema_mode', 'auto' );
 
 // 检查官方插件是否安装

@@ -272,7 +272,9 @@ jQuery(function($) {
                 action: 'wpmind_toggle_module',
                 nonce: wpmindData.nonce,
                 module_id: moduleId,
-                enable: enable
+                // Use string '1'/'0' instead of boolean to ensure reliable transmission.
+                // jQuery may serialize boolean false inconsistently.
+                enable: enable ? '1' : '0'
             },
             success: function(response) {
                 if (response.success) {
