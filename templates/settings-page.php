@@ -84,12 +84,18 @@ defined( 'ABSPATH' ) || exit;
             </div>
             <div id="geo" class="wpmind-tab-pane">
                 <?php
-                // Load GEO settings from module if available.
+                // Load GEO settings from module if available and enabled.
+                $module_loader = \WPMind\Core\ModuleLoader::instance();
+                $geo_module = $module_loader->get_module( 'geo' );
                 $geo_settings = WPMIND_PATH . 'modules/geo/templates/settings.php';
-                if ( file_exists( $geo_settings ) ) {
+
+                if ( $geo_module && $geo_module['enabled'] && file_exists( $geo_settings ) ) {
                     include $geo_settings;
                 } else {
-                    echo '<p>' . esc_html__( 'GEO 模块未安装或已禁用', 'wpmind' ) . '</p>';
+                    echo '<div class="wpmind-module-disabled-notice">';
+                    echo '<p>' . esc_html__( 'GEO 模块未启用。请在"模块"标签页中启用 GEO 模块。', 'wpmind' ) . '</p>';
+                    echo '<a href="#modules" class="button button-primary wpmind-tab" data-tab="modules">' . esc_html__( '前往模块管理', 'wpmind' ) . '</a>';
+                    echo '</div>';
                 }
                 ?>
             </div>
