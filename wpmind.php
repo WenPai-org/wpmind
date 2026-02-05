@@ -3,7 +3,7 @@
  * Plugin Name: WPMind
  * Plugin URI: https://wpcy.com/mind
  * Description: 文派心思 - WordPress AI 自定义端点扩展，支持国内外多种 AI 服务
- * Version: 2.2.0
+ * Version: 3.0.0
  * Author: 文派心思
  * Author URI: https://wpcy.com/mind
  * License: GPL-2.0-or-later
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-    define( 'WPMIND_VERSION', '2.5.0' );
+    define( 'WPMIND_VERSION', '3.0.0' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
     define( 'WPMIND_PLUGIN_FILE', __FILE__ );
@@ -79,6 +79,7 @@ final class WPMind {
         $this->load_textdomain();
         $this->load_custom_endpoints();
         $this->load_public_api();
+        $this->load_geo_module();
         $this->init_hooks();
     }
 
@@ -101,6 +102,26 @@ final class WPMind {
             define('WPMIND_DEV_MODE', true);
             require_once WPMIND_PLUGIN_DIR . 'tests/ajax-test-endpoint.php';
         }
+    }
+
+    /**
+     * 加载 GEO 模块
+     *
+     * @since 3.0.0
+     */
+    private function load_geo_module(): void {
+        // 加载 GEO 模块类
+        require_once WPMIND_PLUGIN_DIR . 'includes/GEO/ChineseOptimizer.php';
+        require_once WPMIND_PLUGIN_DIR . 'includes/GEO/GeoSignalInjector.php';
+        require_once WPMIND_PLUGIN_DIR . 'includes/GEO/HtmlToMarkdown.php';
+        require_once WPMIND_PLUGIN_DIR . 'includes/GEO/MarkdownEnhancer.php';
+        require_once WPMIND_PLUGIN_DIR . 'includes/GEO/MarkdownFeed.php';
+        require_once WPMIND_PLUGIN_DIR . 'includes/GEO/CrawlerTracker.php';
+
+        // 初始化 GEO 模块
+        new \WPMind\GEO\MarkdownEnhancer();
+        new \WPMind\GEO\MarkdownFeed();
+        new \WPMind\GEO\CrawlerTracker();
     }
 
     /**
@@ -463,6 +484,52 @@ final class WPMind {
                 'type'              => 'string',
                 'sanitize_callback' => 'sanitize_text_field',
                 'default'           => '',
+            ]
+        );
+
+        // GEO 模块设置
+        register_setting(
+            'wpmind_geo_settings',
+            'wpmind_geo_enabled',
+            [
+                'type'    => 'boolean',
+                'default' => true,
+            ]
+        );
+
+        register_setting(
+            'wpmind_geo_settings',
+            'wpmind_chinese_optimize',
+            [
+                'type'    => 'boolean',
+                'default' => true,
+            ]
+        );
+
+        register_setting(
+            'wpmind_geo_settings',
+            'wpmind_geo_signals',
+            [
+                'type'    => 'boolean',
+                'default' => true,
+            ]
+        );
+
+        register_setting(
+            'wpmind_geo_settings',
+            'wpmind_standalone_markdown_feed',
+            [
+                'type'    => 'boolean',
+                'default' => false,
+            ]
+        );
+
+        register_setting(
+            'wpmind_geo_settings',
+            'wpmind_crawler_tracking',
+            [
+                'type'    => 'boolean',
+                'default' => true,
             ]
         );
     }
