@@ -70,7 +70,9 @@ class MarkdownProcessor {
 		}
 
 		// Check if GEO enhancement is globally enabled.
-		if ( ! get_option( 'wpmind_geo_enabled', true ) ) {
+		// Support both legacy boolean and new string format.
+		$geo_enabled = get_option( 'wpmind_geo_enabled', '1' );
+		if ( $geo_enabled !== '1' && $geo_enabled !== true && $geo_enabled !== 1 ) {
 			return $this->mark_as_processed( $sections );
 		}
 

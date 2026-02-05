@@ -226,11 +226,16 @@ class ModuleLoader {
 	/**
 	 * Check if a module is enabled.
 	 *
+	 * Uses string '1'/'0' instead of boolean to avoid WordPress update_option() issues
+	 * where false values may be stored inconsistently or cause option deletion.
+	 *
 	 * @param string $module_id Module ID.
 	 * @return bool True if enabled.
 	 */
 	public function is_module_enabled( string $module_id ): bool {
-		return (bool) get_option( "wpmind_module_{$module_id}_enabled", true );
+		$value = get_option( "wpmind_module_{$module_id}_enabled", '1' );
+		// Handle both legacy boolean and new string format.
+		return $value === '1' || $value === true || $value === 1;
 	}
 
 	/**
@@ -244,7 +249,8 @@ class ModuleLoader {
 			return false;
 		}
 
-		update_option( "wpmind_module_{$module_id}_enabled", true );
+		// Use string '1' instead of boolean true for reliable storage.
+		update_option( "wpmind_module_{$module_id}_enabled", '1', false );
 		$this->modules[ $module_id ]['enabled'] = true;
 
 		/**
@@ -272,7 +278,9 @@ class ModuleLoader {
 			return false;
 		}
 
-		update_option( "wpmind_module_{$module_id}_enabled", false );
+		// Use string '0' instead of boolean false for reliable storage.
+		// WordPress update_option() can behave inconsistently with boolean false.
+		update_option( "wpmind_module_{$module_id}_enabled", '0', false );
 		$this->modules[ $module_id ]['enabled'] = false;
 
 		/**
