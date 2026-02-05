@@ -1,0 +1,22 @@
+{
+    "id": "geo",
+    "name": "GEO 优化",
+    "description": "AI 搜索引擎优化 - Markdown Feeds, llms.txt, Schema.org 结构化数据",
+    "version": "1.0.0",
+    "author": "文派",
+    "icon": "ri-search-eye-line",
+    "class": "WPMind\\Modules\\Geo\\GeoModule",
+    "can_disable": true,
+    "settings_tab": "geo",
+    "features": [
+        "Markdown Feed (/?feed=markdown)",
+        "单篇 .md 后缀支持",
+        "llms.txt 生成器",
+        "Schema.org 结构化数据",
+        "AI 爬虫追踪"
+    ],
+    "requires": {
+        "php": "8.1",
+        "wordpress": "6.0"
+    }
+}
