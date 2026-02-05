@@ -292,8 +292,8 @@ final class WPMind {
         add_action( 'wp_ajax_wpmind_route_request', [ $this, 'ajax_route_request' ] );
         add_action( 'wp_ajax_wpmind_set_provider_priority', [ $this, 'ajax_set_provider_priority' ] );
 
-        // AI 过滤器
-        add_filter( 'ai_experiments_preferred_models', [ $this, 'filter_preferred_models' ] );
+        // AI 过滤器 - 对齐官方 WordPress AI 插件 filter hook
+        add_filter( 'ai_experiments_preferred_models_for_text_generation', [ $this, 'filter_preferred_models' ] );
         add_filter( 'wp_ai_client_default_request_timeout', [ $this, 'filter_request_timeout' ] );
         add_filter( 'mcp_adapter_default_server_config', [ $this, 'filter_mcp_config' ] );
         
