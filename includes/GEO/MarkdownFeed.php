@@ -15,6 +15,8 @@ namespace WPMind\GEO;
  *
  * Mode B: Standalone Markdown feed implementation.
  * Only activates when official plugin is not installed and user enables it.
+ *
+ * @since 3.1.0 Refactored to use unified MarkdownProcessor.
  */
 class MarkdownFeed {
 
@@ -26,28 +28,21 @@ class MarkdownFeed {
 	private HtmlToMarkdown $converter;
 
 	/**
-	 * Chinese optimizer.
+	 * Unified Markdown processor.
 	 *
-	 * @var ChineseOptimizer
+	 * @var MarkdownProcessor
 	 */
-	private ChineseOptimizer $chinese_optimizer;
-
-	/**
-	 * GEO signal injector.
-	 *
-	 * @var GeoSignalInjector
-	 */
-	private GeoSignalInjector $geo_injector;
+	private MarkdownProcessor $processor;
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->converter         = new HtmlToMarkdown();
-		$this->chinese_optimizer = new ChineseOptimizer();
-		$this->geo_injector      = new GeoSignalInjector();
+		$this->converter = new HtmlToMarkdown();
+		$this->processor = new MarkdownProcessor();
 
-		add_action( 'init', array( $this, 'maybe_init' ) );
+		// Use init action with early priority to ensure feed registration.
+		add_action( 'init', array( $this, 'maybe_init' ), 1 );
 	}
 
 	/**
@@ -64,8 +59,8 @@ class MarkdownFeed {
 			return;
 		}
 
-		// Register feed.
-		$this->register_feed();
+		// Register feed - must happen during init.
+		add_feed( 'markdown', array( $this, 'render_feed' ) );
 
 		// Register rewrite rules for .md suffix.
 		$this->register_rewrite_rules();
@@ -78,25 +73,11 @@ class MarkdownFeed {
 	}
 
 	/**
-	 * Register the markdown feed.
-	 */
-	private function register_feed(): void {
-		add_feed( 'markdown', array( $this, 'render_feed' ) );
-	}
-
-	/**
 	 * Register rewrite rules for .md suffix.
 	 *
 	 * Codex review fix: Added proper rewrite rules.
 	 */
 	private function register_rewrite_rules(): void {
-		// Add rewrite rule for .md suffix.
-		add_rewrite_rule(
-			'^(.+)\.md$',
-			'index.php?name=$matches[1]&wpmind_markdown=1',
-			'top'
-		);
-
 		// Register query var.
 		add_filter(
 			'query_vars',
@@ -105,6 +86,37 @@ class MarkdownFeed {
 				return $vars;
 			}
 		);
+
+		// Handle .md suffix via request filter (works with any permalink structure).
+		add_filter( 'request', array( $this, 'handle_md_request' ) );
+	}
+
+	/**
+	 * Handle .md suffix in request.
+	 *
+	 * @param array $query_vars The query variables.
+	 * @return array Modified query variables.
+	 */
+	public function handle_md_request( array $query_vars ): array {
+		// Check if request URI ends with .md.
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+
+		if ( preg_match( '/\.md(\?.*)?$/', $request_uri ) ) {
+			// Remove .md suffix to get the real path.
+			$clean_uri = preg_replace( '/\.md(\?.*)?$/', '$1', $request_uri );
+
+			// Parse the clean URI to get post.
+			$post_id = url_to_postid( home_url( $clean_uri ) );
+
+			if ( $post_id ) {
+				$query_vars['p']                = $post_id;
+				$query_vars['wpmind_markdown']  = 1;
+				// Clear other query vars that might conflict.
+				unset( $query_vars['error'], $query_vars['name'], $query_vars['category_name'] );
+			}
+		}
+
+		return $query_vars;
 	}
 
 	/**
@@ -200,29 +212,17 @@ class MarkdownFeed {
 		// Setup post data.
 		setup_postdata( $post );
 
-		// Build sections.
+		// Build sections (convert HTML to Markdown).
 		$sections = array(
 			'title'   => '# ' . esc_html( get_the_title( $post ) ) . "\n\n",
 			'content' => $this->converter->convert( $post->post_content ),
 		);
 
-		// Check if GEO enhancement is globally enabled.
-		if ( ! get_option( 'wpmind_geo_enabled', true ) ) {
-			// Skip GEO enhancements, just return basic markdown.
-			wp_reset_postdata();
-			$sections = apply_filters( 'wpmind_markdown_post_sections', $sections, $post );
-			return implode( '', $sections );
-		}
+		// Use unified processor for GEO enhancements.
+		$sections = $this->processor->process( $sections, $post );
 
-		// Apply Chinese optimization.
-		if ( get_option( 'wpmind_chinese_optimize', true ) ) {
-			$sections = $this->chinese_optimizer->optimize( $sections );
-		}
-
-		// Inject GEO signals.
-		if ( get_option( 'wpmind_geo_signals', true ) ) {
-			$sections = $this->geo_injector->inject( $sections, $post );
-		}
+		// Reset post data.
+		wp_reset_postdata();
 
 		/**
 		 * Filter the markdown sections.
@@ -232,11 +232,17 @@ class MarkdownFeed {
 		 */
 		$sections = apply_filters( 'wpmind_markdown_post_sections', $sections, $post );
 
-		// Reset post data after filter (Codex review fix).
-		wp_reset_postdata();
+		// Combine sections (exclude internal markers).
+		$output = '';
+		foreach ( $sections as $key => $content ) {
+			// Skip internal markers.
+			if ( str_starts_with( $key, '_' ) ) {
+				continue;
+			}
+			$output .= $content;
+		}
 
-		// Combine sections.
-		return implode( '', $sections );
+		return $output;
 	}
 
 	/**

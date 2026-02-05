@@ -3,7 +3,7 @@
  * Plugin Name: WPMind
  * Plugin URI: https://wpcy.com/mind
  * Description: 文派心思 - WordPress AI 自定义端点扩展，支持国内外多种 AI 服务
- * Version: 3.0.0
+ * Version: 3.1.0
  * Author: 文派心思
  * Author URI: https://wpcy.com/mind
  * License: GPL-2.0-or-later
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-    define( 'WPMIND_VERSION', '3.0.0' );
+    define( 'WPMIND_VERSION', '3.1.0' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
     define( 'WPMIND_PLUGIN_FILE', __FILE__ );
@@ -108,20 +108,27 @@ final class WPMind {
      * 加载 GEO 模块
      *
      * @since 3.0.0
+     * @since 3.1.0 Added MarkdownProcessor, LlmsTxtGenerator, SchemaGenerator.
      */
     private function load_geo_module(): void {
         // 加载 GEO 模块类
         require_once WPMIND_PLUGIN_DIR . 'includes/GEO/ChineseOptimizer.php';
         require_once WPMIND_PLUGIN_DIR . 'includes/GEO/GeoSignalInjector.php';
         require_once WPMIND_PLUGIN_DIR . 'includes/GEO/HtmlToMarkdown.php';
+        require_once WPMIND_PLUGIN_DIR . 'includes/GEO/ProcessOptions.php';
+        require_once WPMIND_PLUGIN_DIR . 'includes/GEO/MarkdownProcessor.php';
         require_once WPMIND_PLUGIN_DIR . 'includes/GEO/MarkdownEnhancer.php';
         require_once WPMIND_PLUGIN_DIR . 'includes/GEO/MarkdownFeed.php';
         require_once WPMIND_PLUGIN_DIR . 'includes/GEO/CrawlerTracker.php';
+        require_once WPMIND_PLUGIN_DIR . 'includes/GEO/LlmsTxtGenerator.php';
+        require_once WPMIND_PLUGIN_DIR . 'includes/GEO/SchemaGenerator.php';
 
         // 初始化 GEO 模块
         new \WPMind\GEO\MarkdownEnhancer();
         new \WPMind\GEO\MarkdownFeed();
         new \WPMind\GEO\CrawlerTracker();
+        new \WPMind\GEO\LlmsTxtGenerator();
+        new \WPMind\GEO\SchemaGenerator();
     }
 
     /**
@@ -312,6 +319,7 @@ final class WPMind {
         add_action( 'wp_ajax_wpmind_set_routing_strategy', [ $this, 'ajax_set_routing_strategy' ] );
         add_action( 'wp_ajax_wpmind_route_request', [ $this, 'ajax_route_request' ] );
         add_action( 'wp_ajax_wpmind_set_provider_priority', [ $this, 'ajax_set_provider_priority' ] );
+        add_action( 'wp_ajax_wpmind_save_geo_settings', [ $this, 'ajax_save_geo_settings' ] );
 
         // AI 过滤器 - 对齐官方 WordPress AI 插件 filter hook
         add_filter( 'ai_experiments_preferred_models_for_text_generation', [ $this, 'filter_preferred_models' ] );
@@ -1459,6 +1467,58 @@ final class WPMind {
         } else {
             wp_send_json_error( [ 'message' => __( '保存失败', 'wpmind' ) ] );
         }
+    }
+
+    /**
+     * AJAX 保存 GEO 设置
+     *
+     * @since 3.0.0
+     */
+    /**
+     * AJAX: 保存 GEO 设置
+     *
+     * @since 3.0.0
+     * @since 3.1.0 Added llms.txt and Schema.org settings.
+     */
+    public function ajax_save_geo_settings(): void {
+        check_ajax_referer( 'wpmind_ajax', 'nonce' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+        }
+
+        $settings = isset( $_POST['settings'] ) ? (array) $_POST['settings'] : [];
+
+        // 保存布尔选项
+        $boolean_options = [
+            'wpmind_standalone_markdown_feed',
+            'wpmind_geo_enabled',
+            'wpmind_chinese_optimize',
+            'wpmind_geo_signals',
+            'wpmind_crawler_tracking',
+            'wpmind_llms_txt_enabled',
+            'wpmind_schema_enabled',
+        ];
+
+        foreach ( $boolean_options as $option ) {
+            $value = ! empty( $settings[ $option ] );
+            update_option( $option, $value );
+        }
+
+        // 保存 Schema 模式
+        if ( isset( $settings['wpmind_schema_mode'] ) ) {
+            $mode = sanitize_text_field( $settings['wpmind_schema_mode'] );
+            if ( in_array( $mode, [ 'auto', 'merge', 'force' ], true ) ) {
+                update_option( 'wpmind_schema_mode', $mode );
+            }
+        }
+
+        // 如果启用了 Markdown Feed 或 llms.txt，刷新 rewrite 规则
+        if ( ! empty( $settings['wpmind_standalone_markdown_feed'] ) || ! empty( $settings['wpmind_llms_txt_enabled'] ) ) {
+            flush_rewrite_rules();
+        }
+
+        wp_send_json_success( [ 'message' => __( 'GEO 设置已保存', 'wpmind' ) ] );
     }
 
     /**
