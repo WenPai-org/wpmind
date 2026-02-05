@@ -61,6 +61,9 @@ defined( 'ABSPATH' ) || exit;
                 <a href="#geo" class="wpmind-tab" data-tab="geo">
                     <?php esc_html_e( 'GEO 优化', 'wpmind' ); ?>
                 </a>
+                <a href="#modules" class="wpmind-tab" data-tab="modules">
+                    <?php esc_html_e( '模块', 'wpmind' ); ?>
+                </a>
             </nav>
 
             <!-- Tab 内容 -->
@@ -80,7 +83,18 @@ defined( 'ABSPATH' ) || exit;
                 <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/budget.php'; ?>
             </div>
             <div id="geo" class="wpmind-tab-pane">
-                <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/geo.php'; ?>
+                <?php
+                // Load GEO settings from module if available.
+                $geo_settings = WPMIND_PATH . 'modules/geo/templates/settings.php';
+                if ( file_exists( $geo_settings ) ) {
+                    include $geo_settings;
+                } else {
+                    echo '<p>' . esc_html__( 'GEO 模块未安装或已禁用', 'wpmind' ) . '</p>';
+                }
+                ?>
+            </div>
+            <div id="modules" class="wpmind-tab-pane">
+                <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/modules.php'; ?>
             </div>
         </div>
     </div>
