@@ -64,7 +64,9 @@ class LlmsTxtGenerator {
 	 */
 	public function register_routes(): void {
 		// Check if llms.txt is enabled.
-		if ( ! get_option( 'wpmind_llms_txt_enabled', true ) ) {
+		// Support both legacy boolean and new string format.
+		$enabled = get_option( 'wpmind_llms_txt_enabled', '1' );
+		if ( $enabled !== '1' && $enabled !== true && $enabled !== 1 ) {
 			return;
 		}
 

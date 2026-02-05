@@ -253,6 +253,9 @@ class ModuleLoader {
 		update_option( "wpmind_module_{$module_id}_enabled", '1', false );
 		$this->modules[ $module_id ]['enabled'] = true;
 
+		// Flush rewrite rules to register module routes.
+		flush_rewrite_rules();
+
 		/**
 		 * Fires when a module is enabled.
 		 *
@@ -282,6 +285,9 @@ class ModuleLoader {
 		// WordPress update_option() can behave inconsistently with boolean false.
 		update_option( "wpmind_module_{$module_id}_enabled", '0', false );
 		$this->modules[ $module_id ]['enabled'] = false;
+
+		// Flush rewrite rules to remove module routes.
+		flush_rewrite_rules();
 
 		/**
 		 * Fires when a module is disabled.
