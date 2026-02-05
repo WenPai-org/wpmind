@@ -4,7 +4,7 @@
  *
  * Enhances official AI Experiments Markdown Feeds output with GEO signals.
  *
- * @package WPMind\GEO
+ * @package WPMind\Modules\Geo
  * @since 3.0.0
  */
 

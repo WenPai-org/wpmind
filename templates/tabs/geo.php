@@ -31,7 +31,7 @@ $schema_mode       = get_option( 'wpmind_schema_mode', 'auto' );
 $official_installed = class_exists( 'AI_Experiments\\Experiments\\Markdown_Feeds' );
 
 // 获取爬虫统计
-$crawler_tracker = new \WPMind\GEO\CrawlerTracker();
+$crawler_tracker = new \WPMind\Modules\Geo\CrawlerTracker();
 $crawler_stats   = $crawler_tracker->get_stats();
 $ai_summary      = $crawler_tracker->get_ai_summary();
 ?>
