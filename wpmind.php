@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-    define( 'WPMIND_VERSION', '3.2.0' );
+    define( 'WPMIND_VERSION', '3.2.1' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
     define( 'WPMIND_PLUGIN_FILE', __FILE__ );
@@ -408,10 +408,24 @@ final class WPMind {
             WPMIND_VERSION
         );
 
-        // Chart.js 图表库
+        // Chart.js 图表库（优先本地，其次 CDN）
+        $chartjs_sources = [];
+        $chartjs_local = WPMIND_PLUGIN_DIR . 'assets/vendor/chartjs/chart.umd.min.js';
+
+        if ( file_exists( $chartjs_local ) ) {
+            $chartjs_sources[] = WPMIND_PLUGIN_URL . 'assets/vendor/chartjs/chart.umd.min.js';
+        }
+
+        $chartjs_sources[] = 'https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js';
+        $chartjs_sources[] = 'https://unpkg.com/chart.js@4.5.0/dist/chart.umd.min.js';
+        $chartjs_sources[] = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js';
+
+        $chartjs_sources = array_values( array_unique( $chartjs_sources ) );
+        $chartjs_src = $chartjs_sources[0];
+
         wp_enqueue_script(
             'chartjs',
-            'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js',
+            $chartjs_src,
             [],
             '4.5.0',
             true
@@ -438,8 +452,9 @@ final class WPMind {
 
         // 为 AJAX 添加数据
         wp_localize_script( 'wpmind-admin', 'wpmindData', [
-            'nonce'  => wp_create_nonce( 'wpmind_ajax' ),
-            'ajaxurl' => admin_url( 'admin-ajax.php' ),
+            'nonce'            => wp_create_nonce( 'wpmind_ajax' ),
+            'ajaxurl'          => admin_url( 'admin-ajax.php' ),
+            'chartjsFallbacks' => array_slice( $chartjs_sources, 1 ),
         ] );
     }
 
