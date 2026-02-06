@@ -19,6 +19,124 @@
     }
 
     /**
+     * Chart.js 载入（带 fallback）
+     */
+    var chartJsCallbacks = [];
+
+    function runChartJsCallbacks() {
+        while (chartJsCallbacks.length) {
+            var callback = chartJsCallbacks.shift();
+            if (typeof callback === 'function') {
+                callback();
+            }
+        }
+    }
+
+    function ensureChartJs(callback) {
+        if (typeof callback === 'function') {
+            chartJsCallbacks.push(callback);
+        }
+
+        if (typeof Chart !== 'undefined') {
+            runChartJsCallbacks();
+            return;
+        }
+
+        if (window.wpmindChartJsLoading) {
+            return;
+        }
+
+        window.wpmindChartJsLoading = true;
+
+        var fallbacks = [];
+        if (typeof wpmindData !== 'undefined') {
+            if (Array.isArray(wpmindData.chartjsFallbacks)) {
+                fallbacks = wpmindData.chartjsFallbacks.slice(0);
+            } else if (typeof wpmindData.chartjsFallback === 'string') {
+                fallbacks = [wpmindData.chartjsFallback];
+            }
+        }
+
+        if (!fallbacks.length) {
+            fallbacks = [
+                'https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js',
+                'https://unpkg.com/chart.js@4.5.0/dist/chart.umd.min.js'
+            ];
+        }
+
+        var index = 0;
+
+        function loadNext() {
+            if (index >= fallbacks.length) {
+                window.wpmindChartJsLoading = false;
+                chartJsCallbacks.length = 0;
+                if (typeof Toast !== 'undefined') {
+                    Toast.error('Chart.js 加载失败，请检查网络或改用本地资源');
+                }
+                console.warn('WPMind: Chart.js failed to load');
+                return;
+            }
+
+            var src = fallbacks[index++];
+            var script = document.createElement('script');
+            script.src = src;
+            script.async = true;
+            script.defer = true;
+            script.setAttribute('data-wpmind-chartjs-fallback', '1');
+
+            script.onload = function () {
+                if (typeof Chart !== 'undefined') {
+                    window.wpmindChartJsLoading = false;
+                    runChartJsCallbacks();
+                } else {
+                    if (script.parentNode) {
+                        script.parentNode.removeChild(script);
+                    }
+                    loadNext();
+                }
+            };
+
+            script.onerror = function () {
+                if (script.parentNode) {
+                    script.parentNode.removeChild(script);
+                }
+                loadNext();
+            };
+
+            document.head.appendChild(script);
+        }
+
+        loadNext();
+    }
+
+    /**
+     * Tab id 校验
+     */
+    function resolveTabId(tabId, $tabs) {
+        var safeId = typeof tabId === 'string' ? tabId.trim() : '';
+
+        if (!/^[A-Za-z0-9_-]+$/.test(safeId)) {
+            safeId = '';
+        }
+
+        if (safeId && document.getElementById(safeId)) {
+            return safeId;
+        }
+
+        var activeId = $tabs.filter('.wpmind-tab-active').first().data('tab');
+        if (activeId && document.getElementById(activeId)) {
+            return activeId;
+        }
+
+        var firstId = $tabs.first().data('tab');
+        if (firstId && document.getElementById(firstId)) {
+            return firstId;
+        }
+
+        return '';
+    }
+
+    /**
      * Tab 导航管理
      */
     function initTabs() {
@@ -28,35 +146,47 @@
         if (!$tabs.length) return;
 
         // 从 URL hash 恢复 Tab 状态
-        var hash = window.location.hash.slice(1) || 'dashboard';
-        switchTab(hash);
+        var hash = window.location.hash ? window.location.hash.slice(1) : '';
+        var initialTab = resolveTabId(hash, $tabs);
+        if (initialTab) {
+            switchTab(initialTab);
+        }
 
         // Tab 点击事件
         $tabs.on('click', function (e) {
             e.preventDefault();
-            var tabId = $(this).data('tab');
+            var tabId = resolveTabId($(this).data('tab'), $tabs);
+            if (!tabId) return;
             switchTab(tabId);
-            history.replaceState(null, null, '#' + tabId);
+            if (history && typeof history.replaceState === 'function') {
+                history.replaceState(null, null, '#' + tabId);
+            }
         });
 
         function switchTab(tabId) {
             // 验证 tabId 是否有效
-            if (!$('#' + tabId).length) {
-                tabId = 'dashboard';
+            var pane = document.getElementById(tabId);
+            if (!pane) {
+                tabId = resolveTabId('', $tabs);
+                if (!tabId) return;
+                pane = document.getElementById(tabId);
             }
 
             $tabs.removeClass('wpmind-tab-active');
             $tabs.filter('[data-tab="' + tabId + '"]').addClass('wpmind-tab-active');
 
             $panes.removeClass('wpmind-tab-pane-active');
-            $('#' + tabId).addClass('wpmind-tab-pane-active');
+            $(pane).addClass('wpmind-tab-pane-active');
 
             // 懒加载图表（仅在首次切换到仪表板时）
             if (tabId === 'dashboard' && !window.wpmindChartsLoaded) {
                 if (typeof AnalyticsCharts !== 'undefined') {
-                    AnalyticsCharts.init();
+                    ensureChartJs(function () {
+                        if (AnalyticsCharts.init()) {
+                            window.wpmindChartsLoaded = true;
+                        }
+                    });
                 }
-                window.wpmindChartsLoaded = true;
             }
         }
     }
@@ -1021,11 +1151,12 @@
         },
 
         init: function () {
-            if (!$('#wpmind-usage-trend-chart').length) return;
-            if (typeof Chart === 'undefined') return;
+            if (!$('#wpmind-usage-trend-chart').length) return false;
+            if (typeof Chart === 'undefined') return false;
 
             this.loadData();
             this.bindEvents();
+            return true;
         },
 
         bindEvents: function () {
@@ -1782,9 +1913,12 @@
         GeoManager.init();
 
         // 图表懒加载：只在仪表板 Tab 激活时初始化
-        if ($('#dashboard').hasClass('active')) {
-            AnalyticsCharts.init();
-            window.wpmindChartsLoaded = true;
+        if ($('#dashboard').hasClass('wpmind-tab-pane-active')) {
+            ensureChartJs(function () {
+                if (AnalyticsCharts.init()) {
+                    window.wpmindChartsLoaded = true;
+                }
+            });
         }
     });
 
