@@ -40,7 +40,7 @@ $budget_summary = $budget_checker->get_summary();
 // 获取用量统计
 $today_stats = UsageTracker::get_today_stats();
 $month_stats = UsageTracker::get_month_stats();
-$total_stats = UsageTracker::getStats();
+$total_stats = UsageTracker::get_stats();
 
 // 安全获取数组值的辅助函数
 $get_value = function( $array, $key, $default = 0 ) {
@@ -69,7 +69,7 @@ $get_value = function( $array, $key, $default = 0 ) {
             </div>
             <div class="wpmind-stat-content">
                 <span class="wpmind-stat-value">
-                    <?php echo esc_html( UsageTracker::formatCostByCurrency(
+                    <?php echo esc_html( UsageTracker::format_cost_by_currency(
                         $get_value( $today_stats, 'cost_usd', 0 ),
                         $get_value( $today_stats, 'cost_cny', 0 )
                     ) ); ?>
@@ -83,7 +83,7 @@ $get_value = function( $array, $key, $default = 0 ) {
             </div>
             <div class="wpmind-stat-content">
                 <span class="wpmind-stat-value">
-                    <?php echo esc_html( UsageTracker::formatCostByCurrency(
+                    <?php echo esc_html( UsageTracker::format_cost_by_currency(
                         $get_value( $month_stats, 'cost_usd', 0 ),
                         $get_value( $month_stats, 'cost_cny', 0 )
                     ) ); ?>
@@ -108,7 +108,7 @@ $get_value = function( $array, $key, $default = 0 ) {
             </div>
             <div class="wpmind-stat-content">
                 <span class="wpmind-stat-value">
-                    <?php echo esc_html( UsageTracker::formatTokens(
+                    <?php echo esc_html( UsageTracker::format_tokens(
                         $get_value( $today_stats, 'input_tokens', 0 ) + $get_value( $today_stats, 'output_tokens', 0 )
                     ) ); ?>
                 </span>
@@ -284,10 +284,10 @@ $get_value = function( $array, $key, $default = 0 ) {
                             <span class="wpmind-provider-name"><?php echo esc_html( UsageTracker::get_provider_display_name( $provider ) ); ?></span>
                         </div>
                         <div class="wpmind-provider-stats">
-                            <span class="wpmind-provider-cost"><?php echo esc_html( UsageTracker::formatCost( $total_cost, $currency ) ); ?></span>
+                            <span class="wpmind-provider-cost"><?php echo esc_html( UsageTracker::format_cost( $total_cost, $currency ) ); ?></span>
                             <span class="wpmind-provider-meta">
                                 <?php echo esc_html( number_format( $request_count ) ); ?> <?php esc_html_e( '请求', 'wpmind' ); ?> /
-                                <?php echo esc_html( UsageTracker::formatTokens( $total_tokens ) ); ?> tokens
+                                <?php echo esc_html( UsageTracker::format_tokens( $total_tokens ) ); ?> tokens
                             </span>
                         </div>
                     </div>

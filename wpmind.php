@@ -1252,10 +1252,10 @@ final class WPMind {
             wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
         }
 
-        $stats = Usage\UsageTracker::getStats();
+        $stats = Usage\UsageTracker::get_stats();
         $today = Usage\UsageTracker::get_today_stats();
         $month = Usage\UsageTracker::get_month_stats();
-        $history = Usage\UsageTracker::getHistory( 20 );
+        $history = Usage\UsageTracker::get_history( 20 );
 
         wp_send_json_success( [
             'stats'   => $stats,

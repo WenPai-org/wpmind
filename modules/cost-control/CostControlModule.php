@@ -254,7 +254,7 @@ class CostControlModule implements ModuleInterface {
 		$checker = BudgetChecker::instance();
 		$summary = $checker->get_summary();
 
-		$stats = UsageTracker::getStats();
+		$stats = UsageTracker::get_stats();
 		$today = UsageTracker::get_today_stats();
 		$month = UsageTracker::get_month_stats();
 
