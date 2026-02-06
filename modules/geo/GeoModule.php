@@ -179,7 +179,7 @@ class GeoModule implements ModuleInterface {
 			wp_send_json_error( array( 'message' => __( '权限不足', 'wpmind' ) ) );
 		}
 
-		$settings = $_POST['settings'] ?? array();
+		$settings = isset( $_POST['settings'] ) ? wp_unslash( $_POST['settings'] ) : array();
 
 		// Sanitize and save settings.
 		// Use string '1'/'0' instead of boolean for reliable storage.

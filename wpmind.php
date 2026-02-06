@@ -3,7 +3,7 @@
  * Plugin Name: WPMind
  * Plugin URI: https://wpcy.com/mind
  * Description: 文派心思 - WordPress AI 自定义端点扩展，支持国内外多种 AI 服务
- * Version: 3.1.0
+ * Version: 3.2.0
  * Author: 文派心思
  * Author URI: https://wpcy.com/mind
  * License: GPL-2.0-or-later
@@ -316,7 +316,7 @@ final class WPMind {
         add_action( 'wp_ajax_wpmind_get_provider_status', [ $this, 'ajax_get_provider_status' ] );
         add_action( 'wp_ajax_wpmind_reset_circuit_breaker', [ $this, 'ajax_reset_circuit_breaker' ] );
         add_action( 'wp_ajax_wpmind_get_usage_stats', [ $this, 'ajax_get_usage_stats' ] );
-        add_action( 'wp_ajax_wpmind_clear_usage_stats', [ $this, 'ajax_clear_usage_stats' ] );
+        // wpmind_clear_usage_stats is now handled by CostControlModule.
         add_action( 'wp_ajax_wpmind_save_budget_settings', [ $this, 'ajax_save_budget_settings' ] );
         add_action( 'wp_ajax_wpmind_get_budget_status', [ $this, 'ajax_get_budget_status' ] );
         add_action( 'wp_ajax_wpmind_get_analytics_data', [ $this, 'ajax_get_analytics_data' ] );
@@ -1344,7 +1344,7 @@ final class WPMind {
         }
 
         // 解析 JSON 数据
-        $json_input = isset( $_POST['settings'] ) ? stripslashes( $_POST['settings'] ) : '';
+        $json_input = isset( $_POST['settings'] ) ? wp_unslash( $_POST['settings'] ) : '';
         $input = json_decode( $json_input, true );
 
         if ( ! is_array( $input ) ) {
@@ -1525,14 +1525,6 @@ final class WPMind {
     }
 
     /**
-     * AJAX 保存 GEO 设置
-     *
-     * @since 3.0.0
-     */
-    /**
-     * AJAX: 保存 GEO 设置
-     *
-    /**
      * AJAX 路由请求（获取推荐 Provider）
      *
      * @since 1.9.0
@@ -1575,7 +1567,7 @@ final class WPMind {
     public function plugin_action_links( array $links ): array {
         $settings_link = sprintf(
             '<a href="%s">%s</a>',
-            esc_url( admin_url( 'options-general.php?page=wpmind' ) ),
+            esc_url( admin_url( 'admin.php?page=wpmind' ) ),
             esc_html__( '设置', 'wpmind' )
         );
         array_unshift( $links, $settings_link );
