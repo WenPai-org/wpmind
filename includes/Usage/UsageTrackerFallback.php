@@ -318,6 +318,35 @@ class UsageTracker
         ];
     }
 
+    public static function getWeekStats(): array
+    {
+        $stats = self::getStats();
+        $daily = $stats['daily'] ?? [];
+
+        $weekStart = wp_date('Y-m-d', strtotime('monday this week'));
+        $today = wp_date('Y-m-d');
+
+        $result = [
+            'input_tokens' => 0,
+            'output_tokens' => 0,
+            'cost_usd' => 0,
+            'cost_cny' => 0,
+            'requests' => 0,
+        ];
+
+        foreach ($daily as $date => $dayStats) {
+            if ($date >= $weekStart && $date <= $today) {
+                $result['input_tokens'] += $dayStats['input_tokens'] ?? 0;
+                $result['output_tokens'] += $dayStats['output_tokens'] ?? 0;
+                $result['cost_usd'] += $dayStats['cost_usd'] ?? 0;
+                $result['cost_cny'] += $dayStats['cost_cny'] ?? 0;
+                $result['requests'] += $dayStats['requests'] ?? 0;
+            }
+        }
+
+        return $result;
+    }
+
     public static function getHistory(int $limit = 50): array
     {
         $history = get_option(self::HISTORY_KEY, []);
