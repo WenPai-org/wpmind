@@ -87,6 +87,36 @@ class AnalyticsModule implements ModuleInterface
     }
 
     /**
+     * 检查模块依赖是否满足
+     */
+    public function check_dependencies(): bool
+    {
+        $requires = $this->get_dependencies();
+
+        if (empty($requires)) {
+            return true;
+        }
+
+        $module_loader = \WPMind\Core\ModuleLoader::instance();
+
+        foreach ($requires as $required_module) {
+            if (!$module_loader->is_module_enabled($required_module)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * 获取设置标签页
+     */
+    public function get_settings_tab(): ?string
+    {
+        return $this->config['settings_tab'] ?? 'dashboard';
+    }
+
+    /**
      * 初始化模块
      */
     public function init(): void
