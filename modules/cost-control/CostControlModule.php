@@ -162,7 +162,7 @@ class CostControlModule implements ModuleInterface {
 		UsageTracker::record( $provider, $model, $input_tokens, $output_tokens, $latency_ms );
 
 		// Check budget and send alerts.
-		BudgetAlert::instance()->checkAndAlert();
+		BudgetAlert::instance()->check_and_alert();
 
 		/**
 		 * Fires after usage has been recorded by the Cost Control module.
@@ -232,7 +232,7 @@ class CostControlModule implements ModuleInterface {
 		}
 
 		$manager = BudgetManager::instance();
-		$result = $manager->saveSettings( $settings );
+		$result = $manager->save_settings( $settings );
 
 		if ( $result ) {
 			wp_send_json_success( array( 'message' => __( '设置已保存', 'wpmind' ) ) );
@@ -252,11 +252,11 @@ class CostControlModule implements ModuleInterface {
 		}
 
 		$checker = BudgetChecker::instance();
-		$summary = $checker->getSummary();
+		$summary = $checker->get_summary();
 
 		$stats = UsageTracker::getStats();
-		$today = UsageTracker::getTodayStats();
-		$month = UsageTracker::getMonthStats();
+		$today = UsageTracker::get_today_stats();
+		$month = UsageTracker::get_month_stats();
 
 		wp_send_json_success( array(
 			'budget'  => $summary,

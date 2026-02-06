@@ -186,8 +186,8 @@ class PublicAPI {
         $month_tokens = 0;
 
         if (class_exists('\\WPMind\\Usage\\UsageTracker')) {
-            $today_stats = \WPMind\Usage\UsageTracker::getTodayStats();
-            $month_stats = \WPMind\Usage\UsageTracker::getMonthStats();
+            $today_stats = \WPMind\Usage\UsageTracker::get_today_stats();
+            $month_stats = \WPMind\Usage\UsageTracker::get_month_stats();
             $today_tokens = $today_stats['total_tokens'] ?? 0;
             $month_tokens = $month_stats['total_tokens'] ?? 0;
         }
@@ -293,7 +293,7 @@ class PublicAPI {
         $failover_chain = [$provider];
         if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
             $failover = \WPMind\Failover\FailoverManager::instance();
-            $failover_chain = $failover->getFailoverChain($provider);
+            $failover_chain = $failover->get_failover_chain($provider);
 
             // 如果首选 Provider 不可用，记录日志
             if (!empty($failover_chain) && $failover_chain[0] !== $provider) {
@@ -1514,7 +1514,7 @@ class PublicAPI {
         if (is_wp_error($response)) {
             // 记录失败
             if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
-                \WPMind\Failover\FailoverManager::instance()->recordResult($provider, false, $latency_ms);
+                \WPMind\Failover\FailoverManager::instance()->record_result($provider, false, $latency_ms);
             }
 
             return new WP_Error(
@@ -1531,7 +1531,7 @@ class PublicAPI {
         if ($status_code !== 200) {
             // 记录失败
             if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
-                \WPMind\Failover\FailoverManager::instance()->recordResult($provider, false, $latency_ms);
+                \WPMind\Failover\FailoverManager::instance()->record_result($provider, false, $latency_ms);
             }
 
             $error_message = $data['error']['message'] ?? __('未知错误', 'wpmind');
@@ -1544,7 +1544,7 @@ class PublicAPI {
 
         // 记录成功
         if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
-            \WPMind\Failover\FailoverManager::instance()->recordResult($provider, true, $latency_ms);
+            \WPMind\Failover\FailoverManager::instance()->record_result($provider, true, $latency_ms);
         }
 
         // 解析响应

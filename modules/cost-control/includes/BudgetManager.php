@@ -53,7 +53,7 @@ class BudgetManager
     /**
      * 获取默认预算配置
      */
-    public function getDefaults(): array
+    public function get_defaults(): array
     {
         return [
             'enabled' => false,
@@ -124,7 +124,7 @@ class BudgetManager
     /**
      * 获取预算配置
      */
-    public function getSettings(): array
+    public function get_settings(): array
     {
         if (null === $this->settings) {
             $saved = get_option(self::OPTION_KEY, []);
@@ -132,7 +132,7 @@ class BudgetManager
                 $saved = [];
             }
             // 使用 recursiveMerge 替代 wp_parse_args
-            $this->settings = $this->recursiveMerge($saved, $this->getDefaults());
+            $this->settings = $this->recursiveMerge($saved, $this->get_defaults());
         }
         return $this->settings;
     }
@@ -140,7 +140,7 @@ class BudgetManager
     /**
      * 保存预算配置
      */
-    public function saveSettings(array $settings): bool
+    public function save_settings(array $settings): bool
     {
         $sanitized = $this->sanitizeSettings($settings);
         $result = update_option(self::OPTION_KEY, $sanitized, false);
@@ -153,7 +153,7 @@ class BudgetManager
      */
     private function sanitizeSettings(array $input): array
     {
-        $defaults = $this->getDefaults();
+        $defaults = $this->get_defaults();
         $sanitized = [];
 
         // 启用状态
@@ -225,63 +225,63 @@ class BudgetManager
     /**
      * 检查预算功能是否启用
      */
-    public function isEnabled(): bool
+    public function is_enabled(): bool
     {
-        $settings = $this->getSettings();
+        $settings = $this->get_settings();
         return !empty($settings['enabled']);
     }
 
     /**
      * 获取全局预算设置
      */
-    public function getGlobalBudget(): array
+    public function get_global_budget(): array
     {
-        $settings = $this->getSettings();
-        return $settings['global'] ?? $this->getDefaults()['global'];
+        $settings = $this->get_settings();
+        return $settings['global'] ?? $this->get_defaults()['global'];
     }
 
     /**
      * 获取服务商预算设置
      */
-    public function getProviderBudget(string $provider): ?array
+    public function get_provider_budget(string $provider): ?array
     {
-        $settings = $this->getSettings();
+        $settings = $this->get_settings();
         return $settings['providers'][$provider] ?? null;
     }
 
     /**
      * 获取通知设置
      */
-    public function getNotificationSettings(): array
+    public function get_notification_settings(): array
     {
-        $settings = $this->getSettings();
-        return $settings['notifications'] ?? $this->getDefaults()['notifications'];
+        $settings = $this->get_settings();
+        return $settings['notifications'] ?? $this->get_defaults()['notifications'];
     }
 
     /**
      * 获取强制模式
      */
-    public function getEnforcementMode(): string
+    public function get_enforcement_mode(): string
     {
-        $settings = $this->getSettings();
+        $settings = $this->get_settings();
         return $settings['enforcement_mode'] ?? self::MODE_ALERT;
     }
 
     /**
      * 获取告警阈值
      */
-    public function getAlertThreshold(): int
+    public function get_alert_threshold(): int
     {
-        $global = $this->getGlobalBudget();
+        $global = $this->get_global_budget();
         return $global['alert_threshold'] ?? 80;
     }
 
     /**
      * 检查是否有任何限额设置
      */
-    public function hasAnyLimits(): bool
+    public function has_any_limits(): bool
     {
-        $global = $this->getGlobalBudget();
+        $global = $this->get_global_budget();
 
         if (($global['daily_limit_usd'] ?? 0) > 0 || ($global['daily_limit_cny'] ?? 0) > 0) {
             return true;
@@ -290,14 +290,14 @@ class BudgetManager
             return true;
         }
 
-        $settings = $this->getSettings();
+        $settings = $this->get_settings();
         return !empty($settings['providers']);
     }
 
     /**
      * 获取强制模式的显示名称
      */
-    public static function getModeLabel(string $mode): string
+    public static function get_mode_label(string $mode): string
     {
         $labels = [
             self::MODE_ALERT    => __('仅告警', 'wpmind'),
@@ -310,7 +310,7 @@ class BudgetManager
     /**
      * 获取所有强制模式选项
      */
-    public static function getModeOptions(): array
+    public static function get_mode_options(): array
     {
         return [
             self::MODE_ALERT    => __('仅告警 - 超限时发送通知，不阻止请求', 'wpmind'),

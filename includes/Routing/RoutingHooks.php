@@ -58,11 +58,11 @@ class RoutingHooks
         // 只有启用时才注册过滤器
         if ($this->enabled) {
             // 优先级 10，允许其他插件在之前或之后修改
-            add_filter('wpmind_select_provider', [$this, 'selectProvider'], 10, 2);
+            add_filter('wpmind_select_provider', [$this, 'select_provider'], 10, 2);
         }
 
         // 注册设置变更钩子
-        add_action('update_option_wpmind_routing_settings', [$this, 'onSettingsUpdate'], 10, 2);
+        add_action('update_option_wpmind_routing_settings', [$this, 'on_settings_update'], 10, 2);
     }
 
     /**
@@ -72,7 +72,7 @@ class RoutingHooks
      * @param string $context  请求上下文标识
      * @return string 选择的 Provider ID
      */
-    public function selectProvider(string $provider, string $context): string
+    public function select_provider(string $provider, string $context): string
     {
         // 如果明确指定了 Provider（非 auto），尊重用户选择
         if ($provider !== 'auto' && !empty($provider)) {
@@ -99,7 +99,7 @@ class RoutingHooks
 
         if ($selected !== null) {
             // 记录路由决策
-            do_action('wpmind_routing_decision', $selected, $router->getCurrentStrategy(), $context);
+            do_action('wpmind_routing_decision', $selected, $router->get_current_strategy(), $context);
             return $selected;
         }
 
@@ -120,18 +120,18 @@ class RoutingHooks
 
         // 设置首选 Provider
         if ($preferredProvider !== null && $preferredProvider !== 'auto') {
-            $routingContext->withPreferredProvider($preferredProvider);
+            $routingContext->with_preferred_provider($preferredProvider);
         }
 
         // 根据上下文设置模型类型
         $modelType = $this->inferModelType($context);
         if ($modelType !== null) {
-            $routingContext->withModelType($modelType);
+            $routingContext->with_model_type($modelType);
         }
 
         // 添加上下文元数据
-        $routingContext->withMetadata('context', $context);
-        $routingContext->withMetadata('timestamp', time());
+        $routingContext->with_metadata('context', $context);
+        $routingContext->with_metadata('timestamp', time());
 
         return $routingContext;
     }
@@ -169,7 +169,7 @@ class RoutingHooks
      * @param mixed $old_value 旧值
      * @param mixed $new_value 新值
      */
-    public function onSettingsUpdate($old_value, $new_value): void
+    public function on_settings_update($old_value, $new_value): void
     {
         // 刷新路由器
         IntelligentRouter::instance()->refresh();
@@ -181,7 +181,7 @@ class RoutingHooks
     /**
      * 检查智能路由是否启用
      */
-    public function isEnabled(): bool
+    public function is_enabled(): bool
     {
         return $this->enabled;
     }
@@ -197,8 +197,8 @@ class RoutingHooks
         update_option('wpmind_routing_settings', $settings);
 
         // 重新注册过滤器
-        if (!has_filter('wpmind_select_provider', [$this, 'selectProvider'])) {
-            add_filter('wpmind_select_provider', [$this, 'selectProvider'], 10, 2);
+        if (!has_filter('wpmind_select_provider', [$this, 'select_provider'])) {
+            add_filter('wpmind_select_provider', [$this, 'select_provider'], 10, 2);
         }
     }
 
@@ -213,6 +213,6 @@ class RoutingHooks
         update_option('wpmind_routing_settings', $settings);
 
         // 移除过滤器
-        remove_filter('wpmind_select_provider', [$this, 'selectProvider'], 10);
+        remove_filter('wpmind_select_provider', [$this, 'select_provider'], 10);
     }
 }

@@ -33,13 +33,13 @@ use WPMind\Modules\CostControl\UsageTracker;
 
 // 获取预算设置
 $budget_manager = BudgetManager::instance();
-$budget_settings = $budget_manager->getSettings();
+$budget_settings = $budget_manager->get_settings();
 $budget_checker = BudgetChecker::instance();
-$budget_summary = $budget_checker->getSummary();
+$budget_summary = $budget_checker->get_summary();
 
 // 获取用量统计
-$today_stats = UsageTracker::getTodayStats();
-$month_stats = UsageTracker::getMonthStats();
+$today_stats = UsageTracker::get_today_stats();
+$month_stats = UsageTracker::get_month_stats();
 $total_stats = UsageTracker::getStats();
 
 // 安全获取数组值的辅助函数
@@ -280,8 +280,8 @@ $get_value = function( $array, $key, $default = 0 ) {
                     ?>
                     <div class="wpmind-provider-item">
                         <div class="wpmind-provider-info">
-                            <span class="wpmind-provider-icon <?php echo esc_attr( UsageTracker::getProviderIcon( $provider ) ); ?>"></span>
-                            <span class="wpmind-provider-name"><?php echo esc_html( UsageTracker::getProviderDisplayName( $provider ) ); ?></span>
+                            <span class="wpmind-provider-icon <?php echo esc_attr( UsageTracker::get_provider_icon( $provider ) ); ?>"></span>
+                            <span class="wpmind-provider-name"><?php echo esc_html( UsageTracker::get_provider_display_name( $provider ) ); ?></span>
                         </div>
                         <div class="wpmind-provider-stats">
                             <span class="wpmind-provider-cost"><?php echo esc_html( UsageTracker::formatCost( $total_cost, $currency ) ); ?></span>

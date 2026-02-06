@@ -52,7 +52,7 @@ class RoutingContext
     /**
      * 设置模型类型
      */
-    public function withModelType(string $type): self
+    public function with_model_type(string $type): self
     {
         $this->modelType = $type;
         return $this;
@@ -61,7 +61,7 @@ class RoutingContext
     /**
      * 设置预估 token 数
      */
-    public function withEstimatedTokens(int $input, int $output = 0): self
+    public function with_estimated_tokens(int $input, int $output = 0): self
     {
         $this->estimatedInputTokens = max(0, $input);
         $this->estimatedOutputTokens = max(0, $output);
@@ -71,7 +71,7 @@ class RoutingContext
     /**
      * 设置首选 Provider
      */
-    public function withPreferredProvider(?string $providerId): self
+    public function with_preferred_provider(?string $providerId): self
     {
         $this->preferredProvider = $providerId;
         return $this;
@@ -80,7 +80,7 @@ class RoutingContext
     /**
      * 添加排除的 Provider
      */
-    public function withExcludedProvider(string $providerId): self
+    public function with_excluded_provider(string $providerId): self
     {
         if (!in_array($providerId, $this->excludedProviders, true)) {
             $this->excludedProviders[] = $providerId;
@@ -91,7 +91,7 @@ class RoutingContext
     /**
      * 设置排除的 Provider 列表
      */
-    public function withExcludedProviders(array $providerIds): self
+    public function with_excluded_providers(array $providerIds): self
     {
         $this->excludedProviders = array_values(array_unique($providerIds));
         return $this;
@@ -100,7 +100,7 @@ class RoutingContext
     /**
      * 添加元数据
      */
-    public function withMetadata(string $key, mixed $value): self
+    public function with_metadata(string $key, mixed $value): self
     {
         $this->metadata[$key] = $value;
         return $this;
@@ -108,47 +108,47 @@ class RoutingContext
 
     // Getters
 
-    public function getModelType(): ?string
+    public function get_model_type(): ?string
     {
         return $this->modelType;
     }
 
-    public function getEstimatedInputTokens(): int
+    public function get_estimated_input_tokens(): int
     {
         return $this->estimatedInputTokens;
     }
 
-    public function getEstimatedOutputTokens(): int
+    public function get_estimated_output_tokens(): int
     {
         return $this->estimatedOutputTokens;
     }
 
-    public function getEstimatedTotalTokens(): int
+    public function get_estimated_total_tokens(): int
     {
         return $this->estimatedInputTokens + $this->estimatedOutputTokens;
     }
 
-    public function getPreferredProvider(): ?string
+    public function get_preferred_provider(): ?string
     {
         return $this->preferredProvider;
     }
 
-    public function getExcludedProviders(): array
+    public function get_excluded_providers(): array
     {
         return $this->excludedProviders;
     }
 
-    public function isExcluded(string $providerId): bool
+    public function is_excluded(string $providerId): bool
     {
         return in_array($providerId, $this->excludedProviders, true);
     }
 
-    public function getMetadata(string $key, mixed $default = null): mixed
+    public function get_metadata(string $key, mixed $default = null): mixed
     {
         return $this->metadata[$key] ?? $default;
     }
 
-    public function getAllMetadata(): array
+    public function get_all_metadata(): array
     {
         return $this->metadata;
     }
@@ -156,7 +156,7 @@ class RoutingContext
     /**
      * 获取 Provider 健康数据（带缓存）
      */
-    public function getHealthData(): array
+    public function get_health_data(): array
     {
         if ($this->healthData === null) {
             $this->healthData = ProviderHealthTracker::getAllHealth();
@@ -167,9 +167,9 @@ class RoutingContext
     /**
      * 获取指定 Provider 的健康分数（使用缓存）
      */
-    public function getHealthScore(string $providerId): int
+    public function get_health_score(string $providerId): int
     {
-        $healthData = $this->getHealthData();
+        $healthData = $this->get_health_data();
         if (!isset($healthData[$providerId]) || empty($healthData[$providerId]['history'])) {
             return 100;
         }
@@ -181,16 +181,16 @@ class RoutingContext
     /**
      * 获取指定 Provider 的平均延迟（使用缓存）
      */
-    public function getAverageLatency(string $providerId): int
+    public function get_average_latency(string $providerId): int
     {
-        $healthData = $this->getHealthData();
+        $healthData = $this->get_health_data();
         return $healthData[$providerId]['avg_latency'] ?? 0;
     }
 
     /**
      * 获取使用统计（带缓存）
      */
-    public function getUsageStats(): array
+    public function get_usage_stats(): array
     {
         if ($this->usageStats === null) {
             $this->usageStats = UsageTracker::getStats();
@@ -201,9 +201,9 @@ class RoutingContext
     /**
      * 获取指定 Provider 的使用统计
      */
-    public function getProviderUsageStats(string $providerId): array
+    public function get_provider_usage_stats(string $providerId): array
     {
-        $stats = $this->getUsageStats();
+        $stats = $this->get_usage_stats();
         return $stats['providers'][$providerId] ?? [
             'total_input_tokens' => 0,
             'total_output_tokens' => 0,
@@ -215,7 +215,7 @@ class RoutingContext
     /**
      * 计算指定 Provider 的预估成本
      */
-    public function estimateCost(string $providerId, string $model = 'default'): float
+    public function estimate_cost(string $providerId, string $model = 'default'): float
     {
         return UsageTracker::calculateCost(
             $providerId,
