@@ -1,5 +1,16 @@
 # WPMind 更新日志
 
+## [3.3.0] - 2026-02-07
+
+### 🔧 编码规范化 (Phase 1 完成)
+- **方法名 camelCase → snake_case**: 39 文件全量重命名，符合 WordPress PHP 编码规范
+- 涉及模块: Routing、Failover、Budget、Analytics、Usage、ErrorHandler、API
+- 兼容层 (`__callStatic` 代理) 同步更新
+- 模板文件静态调用同步更新
+- 外部库接口方法 (Providers/Image) 保持不变
+
+---
+
 ## [3.2.1] - 2026-02-06
 
 ### 🔒 全面审查修复 (18 个问题)
