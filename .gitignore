@@ -9,11 +9,15 @@ Thumbs.db
 
 # Dependencies
 node_modules/
-vendor/
+/vendor/
 
 # Build
 *.min.js
 *.min.css
+
+# But keep vendored JS libraries
+!assets/js/vendor/
+!assets/js/vendor/**
 
 # Logs
 *.log
