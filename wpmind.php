@@ -3,7 +3,7 @@
  * Plugin Name: WPMind
  * Plugin URI: https://wpcy.com/mind
  * Description: 文派心思 - WordPress AI 自定义端点扩展，支持国内外多种 AI 服务
- * Version: 3.2.2
+ * Version: 3.2.3
  * Author: 文派心思
  * Author URI: https://wpcy.com/mind
  * License: GPL-2.0-or-later
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-    define( 'WPMIND_VERSION', '3.2.2' );
+    define( 'WPMIND_VERSION', '3.2.3' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
     define( 'WPMIND_PLUGIN_FILE', __FILE__ );
@@ -367,10 +367,17 @@ final class WPMind {
      * @since 1.1.0
      */
     public function enqueue_admin_assets( string $hook_suffix ): void {
-        // 一级菜单的 hook suffix 是 toplevel_page_{menu_slug}
-        if ( 'toplevel_page_wpmind' !== $hook_suffix ) {
+        // 一级菜单的 hook suffix 是 toplevel_page_{menu_slug}，但部分环境可能不同。
+        $is_wpmind_page = isset( $_GET['page'] ) && 'wpmind' === $_GET['page'];
+        if ( 'toplevel_page_wpmind' !== $hook_suffix && ! $is_wpmind_page ) {
             return;
         }
+
+        $admin_css_version = $this->get_asset_version( 'assets/css/admin.css' );
+        $panels_css_version = $this->get_asset_version( 'assets/css/panels.css' );
+        $routing_css_version = $this->get_asset_version( 'assets/css/pages/routing.css' );
+        $responsive_css_version = $this->get_asset_version( 'assets/css/responsive.css' );
+        $admin_js_version = $this->get_asset_version( 'assets/js/admin.js' );
 
         // Remixicon 图标库
         wp_enqueue_style(
@@ -384,28 +391,28 @@ final class WPMind {
             'wpmind-admin',
             WPMIND_PLUGIN_URL . 'assets/css/admin.css',
             [ 'remixicon' ],
-            WPMIND_VERSION
+            $admin_css_version
         );
 
         wp_enqueue_style(
             'wpmind-panels',
             WPMIND_PLUGIN_URL . 'assets/css/panels.css',
             [ 'wpmind-admin' ],
-            WPMIND_VERSION
+            $panels_css_version
         );
 
         wp_enqueue_style(
             'wpmind-routing',
             WPMIND_PLUGIN_URL . 'assets/css/pages/routing.css',
             [ 'wpmind-panels' ],
-            WPMIND_VERSION
+            $routing_css_version
         );
 
         wp_enqueue_style(
             'wpmind-responsive',
             WPMIND_PLUGIN_URL . 'assets/css/responsive.css',
             [ 'wpmind-panels', 'wpmind-routing' ],
-            WPMIND_VERSION
+            $responsive_css_version
         );
 
         // Chart.js 图表库（优先本地，其次 CDN）
@@ -435,7 +442,7 @@ final class WPMind {
             'wpmind-admin',
             WPMIND_PLUGIN_URL . 'assets/js/admin.js',
             [ 'jquery', 'jquery-ui-sortable' ],
-            WPMIND_VERSION,
+            $admin_js_version,
             true
         );
 
@@ -456,6 +463,21 @@ final class WPMind {
             'ajaxurl'          => admin_url( 'admin-ajax.php' ),
             'chartjsFallbacks' => array_slice( $chartjs_sources, 1 ),
         ] );
+    }
+
+    /**
+     * 获取资源版本（用于缓存刷新）
+     *
+     * @param string $relative_path 相对插件根目录路径
+     * @return string
+     */
+    private function get_asset_version( string $relative_path ): string {
+        $path = WPMIND_PLUGIN_DIR . ltrim( $relative_path, '/' );
+        if ( file_exists( $path ) ) {
+            return WPMIND_VERSION . '.' . filemtime( $path );
+        }
+
+        return WPMIND_VERSION;
     }
 
     /**
