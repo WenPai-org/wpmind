@@ -27,7 +27,7 @@ class ProviderHealthTracker
      */
     public static function record(string $providerId, bool $success, int $latencyMs = 0): void
     {
-        $health = self::get_all_health();
+        $health = self::getAllHealth();
 
         if (!isset($health[$providerId])) {
             $health[$providerId] = [
@@ -87,9 +87,9 @@ class ProviderHealthTracker
      * @param string $providerId Provider ID
      * @return int 健康分数
      */
-    public static function get_health_score(string $providerId): int
+    public static function getHealthScore(string $providerId): int
     {
-        $health = self::get_all_health();
+        $health = self::getAllHealth();
 
         if (!isset($health[$providerId]) || empty($health[$providerId]['history'])) {
             return 100;
@@ -108,9 +108,9 @@ class ProviderHealthTracker
      * @param string $providerId Provider ID
      * @return int 平均延迟（毫秒）
      */
-    public static function get_average_latency(string $providerId): int
+    public static function getAverageLatency(string $providerId): int
     {
-        $health = self::get_all_health();
+        $health = self::getAllHealth();
         return $health[$providerId]['avg_latency'] ?? 0;
     }
 
@@ -120,9 +120,9 @@ class ProviderHealthTracker
      * @param string $providerId Provider ID
      * @return array 状态详情
      */
-    public static function get_provider_status(string $providerId): array
+    public static function getProviderStatus(string $providerId): array
     {
-        $health = self::get_all_health();
+        $health = self::getAllHealth();
 
         if (!isset($health[$providerId])) {
             return [
@@ -139,7 +139,7 @@ class ProviderHealthTracker
         $successes = count(array_filter($provider['history'], fn($h) => $h['success']));
 
         return [
-            'health_score' => self::get_health_score($providerId),
+            'health_score' => self::getHealthScore($providerId),
             'avg_latency'  => $provider['avg_latency'] ?? 0,
             'total'        => $provider['total'] ?? 0,
             'failures'     => $provider['failures'] ?? 0,
@@ -153,7 +153,7 @@ class ProviderHealthTracker
      *
      * @return array 所有 Provider 的健康数据
      */
-    public static function get_all_health(): array
+    public static function getAllHealth(): array
     {
         $data = get_transient(self::TRANSIENT_KEY);
         return is_array($data) ? $data : [];
@@ -162,7 +162,7 @@ class ProviderHealthTracker
     /**
      * 清除所有健康数据
      */
-    public static function clear_all(): void
+    public static function clearAll(): void
     {
         delete_transient(self::TRANSIENT_KEY);
     }
@@ -172,9 +172,9 @@ class ProviderHealthTracker
      *
      * @param string $providerId Provider ID
      */
-    public static function clear_provider(string $providerId): void
+    public static function clearProvider(string $providerId): void
     {
-        $health = self::get_all_health();
+        $health = self::getAllHealth();
         unset($health[$providerId]);
         set_transient(self::TRANSIENT_KEY, $health, self::CACHE_TTL);
     }

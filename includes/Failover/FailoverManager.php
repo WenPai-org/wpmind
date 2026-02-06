@@ -57,9 +57,9 @@ class FailoverManager
      * @param string|null $preferredProvider 首选 Provider ID
      * @return string|null 选中的 Provider ID
      */
-    public function select_provider(?string $preferredProvider = null): ?string
+    public function selectProvider(?string $preferredProvider = null): ?string
     {
-        $available = $this->get_available_providers();
+        $available = $this->getAvailableProviders();
 
         if (empty($available)) {
             return null;
@@ -72,13 +72,13 @@ class FailoverManager
 
         // 按健康分数排序
         usort($available, function ($a, $b) {
-            $scoreA = ProviderHealthTracker::get_health_score($a);
-            $scoreB = ProviderHealthTracker::get_health_score($b);
+            $scoreA = ProviderHealthTracker::getHealthScore($a);
+            $scoreB = ProviderHealthTracker::getHealthScore($b);
 
             // 分数相同时，按延迟排序
             if ($scoreA === $scoreB) {
-                $latencyA = ProviderHealthTracker::get_average_latency($a);
-                $latencyB = ProviderHealthTracker::get_average_latency($b);
+                $latencyA = ProviderHealthTracker::getAverageLatency($a);
+                $latencyB = ProviderHealthTracker::getAverageLatency($b);
                 return $latencyA - $latencyB;
             }
 
@@ -93,12 +93,12 @@ class FailoverManager
      *
      * @return array<string> 可用的 Provider ID 列表
      */
-    public function get_available_providers(): array
+    public function getAvailableProviders(): array
     {
         $available = [];
 
         foreach ($this->circuitBreakers as $providerId => $breaker) {
-            if ($breaker->is_available()) {
+            if ($breaker->isAvailable()) {
                 $available[] = $providerId;
             }
         }
@@ -114,9 +114,9 @@ class FailoverManager
      * @param string|null $preferredProvider 首选 Provider ID
      * @return array<string> Provider ID 列表
      */
-    public function get_failover_chain(?string $preferredProvider = null): array
+    public function getFailoverChain(?string $preferredProvider = null): array
     {
-        $available = $this->get_available_providers();
+        $available = $this->getAvailableProviders();
 
         if (empty($available)) {
             return [];
@@ -126,7 +126,7 @@ class FailoverManager
         $manual_priority = [];
         if (class_exists('\\WPMind\\Routing\\IntelligentRouter')) {
             $router = \WPMind\Routing\IntelligentRouter::instance();
-            $manual_priority = $router->get_manual_priority();
+            $manual_priority = $router->getManualPriority();
         }
 
         if (!empty($manual_priority)) {
@@ -147,7 +147,7 @@ class FailoverManager
         } else {
             // 按健康分数排序
             usort($available, function ($a, $b) {
-                return ProviderHealthTracker::get_health_score($b) - ProviderHealthTracker::get_health_score($a);
+                return ProviderHealthTracker::getHealthScore($b) - ProviderHealthTracker::getHealthScore($a);
             });
         }
 
@@ -167,14 +167,14 @@ class FailoverManager
      * @param bool   $success    是否成功
      * @param int    $latencyMs  延迟（毫秒）
      */
-    public function record_result(string $providerId, bool $success, int $latencyMs = 0): void
+    public function recordResult(string $providerId, bool $success, int $latencyMs = 0): void
     {
         // 更新熔断器状态
         if (isset($this->circuitBreakers[$providerId])) {
             if ($success) {
-                $this->circuitBreakers[$providerId]->record_success();
+                $this->circuitBreakers[$providerId]->recordSuccess();
             } else {
-                $this->circuitBreakers[$providerId]->record_failure();
+                $this->circuitBreakers[$providerId]->recordFailure();
             }
         }
 
@@ -187,20 +187,20 @@ class FailoverManager
      *
      * @return array Provider 状态信息
      */
-    public function get_status_summary(): array
+    public function getStatusSummary(): array
     {
         $summary = [];
 
         foreach ($this->circuitBreakers as $providerId => $breaker) {
-            $cbStatus = $breaker->get_status_details();
-            $healthStatus = ProviderHealthTracker::get_provider_status($providerId);
+            $cbStatus = $breaker->getStatusDetails();
+            $healthStatus = ProviderHealthTracker::getProviderStatus($providerId);
 
             $summary[$providerId] = [
                 'name'          => $this->providers[$providerId]['name'] ?? $providerId,
                 'display_name'  => $this->providers[$providerId]['display_name'] ?? $providerId,
                 'state'         => $cbStatus['state'],
                 'state_label'   => $cbStatus['state_label'],
-                'available'     => $breaker->is_available_read_only(),
+                'available'     => $breaker->isAvailableReadOnly(),
                 'health_score'  => $healthStatus['health_score'],
                 'avg_latency'   => $healthStatus['avg_latency'],
                 'success_rate'  => $healthStatus['success_rate'],
@@ -216,9 +216,9 @@ class FailoverManager
      *
      * @return bool
      */
-    public function has_available_provider(): bool
+    public function hasAvailableProvider(): bool
     {
-        return !empty($this->get_available_providers());
+        return !empty($this->getAvailableProviders());
     }
 
     /**
@@ -226,23 +226,23 @@ class FailoverManager
      *
      * @param string $providerId Provider ID
      */
-    public function reset_provider(string $providerId): void
+    public function resetProvider(string $providerId): void
     {
         if (isset($this->circuitBreakers[$providerId])) {
             $this->circuitBreakers[$providerId]->reset();
         }
-        ProviderHealthTracker::clear_provider($providerId);
+        ProviderHealthTracker::clearProvider($providerId);
     }
 
     /**
      * 重置所有熔断器
      */
-    public function reset_all(): void
+    public function resetAll(): void
     {
         foreach ($this->circuitBreakers as $breaker) {
             $breaker->reset();
         }
-        ProviderHealthTracker::clear_all();
+        ProviderHealthTracker::clearAll();
     }
 
     /**
@@ -251,7 +251,7 @@ class FailoverManager
      * @param string $providerId Provider ID
      * @return CircuitBreaker|null
      */
-    public function get_circuit_breaker(string $providerId): ?CircuitBreaker
+    public function getCircuitBreaker(string $providerId): ?CircuitBreaker
     {
         return $this->circuitBreakers[$providerId] ?? null;
     }

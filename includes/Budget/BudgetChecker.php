@@ -42,17 +42,17 @@ if ( class_exists( '\\WPMind\\Modules\\CostControl\\BudgetChecker' ) ) {
         /**
          * 获取状态的显示标签
          */
-        public static function get_status_label( string $status ): string
+        public static function getStatusLabel( string $status ): string
         {
-            return \WPMind\Modules\CostControl\BudgetChecker::get_status_label( $status );
+            return \WPMind\Modules\CostControl\BudgetChecker::getStatusLabel( $status );
         }
 
         /**
          * 获取状态的 CSS 类
          */
-        public static function get_status_class( string $status ): string
+        public static function getStatusClass( string $status ): string
         {
-            return \WPMind\Modules\CostControl\BudgetChecker::get_status_class( $status );
+            return \WPMind\Modules\CostControl\BudgetChecker::getStatusClass( $status );
         }
 
         /**

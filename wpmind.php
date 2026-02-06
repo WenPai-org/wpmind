@@ -3,7 +3,7 @@
  * Plugin Name: WPMind
  * Plugin URI: https://wpcy.com/mind
  * Description: 文派心思 - WordPress AI 自定义端点扩展，支持国内外多种 AI 服务
- * Version: 3.2.3
+ * Version: 3.2.0
  * Author: 文派心思
  * Author URI: https://wpcy.com/mind
  * License: GPL-2.0-or-later
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-    define( 'WPMIND_VERSION', '3.2.3' );
+    define( 'WPMIND_VERSION', '3.2.0' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
     define( 'WPMIND_PLUGIN_FILE', __FILE__ );
@@ -367,17 +367,10 @@ final class WPMind {
      * @since 1.1.0
      */
     public function enqueue_admin_assets( string $hook_suffix ): void {
-        // 一级菜单的 hook suffix 是 toplevel_page_{menu_slug}，但部分环境可能不同。
-        $is_wpmind_page = isset( $_GET['page'] ) && 'wpmind' === $_GET['page'];
-        if ( 'toplevel_page_wpmind' !== $hook_suffix && ! $is_wpmind_page ) {
+        // 一级菜单的 hook suffix 是 toplevel_page_{menu_slug}
+        if ( 'toplevel_page_wpmind' !== $hook_suffix ) {
             return;
         }
-
-        $admin_css_version = $this->get_asset_version( 'assets/css/admin.css' );
-        $panels_css_version = $this->get_asset_version( 'assets/css/panels.css' );
-        $routing_css_version = $this->get_asset_version( 'assets/css/pages/routing.css' );
-        $responsive_css_version = $this->get_asset_version( 'assets/css/responsive.css' );
-        $admin_js_version = $this->get_asset_version( 'assets/js/admin.js' );
 
         // Remixicon 图标库
         wp_enqueue_style(
@@ -391,48 +384,34 @@ final class WPMind {
             'wpmind-admin',
             WPMIND_PLUGIN_URL . 'assets/css/admin.css',
             [ 'remixicon' ],
-            $admin_css_version
+            WPMIND_VERSION
         );
 
         wp_enqueue_style(
             'wpmind-panels',
             WPMIND_PLUGIN_URL . 'assets/css/panels.css',
             [ 'wpmind-admin' ],
-            $panels_css_version
+            WPMIND_VERSION
         );
 
         wp_enqueue_style(
             'wpmind-routing',
             WPMIND_PLUGIN_URL . 'assets/css/pages/routing.css',
             [ 'wpmind-panels' ],
-            $routing_css_version
+            WPMIND_VERSION
         );
 
         wp_enqueue_style(
             'wpmind-responsive',
             WPMIND_PLUGIN_URL . 'assets/css/responsive.css',
             [ 'wpmind-panels', 'wpmind-routing' ],
-            $responsive_css_version
+            WPMIND_VERSION
         );
 
-        // Chart.js 图表库（优先本地，其次 CDN）
-        $chartjs_sources = [];
-        $chartjs_local = WPMIND_PLUGIN_DIR . 'assets/vendor/chartjs/chart.umd.min.js';
-
-        if ( file_exists( $chartjs_local ) ) {
-            $chartjs_sources[] = WPMIND_PLUGIN_URL . 'assets/vendor/chartjs/chart.umd.min.js';
-        }
-
-        $chartjs_sources[] = 'https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js';
-        $chartjs_sources[] = 'https://unpkg.com/chart.js@4.5.0/dist/chart.umd.min.js';
-        $chartjs_sources[] = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js';
-
-        $chartjs_sources = array_values( array_unique( $chartjs_sources ) );
-        $chartjs_src = $chartjs_sources[0];
-
+        // Chart.js 图表库
         wp_enqueue_script(
             'chartjs',
-            $chartjs_src,
+            'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js',
             [],
             '4.5.0',
             true
@@ -441,8 +420,8 @@ final class WPMind {
         wp_enqueue_script(
             'wpmind-admin',
             WPMIND_PLUGIN_URL . 'assets/js/admin.js',
-            [ 'jquery', 'jquery-ui-sortable' ],
-            $admin_js_version,
+            [ 'jquery', 'jquery-ui-sortable', 'chartjs' ],
+            WPMIND_VERSION,
             true
         );
 
@@ -459,25 +438,9 @@ final class WPMind {
 
         // 为 AJAX 添加数据
         wp_localize_script( 'wpmind-admin', 'wpmindData', [
-            'nonce'            => wp_create_nonce( 'wpmind_ajax' ),
-            'ajaxurl'          => admin_url( 'admin-ajax.php' ),
-            'chartjsFallbacks' => array_slice( $chartjs_sources, 1 ),
+            'nonce'  => wp_create_nonce( 'wpmind_ajax' ),
+            'ajaxurl' => admin_url( 'admin-ajax.php' ),
         ] );
-    }
-
-    /**
-     * 获取资源版本（用于缓存刷新）
-     *
-     * @param string $relative_path 相对插件根目录路径
-     * @return string
-     */
-    private function get_asset_version( string $relative_path ): string {
-        $path = WPMIND_PLUGIN_DIR . ltrim( $relative_path, '/' );
-        if ( file_exists( $path ) ) {
-            return WPMIND_VERSION . '.' . filemtime( $path );
-        }
-
-        return WPMIND_VERSION;
     }
 
     /**
@@ -739,8 +702,8 @@ final class WPMind {
             }
 
             // 检查熔断器状态，排除不可用的 Provider（使用只读方法避免状态转换）
-            $breaker = $failover->get_circuit_breaker( $key );
-            if ( $breaker && ! $breaker->is_available_read_only() ) {
+            $breaker = $failover->getCircuitBreaker( $key );
+            if ( $breaker && ! $breaker->isAvailableReadOnly() ) {
                 continue;
             }
 
@@ -868,7 +831,7 @@ final class WPMind {
         }
 
         // 记录结果
-        Failover\FailoverManager::instance()->record_result( $provider, $success, $latency_ms );
+        Failover\FailoverManager::instance()->recordResult( $provider, $success, $latency_ms );
     }
 
     /**
@@ -941,7 +904,7 @@ final class WPMind {
             Usage\UsageTracker::record( $provider, $model, $input_tokens, $output_tokens, $latency_ms );
 
             // 检查预算并发送告警
-            Budget\BudgetAlert::instance()->check_and_alert();
+            Budget\BudgetAlert::instance()->checkAndAlert();
         }
     }
 
@@ -1067,7 +1030,7 @@ final class WPMind {
 
                 // 记录失败到健康追踪
                 $latency_ms = (int) ( ( microtime( true ) - $start_time ) * 1000 );
-                Failover\FailoverManager::instance()->record_result( $provider, false, $latency_ms );
+                Failover\FailoverManager::instance()->recordResult( $provider, false, $latency_ms );
 
                 // 使用 ErrorHandler 获取友好的错误消息
                 wp_send_json_error( [
@@ -1083,7 +1046,7 @@ final class WPMind {
             // 成功
             if ( $last_status_code === 200 ) {
                 // 记录成功到健康追踪
-                Failover\FailoverManager::instance()->record_result( $provider, true, $latency_ms );
+                Failover\FailoverManager::instance()->recordResult( $provider, true, $latency_ms );
 
                 wp_send_json_success( [
                     'message' => __( '连接成功', 'wpmind' ),
@@ -1105,7 +1068,7 @@ final class WPMind {
 
         // 记录失败到健康追踪
         $latency_ms = (int) ( ( microtime( true ) - $start_time ) * 1000 );
-        Failover\FailoverManager::instance()->record_result( $provider, false, $latency_ms );
+        Failover\FailoverManager::instance()->recordResult( $provider, false, $latency_ms );
 
         // 获取响应体以提取更详细的错误信息
         $response_body = wp_remote_retrieve_body( $response );
@@ -1245,11 +1208,11 @@ final class WPMind {
         }
 
         $failover = Failover\FailoverManager::instance();
-        $status = $failover->get_status_summary();
+        $status = $failover->getStatusSummary();
 
         wp_send_json_success( [
             'providers' => $status,
-            'available' => $failover->get_available_providers(),
+            'available' => $failover->getAvailableProviders(),
         ] );
     }
 
@@ -1269,10 +1232,10 @@ final class WPMind {
         $failover = Failover\FailoverManager::instance();
 
         if ( empty( $provider ) || $provider === 'all' ) {
-            $failover->reset_all();
+            $failover->resetAll();
             wp_send_json_success( [ 'message' => __( '所有熔断器已重置', 'wpmind' ) ] );
         } else {
-            $failover->reset_provider( $provider );
+            $failover->resetProvider( $provider );
             wp_send_json_success( [ 'message' => __( '熔断器已重置', 'wpmind' ) ] );
         }
     }
@@ -1289,10 +1252,10 @@ final class WPMind {
             wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
         }
 
-        $stats = Usage\UsageTracker::get_stats();
-        $today = Usage\UsageTracker::get_today_stats();
-        $month = Usage\UsageTracker::get_month_stats();
-        $history = Usage\UsageTracker::get_history( 20 );
+        $stats = Usage\UsageTracker::getStats();
+        $today = Usage\UsageTracker::getTodayStats();
+        $month = Usage\UsageTracker::getMonthStats();
+        $history = Usage\UsageTracker::getHistory( 20 );
 
         wp_send_json_success( [
             'stats'   => $stats,
@@ -1377,7 +1340,7 @@ final class WPMind {
         }
 
         $manager = Budget\BudgetManager::instance();
-        $result = $manager->save_settings( $settings );
+        $result = $manager->saveSettings( $settings );
 
         if ( $result ) {
             wp_send_json_success( [ 'message' => __( '预算设置已保存', 'wpmind' ) ] );
@@ -1405,7 +1368,7 @@ final class WPMind {
         }
 
         $checker = Budget\BudgetChecker::instance();
-        $summary = $checker->get_summary();
+        $summary = $checker->getSummary();
 
         wp_send_json_success( $summary );
     }
@@ -1425,7 +1388,7 @@ final class WPMind {
         $range = isset( $_POST['range'] ) ? sanitize_text_field( $_POST['range'] ) : '7d';
 
         $analytics = Analytics\AnalyticsManager::instance();
-        $data = $analytics->get_analytics_data( $range );
+        $data = $analytics->getAnalyticsData( $range );
 
         wp_send_json_success( $data );
     }
@@ -1443,7 +1406,7 @@ final class WPMind {
         }
 
         $router = Routing\IntelligentRouter::instance();
-        $status = $router->get_status_summary();
+        $status = $router->getStatusSummary();
 
         wp_send_json_success( $status );
     }
@@ -1467,7 +1430,7 @@ final class WPMind {
         }
 
         $router = Routing\IntelligentRouter::instance();
-        $result = $router->set_strategy( $strategy );
+        $result = $router->setStrategy( $strategy );
 
         if ( $result ) {
             wp_send_json_success( [
@@ -1497,10 +1460,10 @@ final class WPMind {
         $router = Routing\IntelligentRouter::instance();
 
         if ( $clear ) {
-            $result = $router->clear_manual_priority();
+            $result = $router->clearManualPriority();
             $message = __( '已清除手动优先级设置', 'wpmind' );
         } else {
-            $result = $router->set_manual_priority( $priority );
+            $result = $router->setManualPriority( $priority );
             $message = __( 'Provider 优先级已更新', 'wpmind' );
         }
 
@@ -1510,7 +1473,7 @@ final class WPMind {
 
             wp_send_json_success( [
                 'message'  => $message,
-                'priority' => $router->get_manual_priority(),
+                'priority' => $router->getManualPriority(),
             ] );
         } else {
             wp_send_json_error( [ 'message' => __( '保存失败', 'wpmind' ) ] );
@@ -1535,14 +1498,14 @@ final class WPMind {
         $output_tokens = absint( $_POST['output_tokens'] ?? 0 );
 
         $context = Routing\RoutingContext::create()
-            ->with_preferred_provider( $preferred ?: null )
-            ->with_excluded_providers( $excluded )
-            ->with_estimated_tokens( $input_tokens, $output_tokens );
+            ->withPreferredProvider( $preferred ?: null )
+            ->withExcludedProviders( $excluded )
+            ->withEstimatedTokens( $input_tokens, $output_tokens );
 
         $router = Routing\IntelligentRouter::instance();
         $selected = $router->route( $context );
-        $failoverChain = $router->get_failover_chain( $context );
-        $scores = $router->get_provider_scores( $context );
+        $failoverChain = $router->getFailoverChain( $context );
+        $scores = $router->getProviderScores( $context );
 
         wp_send_json_success( [
             'selected' => $selected,

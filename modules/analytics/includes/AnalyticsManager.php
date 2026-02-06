@@ -44,10 +44,10 @@ class AnalyticsManager
      * @param array|null $stats 预加载的统计数据
      * @return array
      */
-    public function get_usage_trends(int $days = 7, ?array $stats = null): array
+    public function getUsageTrend(int $days = 7, ?array $stats = null): array
     {
         if ($stats === null) {
-            $stats = UsageTracker::get_stats();
+            $stats = UsageTracker::getStats();
         }
         $daily = $stats['daily'] ?? [];
 
@@ -95,10 +95,10 @@ class AnalyticsManager
      * @param array|null $stats 预加载的统计数据
      * @return array
      */
-    public function get_provider_distribution(?array $stats = null): array
+    public function getProviderComparison(?array $stats = null): array
     {
         if ($stats === null) {
-            $stats = UsageTracker::get_stats();
+            $stats = UsageTracker::getStats();
         }
         $providers = $stats['providers'] ?? [];
 
@@ -109,11 +109,11 @@ class AnalyticsManager
         $colors = [];
 
         foreach ($providers as $providerId => $data) {
-            $labels[] = UsageTracker::get_provider_display_name($providerId);
+            $labels[] = UsageTracker::getProviderDisplayName($providerId);
             $tokens[] = ($data['total_input_tokens'] ?? 0) + ($data['total_output_tokens'] ?? 0);
             $costs[] = round($data['total_cost'] ?? 0, 4);
             $requests[] = $data['request_count'] ?? 0;
-            $colors[] = $this->get_provider_chart_color($providerId);
+            $colors[] = $this->getProviderChartColor($providerId);
         }
 
         return [
@@ -134,10 +134,10 @@ class AnalyticsManager
      * @param array|null $stats 预加载的统计数据
      * @return array
      */
-    public function get_cost_trends(int $months = 6, ?array $stats = null): array
+    public function getCostAnalysis(int $months = 6, ?array $stats = null): array
     {
         if ($stats === null) {
-            $stats = UsageTracker::get_stats();
+            $stats = UsageTracker::getStats();
         }
         $monthly = $stats['monthly'] ?? [];
 
@@ -176,10 +176,10 @@ class AnalyticsManager
      * @param array|null $stats 预加载的统计数据
      * @return array
      */
-    public function get_model_rankings(?array $stats = null): array
+    public function getModelDistribution(?array $stats = null): array
     {
         if ($stats === null) {
-            $stats = UsageTracker::get_stats();
+            $stats = UsageTracker::getStats();
         }
         $providers = $stats['providers'] ?? [];
 
@@ -190,7 +190,7 @@ class AnalyticsManager
             foreach ($providerModels as $modelName => $modelData) {
                 $models[] = [
                     'provider' => $providerId,
-                    'provider_name' => UsageTracker::get_provider_display_name($providerId),
+                    'provider_name' => UsageTracker::getProviderDisplayName($providerId),
                     'model' => $modelName,
                     'tokens' => ($modelData['input_tokens'] ?? 0) + ($modelData['output_tokens'] ?? 0),
                     'cost' => $modelData['cost'] ?? 0,
@@ -233,9 +233,9 @@ class AnalyticsManager
      * @param int $limit 记录数
      * @return array
      */
-    public function get_latency_metrics(int $limit = 100): array
+    public function getLatencyMetrics(int $limit = 100): array
     {
-        $history = UsageTracker::get_history($limit);
+        $history = UsageTracker::getHistory($limit);
 
         $providerLatency = [];
 
@@ -265,7 +265,7 @@ class AnalyticsManager
             if ($data['count'] > 0) {
                 $result[] = [
                     'provider' => $provider,
-                    'provider_name' => UsageTracker::get_provider_display_name($provider),
+                    'provider_name' => UsageTracker::getProviderDisplayName($provider),
                     'avg_latency' => round($data['total'] / $data['count']),
                     'min_latency' => $data['min'] === PHP_INT_MAX ? 0 : $data['min'],
                     'max_latency' => $data['max'],
@@ -287,12 +287,12 @@ class AnalyticsManager
      *
      * @return array
      */
-    public function get_dashboard_summary(): array
+    public function getDashboardSummary(): array
     {
-        $today = UsageTracker::get_today_stats();
-        $week = UsageTracker::get_week_stats();
-        $month = UsageTracker::get_month_stats();
-        $stats = UsageTracker::get_stats();
+        $today = UsageTracker::getTodayStats();
+        $week = UsageTracker::getWeekStats();
+        $month = UsageTracker::getMonthStats();
+        $stats = UsageTracker::getStats();
         $total = $stats['total'] ?? [];
 
         return [
@@ -330,7 +330,7 @@ class AnalyticsManager
      * @param string $range 时间范围 (7d, 30d, 6m)
      * @return array
      */
-    public function get_analytics_data(string $range = '7d'): array
+    public function getAnalyticsData(string $range = '7d'): array
     {
         // 白名单验证
         $allowed_ranges = ['7d', '30d', '6m'];
@@ -355,15 +355,15 @@ class AnalyticsManager
         }
 
         // 一次性获取统计数据，避免重复调用
-        $stats = UsageTracker::get_stats();
+        $stats = UsageTracker::getStats();
 
         return [
-            'summary' => $this->get_dashboard_summary(),
-            'trend' => $this->get_usage_trends($days, $stats),
-            'providers' => $this->get_provider_distribution($stats),
-            'cost' => $this->get_cost_trends($months, $stats),
-            'models' => $this->get_model_rankings($stats),
-            'latency' => $this->get_latency_metrics(),
+            'summary' => $this->getDashboardSummary(),
+            'trend' => $this->getUsageTrend($days, $stats),
+            'providers' => $this->getProviderComparison($stats),
+            'cost' => $this->getCostAnalysis($months, $stats),
+            'models' => $this->getModelDistribution($stats),
+            'latency' => $this->getLatencyMetrics(),
         ];
     }
 
@@ -373,7 +373,7 @@ class AnalyticsManager
      * @param string $provider Provider ID
      * @return string 十六进制颜色值
      */
-    private function get_provider_chart_color(string $provider): string
+    private function getProviderChartColor(string $provider): string
     {
         $colors = [
             'openai'      => '#10a37f',
