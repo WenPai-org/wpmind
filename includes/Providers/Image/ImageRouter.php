@@ -8,6 +8,8 @@
  * @since 2.4.0
  */
 
+declare(strict_types=1);
+
 namespace WPMind\Providers\Image;
 
 defined( 'ABSPATH' ) || exit;

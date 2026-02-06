@@ -1,5 +1,125 @@
 # WPMind 更新日志
 
+## [3.2.1] - 2026-02-06
+
+### 🔒 全面审查修复 (18 个问题)
+
+#### P0 紧急修复
+- **AnalyticsModule Fatal Error**: 移除私有构造函数单例模式，改为 public 构造函数
+- **版本号统一**: 插件头部、常量、CLAUDE.md 统一为 3.2.0
+- **损坏注释块**: 删除 wpmind.php 残留的未闭合 PHPDoc 注释
+- **设置链接 404**: `options-general.php` 修正为 `admin.php`
+
+#### P1 高优先级修复
+- **ImageRouter 命名空间**: `Routing\ImageRouter` 修正为 `Providers\Image\ImageRouter`
+- **Analytics nonce 错误**: `wpmind_admin_nonce` 修正为 `wpmind_ajax`
+- **AJAX 重复注册**: 移除 `wpmind_clear_usage_stats` 重复注册
+- **卸载脚本补全**: 添加 GEO/模块状态等 13 个选项清理 + `$wpdb->prepare()`
+- **测试端点安全**: 添加 nonce 验证，移除 nopriv 未认证访问
+- **speech() 路径遍历**: 添加 uploads 目录路径验证
+- **模块依赖排序**: ModuleLoader 添加 `resolve_load_order()` 确保加载顺序
+
+#### P2 中优先级修复
+- **XSS 防护**: admin.js errorCode 添加 `escapeHtml()`
+- **wp_unslash**: GeoModule/CostControlModule 统一使用 `wp_unslash()`
+- **命名空间验证**: ModuleLoader 添加 `WPMind\` 前缀安全检查
+- **定价数据去重**: 提取共享 `Pricing.php` 类，消除 ~160 行重复
+- **GEO 设置去重**: 从 wpmind.php 移除 5 个重复的 register_setting
+- **strict_types**: 29 个文件添加 `declare(strict_types=1)`
+
+---
+
+## [3.2.0] - 2026-02-05
+
+### ✨ 模块化架构
+
+将 Cost Control 和 Analytics 功能迁移为独立可选模块：
+
+#### 🏗️ 模块系统
+- **ModuleLoader**: 模块发现、加载、生命周期管理
+- **ModuleInterface**: 标准模块契约
+- **module.json**: 模块元数据和配置
+- 支持模块启用/禁用切换
+
+#### 📦 三个模块
+- **Cost Control**: 用量追踪、预算限额、告警通知
+- **Analytics**: 用量趋势、服务商对比、成本分析
+- **GEO**: Markdown Feeds、llms.txt、Schema.org、AI 爬虫追踪
+
+#### 🔧 兼容层
+- 保留 `includes/Usage/`、`includes/Budget/`、`includes/Analytics/` 兼容层
+- 模块加载时委托给模块实现，未加载时使用 Fallback
+
+---
+
+## [3.1.0] - 2026-02-05
+
+### ✨ GEO 增强
+
+#### 统一核心管线
+- **MarkdownProcessor**: 统一的 Markdown 处理管线，替代分散的处理逻辑
+- **ProcessOptions**: 处理选项封装类
+
+#### 新功能
+- **llms.txt 生成器**: `/llms.txt` 端点，AI 友好的站点描述
+- **Schema.org 集成**: 自动注入结构化数据 (Article/WebPage)
+- **GEO 设置界面**: 5 个配置选项的管理界面
+
+#### 修复
+- admin.js AJAX 变量错误 (wpmind_admin → wpmindData)
+- 多站点缓存键问题 (添加 blog_id)
+- 中文阅读时间计算 (400字/分钟)
+
+---
+
+## [3.0.0] - 2026-02-05
+
+### ✨ GEO 优化模块 (Generative Engine Optimization)
+
+面向 AI 搜索引擎的内容优化：
+
+#### 核心功能
+- **Markdown Feed**: `/?feed=markdown` 端点，AI 友好的内容格式
+- **单篇 .md 支持**: 任意文章添加 `.md` 后缀获取 Markdown 版本
+- **Accept 内容协商**: `Accept: text/markdown` 自动返回 Markdown
+- **中文内容优化器**: 针对中文内容的 Markdown 优化
+- **GEO 信号注入**: 权威性声明、引用格式等 AI 引用信号
+- **AI 爬虫追踪**: 追踪 GPTBot、ClaudeBot 等 AI 爬虫访问
+
+#### 📁 新增文件
+```
+includes/GEO/
+├── MarkdownFeed.php        # Markdown Feed 端点
+├── HtmlToMarkdown.php      # HTML 转 Markdown
+├── MarkdownEnhancer.php    # Markdown 增强
+├── ChineseOptimizer.php    # 中文优化
+├── GeoSignalInjector.php   # GEO 信号注入
+└── CrawlerTracker.php      # AI 爬虫追踪
+```
+
+---
+
+## [2.5.0] - 2026-02-04
+
+### ✨ 稳定性增强
+
+#### 公共 API
+- **PublicAPI 类**: 统一的 AI 能力调用接口
+- **递归调用保护**: 防止无限循环
+- **便捷函数**: `wpmind_chat()`, `wpmind_translate()`, `wpmind_summarize()` 等
+- **图像生成 API**: 支持 8 个图像生成 Provider
+
+#### UI 错误反馈优化
+- Toast 通知位置调整
+- 自动跳过不健康 Provider
+- 手动优先级设置
+
+#### 安全修复 (Codex 审计)
+- 输入验证加强
+- ErrorHandler 加载顺序修复
+
+---
+
 ## [2.0.0] - 2026-02-01
 
 ### ✨ 重大更新：Gutenberg 风格设计系统

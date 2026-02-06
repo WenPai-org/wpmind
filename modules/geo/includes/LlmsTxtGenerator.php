@@ -9,6 +9,8 @@
  * @see https://github.com/AnswerDotAI/llms-txt
  */
 
+declare(strict_types=1);
+
 namespace WPMind\Modules\Geo;
 
 /**
