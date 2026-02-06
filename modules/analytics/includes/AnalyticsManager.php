@@ -113,7 +113,7 @@ class AnalyticsManager
             $tokens[] = ($data['total_input_tokens'] ?? 0) + ($data['total_output_tokens'] ?? 0);
             $costs[] = round($data['total_cost'] ?? 0, 4);
             $requests[] = $data['request_count'] ?? 0;
-            $colors[] = $this->getProviderChartColor($providerId);
+            $colors[] = $this->get_provider_chart_color($providerId);
         }
 
         return [
@@ -373,7 +373,7 @@ class AnalyticsManager
      * @param string $provider Provider ID
      * @return string 十六进制颜色值
      */
-    private function getProviderChartColor(string $provider): string
+    private function get_provider_chart_color(string $provider): string
     {
         $colors = [
             'openai'      => '#10a37f',

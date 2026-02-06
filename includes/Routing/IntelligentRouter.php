@@ -44,20 +44,20 @@ class IntelligentRouter
 
     private function __construct()
     {
-        $this->registerDefaultStrategies();
-        $this->loadProviders();
-        $this->loadSettings();
+        $this->register_default_strategies();
+        $this->load_providers();
+        $this->load_settings();
     }
 
     /**
      * 注册默认策略
      */
-    private function registerDefaultStrategies(): void
+    private function register_default_strategies(): void
     {
         // 复合策略（推荐）
-        $this->register_strategy(CompositeStrategy::createBalanced());      // 平衡策略
-        $this->register_strategy(CompositeStrategy::createPerformance());   // 性能优先
-        $this->register_strategy(CompositeStrategy::createEconomic());      // 经济策略
+        $this->register_strategy(CompositeStrategy::create_balanced());      // 平衡策略
+        $this->register_strategy(CompositeStrategy::create_performance());   // 性能优先
+        $this->register_strategy(CompositeStrategy::create_economic());      // 经济策略
         
         // 基础策略
         $this->register_strategy(new LoadBalancedStrategy());               // 负载均衡
@@ -66,7 +66,7 @@ class IntelligentRouter
     /**
      * 加载 Provider 配置
      */
-    private function loadProviders(): void
+    private function load_providers(): void
     {
         if (function_exists('WPMind\\wpmind')) {
             $endpoints = \WPMind\wpmind()->get_custom_endpoints();
@@ -81,7 +81,7 @@ class IntelligentRouter
     /**
      * 加载路由设置
      */
-    private function loadSettings(): void
+    private function load_settings(): void
     {
         $settings = get_option('wpmind_routing_settings', array());
         $strategy = $settings['strategy'] ?? 'balanced';

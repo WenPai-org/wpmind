@@ -36,7 +36,7 @@ class BudgetAlert
     private function __construct()
     {
         // 注册管理员通知钩子
-        add_action('admin_notices', [$this, 'displayAdminNotices']);
+        add_action('admin_notices', [$this, 'display_admin_notices']);
     }
 
     /**
@@ -63,9 +63,9 @@ class BudgetAlert
 
         foreach (($globalCheck['details'] ?? []) as $key => $detail) {
             if (($detail['status'] ?? '') === BudgetChecker::STATUS_WARNING) {
-                $this->sendWarningAlert($key, $detail);
+                $this->send_warning_alert($key, $detail);
             } elseif (($detail['status'] ?? '') === BudgetChecker::STATUS_EXCEEDED) {
-                $this->sendExceededAlert($key, $detail);
+                $this->send_exceeded_alert($key, $detail);
             }
         }
     }
@@ -73,7 +73,7 @@ class BudgetAlert
     /**
      * 发送接近限额告警
      */
-    private function sendWarningAlert(string $key, array $detail): void
+    private function send_warning_alert(string $key, array $detail): void
     {
         $checker = BudgetChecker::instance();
 
@@ -84,10 +84,10 @@ class BudgetAlert
         $manager = BudgetManager::instance();
         $notifications = $manager->get_notification_settings();
 
-        $message = $this->formatAlertMessage($key, $detail, 'warning');
+        $message = $this->format_alert_message($key, $detail, 'warning');
 
         if ($notifications['admin_notice'] ?? false) {
-            $this->storeAdminNotice($message, 'warning');
+            $this->store_admin_notice($message, 'warning');
         }
 
         if (($notifications['email_alert'] ?? false) && !empty($notifications['email_address'] ?? '')) {
@@ -100,7 +100,7 @@ class BudgetAlert
     /**
      * 发送超限告警
      */
-    private function sendExceededAlert(string $key, array $detail): void
+    private function send_exceeded_alert(string $key, array $detail): void
     {
         $checker = BudgetChecker::instance();
 
@@ -111,10 +111,10 @@ class BudgetAlert
         $manager = BudgetManager::instance();
         $notifications = $manager->get_notification_settings();
 
-        $message = $this->formatAlertMessage($key, $detail, 'exceeded');
+        $message = $this->format_alert_message($key, $detail, 'exceeded');
 
         if ($notifications['admin_notice'] ?? false) {
-            $this->storeAdminNotice($message, 'error');
+            $this->store_admin_notice($message, 'error');
         }
 
         if (($notifications['email_alert'] ?? false) && !empty($notifications['email_address'] ?? '')) {
@@ -127,7 +127,7 @@ class BudgetAlert
     /**
      * 格式化告警消息
      */
-    private function formatAlertMessage(string $key, array $detail, string $type): string
+    private function format_alert_message(string $key, array $detail, string $type): string
     {
         $labels = [
             'daily_usd'   => __('每日 USD 预算', 'wpmind'),
@@ -171,7 +171,7 @@ class BudgetAlert
     /**
      * 存储管理员通知
      */
-    private function storeAdminNotice(string $message, string $type): void
+    private function store_admin_notice(string $message, string $type): void
     {
         $notices = get_transient('wpmind_budget_notices');
         if (!is_array($notices)) {
@@ -192,7 +192,7 @@ class BudgetAlert
     /**
      * 显示管理员通知
      */
-    public function displayAdminNotices(): void
+    public function display_admin_notices(): void
     {
         $screen = get_current_screen();
         if (!$screen || $screen->id !== 'toplevel_page_wpmind') {

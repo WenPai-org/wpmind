@@ -121,7 +121,7 @@ class CompositeStrategy extends AbstractStrategy
      *
      * 成本、延迟、可用性各占 1/3
      */
-    public static function createBalanced(): self
+    public static function create_balanced(): self
     {
         return (new self('balanced', '平衡策略', '平衡考虑成本、延迟和可用性'))
             ->add_strategy(new CostStrategy(), 0.33)
@@ -134,7 +134,7 @@ class CompositeStrategy extends AbstractStrategy
      *
      * 延迟 50%，可用性 30%，成本 20%
      */
-    public static function createPerformance(): self
+    public static function create_performance(): self
     {
         return (new self('performance', '性能优先', '优先考虑响应速度和稳定性'))
             ->add_strategy(new LatencyStrategy(), 0.50)
@@ -147,7 +147,7 @@ class CompositeStrategy extends AbstractStrategy
      *
      * 成本 60%，可用性 30%，延迟 10%
      */
-    public static function createEconomic(): self
+    public static function create_economic(): self
     {
         return (new self('economic', '经济策略', '优先考虑成本，兼顾稳定性'))
             ->add_strategy(new CostStrategy(), 0.60)

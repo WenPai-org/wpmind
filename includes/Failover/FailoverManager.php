@@ -231,7 +231,7 @@ class FailoverManager
         if (isset($this->circuitBreakers[$providerId])) {
             $this->circuitBreakers[$providerId]->reset();
         }
-        ProviderHealthTracker::clearProvider($providerId);
+        ProviderHealthTracker::clear_provider($providerId);
     }
 
     /**
@@ -242,7 +242,7 @@ class FailoverManager
         foreach ($this->circuitBreakers as $breaker) {
             $breaker->reset();
         }
-        ProviderHealthTracker::clearAll();
+        ProviderHealthTracker::clear_all();
     }
 
     /**

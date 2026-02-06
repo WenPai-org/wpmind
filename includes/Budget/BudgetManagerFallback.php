@@ -64,18 +64,18 @@ class BudgetManager
             if (!is_array($saved)) {
                 $saved = [];
             }
-            $this->settings = $this->recursiveMerge($saved, $this->get_defaults());
+            $this->settings = $this->recursive_merge($saved, $this->get_defaults());
         }
         return $this->settings;
     }
 
-    private function recursiveMerge(array $args, array $defaults): array
+    private function recursive_merge(array $args, array $defaults): array
     {
         $result = $defaults;
         foreach ($args as $key => $value) {
             if (is_array($value) && isset($defaults[$key]) && is_array($defaults[$key])) {
-                if ($this->isAssociativeArray($defaults[$key])) {
-                    $result[$key] = $this->recursiveMerge($value, $defaults[$key]);
+                if ($this->is_associative_array($defaults[$key])) {
+                    $result[$key] = $this->recursive_merge($value, $defaults[$key]);
                 } else {
                     $result[$key] = $value;
                 }
@@ -86,7 +86,7 @@ class BudgetManager
         return $result;
     }
 
-    private function isAssociativeArray(array $arr): bool
+    private function is_associative_array(array $arr): bool
     {
         if (empty($arr)) {
             return false;
@@ -96,26 +96,26 @@ class BudgetManager
 
     public function save_settings(array $settings): bool
     {
-        $sanitized = $this->sanitizeSettings($settings);
+        $sanitized = $this->sanitize_settings($settings);
         $result = update_option(self::OPTION_KEY, $sanitized, false);
         $this->settings = null;
         return $result;
     }
 
-    private function sanitizeSettings(array $input): array
+    private function sanitize_settings(array $input): array
     {
         $sanitized = [];
         $sanitized['enabled'] = !empty($input['enabled']);
 
         $sanitized['global'] = [
-            'daily_limit_usd'   => $this->sanitizeAmount($input['global']['daily_limit_usd'] ?? 0),
-            'daily_limit_cny'   => $this->sanitizeAmount($input['global']['daily_limit_cny'] ?? 0),
-            'monthly_limit_usd' => $this->sanitizeAmount($input['global']['monthly_limit_usd'] ?? 0),
-            'monthly_limit_cny' => $this->sanitizeAmount($input['global']['monthly_limit_cny'] ?? 0),
-            'alert_threshold'   => $this->sanitizeThreshold($input['global']['alert_threshold'] ?? 80),
+            'daily_limit_usd'   => $this->sanitize_amount($input['global']['daily_limit_usd'] ?? 0),
+            'daily_limit_cny'   => $this->sanitize_amount($input['global']['daily_limit_cny'] ?? 0),
+            'monthly_limit_usd' => $this->sanitize_amount($input['global']['monthly_limit_usd'] ?? 0),
+            'monthly_limit_cny' => $this->sanitize_amount($input['global']['monthly_limit_cny'] ?? 0),
+            'alert_threshold'   => $this->sanitize_threshold($input['global']['alert_threshold'] ?? 80),
         ];
 
-        $sanitized['enforcement_mode'] = $this->sanitizeMode($input['enforcement_mode'] ?? self::MODE_ALERT);
+        $sanitized['enforcement_mode'] = $this->sanitize_mode($input['enforcement_mode'] ?? self::MODE_ALERT);
 
         $sanitized['providers'] = [];
         if (!empty($input['providers']) && is_array($input['providers'])) {
@@ -123,8 +123,8 @@ class BudgetManager
                 $provider = sanitize_key($provider);
                 if (!empty($limits['daily_limit']) || !empty($limits['monthly_limit'])) {
                     $sanitized['providers'][$provider] = [
-                        'daily_limit'   => $this->sanitizeAmount($limits['daily_limit'] ?? 0),
-                        'monthly_limit' => $this->sanitizeAmount($limits['monthly_limit'] ?? 0),
+                        'daily_limit'   => $this->sanitize_amount($limits['daily_limit'] ?? 0),
+                        'monthly_limit' => $this->sanitize_amount($limits['monthly_limit'] ?? 0),
                     ];
                 }
             }
@@ -139,19 +139,19 @@ class BudgetManager
         return $sanitized;
     }
 
-    private function sanitizeAmount($value): float
+    private function sanitize_amount($value): float
     {
         $amount = (float) $value;
         return max(0, round($amount, 2));
     }
 
-    private function sanitizeThreshold($value): int
+    private function sanitize_threshold($value): int
     {
         $threshold = (int) $value;
         return max(1, min(100, $threshold));
     }
 
-    private function sanitizeMode(string $mode): string
+    private function sanitize_mode(string $mode): string
     {
         $allowed = [self::MODE_ALERT, self::MODE_DISABLE, self::MODE_DOWNGRADE];
         return in_array($mode, $allowed, true) ? $mode : self::MODE_ALERT;
