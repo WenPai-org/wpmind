@@ -868,10 +868,14 @@ final class WPMind {
     /**
      * 追踪 Token 用量
      *
+     * 使用事件驱动架构，触发 wpmind_usage_record action hook
+     * Cost Control 模块会监听此 hook 并处理用量记录
+     *
      * @param array  $response HTTP 响应
      * @param string $provider Provider ID
      * @param int    $latency_ms 延迟（毫秒）
      * @since 1.6.0
+     * @since 3.3.0 改用事件驱动架构
      */
     private function track_token_usage( array $response, string $provider, int $latency_ms ): void {
         $body = wp_remote_retrieve_body( $response );
@@ -907,11 +911,32 @@ final class WPMind {
         // 提取模型名称
         $model = $data['model'] ?? 'unknown';
 
-        // 记录用量
-        Usage\UsageTracker::record( $provider, $model, $input_tokens, $output_tokens, $latency_ms );
+        /**
+         * 触发用量记录事件
+         *
+         * Cost Control 模块会监听此 hook 并处理：
+         * - 记录用量统计
+         * - 检查预算限制
+         * - 发送告警通知
+         *
+         * @since 3.3.0
+         *
+         * @param string $provider Provider ID
+         * @param string $model 模型名称
+         * @param int    $input_tokens 输入 tokens
+         * @param int    $output_tokens 输出 tokens
+         * @param int    $latency_ms 延迟（毫秒）
+         */
+        do_action( 'wpmind_usage_record', $provider, $model, $input_tokens, $output_tokens, $latency_ms );
 
-        // 检查预算并发送告警
-        Budget\BudgetAlert::instance()->checkAndAlert();
+        // 向后兼容：如果没有模块监听，直接调用旧的类
+        if ( ! did_action( 'wpmind_usage_recorded' ) ) {
+            // 记录用量（兼容层会自动委托给模块或使用回退实现）
+            Usage\UsageTracker::record( $provider, $model, $input_tokens, $output_tokens, $latency_ms );
+
+            // 检查预算并发送告警
+            Budget\BudgetAlert::instance()->checkAndAlert();
+        }
     }
 
     /**
