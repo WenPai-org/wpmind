@@ -159,7 +159,7 @@ class RoutingContext
     public function get_health_data(): array
     {
         if ($this->healthData === null) {
-            $this->healthData = ProviderHealthTracker::getAllHealth();
+            $this->healthData = ProviderHealthTracker::get_all_health();
         }
         return $this->healthData;
     }

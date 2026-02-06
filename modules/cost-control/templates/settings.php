@@ -273,7 +273,7 @@ $get_value = function( $array, $key, $default = 0 ) {
                 <?php else : ?>
                 <div class="wpmind-provider-list">
                     <?php foreach ( $providers as $provider => $data ) :
-                        $currency = UsageTracker::getCurrency( $provider );
+                        $currency = UsageTracker::get_currency( $provider );
                         $total_cost = $get_value( $data, 'total_cost', 0 );
                         $request_count = $get_value( $data, 'request_count', 0 );
                         $total_tokens = $get_value( $data, 'total_input_tokens', 0 ) + $get_value( $data, 'total_output_tokens', 0 );
