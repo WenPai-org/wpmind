@@ -8,6 +8,8 @@
  * @since 1.0.0
  */
 
+declare(strict_types=1);
+
 namespace WPMind\Modules\CostControl;
 
 use WPMind\Core\ModuleInterface;

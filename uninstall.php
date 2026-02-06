@@ -8,6 +8,8 @@
  * @since 1.1.0
  */
 
+declare(strict_types=1);
+
 // 如果不是通过 WordPress 卸载，则退出
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
     exit;

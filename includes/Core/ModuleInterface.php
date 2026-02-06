@@ -8,6 +8,8 @@
  * @since 3.2.0
  */
 
+declare(strict_types=1);
+
 namespace WPMind\Core;
 
 /**
