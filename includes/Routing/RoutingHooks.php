@@ -37,14 +37,14 @@ class RoutingHooks
 
     private function __construct()
     {
-        $this->loadSettings();
-        $this->registerHooks();
+        $this->load_settings();
+        $this->register_hooks();
     }
 
     /**
      * 加载设置
      */
-    private function loadSettings(): void
+    private function load_settings(): void
     {
         $settings = get_option('wpmind_routing_settings', []);
         $this->enabled = $settings['enabled'] ?? true;
@@ -53,7 +53,7 @@ class RoutingHooks
     /**
      * 注册钩子
      */
-    private function registerHooks(): void
+    private function register_hooks(): void
     {
         // 只有启用时才注册过滤器
         if ($this->enabled) {
@@ -78,7 +78,7 @@ class RoutingHooks
         if ($provider !== 'auto' && !empty($provider)) {
             // 但仍然检查该 Provider 是否可用
             $router = IntelligentRouter::instance();
-            $routingContext = $this->buildRoutingContext($context, $provider);
+            $routingContext = $this->build_routing_context($context, $provider);
 
             // 如果首选 Provider 可用，直接返回
             $selected = $router->route($routingContext);
@@ -93,7 +93,7 @@ class RoutingHooks
 
         // auto 模式：使用智能路由
         $router = IntelligentRouter::instance();
-        $routingContext = $this->buildRoutingContext($context);
+        $routingContext = $this->build_routing_context($context);
 
         $selected = $router->route($routingContext);
 
@@ -114,7 +114,7 @@ class RoutingHooks
      * @param string|null $preferredProvider 首选 Provider
      * @return RoutingContext
      */
-    private function buildRoutingContext(string $context, ?string $preferredProvider = null): RoutingContext
+    private function build_routing_context(string $context, ?string $preferredProvider = null): RoutingContext
     {
         $routingContext = RoutingContext::create();
 
@@ -124,7 +124,7 @@ class RoutingHooks
         }
 
         // 根据上下文设置模型类型
-        $modelType = $this->inferModelType($context);
+        $modelType = $this->infer_model_type($context);
         if ($modelType !== null) {
             $routingContext->with_model_type($modelType);
         }
@@ -142,7 +142,7 @@ class RoutingHooks
      * @param string $context 上下文标识
      * @return string|null
      */
-    private function inferModelType(string $context): ?string
+    private function infer_model_type(string $context): ?string
     {
         // 根据上下文关键词推断模型类型
         $contextLower = strtolower($context);

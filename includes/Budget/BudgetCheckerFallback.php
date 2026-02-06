@@ -74,50 +74,50 @@ class BudgetChecker
 
         // 检查每日 USD 限额
         if (($global['daily_limit_usd'] ?? 0) > 0) {
-            $result = $this->checkLimit(
+            $result = $this->check_limit(
                 $today['cost_usd'] ?? 0,
                 $global['daily_limit_usd'],
                 $threshold,
                 'daily_usd'
             );
             $details['daily_usd'] = $result;
-            $status = $this->mergeStatus($status, $result['status']);
+            $status = $this->merge_status($status, $result['status']);
         }
 
         // 检查每日 CNY 限额
         if (($global['daily_limit_cny'] ?? 0) > 0) {
-            $result = $this->checkLimit(
+            $result = $this->check_limit(
                 $today['cost_cny'] ?? 0,
                 $global['daily_limit_cny'],
                 $threshold,
                 'daily_cny'
             );
             $details['daily_cny'] = $result;
-            $status = $this->mergeStatus($status, $result['status']);
+            $status = $this->merge_status($status, $result['status']);
         }
 
         // 检查每月 USD 限额
         if (($global['monthly_limit_usd'] ?? 0) > 0) {
-            $result = $this->checkLimit(
+            $result = $this->check_limit(
                 $month['cost_usd'] ?? 0,
                 $global['monthly_limit_usd'],
                 $threshold,
                 'monthly_usd'
             );
             $details['monthly_usd'] = $result;
-            $status = $this->mergeStatus($status, $result['status']);
+            $status = $this->merge_status($status, $result['status']);
         }
 
         // 检查每月 CNY 限额
         if (($global['monthly_limit_cny'] ?? 0) > 0) {
-            $result = $this->checkLimit(
+            $result = $this->check_limit(
                 $month['cost_cny'] ?? 0,
                 $global['monthly_limit_cny'],
                 $threshold,
                 'monthly_cny'
             );
             $details['monthly_cny'] = $result;
-            $status = $this->mergeStatus($status, $result['status']);
+            $status = $this->merge_status($status, $result['status']);
         }
 
         return ['status' => $status, 'details' => $details];
@@ -160,28 +160,28 @@ class BudgetChecker
 
         // 检查每日限额
         if (!empty($providerBudget['daily_limit']) && $providerBudget['daily_limit'] > 0) {
-            $todayCost = $this->getProviderTodayCost($provider);
-            $result = $this->checkLimit(
+            $todayCost = $this->get_provider_today_cost($provider);
+            $result = $this->check_limit(
                 $todayCost,
                 $providerBudget['daily_limit'],
                 $threshold,
                 "provider_{$provider}_daily"
             );
             $details['daily'] = $result;
-            $status = $this->mergeStatus($status, $result['status']);
+            $status = $this->merge_status($status, $result['status']);
         }
 
         // 检查每月限额
         if (!empty($providerBudget['monthly_limit']) && $providerBudget['monthly_limit'] > 0) {
-            $monthCost = $this->getProviderMonthCost($provider);
-            $result = $this->checkLimit(
+            $monthCost = $this->get_provider_month_cost($provider);
+            $result = $this->check_limit(
                 $monthCost,
                 $providerBudget['monthly_limit'],
                 $threshold,
                 "provider_{$provider}_monthly"
             );
             $details['monthly'] = $result;
-            $status = $this->mergeStatus($status, $result['status']);
+            $status = $this->merge_status($status, $result['status']);
         }
 
         return ['status' => $status, 'details' => $details, 'currency' => $currency];
@@ -193,7 +193,7 @@ class BudgetChecker
      * @param string|null $provider 服务商 ID（可选）
      * @return array ['allowed' => bool, 'reason' => string|null, 'status' => array]
      */
-    public function canMakeRequest(?string $provider = null): array
+    public function can_make_request(?string $provider = null): array
     {
         $manager = BudgetManager::instance();
 
@@ -238,7 +238,7 @@ class BudgetChecker
      *
      * @return array
      */
-    public function getAllProviderStatus(): array
+    public function get_all_provider_status(): array
     {
         $manager = BudgetManager::instance();
         $settings = $manager->get_settings();
@@ -269,7 +269,7 @@ class BudgetChecker
         }
 
         $global = $this->check_global_budget();
-        $providers = $this->getAllProviderStatus();
+        $providers = $this->get_all_provider_status();
 
         // 计算使用百分比
         $globalBudget = $manager->get_global_budget();
@@ -319,7 +319,7 @@ class BudgetChecker
     /**
      * 检查单个限额
      */
-    private function checkLimit(float $current, float $limit, int $threshold, string $key): array
+    private function check_limit(float $current, float $limit, int $threshold, string $key): array
     {
         if ($limit <= 0) {
             return [
@@ -351,7 +351,7 @@ class BudgetChecker
     /**
      * 合并状态（取最严重的）
      */
-    private function mergeStatus(string $current, string $new): string
+    private function merge_status(string $current, string $new): string
     {
         $priority = [
             self::STATUS_OK      => 0,
@@ -365,7 +365,7 @@ class BudgetChecker
     /**
      * 获取服务商今日费用
      */
-    private function getProviderTodayCost(string $provider): float
+    private function get_provider_today_cost(string $provider): float
     {
         $history = UsageTracker::get_history(1000);
         $today = wp_date('Y-m-d');
@@ -387,7 +387,7 @@ class BudgetChecker
     /**
      * 获取服务商本月费用
      */
-    private function getProviderMonthCost(string $provider): float
+    private function get_provider_month_cost(string $provider): float
     {
         $stats = UsageTracker::get_stats();
         return $stats['providers'][$provider]['total_cost'] ?? 0;

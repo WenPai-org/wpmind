@@ -120,7 +120,7 @@ class ProviderHealthTracker
      * @param string $providerId Provider ID
      * @return array 状态详情
      */
-    public static function getProviderStatus(string $providerId): array
+    public static function get_provider_status(string $providerId): array
     {
         $health = self::get_all_health();
 
@@ -162,7 +162,7 @@ class ProviderHealthTracker
     /**
      * 清除所有健康数据
      */
-    public static function clearAll(): void
+    public static function clear_all(): void
     {
         delete_transient(self::TRANSIENT_KEY);
     }
@@ -172,7 +172,7 @@ class ProviderHealthTracker
      *
      * @param string $providerId Provider ID
      */
-    public static function clearProvider(string $providerId): void
+    public static function clear_provider(string $providerId): void
     {
         $health = self::get_all_health();
         unset($health[$providerId]);

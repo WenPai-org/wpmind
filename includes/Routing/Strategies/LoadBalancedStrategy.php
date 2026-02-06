@@ -73,7 +73,7 @@ class LoadBalancedStrategy extends AbstractStrategy
         }
 
         return match ($this->algorithm) {
-            'round_robin' => $this->roundRobin($healthy),
+            'round_robin' => $this->round_robin($healthy),
             'random' => $this->random($healthy),
             default => $this->weighted($healthy, $context),
         };
@@ -103,7 +103,7 @@ class LoadBalancedStrategy extends AbstractStrategy
     /**
      * 轮询算法
      */
-    private function roundRobin(array $providers): string
+    private function round_robin(array $providers): string
     {
         $providers = array_values($providers);
         $index = (int) get_transient('wpmind_round_robin_index') ?: 0;

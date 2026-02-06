@@ -43,13 +43,13 @@ class AnalyticsManager
      */
     private function __construct()
     {
-        $this->initModuleInstance();
+        $this->init_module_instance();
     }
 
     /**
      * 初始化模块实例
      */
-    private function initModuleInstance(): void
+    private function init_module_instance(): void
     {
         $module_loader = ModuleLoader::instance();
 
