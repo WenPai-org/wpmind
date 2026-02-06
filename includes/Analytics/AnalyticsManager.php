@@ -43,13 +43,13 @@ class AnalyticsManager
      */
     private function __construct()
     {
-        $this->initModuleInstance();
+        $this->init_module_instance();
     }
 
     /**
      * 初始化模块实例
      */
-    private function initModuleInstance(): void
+    private function init_module_instance(): void
     {
         $module_loader = ModuleLoader::instance();
 
@@ -86,56 +86,56 @@ class AnalyticsManager
     /**
      * 获取用量趋势数据
      */
-    public function getUsageTrend(int $days = 7, ?array $stats = null): array
+    public function get_usage_trend(int $days = 7, ?array $stats = null): array
     {
-        return $this->moduleInstance->getUsageTrend($days, $stats);
+        return $this->moduleInstance->get_usage_trend($days, $stats);
     }
 
     /**
      * 获取服务商对比数据
      */
-    public function getProviderComparison(?array $stats = null): array
+    public function get_provider_comparison(?array $stats = null): array
     {
-        return $this->moduleInstance->getProviderComparison($stats);
+        return $this->moduleInstance->get_provider_comparison($stats);
     }
 
     /**
      * 获取成本分析数据
      */
-    public function getCostAnalysis(int $months = 6, ?array $stats = null): array
+    public function get_cost_analysis(int $months = 6, ?array $stats = null): array
     {
-        return $this->moduleInstance->getCostAnalysis($months, $stats);
+        return $this->moduleInstance->get_cost_analysis($months, $stats);
     }
 
     /**
      * 获取模型使用分布
      */
-    public function getModelDistribution(?array $stats = null): array
+    public function get_model_distribution(?array $stats = null): array
     {
-        return $this->moduleInstance->getModelDistribution($stats);
+        return $this->moduleInstance->get_model_distribution($stats);
     }
 
     /**
      * 获取性能指标
      */
-    public function getLatencyMetrics(int $limit = 100): array
+    public function get_latency_metrics(int $limit = 100): array
     {
-        return $this->moduleInstance->getLatencyMetrics($limit);
+        return $this->moduleInstance->get_latency_metrics($limit);
     }
 
     /**
      * 获取仪表板摘要数据
      */
-    public function getDashboardSummary(): array
+    public function get_dashboard_summary(): array
     {
-        return $this->moduleInstance->getDashboardSummary();
+        return $this->moduleInstance->get_dashboard_summary();
     }
 
     /**
      * 获取完整的分析数据
      */
-    public function getAnalyticsData(string $range = '7d'): array
+    public function get_analytics_data(string $range = '7d'): array
     {
-        return $this->moduleInstance->getAnalyticsData($range);
+        return $this->moduleInstance->get_analytics_data($range);
     }
 }

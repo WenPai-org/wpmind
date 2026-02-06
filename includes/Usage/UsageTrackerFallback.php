@@ -24,7 +24,7 @@ class UsageTracker
     /**
      * Get pricing data from shared Pricing class.
      */
-    private static function getPricingData(): array
+    private static function get_pricing_data(): array
     {
         if (!class_exists(Pricing::class)) {
             require_once __DIR__ . '/Pricing.php';
@@ -43,21 +43,21 @@ class UsageTracker
         $outputTokens = max(0, $outputTokens);
         $latencyMs = max(0, $latencyMs);
 
-        $cost = self::calculateCost($provider, $model, $inputTokens, $outputTokens);
-        self::updateStats($provider, $model, $inputTokens, $outputTokens, $cost);
+        $cost = self::calculate_cost($provider, $model, $inputTokens, $outputTokens);
+        self::update_stats($provider, $model, $inputTokens, $outputTokens, $cost);
 
         if ($inputTokens > 0 || $outputTokens > 0) {
-            self::addToHistory($provider, $model, $inputTokens, $outputTokens, $cost, $latencyMs);
+            self::add_to_history($provider, $model, $inputTokens, $outputTokens, $cost, $latencyMs);
         }
     }
 
-    public static function calculateCost(
+    public static function calculate_cost(
         string $provider,
         string $model,
         int $inputTokens,
         int $outputTokens
     ): float {
-        $allPricing = self::getPricingData();
+        $allPricing = self::get_pricing_data();
         $pricing = $allPricing[$provider] ?? [];
         $modelPricing = $pricing[$model] ?? $pricing['default'] ?? ['input' => 0, 'output' => 0];
 
@@ -67,13 +67,13 @@ class UsageTracker
         return round($inputCost + $outputCost, 6);
     }
 
-    public static function getCurrency(string $provider): string
+    public static function get_currency(string $provider): string
     {
-        $allPricing = self::getPricingData();
+        $allPricing = self::get_pricing_data();
         return $allPricing[$provider]['currency'] ?? 'USD';
     }
 
-    private static function updateStats(
+    private static function update_stats(
         string $provider,
         string $model,
         int $inputTokens,
@@ -87,7 +87,7 @@ class UsageTracker
 
         $today = wp_date('Y-m-d');
         $month = wp_date('Y-m');
-        $currency = self::getCurrency($provider);
+        $currency = self::get_currency($provider);
 
         if (!isset($stats['providers']) || !is_array($stats['providers'])) {
             $stats['providers'] = [];
@@ -187,7 +187,7 @@ class UsageTracker
         update_option(self::OPTION_KEY, $stats, false);
     }
 
-    private static function addToHistory(
+    private static function add_to_history(
         string $provider,
         string $model,
         int $inputTokens,
@@ -217,7 +217,7 @@ class UsageTracker
         update_option(self::HISTORY_KEY, $history, false);
     }
 
-    public static function getStats(): array
+    public static function get_stats(): array
     {
         $stats = get_option(self::OPTION_KEY, []);
         if (!is_array($stats)) {
@@ -238,9 +238,9 @@ class UsageTracker
         ];
     }
 
-    public static function getTodayStats(): array
+    public static function get_today_stats(): array
     {
-        $stats = self::getStats();
+        $stats = self::get_stats();
         $today = wp_date('Y-m-d');
 
         return $stats['daily'][$today] ?? [
@@ -252,9 +252,9 @@ class UsageTracker
         ];
     }
 
-    public static function getMonthStats(): array
+    public static function get_month_stats(): array
     {
-        $stats = self::getStats();
+        $stats = self::get_stats();
         $month = wp_date('Y-m');
 
         return $stats['monthly'][$month] ?? [
@@ -266,9 +266,9 @@ class UsageTracker
         ];
     }
 
-    public static function getWeekStats(): array
+    public static function get_week_stats(): array
     {
-        $stats = self::getStats();
+        $stats = self::get_stats();
         $daily = $stats['daily'] ?? [];
 
         $weekStart = wp_date('Y-m-d', strtotime('monday this week'));
@@ -295,7 +295,7 @@ class UsageTracker
         return $result;
     }
 
-    public static function getHistory(int $limit = 50): array
+    public static function get_history(int $limit = 50): array
     {
         $history = get_option(self::HISTORY_KEY, []);
         if (!is_array($history)) {
@@ -305,12 +305,12 @@ class UsageTracker
         return array_slice(array_reverse($history), 0, $limit);
     }
 
-    public static function getPricing(): array
+    public static function get_pricing(): array
     {
-        return self::getPricingData();
+        return self::get_pricing_data();
     }
 
-    public static function clearAll(): void
+    public static function clear_all(): void
     {
         delete_option(self::OPTION_KEY);
         delete_option(self::HISTORY_KEY);
@@ -318,7 +318,7 @@ class UsageTracker
         wp_cache_delete('wpmind_usage_history');
     }
 
-    public static function formatTokens(int $tokens): string
+    public static function format_tokens(int $tokens): string
     {
         if ($tokens >= 1_000_000) {
             return round($tokens / 1_000_000, 2) . 'M';
@@ -329,7 +329,7 @@ class UsageTracker
         return (string) $tokens;
     }
 
-    public static function formatCost(float $cost, string $currency = 'USD'): string
+    public static function format_cost(float $cost, string $currency = 'USD'): string
     {
         $symbol = $currency === 'CNY' ? '¥' : '$';
 
@@ -339,16 +339,16 @@ class UsageTracker
         return $symbol . number_format($cost, 2);
     }
 
-    public static function formatCostByCurrency(float $costUsd, float $costCny): string
+    public static function format_cost_by_currency(float $costUsd, float $costCny): string
     {
         $parts = [];
 
         if ($costUsd > 0) {
-            $parts[] = self::formatCost($costUsd, 'USD');
+            $parts[] = self::format_cost($costUsd, 'USD');
         }
 
         if ($costCny > 0) {
-            $parts[] = self::formatCost($costCny, 'CNY');
+            $parts[] = self::format_cost($costCny, 'CNY');
         }
 
         if (empty($parts)) {
@@ -358,7 +358,7 @@ class UsageTracker
         return implode(' / ', $parts);
     }
 
-    public static function getProviderDisplayName(string $provider): string
+    public static function get_provider_display_name(string $provider): string
     {
         $names = [
             'openai' => 'OpenAI',
@@ -376,7 +376,7 @@ class UsageTracker
         return $names[$provider] ?? $provider;
     }
 
-    public static function getProviderIcon(string $provider): string
+    public static function get_provider_icon(string $provider): string
     {
         $icons = [
             'openai'      => 'ri-openai-line',
@@ -394,7 +394,7 @@ class UsageTracker
         return $icons[$provider] ?? 'ri-robot-line';
     }
 
-    public static function getProviderColor(string $provider): string
+    public static function get_provider_color(string $provider): string
     {
         return '#50575e';
     }

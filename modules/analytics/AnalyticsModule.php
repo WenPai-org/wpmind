@@ -157,7 +157,7 @@ class AnalyticsModule implements ModuleInterface
         $range = isset($_POST['range']) ? sanitize_text_field($_POST['range']) : '7d';
 
         $analytics = AnalyticsManager::instance();
-        $data = $analytics->getAnalyticsData($range);
+        $data = $analytics->get_analytics_data($range);
 
         wp_send_json_success($data);
     }

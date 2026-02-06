@@ -91,7 +91,7 @@ class ErrorHandler
      * @param string|null $raw_error 原始错误消息
      * @return string 用户友好的错误消息
      */
-    public static function getErrorMessage(int $http_code, string $provider = '', ?string $raw_error = null): string
+    public static function get_error_message(int $http_code, string $provider = '', ?string $raw_error = null): string
     {
         // 检查 Provider 特定的错误消息
         if (!empty($provider) && isset(self::PROVIDER_ERROR_HINTS[$provider][$http_code])) {
@@ -105,7 +105,7 @@ class ErrorHandler
 
         // 尝试从原始错误中提取有用信息
         if (!empty($raw_error)) {
-            return self::parseRawError($raw_error);
+            return self::parse_raw_error($raw_error);
         }
 
         // 默认消息
@@ -119,7 +119,7 @@ class ErrorHandler
      * @param string    $provider Provider ID
      * @return string 用户友好的错误消息
      */
-    public static function getWpErrorMessage(\WP_Error $error, string $provider = ''): string
+    public static function get_wp_error_message(\WP_Error $error, string $provider = ''): string
     {
         $error_code = $error->get_error_code();
         $error_message = $error->get_error_message();
@@ -148,22 +148,22 @@ class ErrorHandler
      * @param string $raw_error 原始错误消息
      * @return string 解析后的错误消息
      */
-    private static function parseRawError(string $raw_error): string
+    private static function parse_raw_error(string $raw_error): string
     {
         // 尝试解析 JSON 错误响应
         $decoded = json_decode($raw_error, true);
         if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
             // OpenAI 格式
             if (isset($decoded['error']['message'])) {
-                return self::translateErrorMessage($decoded['error']['message']);
+                return self::translate_error_message($decoded['error']['message']);
             }
             // Anthropic 格式
             if (isset($decoded['error']['type'])) {
-                return self::translateErrorMessage($decoded['error']['type']);
+                return self::translate_error_message($decoded['error']['type']);
             }
             // 通用格式
             if (isset($decoded['message'])) {
-                return self::translateErrorMessage($decoded['message']);
+                return self::translate_error_message($decoded['message']);
             }
         }
 
@@ -176,7 +176,7 @@ class ErrorHandler
      * @param string $message 英文错误消息
      * @return string 翻译后的消息
      */
-    private static function translateErrorMessage(string $message): string
+    private static function translate_error_message(string $message): string
     {
         $translations = [
             'invalid_api_key'           => 'API Key 无效',
@@ -206,7 +206,7 @@ class ErrorHandler
      * @param string $error_type 错误类型
      * @return string 错误消息
      */
-    public static function getErrorTypeMessage(string $error_type): string
+    public static function get_error_type_message(string $error_type): string
     {
         return self::ERROR_TYPE_MESSAGES[$error_type] ?? __('未知错误', 'wpmind');
     }
@@ -217,7 +217,7 @@ class ErrorHandler
      * @param int $http_code HTTP 状态码
      * @return bool 是否应该重试
      */
-    public static function shouldRetry(int $http_code): bool
+    public static function should_retry(int $http_code): bool
     {
         // 可重试的状态码
         $retryable_codes = [408, 429, 500, 502, 503, 504];
@@ -230,7 +230,7 @@ class ErrorHandler
      * @param int $attempt 当前尝试次数（从 1 开始）
      * @return int 延迟时间（毫秒）
      */
-    public static function getRetryDelay(int $attempt): int
+    public static function get_retry_delay(int $attempt): int
     {
         // 指数退避：1s, 2s, 4s...
         return min(1000 * pow(2, $attempt - 1), 8000);

@@ -36,7 +36,7 @@ class BudgetAlert
     private function __construct()
     {
         // 注册管理员通知钩子
-        add_action('admin_notices', [$this, 'displayAdminNotices']);
+        add_action('admin_notices', [$this, 'display_admin_notices']);
     }
 
     /**
@@ -50,22 +50,22 @@ class BudgetAlert
     /**
      * 检查并发送告警
      */
-    public function checkAndAlert(): void
+    public function check_and_alert(): void
     {
         $manager = BudgetManager::instance();
 
-        if (!$manager->isEnabled()) {
+        if (!$manager->is_enabled()) {
             return;
         }
 
         $checker = BudgetChecker::instance();
-        $globalCheck = $checker->checkGlobalBudget();
+        $globalCheck = $checker->check_global_budget();
 
         foreach (($globalCheck['details'] ?? []) as $key => $detail) {
             if (($detail['status'] ?? '') === BudgetChecker::STATUS_WARNING) {
-                $this->sendWarningAlert($key, $detail);
+                $this->send_warning_alert($key, $detail);
             } elseif (($detail['status'] ?? '') === BudgetChecker::STATUS_EXCEEDED) {
-                $this->sendExceededAlert($key, $detail);
+                $this->send_exceeded_alert($key, $detail);
             }
         }
     }
@@ -73,61 +73,61 @@ class BudgetAlert
     /**
      * 发送接近限额告警
      */
-    private function sendWarningAlert(string $key, array $detail): void
+    private function send_warning_alert(string $key, array $detail): void
     {
         $checker = BudgetChecker::instance();
 
-        if (!$checker->shouldSendAlert("warning_{$key}")) {
+        if (!$checker->should_send_alert("warning_{$key}")) {
             return;
         }
 
         $manager = BudgetManager::instance();
-        $notifications = $manager->getNotificationSettings();
+        $notifications = $manager->get_notification_settings();
 
-        $message = $this->formatAlertMessage($key, $detail, 'warning');
+        $message = $this->format_alert_message($key, $detail, 'warning');
 
         if ($notifications['admin_notice'] ?? false) {
-            $this->storeAdminNotice($message, 'warning');
+            $this->store_admin_notice($message, 'warning');
         }
 
         if (($notifications['email_alert'] ?? false) && !empty($notifications['email_address'] ?? '')) {
-            $this->sendEmailAlert($notifications['email_address'], $message, 'warning');
+            $this->send_email_alert($notifications['email_address'], $message, 'warning');
         }
 
-        $checker->markAlertSent("warning_{$key}");
+        $checker->mark_alert_sent("warning_{$key}");
     }
 
     /**
      * 发送超限告警
      */
-    private function sendExceededAlert(string $key, array $detail): void
+    private function send_exceeded_alert(string $key, array $detail): void
     {
         $checker = BudgetChecker::instance();
 
-        if (!$checker->shouldSendAlert("exceeded_{$key}")) {
+        if (!$checker->should_send_alert("exceeded_{$key}")) {
             return;
         }
 
         $manager = BudgetManager::instance();
-        $notifications = $manager->getNotificationSettings();
+        $notifications = $manager->get_notification_settings();
 
-        $message = $this->formatAlertMessage($key, $detail, 'exceeded');
+        $message = $this->format_alert_message($key, $detail, 'exceeded');
 
         if ($notifications['admin_notice'] ?? false) {
-            $this->storeAdminNotice($message, 'error');
+            $this->store_admin_notice($message, 'error');
         }
 
         if (($notifications['email_alert'] ?? false) && !empty($notifications['email_address'] ?? '')) {
-            $this->sendEmailAlert($notifications['email_address'], $message, 'exceeded');
+            $this->send_email_alert($notifications['email_address'], $message, 'exceeded');
         }
 
-        $checker->markAlertSent("exceeded_{$key}");
+        $checker->mark_alert_sent("exceeded_{$key}");
     }
 
     /**
      * 格式化告警消息
      */
-    private function formatAlertMessage(string $key, array $detail, string $type): string
+    private function format_alert_message(string $key, array $detail, string $type): string
     {
         $labels = [
             'daily_usd'   => __('每日 USD 预算', 'wpmind'),
@@ -137,8 +137,8 @@ class BudgetAlert
         ];
 
         $label = $labels[$key] ?? $key;
-        $current = $this->formatCost($detail['current'] ?? 0, $key);
-        $limit = $this->formatCost($detail['limit'] ?? 0, $key);
+        $current = $this->format_cost($detail['current'] ?? 0, $key);
+        $limit = $this->format_cost($detail['limit'] ?? 0, $key);
         $percentage = $detail['percentage'] ?? 0;
 
         if ($type === 'warning') {
@@ -162,16 +162,16 @@ class BudgetAlert
     /**
      * 格式化费用
      */
-    private function formatCost(float $cost, string $key): string
+    private function format_cost(float $cost, string $key): string
     {
         $currency = str_contains($key, 'cny') ? 'CNY' : 'USD';
-        return UsageTracker::formatCost($cost, $currency);
+        return UsageTracker::format_cost($cost, $currency);
     }
 
     /**
      * 存储管理员通知
      */
-    private function storeAdminNotice(string $message, string $type): void
+    private function store_admin_notice(string $message, string $type): void
     {
         $notices = get_transient('wpmind_budget_notices');
         if (!is_array($notices)) {
@@ -192,7 +192,7 @@ class BudgetAlert
     /**
      * 显示管理员通知
      */
-    public function displayAdminNotices(): void
+    public function display_admin_notices(): void
     {
         $screen = get_current_screen();
         if (!$screen || $screen->id !== 'toplevel_page_wpmind') {
@@ -219,7 +219,7 @@ class BudgetAlert
     /**
      * 发送邮件告警
      */
-    private function sendEmailAlert(string $email, string $message, string $type): void
+    private function send_email_alert(string $email, string $message, string $type): void
     {
         $subject = $type === 'exceeded'
             ? __('[WPMind] 预算超限告警', 'wpmind')
@@ -242,10 +242,10 @@ class BudgetAlert
     /**
      * 获取预算状态徽章 HTML
      */
-    public static function getStatusBadge(string $status): string
+    public static function get_status_badge(string $status): string
     {
-        $class = BudgetChecker::getStatusClass($status);
-        $label = BudgetChecker::getStatusLabel($status);
+        $class = BudgetChecker::get_status_class($status);
+        $label = BudgetChecker::get_status_label($status);
 
         return sprintf(
             '<span class="wpmind-budget-badge %s">%s</span>',
@@ -257,9 +257,9 @@ class BudgetAlert
     /**
      * 获取进度条 HTML
      */
-    public static function getProgressBar(float $percentage, string $status): string
+    public static function get_progress_bar(float $percentage, string $status): string
     {
-        $class = BudgetChecker::getStatusClass($status);
+        $class = BudgetChecker::get_status_class($status);
         $width = min(100, max(0, $percentage));
 
         return sprintf(

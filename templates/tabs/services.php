@@ -70,8 +70,8 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
     <div class="wpmind-endpoints-grid">
         <?php foreach ( $endpoints as $key => $endpoint ) :
             $has_api_key = $wpmind_instance->has_api_key( $key );
-            $icon_class  = \WPMind\Usage\UsageTracker::getProviderIcon( $key );
-            $icon_color  = \WPMind\Usage\UsageTracker::getProviderColor( $key );
+            $icon_class  = \WPMind\Usage\UsageTracker::get_provider_icon( $key );
+            $icon_color  = \WPMind\Usage\UsageTracker::get_provider_color( $key );
         ?>
         <div class="wpmind-endpoint-card<?php echo ( ! empty( $endpoint['enabled'] ) && $has_api_key ) ? '' : ' is-collapsed'; ?>" id="endpoint-<?php echo esc_attr( $key ); ?>">
             <div class="wpmind-endpoint-header">
