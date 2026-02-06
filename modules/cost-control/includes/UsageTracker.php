@@ -597,4 +597,13 @@ class UsageTracker
         ];
         return $icons[$provider] ?? 'ri-robot-line';
     }
+
+    /**
+     * 获取 Provider 的图标颜色
+     */
+    public static function getProviderColor(string $provider): string
+    {
+        // 统一使用单色，与 WordPress 后台风格一致
+        return '#50575e';
+    }
 }
