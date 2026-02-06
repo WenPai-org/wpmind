@@ -193,6 +193,11 @@ class ModuleLoader {
 
 		$class = $module['class'];
 
+		// Validate class namespace for security.
+		if ( strpos( $class, 'WPMind\\' ) !== 0 ) {
+			return false;
+		}
+
 		if ( ! class_exists( $class ) ) {
 			return false;
 		}

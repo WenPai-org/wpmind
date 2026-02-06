@@ -19,6 +19,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 function wpmind_cleanup_site_data(): void {
     // 删除所有插件选项
     $options = [
+        // 核心设置
         'wpmind_custom_endpoints',
         'wpmind_request_timeout',
         'wpmind_default_provider',
@@ -28,6 +29,19 @@ function wpmind_cleanup_site_data(): void {
         'wpmind_usage_history',
         'wpmind_budget_settings',
         'wpmind_routing_settings',
+        // GEO 模块设置
+        'wpmind_geo_enabled',
+        'wpmind_chinese_optimize',
+        'wpmind_geo_signals',
+        'wpmind_standalone_markdown_feed',
+        'wpmind_crawler_tracking',
+        'wpmind_llms_txt_enabled',
+        'wpmind_schema_enabled',
+        'wpmind_schema_mode',
+        'wpmind_crawler_logs',
+        'wpmind_crawler_stats',
+        // 激活标记
+        'wpmind_flush_rewrite_rules',
     ];
 
     foreach ( $options as $option ) {
@@ -50,9 +64,24 @@ function wpmind_cleanup_site_data(): void {
     // 格式: wpmind_cb_{provider_id}
     global $wpdb;
     $wpdb->query(
-        "DELETE FROM {$wpdb->options}
-         WHERE option_name LIKE '_transient_wpmind_cb_%'
-            OR option_name LIKE '_transient_timeout_wpmind_cb_%'"
+        $wpdb->prepare(
+            "DELETE FROM {$wpdb->options}
+             WHERE option_name LIKE %s
+                OR option_name LIKE %s",
+            '_transient_wpmind_cb_%',
+            '_transient_timeout_wpmind_cb_%'
+        )
+    );
+
+    // 删除动态模块启用选项和 llms.txt 缓存
+    $wpdb->query(
+        $wpdb->prepare(
+            "DELETE FROM {$wpdb->options}
+             WHERE option_name LIKE %s
+                OR option_name LIKE %s",
+            'wpmind_module_%',
+            '_transient_wpmind_llms_txt_%'
+        )
     );
 }
 

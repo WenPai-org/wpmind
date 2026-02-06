@@ -15,30 +15,14 @@ use WPMind\Core\ModuleInterface;
 class AnalyticsModule implements ModuleInterface
 {
     /**
-     * 单例实例
-     */
-    private static ?AnalyticsModule $instance = null;
-
-    /**
      * 模块配置
      */
     private array $config = [];
 
     /**
-     * 获取单例实例
+     * 构造函数
      */
-    public static function instance(): AnalyticsModule
-    {
-        if (null === self::$instance) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
-
-    /**
-     * 私有构造函数
-     */
-    private function __construct()
+    public function __construct()
     {
         $config_file = __DIR__ . '/module.json';
         if (file_exists($config_file)) {
@@ -164,7 +148,7 @@ class AnalyticsModule implements ModuleInterface
      */
     public function ajax_get_analytics(): void
     {
-        check_ajax_referer('wpmind_admin_nonce', 'nonce');
+        check_ajax_referer('wpmind_ajax', 'nonce');
 
         if (!current_user_can('manage_options')) {
             wp_send_json_error(['message' => __('权限不足', 'wpmind')]);

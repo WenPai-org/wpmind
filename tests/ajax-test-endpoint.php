@@ -18,20 +18,16 @@ if (!defined('ABSPATH')) {
  *
  * 安全说明：
  * - wp_ajax_ 端点仅限已登录用户
- * - wp_ajax_nopriv_ 端点仅在明确启用开发模式时注册
+ * - 需要管理员权限和 nonce 验证
  */
 add_action('wp_ajax_wpmind_test_api', 'wpmind_run_api_test');
 
-// 仅在开发模式下注册未认证端点（需要同时满足 WP_DEBUG 和 WPMIND_DEV_MODE）
-if (defined('WP_DEBUG') && WP_DEBUG && defined('WPMIND_DEV_MODE') && WPMIND_DEV_MODE) {
-    add_action('wp_ajax_nopriv_wpmind_test_api', 'wpmind_run_api_test');
-}
-
 function wpmind_run_api_test() {
-    // 安全检查：必须是管理员，或者在开发模式下
-    $is_dev_mode = defined('WP_DEBUG') && WP_DEBUG && defined('WPMIND_DEV_MODE') && WPMIND_DEV_MODE;
+    // Nonce 验证
+    check_ajax_referer('wpmind_ajax', 'nonce');
 
-    if (!current_user_can('manage_options') && !$is_dev_mode) {
+    // 权限检查：必须是管理员
+    if (!current_user_can('manage_options')) {
         wp_send_json_error(['message' => '权限不足']);
     }
 

@@ -361,7 +361,7 @@
                         Toast.success(provider.toUpperCase() + ' ' + message);
                     } else {
                         var errorMsg = (response.data && response.data.message) || '连接失败';
-                        var errorCode = (response.data && response.data.code) ? ' [' + response.data.code + ']' : '';
+                        var errorCode = (response.data && response.data.code) ? ' [' + escapeHtml(String(response.data.code)) + ']' : '';
                         var retryInfo = (response.data && response.data.retried) ? ' (已重试)' : '';
 
                         $result.html(

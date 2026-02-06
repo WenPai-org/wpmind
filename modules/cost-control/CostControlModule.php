@@ -190,7 +190,7 @@ class CostControlModule implements ModuleInterface {
 		}
 
 		// Parse JSON data.
-		$json_input = isset( $_POST['settings'] ) ? stripslashes( $_POST['settings'] ) : '';
+		$json_input = isset( $_POST['settings'] ) ? wp_unslash( $_POST['settings'] ) : '';
 		$input = json_decode( $json_input, true );
 
 		if ( ! is_array( $input ) ) {

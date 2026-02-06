@@ -489,8 +489,8 @@ class PublicAPI {
         do_action('wpmind_before_request', 'image', compact('prompt', 'options'), $context);
 
         // 使用现有的图像路由器
-        if (class_exists('\\WPMind\\Routing\\ImageRouter')) {
-            $router = \WPMind\Routing\ImageRouter::instance();
+        if (class_exists('\\WPMind\\Providers\\Image\\ImageRouter')) {
+            $router = \WPMind\Providers\Image\ImageRouter::instance();
             $result = $router->generate($prompt, $options);
         } else {
             return new WP_Error(
@@ -1367,6 +1367,13 @@ class PublicAPI {
 
         // 保存到文件或上传到媒体库
         if (!empty($options['save_to'])) {
+            // 验证路径在 uploads 目录内，防止路径遍历
+            $upload_dir = wp_upload_dir();
+            $save_dir = realpath(dirname($options['save_to']));
+            $base_dir = realpath($upload_dir['basedir']);
+            if ($save_dir === false || $base_dir === false || strpos($save_dir, $base_dir) !== 0) {
+                return new WP_Error('wpmind_invalid_path', __('保存路径必须在 uploads 目录内', 'wpmind'));
+            }
             file_put_contents($options['save_to'], $audio_data);
             $result['file'] = $options['save_to'];
         } else {
