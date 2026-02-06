@@ -193,7 +193,7 @@ class RoutingContext
     public function get_usage_stats(): array
     {
         if ($this->usageStats === null) {
-            $this->usageStats = UsageTracker::getStats();
+            $this->usageStats = UsageTracker::get_stats();
         }
         return $this->usageStats;
     }
@@ -217,7 +217,7 @@ class RoutingContext
      */
     public function estimate_cost(string $providerId, string $model = 'default'): float
     {
-        return UsageTracker::calculateCost(
+        return UsageTracker::calculate_cost(
             $providerId,
             $model,
             $this->estimatedInputTokens,
