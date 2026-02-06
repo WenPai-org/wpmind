@@ -13,12 +13,12 @@ defined( 'ABSPATH' ) || exit;
 
 // 获取数据
 $failover_manager = \WPMind\Failover\FailoverManager::instance();
-$provider_status  = $failover_manager->getStatusSummary();
+$provider_status  = $failover_manager->get_status_summary();
 
 $usage_stats = \WPMind\Usage\UsageTracker::getStats();
-$today_stats = \WPMind\Usage\UsageTracker::getTodayStats();
-$week_stats  = \WPMind\Usage\UsageTracker::getWeekStats();
-$month_stats = \WPMind\Usage\UsageTracker::getMonthStats();
+$today_stats = \WPMind\Usage\UsageTracker::get_today_stats();
+$week_stats  = \WPMind\Usage\UsageTracker::get_week_stats();
+$month_stats = \WPMind\Usage\UsageTracker::get_month_stats();
 $last_updated = $usage_stats['last_updated'] ?? 0;
 $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
 ?>
@@ -149,9 +149,9 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
     <div class="wpmind-provider-usage-grid">
         <?php foreach ( $usage_stats['providers'] as $provider_id => $provider_stats ) :
             $currency = \WPMind\Usage\UsageTracker::getCurrency( $provider_id );
-            $display_name = \WPMind\Usage\UsageTracker::getProviderDisplayName( $provider_id );
-            $icon_class = \WPMind\Usage\UsageTracker::getProviderIcon( $provider_id );
-            $icon_color = \WPMind\Usage\UsageTracker::getProviderColor( $provider_id );
+            $display_name = \WPMind\Usage\UsageTracker::get_provider_display_name( $provider_id );
+            $icon_class = \WPMind\Usage\UsageTracker::get_provider_icon( $provider_id );
+            $icon_color = \WPMind\Usage\UsageTracker::get_provider_color( $provider_id );
         ?>
         <div class="wpmind-provider-usage-item">
             <div class="wpmind-provider-usage-header">

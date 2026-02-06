@@ -36,7 +36,7 @@ class BudgetManager
 
     private function __construct() {}
 
-    public function getDefaults(): array
+    public function get_defaults(): array
     {
         return [
             'enabled' => false,
@@ -57,14 +57,14 @@ class BudgetManager
         ];
     }
 
-    public function getSettings(): array
+    public function get_settings(): array
     {
         if (null === $this->settings) {
             $saved = get_option(self::OPTION_KEY, []);
             if (!is_array($saved)) {
                 $saved = [];
             }
-            $this->settings = $this->recursiveMerge($saved, $this->getDefaults());
+            $this->settings = $this->recursiveMerge($saved, $this->get_defaults());
         }
         return $this->settings;
     }
@@ -94,7 +94,7 @@ class BudgetManager
         return array_keys($arr) !== range(0, count($arr) - 1);
     }
 
-    public function saveSettings(array $settings): bool
+    public function save_settings(array $settings): bool
     {
         $sanitized = $this->sanitizeSettings($settings);
         $result = update_option(self::OPTION_KEY, $sanitized, false);
@@ -157,45 +157,45 @@ class BudgetManager
         return in_array($mode, $allowed, true) ? $mode : self::MODE_ALERT;
     }
 
-    public function isEnabled(): bool
+    public function is_enabled(): bool
     {
-        $settings = $this->getSettings();
+        $settings = $this->get_settings();
         return !empty($settings['enabled']);
     }
 
-    public function getGlobalBudget(): array
+    public function get_global_budget(): array
     {
-        $settings = $this->getSettings();
-        return $settings['global'] ?? $this->getDefaults()['global'];
+        $settings = $this->get_settings();
+        return $settings['global'] ?? $this->get_defaults()['global'];
     }
 
-    public function getProviderBudget(string $provider): ?array
+    public function get_provider_budget(string $provider): ?array
     {
-        $settings = $this->getSettings();
+        $settings = $this->get_settings();
         return $settings['providers'][$provider] ?? null;
     }
 
-    public function getNotificationSettings(): array
+    public function get_notification_settings(): array
     {
-        $settings = $this->getSettings();
-        return $settings['notifications'] ?? $this->getDefaults()['notifications'];
+        $settings = $this->get_settings();
+        return $settings['notifications'] ?? $this->get_defaults()['notifications'];
     }
 
-    public function getEnforcementMode(): string
+    public function get_enforcement_mode(): string
     {
-        $settings = $this->getSettings();
+        $settings = $this->get_settings();
         return $settings['enforcement_mode'] ?? self::MODE_ALERT;
     }
 
-    public function getAlertThreshold(): int
+    public function get_alert_threshold(): int
     {
-        $global = $this->getGlobalBudget();
+        $global = $this->get_global_budget();
         return $global['alert_threshold'] ?? 80;
     }
 
-    public function hasAnyLimits(): bool
+    public function has_any_limits(): bool
     {
-        $global = $this->getGlobalBudget();
+        $global = $this->get_global_budget();
 
         if ($global['daily_limit_usd'] > 0 || $global['daily_limit_cny'] > 0) {
             return true;
@@ -204,11 +204,11 @@ class BudgetManager
             return true;
         }
 
-        $settings = $this->getSettings();
+        $settings = $this->get_settings();
         return !empty($settings['providers']);
     }
 
-    public static function getModeLabel(string $mode): string
+    public static function get_mode_label(string $mode): string
     {
         $labels = [
             self::MODE_ALERT    => __('仅告警', 'wpmind'),
@@ -218,7 +218,7 @@ class BudgetManager
         return $labels[$mode] ?? $mode;
     }
 
-    public static function getModeOptions(): array
+    public static function get_mode_options(): array
     {
         return [
             self::MODE_ALERT    => __('仅告警 - 超限时发送通知，不阻止请求', 'wpmind'),

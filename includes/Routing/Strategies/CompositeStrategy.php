@@ -52,7 +52,7 @@ class CompositeStrategy extends AbstractStrategy
      * @param float $weight 权重 (0-1)
      * @return self
      */
-    public function addStrategy(RoutingStrategyInterface $strategy, float $weight): self
+    public function add_strategy(RoutingStrategyInterface $strategy, float $weight): self
     {
         $this->strategies[] = [
             'strategy' => $strategy,
@@ -61,17 +61,17 @@ class CompositeStrategy extends AbstractStrategy
         return $this;
     }
 
-    public function getName(): string
+    public function get_name(): string
     {
         return $this->name;
     }
 
-    public function getDisplayName(): string
+    public function get_display_name(): string
     {
         return $this->displayName;
     }
 
-    public function getDescription(): string
+    public function get_description(): string
     {
         return $this->description;
     }
@@ -81,7 +81,7 @@ class CompositeStrategy extends AbstractStrategy
      *
      * 按权重汇总各子策略的得分
      */
-    public function calculateScore(string $providerId, RoutingContext $context): float
+    public function calculate_score(string $providerId, RoutingContext $context): float
     {
         if (empty($this->strategies)) {
             return 50.0;
@@ -94,7 +94,7 @@ class CompositeStrategy extends AbstractStrategy
 
         $weightedScore = 0;
         foreach ($this->strategies as $item) {
-            $score = $item['strategy']->calculateScore($providerId, $context);
+            $score = $item['strategy']->calculate_score($providerId, $context);
             $normalizedWeight = $item['weight'] / $totalWeight;
             $weightedScore += $score * $normalizedWeight;
         }
@@ -107,11 +107,11 @@ class CompositeStrategy extends AbstractStrategy
      *
      * @return array<array{name: string, weight: float}>
      */
-    public function getStrategies(): array
+    public function get_strategies(): array
     {
         return array_map(fn($item) => [
-            'name' => $item['strategy']->getName(),
-            'display_name' => $item['strategy']->getDisplayName(),
+            'name' => $item['strategy']->get_name(),
+            'display_name' => $item['strategy']->get_display_name(),
             'weight' => $item['weight'],
         ], $this->strategies);
     }
@@ -124,9 +124,9 @@ class CompositeStrategy extends AbstractStrategy
     public static function createBalanced(): self
     {
         return (new self('balanced', '平衡策略', '平衡考虑成本、延迟和可用性'))
-            ->addStrategy(new CostStrategy(), 0.33)
-            ->addStrategy(new LatencyStrategy(), 0.33)
-            ->addStrategy(new AvailabilityStrategy(), 0.34);
+            ->add_strategy(new CostStrategy(), 0.33)
+            ->add_strategy(new LatencyStrategy(), 0.33)
+            ->add_strategy(new AvailabilityStrategy(), 0.34);
     }
 
     /**
@@ -137,9 +137,9 @@ class CompositeStrategy extends AbstractStrategy
     public static function createPerformance(): self
     {
         return (new self('performance', '性能优先', '优先考虑响应速度和稳定性'))
-            ->addStrategy(new LatencyStrategy(), 0.50)
-            ->addStrategy(new AvailabilityStrategy(), 0.30)
-            ->addStrategy(new CostStrategy(), 0.20);
+            ->add_strategy(new LatencyStrategy(), 0.50)
+            ->add_strategy(new AvailabilityStrategy(), 0.30)
+            ->add_strategy(new CostStrategy(), 0.20);
     }
 
     /**
@@ -150,8 +150,8 @@ class CompositeStrategy extends AbstractStrategy
     public static function createEconomic(): self
     {
         return (new self('economic', '经济策略', '优先考虑成本，兼顾稳定性'))
-            ->addStrategy(new CostStrategy(), 0.60)
-            ->addStrategy(new AvailabilityStrategy(), 0.30)
-            ->addStrategy(new LatencyStrategy(), 0.10);
+            ->add_strategy(new CostStrategy(), 0.60)
+            ->add_strategy(new AvailabilityStrategy(), 0.30)
+            ->add_strategy(new LatencyStrategy(), 0.10);
     }
 }

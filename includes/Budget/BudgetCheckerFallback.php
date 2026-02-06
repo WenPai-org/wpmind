@@ -54,20 +54,20 @@ class BudgetChecker
      *
      * @return array ['status' => string, 'details' => array]
      */
-    public function checkGlobalBudget(): array
+    public function check_global_budget(): array
     {
         $manager = BudgetManager::instance();
 
-        if (!$manager->isEnabled() || !$manager->hasAnyLimits()) {
+        if (!$manager->is_enabled() || !$manager->has_any_limits()) {
             return ['status' => self::STATUS_OK, 'details' => []];
         }
 
-        $global = $manager->getGlobalBudget();
-        $threshold = $manager->getAlertThreshold();
+        $global = $manager->get_global_budget();
+        $threshold = $manager->get_alert_threshold();
 
         // 获取当前用量
-        $today = UsageTracker::getTodayStats();
-        $month = UsageTracker::getMonthStats();
+        $today = UsageTracker::get_today_stats();
+        $month = UsageTracker::get_month_stats();
 
         $details = [];
         $status = self::STATUS_OK;
@@ -129,23 +129,23 @@ class BudgetChecker
      * @param string $provider 服务商 ID
      * @return array ['status' => string, 'details' => array]
      */
-    public function checkProviderBudget(string $provider): array
+    public function check_provider_budget(string $provider): array
     {
         $manager = BudgetManager::instance();
 
-        if (!$manager->isEnabled()) {
+        if (!$manager->is_enabled()) {
             return ['status' => self::STATUS_OK, 'details' => []];
         }
 
-        $providerBudget = $manager->getProviderBudget($provider);
+        $providerBudget = $manager->get_provider_budget($provider);
         if (!$providerBudget) {
             return ['status' => self::STATUS_OK, 'details' => []];
         }
 
-        $threshold = $manager->getAlertThreshold();
+        $threshold = $manager->get_alert_threshold();
 
         // 获取服务商用量
-        $stats = UsageTracker::getStats();
+        $stats = UsageTracker::get_stats();
         $providerStats = $stats['providers'][$provider] ?? null;
 
         if (!$providerStats) {
@@ -156,7 +156,7 @@ class BudgetChecker
         $status = self::STATUS_OK;
 
         // 获取服务商货币类型
-        $currency = UsageTracker::getCurrency($provider);
+        $currency = UsageTracker::get_currency($provider);
 
         // 检查每日限额
         if (!empty($providerBudget['daily_limit']) && $providerBudget['daily_limit'] > 0) {
@@ -197,19 +197,19 @@ class BudgetChecker
     {
         $manager = BudgetManager::instance();
 
-        if (!$manager->isEnabled()) {
+        if (!$manager->is_enabled()) {
             return ['allowed' => true, 'reason' => null, 'status' => []];
         }
 
-        $mode = $manager->getEnforcementMode();
+        $mode = $manager->get_enforcement_mode();
 
         // 仅告警模式始终允许请求
         if ($mode === BudgetManager::MODE_ALERT) {
-            return ['allowed' => true, 'reason' => null, 'status' => $this->checkGlobalBudget()];
+            return ['allowed' => true, 'reason' => null, 'status' => $this->check_global_budget()];
         }
 
         // 检查全局预算
-        $globalCheck = $this->checkGlobalBudget();
+        $globalCheck = $this->check_global_budget();
         if ($globalCheck['status'] === self::STATUS_EXCEEDED) {
             return [
                 'allowed' => false,
@@ -220,7 +220,7 @@ class BudgetChecker
 
         // 检查服务商预算
         if ($provider) {
-            $providerCheck = $this->checkProviderBudget($provider);
+            $providerCheck = $this->check_provider_budget($provider);
             if ($providerCheck['status'] === self::STATUS_EXCEEDED) {
                 return [
                     'allowed' => false,
@@ -241,11 +241,11 @@ class BudgetChecker
     public function getAllProviderStatus(): array
     {
         $manager = BudgetManager::instance();
-        $settings = $manager->getSettings();
+        $settings = $manager->get_settings();
         $result = [];
 
         foreach (($settings['providers'] ?? []) as $provider => $limits) {
-            $result[$provider] = $this->checkProviderBudget($provider);
+            $result[$provider] = $this->check_provider_budget($provider);
         }
 
         return $result;
@@ -256,11 +256,11 @@ class BudgetChecker
      *
      * @return array
      */
-    public function getSummary(): array
+    public function get_summary(): array
     {
         $manager = BudgetManager::instance();
 
-        if (!$manager->isEnabled()) {
+        if (!$manager->is_enabled()) {
             return [
                 'enabled' => false,
                 'global'  => null,
@@ -268,13 +268,13 @@ class BudgetChecker
             ];
         }
 
-        $global = $this->checkGlobalBudget();
+        $global = $this->check_global_budget();
         $providers = $this->getAllProviderStatus();
 
         // 计算使用百分比
-        $globalBudget = $manager->getGlobalBudget();
-        $today = UsageTracker::getTodayStats();
-        $month = UsageTracker::getMonthStats();
+        $globalBudget = $manager->get_global_budget();
+        $today = UsageTracker::get_today_stats();
+        $month = UsageTracker::get_month_stats();
 
         $percentages = [];
 
@@ -311,8 +311,8 @@ class BudgetChecker
             'global'      => $global,
             'providers'   => $providers,
             'percentages' => $percentages,
-            'threshold'   => $manager->getAlertThreshold(),
-            'mode'        => $manager->getEnforcementMode(),
+            'threshold'   => $manager->get_alert_threshold(),
+            'mode'        => $manager->get_enforcement_mode(),
         ];
     }
 
@@ -367,7 +367,7 @@ class BudgetChecker
      */
     private function getProviderTodayCost(string $provider): float
     {
-        $history = UsageTracker::getHistory(1000);
+        $history = UsageTracker::get_history(1000);
         $today = wp_date('Y-m-d');
         $todayStart = strtotime($today);
         $cost = 0;
@@ -389,14 +389,14 @@ class BudgetChecker
      */
     private function getProviderMonthCost(string $provider): float
     {
-        $stats = UsageTracker::getStats();
+        $stats = UsageTracker::get_stats();
         return $stats['providers'][$provider]['total_cost'] ?? 0;
     }
 
     /**
      * 检查是否需要发送告警
      */
-    public function shouldSendAlert(string $alertKey): bool
+    public function should_send_alert(string $alertKey): bool
     {
         $sent = get_transient(self::ALERT_TRANSIENT_KEY);
         if (!is_array($sent)) {
@@ -412,7 +412,7 @@ class BudgetChecker
     /**
      * 标记告警已发送
      */
-    public function markAlertSent(string $alertKey): void
+    public function mark_alert_sent(string $alertKey): void
     {
         $sent = get_transient(self::ALERT_TRANSIENT_KEY);
         if (!is_array($sent)) {
@@ -437,7 +437,7 @@ class BudgetChecker
     /**
      * 获取状态的显示标签
      */
-    public static function getStatusLabel(string $status): string
+    public static function get_status_label(string $status): string
     {
         $labels = [
             self::STATUS_OK       => __('正常', 'wpmind'),
@@ -450,7 +450,7 @@ class BudgetChecker
     /**
      * 获取状态的 CSS 类
      */
-    public static function getStatusClass(string $status): string
+    public static function get_status_class(string $status): string
     {
         $classes = [
             self::STATUS_OK       => 'wpmind-budget-ok',
