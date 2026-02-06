@@ -8,6 +8,10 @@
 - 兼容层 (`__callStatic` 代理) 同步更新
 - 模板文件静态调用同步更新
 - 外部库接口方法 (Providers/Image) 保持不变
+- **Chart.js CDN 兜底**: 本地优先加载，失败时自动切换 CDN
+- **后台 JS 模块化**: admin 逻辑拆分为 `admin-*.js`，Chart.js 仅 analytics 依赖
+- **模板去内嵌**: modules/cost-control 模板移除内联脚本，Modules 样式迁移到 `assets/css/modules.css`
+- **后台 PHP 拆分**: admin 逻辑迁移至 `includes/Admin/*`
 
 ---
 
