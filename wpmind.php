@@ -513,51 +513,7 @@ final class WPMind {
             ]
         );
 
-        // GEO 模块设置
-        register_setting(
-            'wpmind_geo_settings',
-            'wpmind_geo_enabled',
-            [
-                'type'    => 'boolean',
-                'default' => true,
-            ]
-        );
-
-        register_setting(
-            'wpmind_geo_settings',
-            'wpmind_chinese_optimize',
-            [
-                'type'    => 'boolean',
-                'default' => true,
-            ]
-        );
-
-        register_setting(
-            'wpmind_geo_settings',
-            'wpmind_geo_signals',
-            [
-                'type'    => 'boolean',
-                'default' => true,
-            ]
-        );
-
-        register_setting(
-            'wpmind_geo_settings',
-            'wpmind_standalone_markdown_feed',
-            [
-                'type'    => 'boolean',
-                'default' => false,
-            ]
-        );
-
-        register_setting(
-            'wpmind_geo_settings',
-            'wpmind_crawler_tracking',
-            [
-                'type'    => 'boolean',
-                'default' => true,
-            ]
-        );
+        // GEO settings are managed by GeoModule via AJAX.
     }
 
     /**

@@ -153,10 +153,15 @@ class ModuleLoader {
 
 	/**
 	 * Load enabled modules.
+	 *
+	 * Resolves module dependencies and loads in correct order.
 	 */
 	private function load_enabled_modules(): void {
-		foreach ( $this->modules as $module_id => $module ) {
-			if ( ! $module['enabled'] ) {
+		// Build dependency-ordered load list.
+		$load_order = $this->resolve_load_order();
+
+		foreach ( $load_order as $module_id ) {
+			if ( ! $this->modules[ $module_id ]['enabled'] ) {
 				continue;
 			}
 
@@ -229,6 +234,55 @@ class ModuleLoader {
 		do_action( "wpmind_module_{$module_id}_loaded", $instance );
 
 		return true;
+	}
+
+	/**
+	 * Resolve module load order based on dependencies.
+	 *
+	 * Ensures modules with dependencies are loaded after their requirements.
+	 * Only considers array-type requires (module dependencies), not object-type
+	 * requires (system requirements like PHP/WordPress versions).
+	 *
+	 * @return array<string> Ordered list of module IDs.
+	 */
+	private function resolve_load_order(): array {
+		$ordered  = [];
+		$resolved = [];
+
+		foreach ( $this->modules as $module_id => $module ) {
+			$this->resolve_module_deps( $module_id, $ordered, $resolved );
+		}
+
+		return $ordered;
+	}
+
+	/**
+	 * Recursively resolve a module's dependencies.
+	 *
+	 * @param string   $module_id Module ID.
+	 * @param array    $ordered   Ordered output list (by reference).
+	 * @param array    $resolved  Already resolved modules (by reference).
+	 */
+	private function resolve_module_deps( string $module_id, array &$ordered, array &$resolved ): void {
+		if ( isset( $resolved[ $module_id ] ) ) {
+			return;
+		}
+
+		$resolved[ $module_id ] = true;
+
+		$requires = $this->modules[ $module_id ]['requires'] ?? [];
+
+		// Only process array-type requires (module dependencies).
+		// Object/associative arrays like {"php": "8.1"} are system requirements.
+		if ( is_array( $requires ) && ! empty( $requires ) && array_is_list( $requires ) ) {
+			foreach ( $requires as $dep_id ) {
+				if ( isset( $this->modules[ $dep_id ] ) && ! isset( $resolved[ $dep_id ] ) ) {
+					$this->resolve_module_deps( $dep_id, $ordered, $resolved );
+				}
+			}
+		}
+
+		$ordered[] = $module_id;
 	}
 
 	/**
