@@ -1,18 +1,18 @@
 {
+    "id": "analytics",
     "name": "Analytics",
-    "slug": "analytics",
     "version": "1.0.0",
     "description": "分析仪表板 - 用量趋势、服务商对比、成本分析",
     "author": "WPMind",
+    "icon": "ri-bar-chart-box-line",
+    "class": "WPMind\\Modules\\Analytics\\AnalyticsModule",
+    "can_disable": true,
+    "settings_tab": "dashboard",
     "requires": ["cost-control"],
-    "settings_tab": {
-        "id": "dashboard",
-        "label": "分析面板",
-        "icon": "dashicons-chart-area",
-        "priority": 10
-    },
-    "assets": {
-        "js": ["chart.min.js"],
-        "css": []
-    }
+    "features": [
+        "用量趋势图表",
+        "服务商对比分析",
+        "成本统计报表",
+        "实时监控面板"
+    ]
 }

@@ -101,17 +101,20 @@ class ModuleLoader {
 			}
 
 			$this->modules[ $module_id ] = array(
-				'id'          => $meta['id'],
-				'name'        => $meta['name'],
-				'description' => $meta['description'] ?? '',
-				'version'     => $meta['version'],
-				'author'      => $meta['author'] ?? '',
-				'icon'        => $meta['icon'] ?? 'dashicons-admin-plugins',
-				'class'       => $meta['class'] ?? $this->get_module_class_name( $module_id ),
-				'class_file'  => $class_file,
-				'path'        => $dir,
-				'enabled'     => $this->is_module_enabled( $module_id ),
-				'can_disable' => $meta['can_disable'] ?? true,
+				'id'           => $meta['id'],
+				'name'         => $meta['name'],
+				'description'  => $meta['description'] ?? '',
+				'version'      => $meta['version'],
+				'author'       => $meta['author'] ?? '',
+				'icon'         => $meta['icon'] ?? 'dashicons-admin-plugins',
+				'class'        => $meta['class'] ?? $this->get_module_class_name( $module_id ),
+				'class_file'   => $class_file,
+				'path'         => $dir,
+				'enabled'      => $this->is_module_enabled( $module_id ),
+				'can_disable'  => $meta['can_disable'] ?? true,
+				'settings_tab' => $meta['settings_tab'] ?? '',
+				'requires'     => $meta['requires'] ?? [],
+				'features'     => $meta['features'] ?? [],
 			);
 		}
 
