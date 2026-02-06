@@ -337,6 +337,9 @@ final class WPMind {
         // HTTP API 钩子 - 追踪 AI 请求结果
         add_action( 'http_api_debug', [ $this, 'track_ai_request_result' ], 10, 5 );
 
+        // 智能路由集成
+        $this->init_routing_hooks();
+
         // 插件链接
         add_filter(
             'plugin_action_links_' . plugin_basename( WPMIND_PLUGIN_FILE ),
@@ -345,6 +348,16 @@ final class WPMind {
 
         // 插件行元信息
         add_filter( 'plugin_row_meta', [ $this, 'plugin_row_meta' ], 10, 2 );
+    }
+
+    /**
+     * 初始化智能路由钩子
+     *
+     * @since 3.2.0
+     */
+    private function init_routing_hooks(): void {
+        // 初始化路由钩子（类通过 autoloader 自动加载）
+        \WPMind\Routing\RoutingHooks::instance();
     }
 
     /**
