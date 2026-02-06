@@ -193,7 +193,7 @@ class FailoverManager
 
         foreach ($this->circuitBreakers as $providerId => $breaker) {
             $cbStatus = $breaker->get_status_details();
-            $healthStatus = ProviderHealthTracker::getProviderStatus($providerId);
+            $healthStatus = ProviderHealthTracker::get_provider_status($providerId);
 
             $summary[$providerId] = [
                 'name'          => $this->providers[$providerId]['name'] ?? $providerId,
