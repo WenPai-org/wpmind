@@ -1,0 +1,22 @@
+{
+    "id": "cost-control",
+    "name": "Cost Control",
+    "description": "AI 服务费用控制 - 用量追踪、预算限额、告警通知",
+    "version": "1.0.0",
+    "author": "WPMind",
+    "icon": "ri-money-cny-circle-line",
+    "class": "WPMind\\Modules\\CostControl\\CostControlModule",
+    "can_disable": true,
+    "settings_tab": "cost-control",
+    "features": [
+        "Token 用量追踪",
+        "费用统计 (USD/CNY)",
+        "预算限额设置",
+        "告警阈值通知",
+        "邮件告警"
+    ],
+    "requires": {
+        "php": "8.1",
+        "wordpress": "6.0"
+    }
+}
