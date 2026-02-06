@@ -39,9 +39,9 @@ class CircuitBreaker
     /**
      * 获取当前状态
      */
-    public function getState(): string
+    public function get_state(): string
     {
-        $data = $this->getData();
+        $data = $this->get_data();
         return $data['state'] ?? self::STATE_CLOSED;
     }
 
@@ -50,18 +50,18 @@ class CircuitBreaker
      *
      * @param bool $allowTransition 是否允许状态转换（默认 true）
      */
-    public function isAvailable(bool $allowTransition = true): bool
+    public function is_available(bool $allowTransition = true): bool
     {
-        $state = $this->getState();
+        $state = $this->get_state();
 
         if ($state === self::STATE_CLOSED) {
             return true;
         }
 
         if ($state === self::STATE_OPEN) {
-            if ($this->shouldTransitionToHalfOpen()) {
+            if ($this->should_transition_to_half_open()) {
                 if ($allowTransition) {
-                    $this->transitionTo(self::STATE_HALF_OPEN);
+                    $this->transition_to(self::STATE_HALF_OPEN);
                 }
                 return true;
             }
@@ -69,7 +69,7 @@ class CircuitBreaker
         }
 
         // 半开状态：检查是否还有测试配额
-        return $this->canAllowHalfOpenRequest();
+        return $this->can_allow_half_open_request();
     }
 
     /**
@@ -77,30 +77,30 @@ class CircuitBreaker
      *
      * 用于状态查询，不会修改熔断器状态
      */
-    public function isAvailableReadOnly(): bool
+    public function is_available_read_only(): bool
     {
-        return $this->isAvailable(false);
+        return $this->is_available(false);
     }
 
     /**
      * 记录成功请求
      */
-    public function recordSuccess(): void
+    public function record_success(): void
     {
-        $data = $this->getData();
+        $data = $this->get_data();
         $now = time();
         $state = $data['state'] ?? self::STATE_CLOSED;
 
         // 开启状态下，如果恢复时间已过，先转换到半开状态
-        if ($state === self::STATE_OPEN && $this->shouldTransitionToHalfOpen()) {
-            $this->transitionTo(self::STATE_HALF_OPEN);
-            $data = $this->getData(); // 重新获取转换后的数据
+        if ($state === self::STATE_OPEN && $this->should_transition_to_half_open()) {
+            $this->transition_to(self::STATE_HALF_OPEN);
+            $data = $this->get_data(); // 重新获取转换后的数据
             $state = self::STATE_HALF_OPEN;
         }
 
         // 记录带时间戳的请求
         $data['requests'][] = ['success' => true, 'time' => $now];
-        $data['requests'] = $this->filterRecentRequests($data['requests'] ?? [], $now);
+        $data['requests'] = $this->filter_recent_requests($data['requests'] ?? [], $now);
 
         $data['successes'] = ($data['successes'] ?? 0) + 1;
         $data['last_success'] = $now;
@@ -110,33 +110,33 @@ class CircuitBreaker
         if ($state === self::STATE_HALF_OPEN) {
             $data['half_open_successes'] = ($data['half_open_successes'] ?? 0) + 1;
             if ($data['half_open_successes'] >= self::HALF_OPEN_REQUESTS) {
-                $this->transitionTo(self::STATE_CLOSED);
+                $this->transition_to(self::STATE_CLOSED);
                 return;
             }
         }
 
-        $this->saveData($data);
+        $this->save_data($data);
     }
 
     /**
      * 记录失败请求
      */
-    public function recordFailure(): void
+    public function record_failure(): void
     {
-        $data = $this->getData();
+        $data = $this->get_data();
         $now = time();
         $state = $data['state'] ?? self::STATE_CLOSED;
 
         // 开启状态下，如果恢复时间已过，先转换到半开状态
-        if ($state === self::STATE_OPEN && $this->shouldTransitionToHalfOpen()) {
-            $this->transitionTo(self::STATE_HALF_OPEN);
-            $data = $this->getData();
+        if ($state === self::STATE_OPEN && $this->should_transition_to_half_open()) {
+            $this->transition_to(self::STATE_HALF_OPEN);
+            $data = $this->get_data();
             $state = self::STATE_HALF_OPEN;
         }
 
         // 记录带时间戳的请求
         $data['requests'][] = ['success' => false, 'time' => $now];
-        $data['requests'] = $this->filterRecentRequests($data['requests'] ?? [], $now);
+        $data['requests'] = $this->filter_recent_requests($data['requests'] ?? [], $now);
 
         $data['failures'] = ($data['failures'] ?? 0) + 1;
         $data['consecutive_failures'] = ($data['consecutive_failures'] ?? 0) + 1;
@@ -145,18 +145,18 @@ class CircuitBreaker
         // 半开状态下失败，立即回到开启状态
         if ($state === self::STATE_HALF_OPEN) {
             $data['half_open_failures'] = ($data['half_open_failures'] ?? 0) + 1;
-            $this->saveData($data);
-            $this->transitionTo(self::STATE_OPEN);
+            $this->save_data($data);
+            $this->transition_to(self::STATE_OPEN);
             return;
         }
 
         // 检查是否应该熔断
-        if ($this->shouldTrip($data)) {
-            $this->transitionTo(self::STATE_OPEN);
+        if ($this->should_trip($data)) {
+            $this->transition_to(self::STATE_OPEN);
             return;
         }
 
-        $this->saveData($data);
+        $this->save_data($data);
     }
 
     /**
@@ -170,29 +170,29 @@ class CircuitBreaker
     /**
      * 获取状态详情
      */
-    public function getStatusDetails(): array
+    public function get_status_details(): array
     {
-        $data = $this->getData();
+        $data = $this->get_data();
         $state = $data['state'] ?? self::STATE_CLOSED;
 
         return [
             'provider_id'          => $this->providerId,
             'state'                => $state,
-            'state_label'          => $this->getStateLabel($state),
+            'state_label'          => $this->get_state_label($state),
             'failures'             => $data['failures'] ?? 0,
             'successes'            => $data['successes'] ?? 0,
             'consecutive_failures' => $data['consecutive_failures'] ?? 0,
             'last_failure'         => $data['last_failure'] ?? null,
             'last_success'         => $data['last_success'] ?? null,
             'transitioned_at'      => $data['transitioned'] ?? null,
-            'recovery_in'          => $this->getRecoveryTimeRemaining($data),
+            'recovery_in'          => $this->get_recovery_time_remaining($data),
         ];
     }
 
     /**
      * 检查是否应该触发熔断
      */
-    private function shouldTrip(array $data): bool
+    private function should_trip(array $data): bool
     {
         // 连续失败次数超过阈值
         $consecutiveFailures = $data['consecutive_failures'] ?? 0;
@@ -216,7 +216,7 @@ class CircuitBreaker
     /**
      * 过滤出时间窗口内的请求
      */
-    private function filterRecentRequests(array $requests, int $now): array
+    private function filter_recent_requests(array $requests, int $now): array
     {
         $cutoff = $now - self::WINDOW_SIZE;
         return array_values(array_filter(
@@ -228,9 +228,9 @@ class CircuitBreaker
     /**
      * 检查是否应该从开启转为半开
      */
-    private function shouldTransitionToHalfOpen(): bool
+    private function should_transition_to_half_open(): bool
     {
-        $data = $this->getData();
+        $data = $this->get_data();
         $transitioned = $data['transitioned'] ?? 0;
         return (time() - $transitioned) >= self::RECOVERY_TIME;
     }
@@ -238,9 +238,9 @@ class CircuitBreaker
     /**
      * 检查半开状态是否还能接受请求
      */
-    private function canAllowHalfOpenRequest(): bool
+    private function can_allow_half_open_request(): bool
     {
-        $data = $this->getData();
+        $data = $this->get_data();
         $halfOpenRequests = ($data['half_open_successes'] ?? 0) + ($data['half_open_failures'] ?? 0);
         return $halfOpenRequests < self::HALF_OPEN_REQUESTS;
     }
@@ -248,7 +248,7 @@ class CircuitBreaker
     /**
      * 状态转换
      */
-    private function transitionTo(string $newState): void
+    private function transition_to(string $newState): void
     {
         $data = [
             'state'                => $newState,
@@ -263,13 +263,13 @@ class CircuitBreaker
             $data['half_open_failures'] = 0;
         }
 
-        $this->saveData($data);
+        $this->save_data($data);
     }
 
     /**
      * 获取剩余恢复时间
      */
-    private function getRecoveryTimeRemaining(array $data): ?int
+    private function get_recovery_time_remaining(array $data): ?int
     {
         if (($data['state'] ?? self::STATE_CLOSED) !== self::STATE_OPEN) {
             return null;
@@ -283,7 +283,7 @@ class CircuitBreaker
     /**
      * 获取状态标签
      */
-    private function getStateLabel(string $state): string
+    private function get_state_label(string $state): string
     {
         return match ($state) {
             self::STATE_CLOSED    => __('正常', 'wpmind'),
@@ -293,13 +293,13 @@ class CircuitBreaker
         };
     }
 
-    private function getData(): array
+    private function get_data(): array
     {
         $data = get_transient($this->transientKey);
         return is_array($data) ? $data : [];
     }
 
-    private function saveData(array $data): void
+    private function save_data(array $data): void
     {
         // TTL 必须大于 RECOVERY_TIME，否则状态会过早重置
         set_transient($this->transientKey, $data, self::RECOVERY_TIME * 2);

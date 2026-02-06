@@ -19,9 +19,9 @@ abstract class AbstractStrategy implements RoutingStrategyInterface
      *
      * 默认实现：返回排名第一的 Provider
      */
-    public function selectProvider(RoutingContext $context, array $providers): ?string
+    public function select_provider(RoutingContext $context, array $providers): ?string
     {
-        $ranked = $this->rankProviders($context, $providers);
+        $ranked = $this->rank_providers($context, $providers);
         return $ranked[0] ?? null;
     }
 
@@ -30,12 +30,12 @@ abstract class AbstractStrategy implements RoutingStrategyInterface
      *
      * 默认实现：按得分降序排列
      */
-    public function rankProviders(RoutingContext $context, array $providers): array
+    public function rank_providers(RoutingContext $context, array $providers): array
     {
         // 过滤掉被排除的 Provider
         $available = array_filter(
             array_keys($providers),
-            fn($id) => !$context->isExcluded($id)
+            fn($id) => !$context->is_excluded($id)
         );
 
         if (empty($available)) {
@@ -45,7 +45,7 @@ abstract class AbstractStrategy implements RoutingStrategyInterface
         // 计算每个 Provider 的得分
         $scores = [];
         foreach ($available as $providerId) {
-            $scores[$providerId] = $this->calculateScore($providerId, $context);
+            $scores[$providerId] = $this->calculate_score($providerId, $context);
         }
 
         // 按得分降序排序
@@ -61,11 +61,11 @@ abstract class AbstractStrategy implements RoutingStrategyInterface
      * @param array<string, array> $providers Provider 列表
      * @return array<string> 可用的 Provider ID 列表
      */
-    protected function filterAvailable(RoutingContext $context, array $providers): array
+    protected function filter_available(RoutingContext $context, array $providers): array
     {
         return array_filter(
             array_keys($providers),
-            fn($id) => !$context->isExcluded($id)
+            fn($id) => !$context->is_excluded($id)
         );
     }
 
@@ -78,7 +78,7 @@ abstract class AbstractStrategy implements RoutingStrategyInterface
      * @param bool $inverse 是否反转（值越小得分越高）
      * @return float 归一化后的得分
      */
-    protected function normalizeScore(float $value, float $min, float $max, bool $inverse = false): float
+    protected function normalize_score(float $value, float $min, float $max, bool $inverse = false): float
     {
         if ($max <= $min) {
             return 50.0;

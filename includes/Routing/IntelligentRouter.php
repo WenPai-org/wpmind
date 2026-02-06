@@ -44,29 +44,29 @@ class IntelligentRouter
 
     private function __construct()
     {
-        $this->registerDefaultStrategies();
-        $this->loadProviders();
-        $this->loadSettings();
+        $this->register_default_strategies();
+        $this->load_providers();
+        $this->load_settings();
     }
 
     /**
      * 注册默认策略
      */
-    private function registerDefaultStrategies(): void
+    private function register_default_strategies(): void
     {
         // 复合策略（推荐）
-        $this->registerStrategy(CompositeStrategy::createBalanced());      // 平衡策略
-        $this->registerStrategy(CompositeStrategy::createPerformance());   // 性能优先
-        $this->registerStrategy(CompositeStrategy::createEconomic());      // 经济策略
-        
+        $this->register_strategy(CompositeStrategy::create_balanced());      // 平衡策略
+        $this->register_strategy(CompositeStrategy::create_performance());   // 性能优先
+        $this->register_strategy(CompositeStrategy::create_economic());      // 经济策略
+
         // 基础策略
-        $this->registerStrategy(new LoadBalancedStrategy());               // 负载均衡
+        $this->register_strategy(new LoadBalancedStrategy());               // 负载均衡
     }
 
     /**
      * 加载 Provider 配置
      */
-    private function loadProviders(): void
+    private function load_providers(): void
     {
         if (function_exists('WPMind\\wpmind')) {
             $endpoints = \WPMind\wpmind()->get_custom_endpoints();
@@ -81,7 +81,7 @@ class IntelligentRouter
     /**
      * 加载路由设置
      */
-    private function loadSettings(): void
+    private function load_settings(): void
     {
         $settings = get_option('wpmind_routing_settings', array());
         $strategy = $settings['strategy'] ?? 'balanced';
@@ -104,9 +104,9 @@ class IntelligentRouter
      *
      * @param RoutingStrategyInterface $strategy 策略实例
      */
-    public function registerStrategy(RoutingStrategyInterface $strategy): void
+    public function register_strategy(RoutingStrategyInterface $strategy): void
     {
-        $this->strategies[$strategy->getName()] = $strategy;
+        $this->strategies[$strategy->get_name()] = $strategy;
     }
 
     /**
@@ -114,14 +114,14 @@ class IntelligentRouter
      *
      * @return array<string, array{name: string, display_name: string, description: string}>
      */
-    public function getAvailableStrategies(): array
+    public function get_available_strategies(): array
     {
         $result = [];
         foreach ($this->strategies as $name => $strategy) {
             $result[$name] = [
-                'name' => $strategy->getName(),
-                'display_name' => $strategy->getDisplayName(),
-                'description' => $strategy->getDescription(),
+                'name' => $strategy->get_name(),
+                'display_name' => $strategy->get_display_name(),
+                'description' => $strategy->get_description(),
             ];
         }
         return $result;
@@ -133,7 +133,7 @@ class IntelligentRouter
      * @param string $strategyName 策略名称
      * @return bool 是否设置成功
      */
-    public function setStrategy(string $strategyName): bool
+    public function set_strategy(string $strategyName): bool
     {
         if (!isset($this->strategies[$strategyName])) {
             return false;
@@ -152,7 +152,7 @@ class IntelligentRouter
     /**
      * 获取当前策略名称
      */
-    public function getCurrentStrategy(): string
+    public function get_current_strategy(): string
     {
         return $this->activeStrategy;
     }
@@ -160,7 +160,7 @@ class IntelligentRouter
     /**
      * 获取当前策略实例
      */
-    public function getStrategy(?string $name = null): ?RoutingStrategyInterface
+    public function get_strategy(?string $name = null): ?RoutingStrategyInterface
     {
         $name = $name ?? $this->activeStrategy;
         
@@ -186,7 +186,7 @@ class IntelligentRouter
     public function route(?RoutingContext $context = null): ?string
     {
         $context = $context ?? RoutingContext::create();
-        $strategy = $this->getStrategy();
+        $strategy = $this->get_strategy();
 
         if ($strategy === null) {
             // 无策略时，返回第一个可用的 Provider
@@ -194,14 +194,14 @@ class IntelligentRouter
         }
 
         // 如果有首选 Provider 且可用，优先使用
-        $preferred = $context->getPreferredProvider();
+        $preferred = $context->get_preferred_provider();
         if ($preferred !== null && isset($this->providers[$preferred])) {
-            if (!$context->isExcluded($preferred)) {
+            if (!$context->is_excluded($preferred)) {
                 return $preferred;
             }
         }
 
-        return $strategy->selectProvider($context, $this->providers);
+        return $strategy->select_provider($context, $this->providers);
     }
 
     /**
@@ -212,19 +212,19 @@ class IntelligentRouter
      * @param RoutingContext|null $context 路由上下文
      * @return array<string> Provider ID 列表
      */
-    public function getFailoverChain(?RoutingContext $context = null): array
+    public function get_failover_chain(?RoutingContext $context = null): array
     {
         $context = $context ?? RoutingContext::create();
-        $strategy = $this->getStrategy();
+        $strategy = $this->get_strategy();
 
         if ($strategy === null) {
             return array_keys($this->providers);
         }
 
-        $ranked = $strategy->rankProviders($context, $this->providers);
+        $ranked = $strategy->rank_providers($context, $this->providers);
 
         // 如果有首选 Provider，放在最前面
-        $preferred = $context->getPreferredProvider();
+        $preferred = $context->get_preferred_provider();
         if ($preferred !== null && in_array($preferred, $ranked, true)) {
             $ranked = array_values(array_diff($ranked, [$preferred]));
             array_unshift($ranked, $preferred);
@@ -239,10 +239,10 @@ class IntelligentRouter
      * @param RoutingContext|null $context 路由上下文
      * @return array<string, array{score: float, rank: int}>
      */
-    public function getProviderScores(?RoutingContext $context = null): array
+    public function get_provider_scores(?RoutingContext $context = null): array
     {
         $context = $context ?? RoutingContext::create();
-        $strategy = $this->getStrategy();
+        $strategy = $this->get_strategy();
 
         if ($strategy === null) {
             return [];
@@ -251,7 +251,7 @@ class IntelligentRouter
         $scores = [];
         foreach ($this->providers as $providerId => $config) {
             $scores[$providerId] = [
-                'score' => $strategy->calculateScore($providerId, $context),
+                'score' => $strategy->calculate_score($providerId, $context),
                 'name' => $config['display_name'] ?? $providerId,
             ];
         }
@@ -272,22 +272,22 @@ class IntelligentRouter
      *
      * @return array 状态信息
      */
-    public function getStatusSummary(): array
+    public function get_status_summary(): array
     {
         $context = RoutingContext::create();
-        $strategy = $this->getStrategy();
+        $strategy = $this->get_strategy();
 
         return [
             'active_strategy' => [
                 'name' => $this->activeStrategy,
-                'display_name' => $strategy?->getDisplayName() ?? '未知',
-                'description' => $strategy?->getDescription() ?? '',
+                'display_name' => $strategy?->get_display_name() ?? '未知',
+                'description' => $strategy?->get_description() ?? '',
             ],
-            'available_strategies' => $this->getAvailableStrategies(),
+            'available_strategies' => $this->get_available_strategies(),
             'provider_count' => count($this->providers),
-            'provider_scores' => $this->getProviderScores($context),
+            'provider_scores' => $this->get_provider_scores($context),
             'recommended' => $this->route($context),
-            'failover_chain' => $this->getFailoverChain($context),
+            'failover_chain' => $this->get_failover_chain($context),
         ];
     }
 
@@ -305,7 +305,7 @@ class IntelligentRouter
      *
      * @return array<string> Provider ID 列表，按优先级排序
      */
-    public function getManualPriority(): array
+    public function get_manual_priority(): array
     {
         $settings = get_option('wpmind_routing_settings', []);
         return $settings['provider_priority'] ?? [];
@@ -317,7 +317,7 @@ class IntelligentRouter
      * @param array<string> $priority Provider ID 列表，按优先级排序
      * @return bool 是否设置成功
      */
-    public function setManualPriority(array $priority): bool
+    public function set_manual_priority(array $priority): bool
     {
         // 验证所有 Provider ID 都有效
         $valid_providers = array_keys($this->providers);
@@ -334,7 +334,7 @@ class IntelligentRouter
      *
      * @return bool 是否清除成功
      */
-    public function clearManualPriority(): bool
+    public function clear_manual_priority(): bool
     {
         $settings = get_option('wpmind_routing_settings', []);
         unset($settings['provider_priority']);
@@ -347,9 +347,9 @@ class IntelligentRouter
      *
      * @return bool
      */
-    public function hasManualPriority(): bool
+    public function has_manual_priority(): bool
     {
-        $priority = $this->getManualPriority();
+        $priority = $this->get_manual_priority();
         return !empty($priority);
     }
 }

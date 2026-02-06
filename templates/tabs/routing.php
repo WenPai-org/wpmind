@@ -13,14 +13,14 @@ defined( 'ABSPATH' ) || exit;
 
 // 获取路由设置
 $router = \WPMind\Routing\IntelligentRouter::instance();
-$routing_status = $router->getStatusSummary();
-$current_strategy = $router->getCurrentStrategy();
-$available_strategies = $router->getAvailableStrategies();
+$routing_status = $router->get_status_summary();
+$current_strategy = $router->get_current_strategy();
+$available_strategies = $router->get_available_strategies();
 
 // 获取仪表板统计数据
 $analytics = \WPMind\Analytics\AnalyticsManager::instance();
-$dashboard = $analytics->getDashboardSummary();
-$latency_metrics = $analytics->getLatencyMetrics();
+$dashboard = $analytics->get_dashboard_summary();
+$latency_metrics = $analytics->get_latency_metrics();
 
 // 构建 Provider 延迟映射
 $provider_latency = array();
@@ -189,7 +189,7 @@ $strategy_icons = array(
 
     <!-- 手动优先级设置 -->
     <?php
-    $manual_priority = $router->getManualPriority();
+    $manual_priority = $router->get_manual_priority();
     $has_manual_priority = ! empty( $manual_priority );
     ?>
     <div class="wpmind-routing-section wpmind-routing-priority">

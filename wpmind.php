@@ -704,8 +704,8 @@ final class WPMind {
             }
 
             // 检查熔断器状态，排除不可用的 Provider（使用只读方法避免状态转换）
-            $breaker = $failover->getCircuitBreaker( $key );
-            if ( $breaker && ! $breaker->isAvailableReadOnly() ) {
+            $breaker = $failover->get_circuit_breaker( $key );
+            if ( $breaker && ! $breaker->is_available_read_only() ) {
                 continue;
             }
 
@@ -803,7 +803,7 @@ final class WPMind {
             return;
         }
 
-        // 跳过已标记的请求（避免与手动 recordResult 双重计数）
+        // 跳过已标记的请求（避免与手动 record_result 双重计数）
         if ( ! empty( $parsed_args['_wpmind_skip_tracking'] ) ) {
             return;
         }
@@ -833,7 +833,7 @@ final class WPMind {
         }
 
         // 记录结果
-        Failover\FailoverManager::instance()->recordResult( $provider, $success, $latency_ms );
+        Failover\FailoverManager::instance()->record_result( $provider, $success, $latency_ms );
     }
 
     /**
@@ -906,7 +906,7 @@ final class WPMind {
             Usage\UsageTracker::record( $provider, $model, $input_tokens, $output_tokens, $latency_ms );
 
             // 检查预算并发送告警
-            Budget\BudgetAlert::instance()->checkAndAlert();
+            Budget\BudgetAlert::instance()->check_and_alert();
         }
     }
 
@@ -1026,17 +1026,17 @@ final class WPMind {
                 $last_error = $response;
                 // 检查是否应该重试
                 if ( $attempt < $max_retries ) {
-                    usleep( ErrorHandler::getRetryDelay( $attempt ) * 1000 );
+                    usleep( ErrorHandler::get_retry_delay( $attempt ) * 1000 );
                     continue;
                 }
 
                 // 记录失败到健康追踪
                 $latency_ms = (int) ( ( microtime( true ) - $start_time ) * 1000 );
-                Failover\FailoverManager::instance()->recordResult( $provider, false, $latency_ms );
+                Failover\FailoverManager::instance()->record_result( $provider, false, $latency_ms );
 
                 // 使用 ErrorHandler 获取友好的错误消息
                 wp_send_json_error( [
-                    'message' => ErrorHandler::getWpErrorMessage( $response, $provider ),
+                    'message' => ErrorHandler::get_wp_error_message( $response, $provider ),
                     'details' => $response->get_error_message(),
                     'retried' => $attempt > 1,
                 ] );
@@ -1048,7 +1048,7 @@ final class WPMind {
             // 成功
             if ( $last_status_code === 200 ) {
                 // 记录成功到健康追踪
-                Failover\FailoverManager::instance()->recordResult( $provider, true, $latency_ms );
+                Failover\FailoverManager::instance()->record_result( $provider, true, $latency_ms );
 
                 wp_send_json_success( [
                     'message' => __( '连接成功', 'wpmind' ),
@@ -1058,25 +1058,25 @@ final class WPMind {
             }
 
             // 不可重试的错误
-            if ( ! ErrorHandler::shouldRetry( $last_status_code ) ) {
+            if ( ! ErrorHandler::should_retry( $last_status_code ) ) {
                 break;
             }
 
             // 可重试的错误，等待后重试
             if ( $attempt < $max_retries ) {
-                usleep( ErrorHandler::getRetryDelay( $attempt ) * 1000 );
+                usleep( ErrorHandler::get_retry_delay( $attempt ) * 1000 );
             }
         }
 
         // 记录失败到健康追踪
         $latency_ms = (int) ( ( microtime( true ) - $start_time ) * 1000 );
-        Failover\FailoverManager::instance()->recordResult( $provider, false, $latency_ms );
+        Failover\FailoverManager::instance()->record_result( $provider, false, $latency_ms );
 
         // 获取响应体以提取更详细的错误信息
         $response_body = wp_remote_retrieve_body( $response );
 
         wp_send_json_error( [
-            'message' => ErrorHandler::getErrorMessage( $last_status_code, $provider, $response_body ),
+            'message' => ErrorHandler::get_error_message( $last_status_code, $provider, $response_body ),
             'code'    => $last_status_code,
             'retried' => $max_retries > 1,
         ] );
@@ -1210,11 +1210,11 @@ final class WPMind {
         }
 
         $failover = Failover\FailoverManager::instance();
-        $status = $failover->getStatusSummary();
+        $status = $failover->get_status_summary();
 
         wp_send_json_success( [
             'providers' => $status,
-            'available' => $failover->getAvailableProviders(),
+            'available' => $failover->get_available_providers(),
         ] );
     }
 
@@ -1234,10 +1234,10 @@ final class WPMind {
         $failover = Failover\FailoverManager::instance();
 
         if ( empty( $provider ) || $provider === 'all' ) {
-            $failover->resetAll();
+            $failover->reset_all();
             wp_send_json_success( [ 'message' => __( '所有熔断器已重置', 'wpmind' ) ] );
         } else {
-            $failover->resetProvider( $provider );
+            $failover->reset_provider( $provider );
             wp_send_json_success( [ 'message' => __( '熔断器已重置', 'wpmind' ) ] );
         }
     }
@@ -1254,10 +1254,10 @@ final class WPMind {
             wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
         }
 
-        $stats = Usage\UsageTracker::getStats();
-        $today = Usage\UsageTracker::getTodayStats();
-        $month = Usage\UsageTracker::getMonthStats();
-        $history = Usage\UsageTracker::getHistory( 20 );
+        $stats = Usage\UsageTracker::get_stats();
+        $today = Usage\UsageTracker::get_today_stats();
+        $month = Usage\UsageTracker::get_month_stats();
+        $history = Usage\UsageTracker::get_history( 20 );
 
         wp_send_json_success( [
             'stats'   => $stats,
@@ -1279,7 +1279,7 @@ final class WPMind {
             wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
         }
 
-        Usage\UsageTracker::clearAll();
+        Usage\UsageTracker::clear_all();
         wp_send_json_success( [ 'message' => __( '用量统计已清除', 'wpmind' ) ] );
     }
 
@@ -1342,7 +1342,7 @@ final class WPMind {
         }
 
         $manager = Budget\BudgetManager::instance();
-        $result = $manager->saveSettings( $settings );
+        $result = $manager->save_settings( $settings );
 
         if ( $result ) {
             wp_send_json_success( [ 'message' => __( '预算设置已保存', 'wpmind' ) ] );
@@ -1370,7 +1370,7 @@ final class WPMind {
         }
 
         $checker = Budget\BudgetChecker::instance();
-        $summary = $checker->getSummary();
+        $summary = $checker->get_summary();
 
         wp_send_json_success( $summary );
     }
@@ -1390,7 +1390,7 @@ final class WPMind {
         $range = isset( $_POST['range'] ) ? sanitize_text_field( $_POST['range'] ) : '7d';
 
         $analytics = Analytics\AnalyticsManager::instance();
-        $data = $analytics->getAnalyticsData( $range );
+        $data = $analytics->get_analytics_data( $range );
 
         wp_send_json_success( $data );
     }
@@ -1408,7 +1408,7 @@ final class WPMind {
         }
 
         $router = Routing\IntelligentRouter::instance();
-        $status = $router->getStatusSummary();
+        $status = $router->get_status_summary();
 
         wp_send_json_success( $status );
     }
@@ -1432,7 +1432,7 @@ final class WPMind {
         }
 
         $router = Routing\IntelligentRouter::instance();
-        $result = $router->setStrategy( $strategy );
+        $result = $router->set_strategy( $strategy );
 
         if ( $result ) {
             wp_send_json_success( [
@@ -1462,10 +1462,10 @@ final class WPMind {
         $router = Routing\IntelligentRouter::instance();
 
         if ( $clear ) {
-            $result = $router->clearManualPriority();
+            $result = $router->clear_manual_priority();
             $message = __( '已清除手动优先级设置', 'wpmind' );
         } else {
-            $result = $router->setManualPriority( $priority );
+            $result = $router->set_manual_priority( $priority );
             $message = __( 'Provider 优先级已更新', 'wpmind' );
         }
 
@@ -1475,7 +1475,7 @@ final class WPMind {
 
             wp_send_json_success( [
                 'message'  => $message,
-                'priority' => $router->getManualPriority(),
+                'priority' => $router->get_manual_priority(),
             ] );
         } else {
             wp_send_json_error( [ 'message' => __( '保存失败', 'wpmind' ) ] );
@@ -1500,14 +1500,14 @@ final class WPMind {
         $output_tokens = absint( $_POST['output_tokens'] ?? 0 );
 
         $context = Routing\RoutingContext::create()
-            ->withPreferredProvider( $preferred ?: null )
-            ->withExcludedProviders( $excluded )
-            ->withEstimatedTokens( $input_tokens, $output_tokens );
+            ->with_preferred_provider( $preferred ?: null )
+            ->with_excluded_providers( $excluded )
+            ->with_estimated_tokens( $input_tokens, $output_tokens );
 
         $router = Routing\IntelligentRouter::instance();
         $selected = $router->route( $context );
-        $failoverChain = $router->getFailoverChain( $context );
-        $scores = $router->getProviderScores( $context );
+        $failoverChain = $router->get_failover_chain( $context );
+        $scores = $router->get_provider_scores( $context );
 
         wp_send_json_success( [
             'selected' => $selected,

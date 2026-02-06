@@ -38,10 +38,10 @@ class AnalyticsManagerFallback
     /**
      * 获取用量趋势数据（按日）
      */
-    public function getUsageTrend(int $days = 7, ?array $stats = null): array
+    public function get_usage_trend(int $days = 7, ?array $stats = null): array
     {
         if ($stats === null) {
-            $stats = UsageTracker::getStats();
+            $stats = UsageTracker::get_stats();
         }
         $daily = $stats['daily'] ?? [];
 
@@ -85,10 +85,10 @@ class AnalyticsManagerFallback
     /**
      * 获取服务商对比数据
      */
-    public function getProviderComparison(?array $stats = null): array
+    public function get_provider_comparison(?array $stats = null): array
     {
         if ($stats === null) {
-            $stats = UsageTracker::getStats();
+            $stats = UsageTracker::get_stats();
         }
         $providers = $stats['providers'] ?? [];
 
@@ -99,11 +99,11 @@ class AnalyticsManagerFallback
         $colors = [];
 
         foreach ($providers as $providerId => $data) {
-            $labels[] = UsageTracker::getProviderDisplayName($providerId);
+            $labels[] = UsageTracker::get_provider_display_name($providerId);
             $tokens[] = ($data['total_input_tokens'] ?? 0) + ($data['total_output_tokens'] ?? 0);
             $costs[] = round($data['total_cost'] ?? 0, 4);
             $requests[] = $data['request_count'] ?? 0;
-            $colors[] = $this->getProviderChartColor($providerId);
+            $colors[] = $this->get_provider_chart_color($providerId);
         }
 
         return [
@@ -120,10 +120,10 @@ class AnalyticsManagerFallback
     /**
      * 获取成本分析数据
      */
-    public function getCostAnalysis(int $months = 6, ?array $stats = null): array
+    public function get_cost_analysis(int $months = 6, ?array $stats = null): array
     {
         if ($stats === null) {
-            $stats = UsageTracker::getStats();
+            $stats = UsageTracker::get_stats();
         }
         $monthly = $stats['monthly'] ?? [];
 
@@ -158,10 +158,10 @@ class AnalyticsManagerFallback
     /**
      * 获取模型使用分布
      */
-    public function getModelDistribution(?array $stats = null): array
+    public function get_model_distribution(?array $stats = null): array
     {
         if ($stats === null) {
-            $stats = UsageTracker::getStats();
+            $stats = UsageTracker::get_stats();
         }
         $providers = $stats['providers'] ?? [];
 
@@ -172,7 +172,7 @@ class AnalyticsManagerFallback
             foreach ($providerModels as $modelName => $modelData) {
                 $models[] = [
                     'provider' => $providerId,
-                    'provider_name' => UsageTracker::getProviderDisplayName($providerId),
+                    'provider_name' => UsageTracker::get_provider_display_name($providerId),
                     'model' => $modelName,
                     'tokens' => ($modelData['input_tokens'] ?? 0) + ($modelData['output_tokens'] ?? 0),
                     'cost' => $modelData['cost'] ?? 0,
@@ -210,9 +210,9 @@ class AnalyticsManagerFallback
     /**
      * 获取性能指标
      */
-    public function getLatencyMetrics(int $limit = 100): array
+    public function get_latency_metrics(int $limit = 100): array
     {
-        $history = UsageTracker::getHistory($limit);
+        $history = UsageTracker::get_history($limit);
 
         $providerLatency = [];
 
@@ -242,7 +242,7 @@ class AnalyticsManagerFallback
             if ($data['count'] > 0) {
                 $result[] = [
                     'provider' => $provider,
-                    'provider_name' => UsageTracker::getProviderDisplayName($provider),
+                    'provider_name' => UsageTracker::get_provider_display_name($provider),
                     'avg_latency' => round($data['total'] / $data['count']),
                     'min_latency' => $data['min'] === PHP_INT_MAX ? 0 : $data['min'],
                     'max_latency' => $data['max'],
@@ -261,12 +261,12 @@ class AnalyticsManagerFallback
     /**
      * 获取仪表板摘要数据
      */
-    public function getDashboardSummary(): array
+    public function get_dashboard_summary(): array
     {
-        $today = UsageTracker::getTodayStats();
-        $week = UsageTracker::getWeekStats();
-        $month = UsageTracker::getMonthStats();
-        $stats = UsageTracker::getStats();
+        $today = UsageTracker::get_today_stats();
+        $week = UsageTracker::get_week_stats();
+        $month = UsageTracker::get_month_stats();
+        $stats = UsageTracker::get_stats();
         $total = $stats['total'] ?? [];
 
         return [
@@ -301,7 +301,7 @@ class AnalyticsManagerFallback
     /**
      * 获取完整的分析数据
      */
-    public function getAnalyticsData(string $range = '7d'): array
+    public function get_analytics_data(string $range = '7d'): array
     {
         $allowed_ranges = ['7d', '30d', '6m'];
         if (!in_array($range, $allowed_ranges, true)) {
@@ -324,22 +324,22 @@ class AnalyticsManagerFallback
                 break;
         }
 
-        $stats = UsageTracker::getStats();
+        $stats = UsageTracker::get_stats();
 
         return [
-            'summary' => $this->getDashboardSummary(),
-            'trend' => $this->getUsageTrend($days, $stats),
-            'providers' => $this->getProviderComparison($stats),
-            'cost' => $this->getCostAnalysis($months, $stats),
-            'models' => $this->getModelDistribution($stats),
-            'latency' => $this->getLatencyMetrics(),
+            'summary' => $this->get_dashboard_summary(),
+            'trend' => $this->get_usage_trend($days, $stats),
+            'providers' => $this->get_provider_comparison($stats),
+            'cost' => $this->get_cost_analysis($months, $stats),
+            'models' => $this->get_model_distribution($stats),
+            'latency' => $this->get_latency_metrics(),
         ];
     }
 
     /**
      * 获取服务商的图表颜色
      */
-    private function getProviderChartColor(string $provider): string
+    private function get_provider_chart_color(string $provider): string
     {
         $colors = [
             'openai'      => '#10a37f',
