@@ -1324,6 +1324,12 @@ final class WPMind {
             wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
         }
 
+        // 检查 Cost Control 模块是否启用
+        $module_loader = Core\ModuleLoader::instance();
+        if ( ! $module_loader->is_module_enabled( 'cost-control' ) ) {
+            wp_send_json_error( [ 'message' => __( 'Cost Control 模块未启用', 'wpmind' ) ] );
+        }
+
         // 解析 JSON 数据
         $json_input = isset( $_POST['settings'] ) ? stripslashes( $_POST['settings'] ) : '';
         $input = json_decode( $json_input, true );
@@ -1384,6 +1390,12 @@ final class WPMind {
 
         if ( ! current_user_can( 'manage_options' ) ) {
             wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+        }
+
+        // 检查 Cost Control 模块是否启用
+        $module_loader = Core\ModuleLoader::instance();
+        if ( ! $module_loader->is_module_enabled( 'cost-control' ) ) {
+            wp_send_json_error( [ 'message' => __( 'Cost Control 模块未启用', 'wpmind' ) ] );
         }
 
         $checker = Budget\BudgetChecker::instance();

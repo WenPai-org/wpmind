@@ -44,6 +44,8 @@ defined( 'ABSPATH' ) || exit;
         $module_loader = \WPMind\Core\ModuleLoader::instance();
         $geo_module = $module_loader->get_module( 'geo' );
         $geo_enabled = $geo_module && $geo_module['enabled'];
+        $cost_control_module = $module_loader->get_module( 'cost-control' );
+        $cost_control_enabled = $cost_control_module && $cost_control_module['enabled'];
         ?>
         <!-- Tab 卡片 -->
         <div class="wpmind-tabs-card">
@@ -61,9 +63,11 @@ defined( 'ABSPATH' ) || exit;
                 <a href="#routing" class="wpmind-tab" data-tab="routing">
                     <?php esc_html_e( '智能路由', 'wpmind' ); ?>
                 </a>
+                <?php if ( $cost_control_enabled ) : ?>
                 <a href="#budget" class="wpmind-tab" data-tab="budget">
                     <?php esc_html_e( '预算管理', 'wpmind' ); ?>
                 </a>
+                <?php endif; ?>
                 <?php if ( $geo_enabled ) : ?>
                 <a href="#geo" class="wpmind-tab" data-tab="geo">
                     <?php esc_html_e( 'GEO 优化', 'wpmind' ); ?>
@@ -87,9 +91,11 @@ defined( 'ABSPATH' ) || exit;
             <div id="routing" class="wpmind-tab-pane">
                 <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/routing.php'; ?>
             </div>
+            <?php if ( $cost_control_enabled ) : ?>
             <div id="budget" class="wpmind-tab-pane">
                 <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/budget.php'; ?>
             </div>
+            <?php endif; ?>
             <?php if ( $geo_enabled ) : ?>
             <div id="geo" class="wpmind-tab-pane">
                 <?php
