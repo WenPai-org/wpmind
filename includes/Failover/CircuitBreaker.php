@@ -89,6 +89,14 @@ class CircuitBreaker
     {
         $data = $this->getData();
         $now = time();
+        $state = $data['state'] ?? self::STATE_CLOSED;
+
+        // 开启状态下，如果恢复时间已过，先转换到半开状态
+        if ($state === self::STATE_OPEN && $this->shouldTransitionToHalfOpen()) {
+            $this->transitionTo(self::STATE_HALF_OPEN);
+            $data = $this->getData(); // 重新获取转换后的数据
+            $state = self::STATE_HALF_OPEN;
+        }
 
         // 记录带时间戳的请求
         $data['requests'][] = ['success' => true, 'time' => $now];
@@ -99,7 +107,7 @@ class CircuitBreaker
         $data['consecutive_failures'] = 0;
 
         // 半开状态下成功次数达标，恢复到关闭状态
-        if (($data['state'] ?? self::STATE_CLOSED) === self::STATE_HALF_OPEN) {
+        if ($state === self::STATE_HALF_OPEN) {
             $data['half_open_successes'] = ($data['half_open_successes'] ?? 0) + 1;
             if ($data['half_open_successes'] >= self::HALF_OPEN_REQUESTS) {
                 $this->transitionTo(self::STATE_CLOSED);
@@ -117,6 +125,14 @@ class CircuitBreaker
     {
         $data = $this->getData();
         $now = time();
+        $state = $data['state'] ?? self::STATE_CLOSED;
+
+        // 开启状态下，如果恢复时间已过，先转换到半开状态
+        if ($state === self::STATE_OPEN && $this->shouldTransitionToHalfOpen()) {
+            $this->transitionTo(self::STATE_HALF_OPEN);
+            $data = $this->getData();
+            $state = self::STATE_HALF_OPEN;
+        }
 
         // 记录带时间戳的请求
         $data['requests'][] = ['success' => false, 'time' => $now];
@@ -127,7 +143,7 @@ class CircuitBreaker
         $data['last_failure'] = $now;
 
         // 半开状态下失败，立即回到开启状态
-        if (($data['state'] ?? self::STATE_CLOSED) === self::STATE_HALF_OPEN) {
+        if ($state === self::STATE_HALF_OPEN) {
             $data['half_open_failures'] = ($data['half_open_failures'] ?? 0) + 1;
             $this->saveData($data);
             $this->transitionTo(self::STATE_OPEN);
