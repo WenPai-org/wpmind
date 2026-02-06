@@ -43,17 +43,17 @@ if ( class_exists( '\\WPMind\\Modules\\CostControl\\BudgetAlert' ) ) {
         /**
          * 获取预算状态徽章 HTML
          */
-        public static function get_status_badge( string $status ): string
+        public static function getStatusBadge( string $status ): string
         {
-            return \WPMind\Modules\CostControl\BudgetAlert::get_status_badge( $status );
+            return \WPMind\Modules\CostControl\BudgetAlert::getStatusBadge( $status );
         }
 
         /**
          * 获取进度条 HTML
          */
-        public static function get_progress_bar( float $percentage, string $status ): string
+        public static function getProgressBar( float $percentage, string $status ): string
         {
-            return \WPMind\Modules\CostControl\BudgetAlert::get_progress_bar( $percentage, $status );
+            return \WPMind\Modules\CostControl\BudgetAlert::getProgressBar( $percentage, $status );
         }
 
         /**

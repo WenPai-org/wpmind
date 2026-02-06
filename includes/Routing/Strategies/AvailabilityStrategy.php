@@ -17,17 +17,17 @@ use WPMind\Routing\RoutingContext;
 
 class AvailabilityStrategy extends AbstractStrategy
 {
-    public function get_name(): string
+    public function getName(): string
     {
         return 'availability';
     }
 
-    public function get_display_name(): string
+    public function getDisplayName(): string
     {
         return '可用性优先';
     }
 
-    public function get_description(): string
+    public function getDescription(): string
     {
         return '选择健康分数最高的 Provider，适合对稳定性要求高的场景';
     }
@@ -37,10 +37,10 @@ class AvailabilityStrategy extends AbstractStrategy
      *
      * 直接使用健康分数
      */
-    public function calculate_score(string $providerId, RoutingContext $context): float
+    public function calculateScore(string $providerId, RoutingContext $context): float
     {
-        $healthScore = $context->get_health_score($providerId);
-        $latency = $context->get_average_latency($providerId);
+        $healthScore = $context->getHealthScore($providerId);
+        $latency = $context->getAverageLatency($providerId);
 
         // 延迟作为次要因素（延迟越低加分越多）
         $latencyBonus = 0;
@@ -56,9 +56,9 @@ class AvailabilityStrategy extends AbstractStrategy
      *
      * 按健康分数降序排列
      */
-    public function rank_providers(RoutingContext $context, array $providers): array
+    public function rankProviders(RoutingContext $context, array $providers): array
     {
-        $available = $this->filter_available($context, $providers);
+        $available = $this->filterAvailable($context, $providers);
 
         if (empty($available)) {
             return [];
@@ -68,8 +68,8 @@ class AvailabilityStrategy extends AbstractStrategy
         $providerData = [];
         foreach ($available as $providerId) {
             $providerData[$providerId] = [
-                'health' => $context->get_health_score($providerId),
-                'latency' => $context->get_average_latency($providerId),
+                'health' => $context->getHealthScore($providerId),
+                'latency' => $context->getAverageLatency($providerId),
             ];
         }
 

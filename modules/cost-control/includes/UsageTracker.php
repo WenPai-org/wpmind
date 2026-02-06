@@ -49,14 +49,14 @@ class UsageTracker
         $latencyMs = max(0, $latencyMs);
 
         // 计算成本
-        $cost = self::calculate_cost($provider, $model, $inputTokens, $outputTokens);
+        $cost = self::calculateCost($provider, $model, $inputTokens, $outputTokens);
 
         // 更新汇总统计
-        self::update_stats($provider, $model, $inputTokens, $outputTokens, $cost);
+        self::updateStats($provider, $model, $inputTokens, $outputTokens, $cost);
 
         // 只有有 token 使用时才添加到历史记录
         if ($inputTokens > 0 || $outputTokens > 0) {
-            self::add_to_history($provider, $model, $inputTokens, $outputTokens, $cost, $latencyMs);
+            self::addToHistory($provider, $model, $inputTokens, $outputTokens, $cost, $latencyMs);
         }
     }
 
@@ -65,13 +65,13 @@ class UsageTracker
      *
      * @return float 成本（按服务商货币计价）
      */
-    public static function calculate_cost(
+    public static function calculateCost(
         string $provider,
         string $model,
         int $inputTokens,
         int $outputTokens
     ): float {
-        $allPricing = self::get_pricing();
+        $allPricing = self::getPricing();
         $pricing = $allPricing[$provider] ?? [];
         $modelPricing = $pricing[$model] ?? $pricing['default'] ?? ['input' => 0, 'output' => 0];
 
@@ -87,16 +87,16 @@ class UsageTracker
      * @param string $provider Provider ID
      * @return string USD 或 CNY
      */
-    public static function get_currency(string $provider): string
+    public static function getCurrency(string $provider): string
     {
-        $allPricing = self::get_pricing();
+        $allPricing = self::getPricing();
         return $allPricing[$provider]['currency'] ?? 'USD';
     }
 
     /**
      * 更新汇总统计（带并发锁）
      */
-    private static function update_stats(
+    private static function updateStats(
         string $provider,
         string $model,
         int $inputTokens,
@@ -125,7 +125,7 @@ class UsageTracker
 
             $today = wp_date('Y-m-d');
             $month = wp_date('Y-m');
-            $currency = self::get_currency($provider);
+            $currency = self::getCurrency($provider);
 
             // 初始化结构
             if (!isset($stats['providers']) || !is_array($stats['providers'])) {
@@ -253,7 +253,7 @@ class UsageTracker
     /**
      * 添加到历史记录（带并发锁）
      */
-    private static function add_to_history(
+    private static function addToHistory(
         string $provider,
         string $model,
         int $inputTokens,
@@ -304,7 +304,7 @@ class UsageTracker
     /**
      * 获取汇总统计
      */
-    public static function get_stats(): array
+    public static function getStats(): array
     {
         $cache_key = 'wpmind_usage_stats';
         $stats = wp_cache_get($cache_key);
@@ -335,9 +335,9 @@ class UsageTracker
     /**
      * 获取今日统计
      */
-    public static function get_today_stats(): array
+    public static function getTodayStats(): array
     {
-        $stats = self::get_stats();
+        $stats = self::getStats();
         $today = wp_date('Y-m-d');
 
         return $stats['daily'][$today] ?? [
@@ -352,9 +352,9 @@ class UsageTracker
     /**
      * 获取本月统计
      */
-    public static function get_month_stats(): array
+    public static function getMonthStats(): array
     {
-        $stats = self::get_stats();
+        $stats = self::getStats();
         $month = wp_date('Y-m');
 
         return $stats['monthly'][$month] ?? [
@@ -369,9 +369,9 @@ class UsageTracker
     /**
      * 获取本周统计（周一到周日）
      */
-    public static function get_week_stats(): array
+    public static function getWeekStats(): array
     {
-        $stats = self::get_stats();
+        $stats = self::getStats();
         $daily = $stats['daily'] ?? [];
 
         // 使用 WordPress 时区计算本周的日期范围
@@ -403,7 +403,7 @@ class UsageTracker
     /**
      * 获取历史记录
      */
-    public static function get_history(int $limit = 50): array
+    public static function getHistory(int $limit = 50): array
     {
         $cache_key = 'wpmind_usage_history';
         $history = wp_cache_get($cache_key);
@@ -423,7 +423,7 @@ class UsageTracker
     /**
      * 获取定价信息
      */
-    public static function get_pricing(): array
+    public static function getPricing(): array
     {
         if (!class_exists(Pricing::class)) {
             require_once WPMIND_PATH . 'includes/Usage/Pricing.php';
@@ -434,7 +434,7 @@ class UsageTracker
     /**
      * 清除所有统计数据
      */
-    public static function clear_all(): void
+    public static function clearAll(): void
     {
         delete_option(self::OPTION_KEY);
         delete_option(self::HISTORY_KEY);
@@ -445,7 +445,7 @@ class UsageTracker
     /**
      * 格式化 token 数量
      */
-    public static function format_tokens(int $tokens): string
+    public static function formatTokens(int $tokens): string
     {
         if ($tokens >= 1_000_000) {
             return round($tokens / 1_000_000, 2) . 'M';
@@ -459,7 +459,7 @@ class UsageTracker
     /**
      * 格式化成本
      */
-    public static function format_cost(float $cost, string $currency = 'USD'): string
+    public static function formatCost(float $cost, string $currency = 'USD'): string
     {
         $symbol = $currency === 'CNY' ? '¥' : '$';
         if ($cost < 0.01) {
@@ -471,14 +471,14 @@ class UsageTracker
     /**
      * 格式化分货币费用显示
      */
-    public static function format_cost_by_currency(float $costUsd, float $costCny): string
+    public static function formatCostByCurrency(float $costUsd, float $costCny): string
     {
         $parts = [];
         if ($costUsd > 0) {
-            $parts[] = self::format_cost($costUsd, 'USD');
+            $parts[] = self::formatCost($costUsd, 'USD');
         }
         if ($costCny > 0) {
-            $parts[] = self::format_cost($costCny, 'CNY');
+            $parts[] = self::formatCost($costCny, 'CNY');
         }
         if (empty($parts)) {
             return '$0.00';
@@ -489,7 +489,7 @@ class UsageTracker
     /**
      * 获取 Provider 的显示名称
      */
-    public static function get_provider_display_name(string $provider): string
+    public static function getProviderDisplayName(string $provider): string
     {
         $names = [
             'openai' => 'OpenAI',
@@ -510,7 +510,7 @@ class UsageTracker
     /**
      * 获取 Provider 的 Remixicon 图标类
      */
-    public static function get_provider_icon(string $provider): string
+    public static function getProviderIcon(string $provider): string
     {
         $icons = [
             'openai'      => 'ri-openai-line',
@@ -531,7 +531,7 @@ class UsageTracker
     /**
      * 获取 Provider 的图标颜色
      */
-    public static function get_provider_color(string $provider): string
+    public static function getProviderColor(string $provider): string
     {
         // 统一使用单色，与 WordPress 后台风格一致
         return '#50575e';

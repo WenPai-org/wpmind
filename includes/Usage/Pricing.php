@@ -108,7 +108,7 @@ class Pricing
     /**
      * Get currency for a provider.
      */
-    public static function get_currency(string $provider): string
+    public static function getCurrency(string $provider): string
     {
         return self::DATA[$provider]['currency'] ?? 'USD';
     }
@@ -116,7 +116,7 @@ class Pricing
     /**
      * Calculate cost for a request.
      */
-    public static function calculate_cost(
+    public static function calculateCost(
         string $provider,
         string $model,
         int $inputTokens,

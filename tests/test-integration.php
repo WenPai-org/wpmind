@@ -121,18 +121,18 @@ echo "\n--- budget.php 依赖检查 ---\n";
 $manager_file = $plugin_path . 'modules/cost-control/includes/BudgetManager.php';
 $checker_file = $plugin_path . 'modules/cost-control/includes/BudgetChecker.php';
 
-if (check_method($manager_file, 'get_settings')) {
-    echo "✅ BudgetManager::get_settings()\n";
+if (check_method($manager_file, 'getSettings')) {
+    echo "✅ BudgetManager::getSettings()\n";
 } else {
-    echo "❌ BudgetManager::get_settings() 缺失\n";
-    $errors[] = "方法缺失: BudgetManager::get_settings()";
+    echo "❌ BudgetManager::getSettings() 缺失\n";
+    $errors[] = "方法缺失: BudgetManager::getSettings()";
 }
 
-if (check_method($checker_file, 'get_summary')) {
-    echo "✅ BudgetChecker::get_summary()\n";
+if (check_method($checker_file, 'getSummary')) {
+    echo "✅ BudgetChecker::getSummary()\n";
 } else {
-    echo "❌ BudgetChecker::get_summary() 缺失\n";
-    $errors[] = "方法缺失: BudgetChecker::get_summary()";
+    echo "❌ BudgetChecker::getSummary() 缺失\n";
+    $errors[] = "方法缺失: BudgetChecker::getSummary()";
 }
 
 // 5. Cost Control 模块设置页面依赖检查

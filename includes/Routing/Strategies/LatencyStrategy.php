@@ -20,17 +20,17 @@ class LatencyStrategy extends AbstractStrategy
     /** @var int 最大可接受延迟（毫秒） */
     private const MAX_ACCEPTABLE_LATENCY = 10000;
 
-    public function get_name(): string
+    public function getName(): string
     {
         return 'latency';
     }
 
-    public function get_display_name(): string
+    public function getDisplayName(): string
     {
         return '延迟优先';
     }
 
-    public function get_description(): string
+    public function getDescription(): string
     {
         return '选择响应最快的 Provider，适合对实时性要求高的场景';
     }
@@ -40,10 +40,10 @@ class LatencyStrategy extends AbstractStrategy
      *
      * 延迟越低，得分越高
      */
-    public function calculate_score(string $providerId, RoutingContext $context): float
+    public function calculateScore(string $providerId, RoutingContext $context): float
     {
-        $latency = $context->get_average_latency($providerId);
-        $healthScore = $context->get_health_score($providerId);
+        $latency = $context->getAverageLatency($providerId);
+        $healthScore = $context->getHealthScore($providerId);
 
         // 如果健康分数太低，大幅降低得分
         if ($healthScore < 50) {
@@ -57,7 +57,7 @@ class LatencyStrategy extends AbstractStrategy
 
         // 延迟归一化（0-10000ms 范围）
         // 延迟越低，得分越高
-        $latencyScore = $this->normalize_score(
+        $latencyScore = $this->normalizeScore(
             (float) $latency,
             0,
             self::MAX_ACCEPTABLE_LATENCY,
@@ -73,9 +73,9 @@ class LatencyStrategy extends AbstractStrategy
      *
      * 按延迟升序排列
      */
-    public function rank_providers(RoutingContext $context, array $providers): array
+    public function rankProviders(RoutingContext $context, array $providers): array
     {
-        $available = $this->filter_available($context, $providers);
+        $available = $this->filterAvailable($context, $providers);
 
         if (empty($available)) {
             return [];
@@ -84,10 +84,10 @@ class LatencyStrategy extends AbstractStrategy
         // 计算每个 Provider 的延迟和健康分数
         $providerData = [];
         foreach ($available as $providerId) {
-            $latency = $context->get_average_latency($providerId);
+            $latency = $context->getAverageLatency($providerId);
             $providerData[$providerId] = [
                 'latency' => $latency ?: PHP_INT_MAX, // 无数据时排在最后
-                'health' => $context->get_health_score($providerId),
+                'health' => $context->getHealthScore($providerId),
             ];
         }
 

@@ -13,9 +13,9 @@ defined( 'ABSPATH' ) || exit;
 
 // 获取预算设置
 $budget_manager = \WPMind\Budget\BudgetManager::instance();
-$budget_settings = $budget_manager->get_settings();
+$budget_settings = $budget_manager->getSettings();
 $budget_checker = \WPMind\Budget\BudgetChecker::instance();
-$budget_summary = $budget_checker->get_summary();
+$budget_summary = $budget_checker->getSummary();
 ?>
 
 <div class="wpmind-budget-panel">
