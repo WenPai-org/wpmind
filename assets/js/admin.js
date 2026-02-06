@@ -1022,7 +1022,29 @@
 
         init: function () {
             if (!$('#wpmind-usage-trend-chart').length) return;
-            if (typeof Chart === 'undefined') return;
+
+            var self = this;
+
+            if (typeof Chart === 'undefined') {
+                // Chart.js 尚未加载，轮询等待
+                var retries = 0;
+                var maxRetries = 10;
+                var timer = setInterval(function () {
+                    retries++;
+                    if (typeof Chart !== 'undefined') {
+                        clearInterval(timer);
+                        self.loadData();
+                        self.bindEvents();
+                    } else if (retries >= maxRetries) {
+                        clearInterval(timer);
+                        $('.wpmind-chart-container').html(
+                            '<p style="text-align:center;color:#6b7280;padding:2em 0;">' +
+                            '图表库加载失败，其他功能不受影响。</p>'
+                        );
+                    }
+                }, 500);
+                return;
+            }
 
             this.loadData();
             this.bindEvents();
@@ -1763,6 +1785,12 @@
      * Initialize on document ready
      */
     $(function () {
+        // Health check
+        $('body').addClass('wpmind-js-loaded');
+        if (typeof wpmindData !== 'undefined' && wpmindData.version) {
+            console.log('[WPMind] admin.js v' + wpmindData.version + ' loaded');
+        }
+
         initTabs();
         initPasswordToggle();
         initEndpointCollapse();
@@ -1782,7 +1810,7 @@
         GeoManager.init();
 
         // 图表懒加载：只在仪表板 Tab 激活时初始化
-        if ($('#dashboard').hasClass('active')) {
+        if ($('#dashboard').hasClass('wpmind-tab-pane-active')) {
             AnalyticsCharts.init();
             window.wpmindChartsLoaded = true;
         }

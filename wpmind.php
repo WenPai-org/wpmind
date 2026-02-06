@@ -408,10 +408,10 @@ final class WPMind {
             WPMIND_VERSION
         );
 
-        // Chart.js 图表库
+        // Chart.js 图表库（本地化，避免 CDN 被墙）
         wp_enqueue_script(
             'chartjs',
-            'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js',
+            WPMIND_PLUGIN_URL . 'assets/js/vendor/chartjs/chart.umd.min.js',
             [],
             '4.5.0',
             true
@@ -420,7 +420,7 @@ final class WPMind {
         wp_enqueue_script(
             'wpmind-admin',
             WPMIND_PLUGIN_URL . 'assets/js/admin.js',
-            [ 'jquery', 'jquery-ui-sortable', 'chartjs' ],
+            [ 'jquery', 'jquery-ui-sortable' ],
             WPMIND_VERSION,
             true
         );
@@ -438,8 +438,10 @@ final class WPMind {
 
         // 为 AJAX 添加数据
         wp_localize_script( 'wpmind-admin', 'wpmindData', [
-            'nonce'  => wp_create_nonce( 'wpmind_ajax' ),
+            'nonce'   => wp_create_nonce( 'wpmind_ajax' ),
             'ajaxurl' => admin_url( 'admin-ajax.php' ),
+            'version' => WPMIND_VERSION,
+            'debug'   => defined( 'WP_DEBUG' ) && WP_DEBUG,
         ] );
     }
 
