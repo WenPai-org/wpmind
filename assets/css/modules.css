@@ -1,218 +1,218 @@
 /* WPMind modules panel styles */
 .wpmind-modules-container {
-    max-width: 1200px;
+	max-width: 1200px;
 }
 
 .wpmind-modules-header {
-    margin-bottom: 24px;
+	margin-bottom: 24px;
 }
 
 .wpmind-modules-header h2 {
-    margin: 0 0 8px;
-    font-size: 1.3em;
+	margin: 0 0 8px;
+	font-size: 1.3em;
 }
 
 .wpmind-modules-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 20px;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+	gap: 20px;
 }
 
 .wpmind-module-card {
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    overflow: hidden;
-    transition: all 0.2s ease;
+	background: #fff;
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	overflow: hidden;
+	transition: all 0.2s ease;
 }
 
 .wpmind-module-card:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .wpmind-module-card.is-disabled {
-    opacity: 0.7;
+	opacity: 0.7;
 }
 
 .wpmind-module-header {
-    display: flex;
-    align-items: center;
-    padding: 16px;
-    border-bottom: 1px solid #f0f0f0;
-    gap: 12px;
+	display: flex;
+	align-items: center;
+	padding: 16px;
+	border-bottom: 1px solid #f0f0f0;
+	gap: 12px;
 }
 
 .wpmind-module-icon {
-    font-size: 24px;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #f5f5f5;
-    border-radius: 8px;
-    color: #666;
+	font-size: 24px;
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #f5f5f5;
+	border-radius: 8px;
+	color: #666;
 }
 
 .wpmind-module-card.is-enabled .wpmind-module-icon {
-    background: #e8f5e9;
-    color: #2e7d32;
+	background: #e8f5e9;
+	color: #2e7d32;
 }
 
 .wpmind-module-info {
-    flex: 1;
+	flex: 1;
 }
 
 .wpmind-module-name {
-    margin: 0;
-    font-size: 1em;
-    font-weight: 600;
+	margin: 0;
+	font-size: 1em;
+	font-weight: 600;
 }
 
 .wpmind-module-version {
-    font-size: 0.8em;
-    color: #888;
+	font-size: 0.8em;
+	color: #888;
 }
 
 .wpmind-module-body {
-    padding: 16px;
+	padding: 16px;
 }
 
 .wpmind-module-description {
-    margin: 0;
-    color: #666;
-    font-size: 0.9em;
-    line-height: 1.5;
+	margin: 0;
+	color: #666;
+	font-size: 0.9em;
+	line-height: 1.5;
 }
 
 .wpmind-module-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    background: #fafafa;
-    border-top: 1px solid #f0f0f0;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px 16px;
+	background: #fafafa;
+	border-top: 1px solid #f0f0f0;
 }
 
 .wpmind-module-status {
-    font-size: 0.85em;
+	font-size: 0.85em;
 }
 
 .status-enabled {
-    color: #2e7d32;
+	color: #2e7d32;
 }
 
 .status-disabled {
-    color: #888;
+	color: #888;
 }
 
 .wpmind-module-settings-link {
-    font-size: 0.85em;
-    text-decoration: none;
-    color: #0073aa;
+	font-size: 0.85em;
+	text-decoration: none;
+	color: #0073aa;
 }
 
 .wpmind-module-settings-link:hover {
-    color: #005177;
+	color: #005177;
 }
 
 /* Switch styles */
 .wpmind-switch {
-    position: relative;
-    display: inline-block;
-    width: 44px;
-    height: 24px;
+	position: relative;
+	display: inline-block;
+	width: 44px;
+	height: 24px;
 }
 
 .wpmind-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
+	opacity: 0;
+	width: 0;
+	height: 0;
 }
 
 .wpmind-switch-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: 0.3s;
-    border-radius: 24px;
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #ccc;
+	transition: 0.3s;
+	border-radius: 24px;
 }
 
 .wpmind-switch-slider:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: 0.3s;
-    border-radius: 50%;
+	position: absolute;
+	content: "";
+	height: 18px;
+	width: 18px;
+	left: 3px;
+	bottom: 3px;
+	background-color: white;
+	transition: 0.3s;
+	border-radius: 50%;
 }
 
 .wpmind-switch input:checked + .wpmind-switch-slider {
-    background-color: #2e7d32;
+	background-color: #2e7d32;
 }
 
 .wpmind-switch input:checked + .wpmind-switch-slider:before {
-    transform: translateX(20px);
+	transform: translateX(20px);
 }
 
 .wpmind-switch input:disabled + .wpmind-switch-slider {
-    opacity: 0.5;
-    cursor: not-allowed;
+	opacity: 0.5;
+	cursor: not-allowed;
 }
 
 /* Core module badge */
 .wpmind-module-badge-core {
-    display: inline-block;
-    font-size: 0.7em;
-    font-weight: 500;
-    padding: 1px 6px;
-    margin-left: 6px;
-    background: #e3f2fd;
-    color: #1565c0;
-    border-radius: 4px;
-    vertical-align: middle;
-    line-height: 1.6;
+	display: inline-block;
+	font-size: 0.7em;
+	font-weight: 500;
+	padding: 1px 6px;
+	margin-left: 6px;
+	background: #e3f2fd;
+	color: #1565c0;
+	border-radius: 4px;
+	vertical-align: middle;
+	line-height: 1.6;
 }
 
 /* Lock icon for non-disableable modules */
 .wpmind-toggle-locked {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 24px;
-    color: #90a4ae;
-    cursor: help;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 24px;
+	color: #90a4ae;
+	cursor: help;
 }
 
 .wpmind-toggle-locked .dashicons {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
 }
 
 /* Core module status */
 .status-core {
-    color: #1565c0;
+	color: #1565c0;
 }
 
 .wpmind-no-modules {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 60px 20px;
-    color: #888;
+	grid-column: 1 / -1;
+	text-align: center;
+	padding: 60px 20px;
+	color: #888;
 }
 
 .wpmind-no-modules .dashicons {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
-    margin-bottom: 16px;
+	font-size: 48px;
+	width: 48px;
+	height: 48px;
+	margin-bottom: 16px;
 }

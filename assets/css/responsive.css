@@ -9,182 +9,182 @@
    Tablet (max-width: 1200px)
    ======================================== */
 @media (max-width: 1200px) {
-    .wpmind-analytics-content {
-        grid-template-columns: 1fr;
-    }
+	.wpmind-analytics-content {
+		grid-template-columns: 1fr;
+	}
 }
 
 /* ========================================
    Mobile Landscape (max-width: 960px)
    ======================================== */
 @media (max-width: 960px) {
-    .wpmind-endpoints-grid {
-        grid-template-columns: 1fr;
-    }
+	.wpmind-endpoints-grid {
+		grid-template-columns: 1fr;
+	}
 }
 
 /* ========================================
    Tablet Portrait (max-width: 782px)
    ======================================== */
 @media (max-width: 782px) {
-    /* Tabs */
-    .wpmind-tabs {
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--wpmind-space-1);
-    }
+	/* Tabs */
+	.wpmind-tabs {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--wpmind-space-1);
+	}
 
-    .wpmind-tabs .nav-tab {
-        flex: 1;
-        justify-content: center;
-        padding: var(--wpmind-space-2) var(--wpmind-space-3);
-        font-size: var(--wpmind-text-sm);
-        min-width: 0;
-    }
+	.wpmind-tabs .nav-tab {
+		flex: 1;
+		justify-content: center;
+		padding: var(--wpmind-space-2) var(--wpmind-space-3);
+		font-size: var(--wpmind-text-sm);
+		min-width: 0;
+	}
 
-    .wpmind-tabs .nav-tab .dashicons {
-        font-size: 16px;
-        width: 16px;
-        height: 16px;
-    }
+	.wpmind-tabs .nav-tab .dashicons {
+		font-size: 16px;
+		width: 16px;
+		height: 16px;
+	}
 
-    .wpmind-tab-content {
-        padding: var(--wpmind-space-4);
-    }
+	.wpmind-tab-content {
+		padding: var(--wpmind-space-4);
+	}
 
-    /* Usage Panel */
-    .wpmind-usage-cards {
-        grid-template-columns: 1fr 1fr;
-    }
+	/* Usage Panel */
+	.wpmind-usage-cards {
+		grid-template-columns: 1fr 1fr;
+	}
 
-    .wpmind-usage-card-body {
-        flex-direction: column;
-        gap: var(--wpmind-space-2);
-    }
+	.wpmind-usage-card-body {
+		flex-direction: column;
+		gap: var(--wpmind-space-2);
+	}
 
-    .wpmind-usage-stat {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        text-align: left;
-    }
+	.wpmind-usage-stat {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		text-align: left;
+	}
 
-    .wpmind-usage-value {
-        font-size: var(--wpmind-text-lg);
-    }
+	.wpmind-usage-value {
+		font-size: var(--wpmind-text-lg);
+	}
 
-    .wpmind-usage-value.wpmind-usage-cost {
-        font-size: var(--wpmind-text-sm);
-    }
+	.wpmind-usage-value.wpmind-usage-cost {
+		font-size: var(--wpmind-text-sm);
+	}
 
-    .wpmind-usage-label {
-        margin-top: 0;
-        order: -1;
-    }
+	.wpmind-usage-label {
+		margin-top: 0;
+		order: -1;
+	}
 
-    .wpmind-usage-panel .title {
-        flex-wrap: wrap;
-    }
+	.wpmind-usage-panel .title {
+		flex-wrap: wrap;
+	}
 
-    .wpmind-last-updated {
-        width: 100%;
-        order: 10;
-        margin-top: var(--wpmind-space-2);
-    }
+	.wpmind-last-updated {
+		width: 100%;
+		order: 10;
+		margin-top: var(--wpmind-space-2);
+	}
 
-    /* Budget Panel */
-    .wpmind-budget-grid {
-        grid-template-columns: 1fr 1fr;
-    }
+	/* Budget Panel */
+	.wpmind-budget-grid {
+		grid-template-columns: 1fr 1fr;
+	}
 
-    .wpmind-budget-row {
-        flex-direction: column;
-        gap: var(--wpmind-space-4);
-    }
+	.wpmind-budget-row {
+		flex-direction: column;
+		gap: var(--wpmind-space-4);
+	}
 
-    /* Analytics Panel */
-    .wpmind-analytics-panel .title {
-        flex-wrap: wrap;
-    }
+	/* Analytics Panel */
+	.wpmind-analytics-panel .title {
+		flex-wrap: wrap;
+	}
 
-    .wpmind-analytics-range-select {
-        margin-left: 0;
-        order: 3;
-        width: 100%;
-        margin-top: var(--wpmind-space-3);
-    }
+	.wpmind-analytics-range-select {
+		margin-left: 0;
+		order: 3;
+		width: 100%;
+		margin-top: var(--wpmind-space-3);
+	}
 
-    .wpmind-chart-wrapper {
-        height: 200px;
-    }
+	.wpmind-chart-wrapper {
+		height: 200px;
+	}
 
-    /* Routing Panel */
-    .wpmind-routing-strategies {
-        grid-template-columns: 1fr;
-    }
+	/* Routing Panel */
+	.wpmind-routing-strategies {
+		grid-template-columns: 1fr;
+	}
 
-    .wpmind-routing-score-item {
-        flex-wrap: wrap;
-    }
+	.wpmind-routing-score-item {
+		flex-wrap: wrap;
+	}
 
-    .wpmind-routing-score-bar {
-        order: 4;
-        width: 100%;
-        margin-top: var(--wpmind-space-2);
-    }
+	.wpmind-routing-score-bar {
+		order: 4;
+		width: 100%;
+		margin-top: var(--wpmind-space-2);
+	}
 
-    /* Grid System */
-    .wpmind-grid-2,
-    .wpmind-grid-3,
-    .wpmind-grid-4 {
-        grid-template-columns: 1fr 1fr;
-    }
+	/* Grid System */
+	.wpmind-grid-2,
+	.wpmind-grid-3,
+	.wpmind-grid-4 {
+		grid-template-columns: 1fr 1fr;
+	}
 }
 
 /* ========================================
    Mobile Portrait (max-width: 480px)
    ======================================== */
 @media (max-width: 480px) {
-    /* Tabs */
-    .wpmind-tabs .nav-tab {
-        flex-direction: column;
-        gap: var(--wpmind-space-1);
-        padding: var(--wpmind-space-2);
-        font-size: var(--wpmind-text-xs);
-    }
+	/* Tabs */
+	.wpmind-tabs .nav-tab {
+		flex-direction: column;
+		gap: var(--wpmind-space-1);
+		padding: var(--wpmind-space-2);
+		font-size: var(--wpmind-text-xs);
+	}
 
-    /* Usage Panel */
-    .wpmind-usage-cards {
-        grid-template-columns: 1fr;
-    }
+	/* Usage Panel */
+	.wpmind-usage-cards {
+		grid-template-columns: 1fr;
+	}
 
-    .wpmind-provider-usage-grid {
-        grid-template-columns: 1fr;
-    }
+	.wpmind-provider-usage-grid {
+		grid-template-columns: 1fr;
+	}
 
-    /* Budget Panel */
-    .wpmind-budget-grid {
-        grid-template-columns: 1fr;
-    }
+	/* Budget Panel */
+	.wpmind-budget-grid {
+		grid-template-columns: 1fr;
+	}
 
-    /* Dialog */
-    .wpmind-dialog {
-        min-width: auto;
-        left: var(--wpmind-space-5);
-        right: var(--wpmind-space-5);
-        transform: translateY(-50%) scale(0.9);
-    }
+	/* Dialog */
+	.wpmind-dialog {
+		min-width: auto;
+		left: var(--wpmind-space-5);
+		right: var(--wpmind-space-5);
+		transform: translateY(-50%) scale(0.9);
+	}
 
-    .wpmind-dialog.is-visible {
-        transform: translateY(-50%) scale(1);
-    }
+	.wpmind-dialog.is-visible {
+		transform: translateY(-50%) scale(1);
+	}
 
-    /* Grid System */
-    .wpmind-grid-2,
-    .wpmind-grid-3,
-    .wpmind-grid-4 {
-        grid-template-columns: 1fr;
-    }
+	/* Grid System */
+	.wpmind-grid-2,
+	.wpmind-grid-3,
+	.wpmind-grid-4 {
+		grid-template-columns: 1fr;
+	}
 }
 
 /* ========================================
@@ -195,11 +195,11 @@
 .wpmind-tab-pane .wpmind-status-panel,
 .wpmind-tab-pane .wpmind-routing-panel,
 .wpmind-tab-pane .wpmind-budget-panel {
-    border: none;
-    box-shadow: none;
-    padding: 0;
-    margin: 0 0 var(--wpmind-space-8) 0;
-    background: transparent;
+	border: none;
+	box-shadow: none;
+	padding: 0;
+	margin: 0 0 var(--wpmind-space-8) 0;
+	background: transparent;
 }
 
 .wpmind-tab-pane .wpmind-usage-panel:last-child,
@@ -207,9 +207,9 @@
 .wpmind-tab-pane .wpmind-status-panel:last-child,
 .wpmind-tab-pane .wpmind-routing-panel:last-child,
 .wpmind-tab-pane .wpmind-budget-panel:last-child {
-    margin-bottom: 0;
+	margin-bottom: 0;
 }
 
 .wpmind-tab-pane .title {
-    margin-top: 0;
+	margin-top: 0;
 }

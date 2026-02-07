@@ -88,7 +88,7 @@ foreach ( $providers as $p ) {
 		<div class="wpmind-overview-card">
 			<div class="wpmind-overview-card-header">
 				<h3><?php esc_html_e( 'Provider 状态', 'wpmind' ); ?></h3>
-				<a href="#services" class="wpmind-overview-card-link" data-tab-link="services"><?php esc_html_e( '管理', 'wpmind' ); ?> →</a>
+				<a href="#services" class="wpmind-overview-card-link wpmind-tab-link" data-tab-link="services"><?php esc_html_e( '管理', 'wpmind' ); ?> →</a>
 			</div>
 			<div class="wpmind-overview-card-body">
 				<?php if ( empty( $providers ) ) : ?>
@@ -116,7 +116,7 @@ foreach ( $providers as $p ) {
 		<div class="wpmind-overview-card">
 			<div class="wpmind-overview-card-header">
 				<h3><?php esc_html_e( '模块状态', 'wpmind' ); ?></h3>
-				<a href="#modules" class="wpmind-overview-card-link" data-tab-link="modules"><?php esc_html_e( '管理', 'wpmind' ); ?> →</a>
+				<a href="#modules" class="wpmind-overview-card-link wpmind-tab-link" data-tab-link="modules"><?php esc_html_e( '管理', 'wpmind' ); ?> →</a>
 			</div>
 			<div class="wpmind-overview-card-body">
 				<div class="wpmind-overview-module-list">
@@ -144,23 +144,23 @@ foreach ( $providers as $p ) {
 		</div>
 		<div class="wpmind-overview-card-body">
 			<div class="wpmind-overview-shortcuts">
-				<a href="#services" class="wpmind-overview-shortcut" data-tab-link="services">
+				<a href="#services" class="wpmind-overview-shortcut wpmind-tab-link" data-tab-link="services">
 					<span class="dashicons ri-settings-3-line"></span>
 					<span><?php esc_html_e( '文本服务', 'wpmind' ); ?></span>
 				</a>
-				<a href="#images" class="wpmind-overview-shortcut" data-tab-link="images">
+				<a href="#images" class="wpmind-overview-shortcut wpmind-tab-link" data-tab-link="images">
 					<span class="dashicons ri-image-line"></span>
 					<span><?php esc_html_e( '图像服务', 'wpmind' ); ?></span>
 				</a>
-				<a href="#routing" class="wpmind-overview-shortcut" data-tab-link="routing">
+				<a href="#routing" class="wpmind-overview-shortcut wpmind-tab-link" data-tab-link="routing">
 					<span class="dashicons ri-route-line"></span>
 					<span><?php esc_html_e( '智能路由', 'wpmind' ); ?></span>
 				</a>
-				<a href="#budget" class="wpmind-overview-shortcut" data-tab-link="budget">
+				<a href="#budget" class="wpmind-overview-shortcut wpmind-tab-link" data-tab-link="budget">
 					<span class="dashicons ri-wallet-3-line"></span>
 					<span><?php esc_html_e( '预算管理', 'wpmind' ); ?></span>
 				</a>
-				<a href="#modules" class="wpmind-overview-shortcut" data-tab-link="modules">
+				<a href="#modules" class="wpmind-overview-shortcut wpmind-tab-link" data-tab-link="modules">
 					<span class="dashicons ri-puzzle-line"></span>
 					<span><?php esc_html_e( '模块管理', 'wpmind' ); ?></span>
 				</a>
