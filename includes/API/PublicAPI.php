@@ -301,9 +301,9 @@ class PublicAPI {
             }
         }
 
-        // 检查缓存
+        // 检查缓存（provider/model 已确定，加入缓存键避免不同 Provider 命中同一缓存）
         if ($options['cache_ttl'] > 0) {
-            $cache_key = $this->generate_cache_key('chat', $args);
+            $cache_key = $this->generate_cache_key('chat', $args, $provider, $model);
             $cached = get_transient($cache_key);
             if ($cached !== false) {
                 return $cached;
@@ -318,28 +318,50 @@ class PublicAPI {
         $last_error = null;
         $tried_providers = [];
 
-        foreach ($failover_chain as $try_provider) {
+        $failover_count = count($failover_chain);
+
+        foreach ($failover_chain as $index => $try_provider) {
             $tried_providers[] = $try_provider;
-            $result = $this->execute_chat_request($args, $try_provider, $model);
+            $is_last_provider = ($index === $failover_count - 1);
+            $max_retries = $is_last_provider ? 3 : 1;
 
-            if (!is_wp_error($result)) {
-                // 成功，如果使用了备用 Provider，添加标记
-                if ($try_provider !== $provider) {
-                    $result['failover'] = [
-                        'original_provider' => $provider,
-                        'actual_provider'   => $try_provider,
-                        'tried_providers'   => $tried_providers,
-                    ];
+            for ($attempt = 0; $attempt <= $max_retries; $attempt++) {
+                $result = $this->execute_chat_request($args, $try_provider, $model);
+
+                if (!is_wp_error($result)) {
+                    // 成功，如果使用了备用 Provider，添加标记
+                    if ($try_provider !== $provider) {
+                        $result['failover'] = [
+                            'original_provider' => $provider,
+                            'actual_provider'   => $try_provider,
+                            'tried_providers'   => $tried_providers,
+                        ];
+                    }
+                    break 2;
                 }
-                break;
-            }
 
-            $last_error = $result;
+                $last_error = $result;
 
-            // 检查是否应该重试（某些错误不应该重试）
-            $error_code = $result->get_error_code();
-            if (in_array($error_code, ['wpmind_api_key_missing', 'wpmind_provider_not_found'], true)) {
-                continue; // 配置错误，尝试下一个 Provider
+                // 不可重试的配置错误，直接跳到下一个 Provider
+                $error_code = $result->get_error_code();
+                if (in_array($error_code, ['wpmind_api_key_missing', 'wpmind_provider_not_found'], true)) {
+                    break;
+                }
+
+                // 提取 HTTP status code 判断是否可重试
+                $error_data = $result->get_error_data();
+                $status = is_array($error_data) && isset($error_data['status']) ? (int) $error_data['status'] : 0;
+
+                if ($status > 0 && !\WPMind\ErrorHandler::should_retry($status)) {
+                    break; // 不可重试的 HTTP 错误（如 401/403），跳到下一个 Provider
+                }
+
+                // 可重试但还有剩余尝试次数，执行退避
+                if ($attempt < $max_retries) {
+                    $delay_ms = \WPMind\ErrorHandler::get_retry_delay($attempt + 1);
+                    do_action('wpmind_retry', $try_provider, $attempt + 1, $status);
+                    sleep((int) ($delay_ms / 1000));
+                }
             }
         }
 
@@ -418,9 +440,13 @@ class PublicAPI {
         $args = compact('text', 'from', 'to', 'options');
         $args = apply_filters('wpmind_translate_args', $args, $context);
 
+        // 解析默认 provider/model 用于缓存键
+        $default_provider = get_option('wpmind_default_provider', 'openai');
+        $default_model = $this->get_current_model($default_provider);
+
         // 检查缓存
         if ($options['cache_ttl'] > 0) {
-            $cache_key = $this->generate_cache_key('translate', $args);
+            $cache_key = $this->generate_cache_key('translate', $args, $default_provider, $default_model);
             $cached = get_transient($cache_key);
             if ($cached !== false) {
                 return $cached;
@@ -540,8 +566,8 @@ class PublicAPI {
         $normalized_messages = $this->normalize_messages($messages, $options);
 
         // 选择服务商和模型
-        $provider = $options['provider'] === 'auto' 
-            ? get_option('wpmind_default_provider', 'deepseek') 
+        $provider = $options['provider'] === 'auto'
+            ? get_option('wpmind_default_provider', 'openai')
             : $options['provider'];
         $model = $options['model'] === 'auto' 
             ? $this->get_current_model($provider) 
@@ -999,9 +1025,13 @@ class PublicAPI {
 
         $context = $options['context'];
 
+        // 解析默认 provider/model 用于缓存键
+        $default_provider = get_option('wpmind_default_provider', 'openai');
+        $default_model = $this->get_current_model($default_provider);
+
         // 检查缓存
         if ($options['cache_ttl'] > 0) {
-            $cache_key = $this->generate_cache_key('summarize', compact('text', 'options'));
+            $cache_key = $this->generate_cache_key('summarize', compact('text', 'options'), $default_provider, $default_model);
             $cached = get_transient($cache_key);
             if ($cached !== false) {
                 return $cached;
@@ -1071,9 +1101,13 @@ class PublicAPI {
 
         $context = $options['context'];
 
+        // 解析默认 provider/model 用于缓存键
+        $default_provider = get_option('wpmind_default_provider', 'openai');
+        $default_model = $this->get_current_model($default_provider);
+
         // 检查缓存
         if ($options['cache_ttl'] > 0) {
-            $cache_key = $this->generate_cache_key('moderate', compact('content', 'options'));
+            $cache_key = $this->generate_cache_key('moderate', compact('content', 'options'), $default_provider, $default_model);
             $cached = get_transient($cache_key);
             if ($cached !== false) {
                 return $cached;
@@ -1538,7 +1572,21 @@ class PublicAPI {
             return new WP_Error(
                 'wpmind_api_error',
                 sprintf(__('API 错误 (%d): %s', 'wpmind'), $status_code, $error_message),
-                ['status' => $status_code]
+                ['status' => $status_code, 'body' => substr((string) $body, 0, 500)]
+            );
+        }
+
+        // 非 JSON 响应防护（如 Cloudflare HTML 错误页、空响应）
+        if ( ! is_array($data) ) {
+            // 记录失败
+            if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
+                \WPMind\Failover\FailoverManager::instance()->record_result($provider, false, $latency_ms);
+            }
+
+            return new WP_Error(
+                'wpmind_invalid_response',
+                __('服务商返回了无效的响应格式', 'wpmind'),
+                ['status' => $status_code, 'body' => substr((string) $body, 0, 500)]
             );
         }
 
@@ -1677,12 +1725,14 @@ class PublicAPI {
     /**
      * 生成缓存键
      *
-     * @param string $type 类型
-     * @param array  $args 参数
+     * @param string $type     类型
+     * @param array  $args     参数
+     * @param string $provider 服务商
+     * @param string $model    模型
      * @return string
      */
-    private function generate_cache_key(string $type, array $args): string {
-        $key = 'wpmind_' . $type . '_' . md5(serialize($args));
+    private function generate_cache_key(string $type, array $args, string $provider = '', string $model = ''): string {
+        $key = 'wpmind_' . $type . '_' . $provider . '_' . $model . '_' . md5(serialize($args));
         return apply_filters('wpmind_cache_key', $key, $type, $args);
     }
 
