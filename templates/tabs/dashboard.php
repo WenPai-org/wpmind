@@ -25,8 +25,11 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
 
 <!-- Token 用量统计面板 -->
 <div class="wpmind-usage-panel">
-	<h2 class="title">
-		<?php esc_html_e( 'Token 用量统计', 'wpmind' ); ?>
+	<div class="wpmind-usage-header">
+		<h2 class="wpmind-usage-title">
+			<span class="dashicons ri-bar-chart-box-line"></span>
+			<?php esc_html_e( 'Token 用量统计', 'wpmind' ); ?>
+		</h2>
 		<?php if ( $last_updated > 0 ) : ?>
 		<span class="wpmind-last-updated" title="<?php esc_attr_e( '上次更新时间', 'wpmind' ); ?>">
 			<?php
@@ -45,7 +48,11 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
 			<span class="dashicons ri-delete-bin-line"></span>
 			<?php esc_html_e( '清除', 'wpmind' ); ?>
 		</button>
-	</h2>
+	</div>
+
+	<p class="wpmind-usage-desc">
+		<?php esc_html_e( '追踪各 AI 服务的 Token 消耗和费用估算，帮助优化成本。', 'wpmind' ); ?>
+	</p>
 
 	<?php if ( ! $has_usage_data ) : ?>
 	<!-- 空状态提示 -->
@@ -145,7 +152,10 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
 
 	<!-- 各渠道用量统计 -->
 	<?php if ( ! empty( $usage_stats['providers'] ) ) : ?>
-	<h3 class="wpmind-usage-section-title"><?php esc_html_e( '各渠道用量', 'wpmind' ); ?></h3>
+	<h3 class="wpmind-usage-section-title">
+		<span class="dashicons ri-server-line"></span>
+		<?php esc_html_e( '各渠道用量', 'wpmind' ); ?>
+	</h3>
 	<div class="wpmind-provider-usage-grid">
 		<?php foreach ( $usage_stats['providers'] as $provider_id => $provider_stats ) :
 			$currency = \WPMind\Modules\CostControl\UsageTracker::get_currency( $provider_id );

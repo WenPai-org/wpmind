@@ -4,30 +4,30 @@
 }
 
 .wpmind-modules-header {
-	margin-bottom: 24px;
+	margin-bottom: var(--wpmind-space-6);
 }
 
 .wpmind-modules-header h2 {
-	margin: 0 0 8px;
-	font-size: 1.3em;
+	margin: 0 0 var(--wpmind-space-2);
+	font-size: var(--wpmind-text-md);
 }
 
 .wpmind-modules-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-	gap: 20px;
+	gap: var(--wpmind-space-5);
 }
 
 .wpmind-module-card {
 	background: #fff;
-	border: 1px solid #e0e0e0;
-	border-radius: 8px;
+	border: 1px solid var(--wpmind-gray-200);
+	border-radius: var(--wpmind-radius-lg);
 	overflow: hidden;
-	transition: all 0.2s ease;
+	transition: all var(--wpmind-transition-normal);
 }
 
 .wpmind-module-card:hover {
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	box-shadow: var(--wpmind-shadow-md);
 }
 
 .wpmind-module-card.is-disabled {
@@ -37,9 +37,9 @@
 .wpmind-module-header {
 	display: flex;
 	align-items: center;
-	padding: 16px;
-	border-bottom: 1px solid #f0f0f0;
-	gap: 12px;
+	padding: var(--wpmind-space-4);
+	border-bottom: 1px solid var(--wpmind-gray-100);
+	gap: var(--wpmind-space-3);
 }
 
 .wpmind-module-icon {
@@ -49,14 +49,14 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: #f5f5f5;
-	border-radius: 8px;
-	color: #666;
+	background: var(--wpmind-gray-100);
+	border-radius: var(--wpmind-radius-lg);
+	color: var(--wpmind-gray-500);
 }
 
 .wpmind-module-card.is-enabled .wpmind-module-icon {
-	background: #e8f5e9;
-	color: #2e7d32;
+	background: var(--wpmind-success-light);
+	color: var(--wpmind-success);
 }
 
 .wpmind-module-info {
@@ -70,18 +70,18 @@
 }
 
 .wpmind-module-version {
-	font-size: 0.8em;
-	color: #888;
+	font-size: var(--wpmind-text-sm);
+	color: var(--wpmind-gray-400);
 }
 
 .wpmind-module-body {
-	padding: 16px;
+	padding: var(--wpmind-space-4);
 }
 
 .wpmind-module-description {
 	margin: 0;
-	color: #666;
-	font-size: 0.9em;
+	color: var(--wpmind-gray-500);
+	font-size: var(--wpmind-text-base);
 	line-height: 1.5;
 }
 
@@ -89,31 +89,31 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 12px 16px;
-	background: #fafafa;
-	border-top: 1px solid #f0f0f0;
+	padding: var(--wpmind-space-3) var(--wpmind-space-4);
+	background: var(--wpmind-gray-50);
+	border-top: 1px solid var(--wpmind-gray-100);
 }
 
 .wpmind-module-status {
-	font-size: 0.85em;
+	font-size: var(--wpmind-text-sm);
 }
 
 .status-enabled {
-	color: #2e7d32;
+	color: var(--wpmind-success);
 }
 
 .status-disabled {
-	color: #888;
+	color: var(--wpmind-gray-400);
 }
 
 .wpmind-module-settings-link {
-	font-size: 0.85em;
+	font-size: var(--wpmind-text-sm);
 	text-decoration: none;
-	color: #0073aa;
+	color: var(--wpmind-primary);
 }
 
 .wpmind-module-settings-link:hover {
-	color: #005177;
+	color: var(--wpmind-primary-hover);
 }
 
 /* Switch styles */
@@ -137,9 +137,9 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background-color: #ccc;
-	transition: 0.3s;
-	border-radius: 24px;
+	background-color: var(--wpmind-gray-300);
+	transition: all var(--wpmind-transition-slow);
+	border-radius: var(--wpmind-radius-full);
 }
 
 .wpmind-switch-slider:before {
@@ -150,12 +150,12 @@
 	left: 3px;
 	bottom: 3px;
 	background-color: white;
-	transition: 0.3s;
-	border-radius: 50%;
+	transition: all var(--wpmind-transition-slow);
+	border-radius: var(--wpmind-radius-full);
 }
 
 .wpmind-switch input:checked + .wpmind-switch-slider {
-	background-color: #2e7d32;
+	background-color: var(--wpmind-success);
 }
 
 .wpmind-switch input:checked + .wpmind-switch-slider:before {
@@ -170,13 +170,13 @@
 /* Core module badge */
 .wpmind-module-badge-core {
 	display: inline-block;
-	font-size: 0.7em;
+	font-size: var(--wpmind-text-xs);
 	font-weight: 500;
-	padding: 1px 6px;
-	margin-left: 6px;
-	background: #e3f2fd;
-	color: #1565c0;
-	border-radius: 4px;
+	padding: 1px var(--wpmind-space-2);
+	margin-left: var(--wpmind-space-2);
+	background: var(--wpmind-info-light);
+	color: var(--wpmind-info);
+	border-radius: var(--wpmind-radius-md);
 	vertical-align: middle;
 	line-height: 1.6;
 }
@@ -188,7 +188,7 @@
 	justify-content: center;
 	width: 44px;
 	height: 24px;
-	color: #90a4ae;
+	color: var(--wpmind-gray-400);
 	cursor: help;
 }
 
@@ -200,19 +200,19 @@
 
 /* Core module status */
 .status-core {
-	color: #1565c0;
+	color: var(--wpmind-info);
 }
 
 .wpmind-no-modules {
 	grid-column: 1 / -1;
 	text-align: center;
-	padding: 60px 20px;
-	color: #888;
+	padding: var(--wpmind-space-12) var(--wpmind-space-5);
+	color: var(--wpmind-gray-400);
 }
 
 .wpmind-no-modules .dashicons {
 	font-size: 48px;
 	width: 48px;
 	height: 48px;
-	margin-bottom: 16px;
+	margin-bottom: var(--wpmind-space-4);
 }

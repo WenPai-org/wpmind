@@ -17,13 +17,13 @@
 .wpmind-status-panel .title {
 	margin: 0;
 	padding: var(--wpmind-space-4) var(--wpmind-space-6);
-	border-bottom: 1px solid #ccd0d4;
+	border-bottom: 1px solid var(--wpmind-border-color);
 	display: flex;
 	align-items: center;
 	gap: var(--wpmind-space-3);
 	font-size: var(--wpmind-text-md);
-	font-weight: 500;
-	color: #1e1e1e;
+	font-weight: 600;
+	color: var(--wpmind-gray-900);
 	min-height: 54px;
 	box-sizing: border-box;
 }
@@ -158,28 +158,36 @@
    Budget Panel - 预算设置面板
    ======================================== */
 .wpmind-budget-panel {
-	background: #fff;
-	border: 1px solid var(--wpmind-gray-200);
-	border-radius: 0;
-	padding: var(--wpmind-space-5);
-	margin: var(--wpmind-space-5) 0;
+	/* padding handled by .wpmind-tab-pane */
 }
 
-.wpmind-budget-panel .title {
-	margin: 0 0 var(--wpmind-space-4) 0;
-	padding: 0 0 var(--wpmind-space-3) 0;
-	border: none;
-	border-bottom: 1px solid var(--wpmind-gray-100);
+.wpmind-budget-header {
+	display: flex;
+	align-items: center;
+	gap: var(--wpmind-space-3);
+	margin-bottom: var(--wpmind-space-2);
+}
+
+.wpmind-budget-title {
 	display: flex;
 	align-items: center;
 	gap: var(--wpmind-space-2);
-	font-size: var(--wpmind-text-lg);
+	font-size: var(--wpmind-text-md);
 	font-weight: 600;
 	color: var(--wpmind-gray-900);
+	margin: 0;
 }
 
-.wpmind-budget-panel .title .dashicons {
+.wpmind-budget-title .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
 	color: var(--wpmind-primary);
+}
+
+.wpmind-budget-desc {
+	color: var(--wpmind-gray-600);
+	margin: 0 0 var(--wpmind-space-6);
 }
 
 .wpmind-budget-status-badge {
@@ -205,12 +213,15 @@
 }
 
 .wpmind-budget-settings {
-	border-top: 1px solid var(--wpmind-gray-100);
-	padding-top: var(--wpmind-space-5);
+	/* sections handle their own styling */
 }
 
 .wpmind-budget-section {
-	margin-bottom: var(--wpmind-space-6);
+	background: var(--wpmind-gray-50);
+	border: 1px solid var(--wpmind-gray-200);
+	border-radius: var(--wpmind-radius-lg);
+	padding: var(--wpmind-space-5);
+	margin-bottom: var(--wpmind-space-4);
 }
 
 .wpmind-budget-section:last-child {
@@ -218,11 +229,21 @@
 }
 
 .wpmind-budget-section h3 {
-	font-size: var(--wpmind-text-sm);
+	display: flex;
+	align-items: center;
+	gap: var(--wpmind-space-2);
+	font-size: var(--wpmind-text-base);
 	font-weight: 600;
-	color: var(--wpmind-gray-900);
+	color: var(--wpmind-gray-800);
 	margin: 0 0 var(--wpmind-space-3) 0;
 	padding: 0;
+}
+
+.wpmind-budget-section h3 .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	color: var(--wpmind-primary);
 }
 
 .wpmind-budget-grid {
@@ -347,8 +368,6 @@
 	align-items: center;
 	gap: var(--wpmind-space-3);
 	margin-top: var(--wpmind-space-5);
-	padding-top: var(--wpmind-space-4);
-	border-top: 1px solid var(--wpmind-gray-100);
 }
 
 .wpmind-budget-actions .spinner {
@@ -411,10 +430,13 @@
 	margin: 0 0 var(--wpmind-space-5) 0;
 	padding-bottom: var(--wpmind-space-3);
 	border-bottom: 1px solid var(--wpmind-gray-200);
+	font-size: var(--wpmind-text-lg);
+	font-weight: 600;
+	color: var(--wpmind-gray-900);
 }
 
 .wpmind-analytics-panel .title .dashicons {
-	color: var(--wpmind-gray-500);
+	color: var(--wpmind-primary);
 }
 
 .wpmind-analytics-range-select {
@@ -603,8 +625,8 @@
 }
 
 .wpmind-dialog-danger .wpmind-dialog-confirm:hover {
-	background: #b91c1c;
-	border-color: #b91c1c;
+	background: var(--wpmind-error-dark);
+	border-color: var(--wpmind-error-dark);
 }
 
 .wpmind-dialog-info .wpmind-dialog-header .dashicons {

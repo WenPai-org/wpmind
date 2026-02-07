@@ -72,37 +72,26 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 
 	<!-- Hero -->
 	<div class="wpmind-overview-hero">
-		<div class="wpmind-overview-hero-content">
-			<h2 class="wpmind-overview-hero-title">
-				<span class="dashicons ri-brain-line"></span>
-				<?php esc_html_e( '文派心思', 'wpmind' ); ?>
-			</h2>
-			<p class="wpmind-overview-hero-desc"><?php esc_html_e( 'WordPress AI 智能路由引擎', 'wpmind' ); ?></p>
-			<div class="wpmind-overview-hero-meta">
-				<span>v<?php echo esc_html( WPMIND_VERSION ); ?></span>
-				<span class="wpmind-overview-hero-sep">&middot;</span>
-				<span><?php echo esc_html( count( $providers ) ); ?> <?php esc_html_e( '个 Provider', 'wpmind' ); ?></span>
-				<span class="wpmind-overview-hero-sep">&middot;</span>
-				<span><?php echo esc_html( $active_count ); ?>/<?php echo esc_html( count( $modules ) ); ?> <?php esc_html_e( '模块启用', 'wpmind' ); ?></span>
-			</div>
-		</div>
+		<h2 class="wpmind-overview-hero-title">
+			<span class="dashicons ri-brain-line"></span>
+			<?php esc_html_e( '文派心思', 'wpmind' ); ?>
+		</h2>
+		<p class="wpmind-overview-hero-subtitle"><?php esc_html_e( 'WordPress AI 智能路由引擎', 'wpmind' ); ?></p>
+		<p class="wpmind-overview-hero-meta">
+			v<?php echo esc_html( WPMIND_VERSION ); ?>
+			&middot; <?php echo esc_html( count( $providers ) ); ?> <?php esc_html_e( '个 Provider', 'wpmind' ); ?>
+			&middot; <?php echo esc_html( $active_count ); ?>/<?php echo esc_html( count( $modules ) ); ?> <?php esc_html_e( '模块启用', 'wpmind' ); ?>
+		</p>
 		<div class="wpmind-overview-hero-actions">
-			<a href="#services" class="wpmind-overview-hero-btn wpmind-tab-link" data-tab-link="services">
-				<span class="dashicons ri-add-line"></span>
-				<?php esc_html_e( '添加 Provider', 'wpmind' ); ?>
-			</a>
-			<a href="https://wpcommunity.com/c/wpmind/" target="_blank" rel="noopener" class="wpmind-overview-hero-btn wpmind-overview-hero-btn--ghost">
-				<span class="dashicons ri-book-open-line"></span>
-				<?php esc_html_e( '查看文档', 'wpmind' ); ?>
-			</a>
+			<a href="#services" class="wpmind-overview-hero-btn wpmind-tab-link" data-tab-link="services"><?php esc_html_e( '添加 Provider', 'wpmind' ); ?> &rarr;</a>
+			<a href="https://wpcommunity.com/c/wpmind/" target="_blank" rel="noopener" class="wpmind-overview-hero-btn wpmind-overview-hero-btn--ghost"><?php esc_html_e( '查看文档', 'wpmind' ); ?> &rarr;</a>
 		</div>
-		<span class="wpmind-overview-hero-icon dashicons ri-robot-2-line"></span>
 	</div>
 
 	<!-- 统计卡片 -->
 	<div class="wpmind-overview-stats">
 		<div class="wpmind-overview-stat">
-			<span class="wpmind-overview-stat-icon" style="background: var(--wpmind-primary-light); color: var(--wpmind-primary);">
+			<span class="wpmind-overview-stat-icon">
 				<span class="dashicons ri-chat-ai-line"></span>
 			</span>
 			<div class="wpmind-overview-stat-body">
@@ -112,7 +101,7 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 		</div>
 
 		<div class="wpmind-overview-stat">
-			<span class="wpmind-overview-stat-icon" style="background: var(--wpmind-success-light); color: var(--wpmind-success);">
+			<span class="wpmind-overview-stat-icon">
 				<span class="dashicons ri-token-swap-line"></span>
 			</span>
 			<div class="wpmind-overview-stat-body">
@@ -122,7 +111,7 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 		</div>
 
 		<div class="wpmind-overview-stat">
-			<span class="wpmind-overview-stat-icon" style="background: var(--wpmind-warning-light); color: var(--wpmind-warning);">
+			<span class="wpmind-overview-stat-icon">
 				<span class="dashicons ri-money-cny-circle-line"></span>
 			</span>
 			<div class="wpmind-overview-stat-body">
@@ -132,7 +121,7 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 		</div>
 
 		<div class="wpmind-overview-stat">
-			<span class="wpmind-overview-stat-icon" style="background: #f3e8ff; color: #7c3aed;">
+			<span class="wpmind-overview-stat-icon">
 				<span class="dashicons ri-server-line"></span>
 			</span>
 			<div class="wpmind-overview-stat-body">
@@ -146,18 +135,17 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 	<div class="wpmind-overview-grid">
 
 		<!-- 左栏：Provider 状态 -->
-		<div class="wpmind-overview-card wpmind-overview-card--bg-icon">
-			<span class="wpmind-overview-card-bg dashicons ri-server-line"></span>
+		<div class="wpmind-overview-card">
 			<div class="wpmind-overview-card-header">
-				<h3><?php esc_html_e( 'Provider 状态', 'wpmind' ); ?></h3>
-				<a href="#services" class="wpmind-overview-card-link wpmind-tab-link" data-tab-link="services"><?php esc_html_e( '管理', 'wpmind' ); ?> →</a>
+				<h3><span class="dashicons ri-server-line"></span><?php esc_html_e( 'Provider 状态', 'wpmind' ); ?></h3>
+				<a href="#services" class="wpmind-overview-card-link wpmind-tab-link" data-tab-link="services"><?php esc_html_e( '管理', 'wpmind' ); ?> &rarr;</a>
 			</div>
 			<div class="wpmind-overview-card-body">
 				<?php if ( empty( $providers ) ) : ?>
 					<div class="wpmind-overview-empty-state">
 						<span class="wpmind-overview-empty-icon dashicons ri-server-line"></span>
 						<p class="wpmind-overview-empty-text"><?php esc_html_e( '还没有配置 Provider', 'wpmind' ); ?></p>
-						<a href="#services" class="wpmind-overview-empty-action wpmind-tab-link" data-tab-link="services"><?php esc_html_e( '去配置', 'wpmind' ); ?> →</a>
+						<a href="#services" class="wpmind-overview-empty-action wpmind-tab-link" data-tab-link="services"><?php esc_html_e( '去配置', 'wpmind' ); ?> &rarr;</a>
 					</div>
 				<?php else : ?>
 					<div class="wpmind-overview-provider-list">
@@ -179,11 +167,10 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 		</div>
 
 		<!-- 右栏：模块状态 -->
-		<div class="wpmind-overview-card wpmind-overview-card--bg-icon">
-			<span class="wpmind-overview-card-bg dashicons ri-puzzle-line"></span>
+		<div class="wpmind-overview-card">
 			<div class="wpmind-overview-card-header">
-				<h3><?php esc_html_e( '模块状态', 'wpmind' ); ?></h3>
-				<a href="#modules" class="wpmind-overview-card-link wpmind-tab-link" data-tab-link="modules"><?php esc_html_e( '管理', 'wpmind' ); ?> →</a>
+				<h3><span class="dashicons ri-puzzle-line"></span><?php esc_html_e( '模块状态', 'wpmind' ); ?></h3>
+				<a href="#modules" class="wpmind-overview-card-link wpmind-tab-link" data-tab-link="modules"><?php esc_html_e( '管理', 'wpmind' ); ?> &rarr;</a>
 			</div>
 			<div class="wpmind-overview-card-body">
 				<div class="wpmind-overview-module-list">
@@ -208,15 +195,14 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 	<div class="wpmind-overview-grid">
 
 		<!-- 左栏：本月摘要 -->
-		<div class="wpmind-overview-card wpmind-overview-card--bg-icon">
-			<span class="wpmind-overview-card-bg dashicons ri-bar-chart-grouped-line"></span>
+		<div class="wpmind-overview-card">
 			<div class="wpmind-overview-card-header">
-				<h3><?php esc_html_e( '本月摘要', 'wpmind' ); ?></h3>
+				<h3><span class="dashicons ri-bar-chart-grouped-line"></span><?php esc_html_e( '本月摘要', 'wpmind' ); ?></h3>
 			</div>
 			<div class="wpmind-overview-card-body">
 				<div class="wpmind-overview-summary-grid">
 					<div class="wpmind-overview-summary-cell">
-						<span class="wpmind-overview-summary-icon" style="background: var(--wpmind-primary-light); color: var(--wpmind-primary);">
+						<span class="wpmind-overview-summary-icon">
 							<span class="dashicons ri-robot-2-line"></span>
 						</span>
 						<div class="wpmind-overview-summary-text">
@@ -225,7 +211,7 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 						</div>
 					</div>
 					<div class="wpmind-overview-summary-cell">
-						<span class="wpmind-overview-summary-icon" style="background: #fef3c7; color: #d97706;">
+						<span class="wpmind-overview-summary-icon">
 							<span class="dashicons ri-timer-flash-line"></span>
 						</span>
 						<div class="wpmind-overview-summary-text">
@@ -234,7 +220,7 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 						</div>
 					</div>
 					<div class="wpmind-overview-summary-cell">
-						<span class="wpmind-overview-summary-icon" style="background: var(--wpmind-success-light); color: var(--wpmind-success);">
+						<span class="wpmind-overview-summary-icon">
 							<span class="dashicons ri-shield-check-line"></span>
 						</span>
 						<div class="wpmind-overview-summary-text">
@@ -243,7 +229,7 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 						</div>
 					</div>
 					<div class="wpmind-overview-summary-cell">
-						<span class="wpmind-overview-summary-icon" style="background: #f3e8ff; color: #7c3aed;">
+						<span class="wpmind-overview-summary-icon">
 							<span class="dashicons ri-token-swap-line"></span>
 						</span>
 						<div class="wpmind-overview-summary-text">
@@ -256,10 +242,9 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 		</div>
 
 		<!-- 右栏：最近活动 -->
-		<div class="wpmind-overview-card wpmind-overview-card--bg-icon">
-			<span class="wpmind-overview-card-bg dashicons ri-pulse-line"></span>
+		<div class="wpmind-overview-card">
 			<div class="wpmind-overview-card-header">
-				<h3><?php esc_html_e( '最近活动', 'wpmind' ); ?></h3>
+				<h3><span class="dashicons ri-pulse-line"></span><?php esc_html_e( '最近活动', 'wpmind' ); ?></h3>
 				<?php if ( class_exists( 'WPMind\\Modules\\Analytics\\AnalyticsManager' ) ) : ?>
 					<a href="#analytics" class="wpmind-overview-card-link wpmind-tab-link" data-tab-link="analytics"><?php esc_html_e( '查看全部', 'wpmind' ); ?> →</a>
 				<?php endif; ?>
@@ -307,7 +292,7 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 	<!-- 快捷入口 -->
 	<div class="wpmind-overview-card">
 		<div class="wpmind-overview-card-header">
-			<h3><?php esc_html_e( '快捷入口', 'wpmind' ); ?></h3>
+			<h3><span class="dashicons ri-apps-2-line"></span><?php esc_html_e( '快捷入口', 'wpmind' ); ?></h3>
 		</div>
 		<div class="wpmind-overview-card-body">
 			<div class="wpmind-overview-shortcuts">
