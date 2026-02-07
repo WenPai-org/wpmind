@@ -38,8 +38,9 @@
 
         if (!$tabs.length) return;
 
-        // 从 URL hash 恢复 Tab 状态
-        var hash = window.location.hash.slice(1) || 'dashboard';
+        // 从 URL hash 恢复 Tab 状态，fallback 到第一个可用 Tab
+        var firstTab = $tabs.first().data('tab') || 'services';
+        var hash = window.location.hash.slice(1) || firstTab;
         switchTab(hash);
 
         // Tab 点击事件
@@ -50,10 +51,18 @@
             history.replaceState(null, null, '#' + tabId);
         });
 
+        // 概览页快捷入口点击事件
+        $(document).on('click', '[data-tab-link]', function (e) {
+            e.preventDefault();
+            var tabId = $(this).data('tab-link');
+            switchTab(tabId);
+            history.replaceState(null, null, '#' + tabId);
+        });
+
         function switchTab(tabId) {
-            // 验证 tabId 是否有效
+            // 验证 tabId 是否有效，fallback 到第一个可用 Tab
             if (!$('#' + tabId).length) {
-                tabId = 'dashboard';
+                tabId = firstTab;
             }
 
             $tabs.removeClass('wpmind-tab-active');

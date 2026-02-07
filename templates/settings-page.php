@@ -53,12 +53,15 @@ defined( 'ABSPATH' ) || exit;
         <div class="wpmind-tabs-card">
             <!-- Tab 导航 -->
             <nav class="wpmind-tab-list">
+                <a href="#overview" class="wpmind-tab wpmind-tab-active" data-tab="overview">
+                    <?php esc_html_e( '概览', 'wpmind' ); ?>
+                </a>
                 <?php if ( $analytics_enabled ) : ?>
-                <a href="#dashboard" class="wpmind-tab wpmind-tab-active" data-tab="dashboard">
+                <a href="#dashboard" class="wpmind-tab" data-tab="dashboard">
                     <?php esc_html_e( '仪表板', 'wpmind' ); ?>
                 </a>
                 <?php endif; ?>
-                <a href="#services" class="wpmind-tab<?php echo ! $analytics_enabled ? ' wpmind-tab-active' : ''; ?>" data-tab="services">
+                <a href="#services" class="wpmind-tab" data-tab="services">
                     <?php esc_html_e( '文本服务', 'wpmind' ); ?>
                 </a>
                 <a href="#images" class="wpmind-tab" data-tab="images">
@@ -83,12 +86,15 @@ defined( 'ABSPATH' ) || exit;
             </nav>
 
             <!-- Tab 内容 -->
+            <div id="overview" class="wpmind-tab-pane wpmind-tab-pane-active">
+                <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/overview.php'; ?>
+            </div>
             <?php if ( $analytics_enabled ) : ?>
-            <div id="dashboard" class="wpmind-tab-pane wpmind-tab-pane-active">
+            <div id="dashboard" class="wpmind-tab-pane">
                 <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/dashboard.php'; ?>
             </div>
             <?php endif; ?>
-            <div id="services" class="wpmind-tab-pane<?php echo ! $analytics_enabled ? ' wpmind-tab-pane-active' : ''; ?>">
+            <div id="services" class="wpmind-tab-pane">
                 <?php include WPMIND_PLUGIN_DIR . 'templates/tabs/services.php'; ?>
             </div>
             <div id="images" class="wpmind-tab-pane">
