@@ -1730,14 +1730,95 @@ class PublicAPI {
     }
 
     /**
-     * 执行 Chat 请求
+     * 判断是否应该使用 SDK 执行请求
      *
+     * @since 3.6.0
+     * @param string $provider 服务商 ID
+     * @param array  $args     请求参数
+     * @return bool
+     */
+    private function should_use_sdk(string $provider, array $args): bool {
+        // 1. SDK 适配器类不存在，不使用
+        if (!class_exists('\\WPMind\\SDK\\SDKAdapter')) {
+            return false;
+        }
+
+        // 2. AiClient SDK 不可用，不使用
+        if (!class_exists('WordPress\\AiClient\\AiClient')) {
+            return false;
+        }
+
+        // 3. 用户配置禁用
+        if (!get_option('wpmind_sdk_enabled', true)) {
+            return false;
+        }
+
+        // 4. 能力 gate：tools 请求暂不走 SDK（v3.6.0 限制）
+        if (!empty($args['tools'])) {
+            return false;
+        }
+
+        // 5. Provider 白名单（默认 anthropic/google，可通过 filter 扩展）
+        $sdk_providers = apply_filters('wpmind_sdk_providers', ['anthropic', 'google']);
+        return in_array($provider, $sdk_providers, true);
+    }
+
+    /**
+     * 执行 Chat 请求（路由方法）
+     *
+     * 优先尝试 SDK 路径，失败时回退到原生 HTTP。
+     *
+     * @since 3.6.0
      * @param array  $args     请求参数
      * @param string $provider 服务商
      * @param string $model    模型
      * @return array|WP_Error
      */
     private function execute_chat_request(array $args, string $provider, string $model) {
+        // 尝试 SDK 路径
+        if ($this->should_use_sdk($provider, $args)) {
+            $sdk = new \WPMind\SDK\SDKAdapter();
+            $start_time = microtime(true);
+            $result = $sdk->chat($args, $provider, $model);
+            $latency_ms = (int)((microtime(true) - $start_time) * 1000);
+
+            if (!is_wp_error($result)) {
+                // SDK 成功，记录健康状态
+                if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
+                    \WPMind\Failover\FailoverManager::instance()->record_result($provider, true, $latency_ms);
+                }
+                return $result;
+            }
+
+            // SDK 失败：按错误分类处理
+            $error_code = $result->get_error_code();
+
+            if ($error_code === 'wpmind_sdk_invalid_args' || $error_code === 'wpmind_sdk_unavailable') {
+                // 适配错误或 SDK 不可用，静默回退到 HTTP（不记录失败，不消耗重试预算）
+                do_action('wpmind_sdk_fallback', $provider, $error_code, $result->get_error_message());
+            } else {
+                // Provider 错误（429/5xx 等），记录失败并返回（让外层重试/failover）
+                if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
+                    \WPMind\Failover\FailoverManager::instance()->record_result($provider, false, $latency_ms);
+                }
+                return $result;
+            }
+        }
+
+        // HTTP 路径（原实现）
+        return $this->execute_chat_request_native($args, $provider, $model);
+    }
+
+    /**
+     * 通过原生 HTTP 执行 chat 请求（SDK 的 fallback）
+     *
+     * @since 3.6.0
+     * @param array  $args     请求参数
+     * @param string $provider 服务商
+     * @param string $model    模型
+     * @return array|WP_Error
+     */
+    private function execute_chat_request_native(array $args, string $provider, string $model) {
         // 获取端点配置
         $wpmind = \WPMind\WPMind::instance();
         $endpoints = $wpmind->get_custom_endpoints();
@@ -1791,7 +1872,7 @@ class PublicAPI {
 
         // 发送请求
         $start_time = microtime(true);
-        
+
         $response = wp_remote_post($api_url, [
             'headers' => [
                 'Authorization' => 'Bearer ' . $api_key,
