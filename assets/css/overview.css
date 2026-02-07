@@ -4,6 +4,70 @@
 	max-width: 1200px;
 }
 
+/* Hero section */
+.wpmind-overview-hero {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background: linear-gradient(135deg, var(--wpmind-primary) 0%, #6366f1 100%);
+	color: #fff;
+	padding: var(--wpmind-space-7, 32px) var(--wpmind-space-8, 40px);
+	margin-bottom: var(--wpmind-space-6);
+	border-radius: 2px;
+	position: relative;
+	overflow: hidden;
+}
+
+.wpmind-overview-hero-content {
+	position: relative;
+	z-index: 1;
+}
+
+.wpmind-overview-hero-title {
+	display: flex;
+	align-items: center;
+	gap: var(--wpmind-space-3);
+	margin: 0 0 var(--wpmind-space-2) 0;
+	font-size: 1.5em;
+	font-weight: 700;
+	color: #fff;
+}
+
+.wpmind-overview-hero-title .dashicons {
+	font-size: 28px;
+	width: 28px;
+	height: 28px;
+}
+
+.wpmind-overview-hero-desc {
+	margin: 0 0 var(--wpmind-space-3) 0;
+	font-size: var(--wpmind-text-base);
+	opacity: 0.9;
+}
+
+.wpmind-overview-hero-meta {
+	display: flex;
+	align-items: center;
+	gap: var(--wpmind-space-2);
+	font-size: var(--wpmind-text-sm);
+	opacity: 0.75;
+}
+
+.wpmind-overview-hero-sep {
+	opacity: 0.5;
+}
+
+.wpmind-overview-hero-icon {
+	font-size: 120px !important;
+	width: 120px !important;
+	height: 120px !important;
+	opacity: 0.12;
+	position: absolute;
+	right: 24px;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
 /* Stat cards row */
 .wpmind-overview-stats {
 	display: grid;
@@ -74,6 +138,21 @@
 .wpmind-overview-card {
 	background: #fff;
 	box-shadow: var(--wpmind-shadow);
+	position: relative;
+	overflow: hidden;
+}
+
+/* Card decorative background icon */
+.wpmind-overview-card--bg-icon .wpmind-overview-card-bg {
+	position: absolute;
+	right: -8px;
+	bottom: -8px;
+	font-size: 80px !important;
+	width: 80px !important;
+	height: 80px !important;
+	opacity: 0.04;
+	pointer-events: none;
+	z-index: 0;
 }
 
 .wpmind-overview-card-header {
@@ -152,34 +231,67 @@
 	font-size: var(--wpmind-text-sm);
 }
 
-/* Summary list (value card) */
-.wpmind-overview-summary-list {
-	display: flex;
-	flex-direction: column;
-	gap: 0;
+/* Card accent borders */
+.wpmind-overview-card--accent-blue {
+	border-top: 3px solid var(--wpmind-primary);
 }
 
-.wpmind-overview-summary-item {
+.wpmind-overview-card--accent-green {
+	border-top: 3px solid var(--wpmind-success);
+}
+
+/* Summary grid (value card — 2x2) */
+.wpmind-overview-summary-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: var(--wpmind-space-4);
+}
+
+.wpmind-overview-summary-cell {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
-	padding: var(--wpmind-space-3) 0;
-	border-bottom: 1px solid var(--wpmind-gray-100);
+	gap: var(--wpmind-space-3);
+	padding: var(--wpmind-space-3);
+	background: var(--wpmind-gray-50, #f9fafb);
+	border-radius: 8px;
 }
 
-.wpmind-overview-summary-item:last-child {
-	border-bottom: none;
+.wpmind-overview-summary-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	border-radius: 8px;
+	flex-shrink: 0;
 }
 
-.wpmind-overview-summary-label {
-	font-size: var(--wpmind-text-sm);
-	color: var(--wpmind-gray-500);
+.wpmind-overview-summary-icon .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+}
+
+.wpmind-overview-summary-text {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
 }
 
 .wpmind-overview-summary-value {
-	font-size: var(--wpmind-text-sm);
+	font-size: var(--wpmind-text-base);
 	font-weight: 600;
-	color: var(--wpmind-gray-800);
+	color: var(--wpmind-gray-900);
+	line-height: 1.3;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wpmind-overview-summary-label {
+	font-size: 0.75rem;
+	color: var(--wpmind-gray-500);
+	margin-top: 1px;
 }
 
 /* Activity list (recent activity card) */
@@ -190,27 +302,45 @@
 }
 
 .wpmind-overview-activity-item {
-	display: grid;
-	grid-template-columns: 40px 80px 1fr auto auto;
-	gap: var(--wpmind-space-3);
+	display: flex;
 	align-items: center;
-	padding: var(--wpmind-space-2) 0;
+	gap: var(--wpmind-space-3);
+	padding: var(--wpmind-space-3) var(--wpmind-space-2);
 	border-bottom: 1px solid var(--wpmind-gray-100);
 	font-size: var(--wpmind-text-sm);
+	border-radius: 4px;
+	transition: background 0.1s ease;
 }
 
 .wpmind-overview-activity-item:last-child {
 	border-bottom: none;
 }
 
+.wpmind-overview-activity-item:hover {
+	background: var(--wpmind-gray-50, #f9fafb);
+}
+
 .wpmind-overview-activity-time {
 	color: var(--wpmind-gray-400);
 	font-variant-numeric: tabular-nums;
+	flex-shrink: 0;
+	width: 36px;
 }
 
 .wpmind-overview-activity-provider {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
 	color: var(--wpmind-gray-700);
 	font-weight: 500;
+	flex-shrink: 0;
+}
+
+.wpmind-overview-activity-provider .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+	color: var(--wpmind-gray-400);
 }
 
 .wpmind-overview-activity-model {
@@ -218,19 +348,28 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	flex: 1;
+	min-width: 0;
+}
+
+.wpmind-overview-activity-meta {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--wpmind-space-2);
+	flex-shrink: 0;
+	margin-left: auto;
 }
 
 .wpmind-overview-activity-tokens {
 	color: var(--wpmind-gray-600);
-	text-align: right;
 	font-variant-numeric: tabular-nums;
+	font-weight: 500;
 }
 
 .wpmind-overview-activity-latency {
 	color: var(--wpmind-gray-400);
-	text-align: right;
-	min-width: 50px;
 	font-variant-numeric: tabular-nums;
+	font-size: 0.75rem;
 }
 
 /* Footer links */
@@ -319,11 +458,17 @@
 	.wpmind-overview-shortcuts {
 		grid-template-columns: repeat(3, 1fr);
 	}
-	.wpmind-overview-activity-item {
-		grid-template-columns: 40px 70px 1fr auto;
-	}
 	.wpmind-overview-activity-latency {
 		display: none;
+	}
+	.wpmind-overview-hero {
+		padding: var(--wpmind-space-6) var(--wpmind-space-6);
+	}
+	.wpmind-overview-hero-icon {
+		font-size: 80px !important;
+		width: 80px !important;
+		height: 80px !important;
+		right: 12px;
 	}
 }
 
@@ -333,5 +478,14 @@
 	}
 	.wpmind-overview-shortcuts {
 		grid-template-columns: repeat(2, 1fr);
+	}
+	.wpmind-overview-summary-grid {
+		grid-template-columns: 1fr;
+	}
+	.wpmind-overview-hero-meta {
+		flex-wrap: wrap;
+	}
+	.wpmind-overview-hero-icon {
+		display: none;
 	}
 }
