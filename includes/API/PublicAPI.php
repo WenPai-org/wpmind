@@ -273,10 +273,15 @@ class PublicAPI {
         // 应用参数过滤
         $args = apply_filters('wpmind_chat_args', $args, $context, $messages);
 
-        // 选择模型
-        $model = $options['model'];
-        if ($model === 'auto') {
+        // 保存用户原始 model 意图，failover 时动态选择模型
+        $original_model = $options['model'];
+        $model_is_auto = ($original_model === 'auto');
+
+        // 非 auto 时保留用户指定的 model，auto 时用默认 provider 的默认模型（用于缓存键等）
+        if ($model_is_auto) {
             $model = $this->get_default_model();
+        } else {
+            $model = $original_model;
         }
         $model = apply_filters('wpmind_select_model', $model, $context, get_current_user_id());
 
@@ -325,8 +330,26 @@ class PublicAPI {
             $is_last_provider = ($index === $failover_count - 1);
             $max_retries = $is_last_provider ? 3 : 1;
 
+            // 动态选择当前 provider 的模型
+            if ($model_is_auto) {
+                // auto 模式：每个 provider 用自己的默认模型
+                $try_model = $this->get_current_model($try_provider);
+            } else {
+                // 显式 model：先尝试用户指定的，若 provider 不支持则回退
+                $try_model = $model;
+                $wpmind_instance = class_exists('\\WPMind\\WPMind') ? \WPMind\WPMind::instance() : null;
+                if ($wpmind_instance) {
+                    $endpoints = $wpmind_instance->get_custom_endpoints();
+                    $provider_models = $endpoints[$try_provider]['models'] ?? [];
+                    if (!empty($provider_models) && !in_array($try_model, $provider_models, true)) {
+                        // 目标 provider 不支持该模型，回退到其默认模型
+                        $try_model = $this->get_current_model($try_provider);
+                    }
+                }
+            }
+
             for ($attempt = 0; $attempt <= $max_retries; $attempt++) {
-                $result = $this->execute_chat_request($args, $try_provider, $model);
+                $result = $this->execute_chat_request($args, $try_provider, $try_model);
 
                 if (!is_wp_error($result)) {
                     // 成功，如果使用了备用 Provider，添加标记
@@ -336,6 +359,12 @@ class PublicAPI {
                             'actual_provider'   => $try_provider,
                             'tried_providers'   => $tried_providers,
                         ];
+                    }
+
+                    // 如果模型发生了回退，添加标记
+                    if ($try_model !== $model) {
+                        $result['model_fallback'] = true;
+                        $result['original_model'] = $model;
                     }
                     break 2;
                 }
@@ -565,100 +594,152 @@ class PublicAPI {
         $context = $options['context'];
         $normalized_messages = $this->normalize_messages($messages, $options);
 
-        // 选择服务商和模型
-        $provider = $options['provider'] === 'auto'
-            ? get_option('wpmind_default_provider', 'openai')
-            : $options['provider'];
-        $model = $options['model'] === 'auto' 
-            ? $this->get_current_model($provider) 
-            : $options['model'];
+        // 保存用户原始 model 意图，failover 时动态选择模型
+        $original_model = $options['model'];
+        $model_is_auto = ($original_model === 'auto');
+
+        // 选择服务商（集成路由 + 故障转移）
+        $provider = $options['provider'];
+        if ($provider === 'auto') {
+            $provider = get_option('wpmind_default_provider', 'openai');
+        }
+        $provider = apply_filters('wpmind_select_provider', $provider, $context);
+
+        // 使用 FailoverManager 获取故障转移链
+        $failover_chain = [$provider];
+        if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
+            $failover = \WPMind\Failover\FailoverManager::instance();
+            $failover_chain = $failover->get_failover_chain($provider);
+
+            // 如果首选 Provider 不可用，记录日志
+            if (!empty($failover_chain) && $failover_chain[0] !== $provider) {
+                do_action('wpmind_provider_failover', $provider, $failover_chain[0], $context);
+            }
+        }
+
+        do_action('wpmind_before_request', 'stream', compact('messages', 'options'), $context);
 
         // 获取端点配置
         $wpmind = \WPMind\WPMind::instance();
         $endpoints = $wpmind->get_custom_endpoints();
 
-        if (!isset($endpoints[$provider])) {
-            return new WP_Error('wpmind_provider_not_found', 
-                sprintf(__('服务商 %s 未配置', 'wpmind'), $provider));
-        }
+        // 使用故障转移链依次尝试
+        $last_error = null;
 
-        $endpoint = $endpoints[$provider];
-        $api_key = $endpoint['api_key'] ?? '';
-
-        if (empty($api_key)) {
-            return new WP_Error('wpmind_api_key_missing', 
-                sprintf(__('服务商 %s 未配置 API Key', 'wpmind'), $provider));
-        }
-
-        // 确定模型
-        if ($model === 'auto' || $model === 'default') {
-            $model = $endpoint['models'][0] ?? 'gpt-3.5-turbo';
-        }
-
-        do_action('wpmind_before_request', 'stream', compact('messages', 'options'), $context);
-
-        // 构建请求
-        $base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
-        $api_url = trailingslashit($base_url) . 'chat/completions';
-
-        $request_body = [
-            'model'       => $model,
-            'messages'    => $normalized_messages,
-            'max_tokens'  => $options['max_tokens'],
-            'temperature' => $options['temperature'],
-            'stream'      => true,
-        ];
-
-        // 使用 PHP stream context 处理流式响应
-        $context_options = [
-            'http' => [
-                'method'  => 'POST',
-                'header'  => [
-                    'Content-Type: application/json',
-                    'Authorization: Bearer ' . $api_key,
-                ],
-                'content' => wp_json_encode($request_body),
-                'timeout' => 120,
-            ],
-            'ssl' => [
-                'verify_peer' => true,
-            ],
-        ];
-
-        $stream_context = stream_context_create($context_options);
-        $stream = @fopen($api_url, 'r', false, $stream_context);
-
-        if (!$stream) {
-            return new WP_Error('wpmind_stream_failed', __('无法建立流式连接', 'wpmind'));
-        }
-
-        $full_content = '';
-
-        while (!feof($stream)) {
-            $line = fgets($stream);
-            if (empty($line)) continue;
-
-            $line = trim($line);
-            if (strpos($line, 'data: ') !== 0) continue;
-
-            $data = substr($line, 6);
-            if ($data === '[DONE]') break;
-
-            $json = json_decode($data, true);
-            if (!$json) continue;
-
-            $delta = $json['choices'][0]['delta']['content'] ?? '';
-            if (!empty($delta)) {
-                $full_content .= $delta;
-                call_user_func($callback, $delta, $json);
+        foreach ($failover_chain as $index => $try_provider) {
+            if (!isset($endpoints[$try_provider])) {
+                $last_error = new WP_Error('wpmind_provider_not_found',
+                    sprintf(__('服务商 %s 未配置', 'wpmind'), $try_provider));
+                continue;
             }
+
+            $endpoint = $endpoints[$try_provider];
+            $api_key = $endpoint['api_key'] ?? '';
+
+            if (empty($api_key)) {
+                $last_error = new WP_Error('wpmind_api_key_missing',
+                    sprintf(__('服务商 %s 未配置 API Key', 'wpmind'), $try_provider));
+                continue;
+            }
+
+            // 动态获取模型：auto 时用当前 provider 的默认模型
+            $model = $model_is_auto
+                ? $this->get_current_model($try_provider)
+                : $original_model;
+
+            if ($model === 'auto' || $model === 'default') {
+                $model = $endpoint['models'][0] ?? 'gpt-3.5-turbo';
+            }
+
+            // 构建请求
+            $base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
+            $api_url = trailingslashit($base_url) . 'chat/completions';
+
+            $request_body = [
+                'model'       => $model,
+                'messages'    => $normalized_messages,
+                'max_tokens'  => $options['max_tokens'],
+                'temperature' => $options['temperature'],
+                'stream'      => true,
+            ];
+
+            // 使用 PHP stream context 处理流式响应
+            $stream_context_options = [
+                'http' => [
+                    'method'  => 'POST',
+                    'header'  => [
+                        'Content-Type: application/json',
+                        'Authorization: Bearer ' . $api_key,
+                    ],
+                    'content' => wp_json_encode($request_body),
+                    'timeout' => 120,
+                ],
+                'ssl' => [
+                    'verify_peer' => true,
+                ],
+            ];
+
+            $start_time = microtime(true);
+            $stream_ctx = stream_context_create($stream_context_options);
+            $stream = @fopen($api_url, 'r', false, $stream_ctx);
+
+            if (!$stream) {
+                $latency_ms = (int)((microtime(true) - $start_time) * 1000);
+
+                // 记录失败
+                if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
+                    \WPMind\Failover\FailoverManager::instance()->record_result($try_provider, false, $latency_ms);
+                }
+
+                $last_error = new WP_Error('wpmind_stream_failed',
+                    sprintf(__('服务商 %s 无法建立流式连接', 'wpmind'), $try_provider));
+                continue;
+            }
+
+            // 流式读取成功，解析 SSE 数据
+            $full_content = '';
+
+            while (!feof($stream)) {
+                $line = fgets($stream);
+                if (empty($line)) continue;
+
+                $line = trim($line);
+                if (strpos($line, 'data: ') !== 0) continue;
+
+                $data = substr($line, 6);
+                if ($data === '[DONE]') break;
+
+                $json = json_decode($data, true);
+                if (!$json) continue;
+
+                $delta = $json['choices'][0]['delta']['content'] ?? '';
+                if (!empty($delta)) {
+                    $full_content .= $delta;
+                    call_user_func($callback, $delta, $json);
+                }
+            }
+
+            fclose($stream);
+
+            $latency_ms = (int)((microtime(true) - $start_time) * 1000);
+
+            // 记录成功
+            if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
+                \WPMind\Failover\FailoverManager::instance()->record_result($try_provider, true, $latency_ms);
+            }
+
+            do_action('wpmind_after_request', 'stream', ['content' => $full_content], compact('messages', 'options'), []);
+
+            return true;
         }
 
-        fclose($stream);
+        // 所有 Provider 都失败了
+        if ($last_error) {
+            do_action('wpmind_error', $last_error, 'stream', compact('messages', 'options'));
+            return $last_error;
+        }
 
-        do_action('wpmind_after_request', 'stream', ['content' => $full_content], compact('messages', 'options'), []);
-
-        return true;
+        return new WP_Error('wpmind_stream_failed', __('无法建立流式连接', 'wpmind'));
     }
 
     /**
@@ -846,94 +927,148 @@ class PublicAPI {
         // 确保是数组
         $input_texts = is_array($texts) ? $texts : [$texts];
 
-        // 选择服务商
-        $provider = $options['provider'] === 'auto' 
-            ? get_option('wpmind_default_provider', 'openai') 
-            : $options['provider'];
+        // 保存用户原始 model 意图
+        $original_model = $options['model'];
+        $model_is_auto = ($original_model === 'auto');
+
+        // 选择服务商（集成路由 + 故障转移）
+        $provider = $options['provider'];
+        if ($provider === 'auto') {
+            $provider = get_option('wpmind_default_provider', 'openai');
+        }
+        $provider = apply_filters('wpmind_select_provider', $provider, $context);
+
+        // 使用 FailoverManager 获取故障转移链
+        $failover_chain = [$provider];
+        if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
+            $failover = \WPMind\Failover\FailoverManager::instance();
+            $failover_chain = $failover->get_failover_chain($provider);
+
+            // 如果首选 Provider 不可用，记录日志
+            if (!empty($failover_chain) && $failover_chain[0] !== $provider) {
+                do_action('wpmind_provider_failover', $provider, $failover_chain[0], $context);
+            }
+        }
+
+        do_action('wpmind_before_request', 'embed', compact('texts', 'options'), $context);
 
         // 获取端点配置
         $wpmind = \WPMind\WPMind::instance();
         $endpoints = $wpmind->get_custom_endpoints();
 
-        if (!isset($endpoints[$provider])) {
-            return new WP_Error('wpmind_provider_not_found', 
-                sprintf(__('服务商 %s 未配置', 'wpmind'), $provider));
-        }
+        // 嵌入模型映射表
+        $embed_models = [
+            'openai'   => 'text-embedding-3-small',
+            'deepseek' => 'text-embedding-3-small', // DeepSeek 兼容 OpenAI
+            'zhipu'    => 'embedding-2',
+            'qwen'     => 'text-embedding-v2',
+        ];
 
-        $endpoint = $endpoints[$provider];
-        $api_key = $endpoint['api_key'] ?? '';
+        // 使用故障转移链依次尝试
+        $last_error = null;
 
-        if (empty($api_key)) {
-            return new WP_Error('wpmind_api_key_missing', 
-                sprintf(__('服务商 %s 未配置 API Key', 'wpmind'), $provider));
-        }
+        foreach ($failover_chain as $index => $try_provider) {
+            if (!isset($endpoints[$try_provider])) {
+                $last_error = new WP_Error('wpmind_provider_not_found',
+                    sprintf(__('服务商 %s 未配置', 'wpmind'), $try_provider));
+                continue;
+            }
 
-        // 确定嵌入模型
-        $embed_model = $options['model'];
-        if ($embed_model === 'auto') {
-            // 根据服务商选择默认嵌入模型
-            $embed_models = [
-                'openai'   => 'text-embedding-3-small',
-                'deepseek' => 'text-embedding-3-small', // DeepSeek 兼容 OpenAI
-                'zhipu'    => 'embedding-2',
-                'qwen'     => 'text-embedding-v2',
+            $endpoint = $endpoints[$try_provider];
+            $api_key = $endpoint['api_key'] ?? '';
+
+            if (empty($api_key)) {
+                $last_error = new WP_Error('wpmind_api_key_missing',
+                    sprintf(__('服务商 %s 未配置 API Key', 'wpmind'), $try_provider));
+                continue;
+            }
+
+            // 动态获取嵌入模型
+            $embed_model = $model_is_auto
+                ? ($embed_models[$try_provider] ?? 'text-embedding-3-small')
+                : $original_model;
+
+            // 构建请求
+            $base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
+            $api_url = trailingslashit($base_url) . 'embeddings';
+
+            $start_time = microtime(true);
+
+            $response = wp_remote_post($api_url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $api_key,
+                    'Content-Type'  => 'application/json',
+                ],
+                'body'    => wp_json_encode([
+                    'model' => $embed_model,
+                    'input' => $input_texts,
+                ]),
+                'timeout' => 60,
+            ]);
+
+            $latency_ms = (int)((microtime(true) - $start_time) * 1000);
+
+            if (is_wp_error($response)) {
+                // 记录失败
+                if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
+                    \WPMind\Failover\FailoverManager::instance()->record_result($try_provider, false, $latency_ms);
+                }
+
+                $last_error = new WP_Error('wpmind_embed_failed',
+                    sprintf(__('嵌入请求失败: %s', 'wpmind'), $response->get_error_message()));
+                continue;
+            }
+
+            $status_code = wp_remote_retrieve_response_code($response);
+            $body = wp_remote_retrieve_body($response);
+            $data = json_decode($body, true);
+
+            if ($status_code !== 200) {
+                // 记录失败
+                if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
+                    \WPMind\Failover\FailoverManager::instance()->record_result($try_provider, false, $latency_ms);
+                }
+
+                $error_message = $data['error']['message'] ?? __('未知错误', 'wpmind');
+                $last_error = new WP_Error('wpmind_embed_error',
+                    sprintf(__('嵌入 API 错误 (%d): %s', 'wpmind'), $status_code, $error_message));
+                continue;
+            }
+
+            // 记录成功
+            if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
+                \WPMind\Failover\FailoverManager::instance()->record_result($try_provider, true, $latency_ms);
+            }
+
+            // 提取向量
+            $embeddings = [];
+            foreach ($data['data'] ?? [] as $item) {
+                $embeddings[] = $item['embedding'];
+            }
+
+            $usage = [
+                'prompt_tokens' => $data['usage']['prompt_tokens'] ?? 0,
+                'total_tokens'  => $data['usage']['total_tokens'] ?? 0,
             ];
-            $embed_model = $embed_models[$provider] ?? 'text-embedding-3-small';
+
+            do_action('wpmind_after_request', 'embed', $embeddings, compact('texts', 'options'), $usage);
+
+            return [
+                'embeddings' => $embeddings,
+                'model'      => $embed_model,
+                'provider'   => $try_provider,
+                'usage'      => $usage,
+                'dimensions' => !empty($embeddings[0]) ? count($embeddings[0]) : 0,
+            ];
         }
 
-        do_action('wpmind_before_request', 'embed', compact('texts', 'options'), $context);
-
-        // 构建请求
-        $base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
-        $api_url = trailingslashit($base_url) . 'embeddings';
-
-        $response = wp_remote_post($api_url, [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $api_key,
-                'Content-Type'  => 'application/json',
-            ],
-            'body'    => wp_json_encode([
-                'model' => $embed_model,
-                'input' => $input_texts,
-            ]),
-            'timeout' => 60,
-        ]);
-
-        if (is_wp_error($response)) {
-            return new WP_Error('wpmind_embed_failed', 
-                sprintf(__('嵌入请求失败: %s', 'wpmind'), $response->get_error_message()));
+        // 所有 Provider 都失败了
+        if ($last_error) {
+            do_action('wpmind_error', $last_error, 'embed', compact('texts', 'options'));
+            return $last_error;
         }
 
-        $status_code = wp_remote_retrieve_response_code($response);
-        $body = wp_remote_retrieve_body($response);
-        $data = json_decode($body, true);
-
-        if ($status_code !== 200) {
-            $error_message = $data['error']['message'] ?? __('未知错误', 'wpmind');
-            return new WP_Error('wpmind_embed_error', 
-                sprintf(__('嵌入 API 错误 (%d): %s', 'wpmind'), $status_code, $error_message));
-        }
-
-        // 提取向量
-        $embeddings = [];
-        foreach ($data['data'] ?? [] as $item) {
-            $embeddings[] = $item['embedding'];
-        }
-
-        $usage = [
-            'prompt_tokens' => $data['usage']['prompt_tokens'] ?? 0,
-            'total_tokens'  => $data['usage']['total_tokens'] ?? 0,
-        ];
-
-        do_action('wpmind_after_request', 'embed', $embeddings, compact('texts', 'options'), $usage);
-
-        return [
-            'embeddings' => $embeddings,
-            'model'      => $embed_model,
-            'provider'   => $provider,
-            'usage'      => $usage,
-            'dimensions' => !empty($embeddings[0]) ? count($embeddings[0]) : 0,
-        ];
+        return new WP_Error('wpmind_embed_failed', __('嵌入请求失败', 'wpmind'));
     }
 
     /**
@@ -1187,35 +1322,42 @@ class PublicAPI {
             'language' => 'auto',    // 语言提示
             'prompt'   => '',        // 可选的提示词
             'format'   => 'text',    // text/json/srt/vtt
-            'provider' => 'openai',  // 暂只支持 OpenAI Whisper
+            'provider' => 'auto',    // auto 时使用默认 provider
         ];
         $options = wp_parse_args($options, $defaults);
 
         $context = $options['context'];
 
-        // 获取端点配置
-        $wpmind = \WPMind\WPMind::instance();
-        $endpoints = $wpmind->get_custom_endpoints();
+        // 支持 transcribe 的 provider 列表
+        $transcribe_providers = ['openai'];
 
+        // 选择服务商（集成路由 + 故障转移）
         $provider = $options['provider'];
-        if (!isset($endpoints[$provider])) {
-            return new WP_Error('wpmind_provider_not_found', 
-                sprintf(__('服务商 %s 未配置', 'wpmind'), $provider));
+        if ($provider === 'auto') {
+            $provider = get_option('wpmind_default_provider', 'openai');
+        }
+        $provider = apply_filters('wpmind_select_provider', $provider, $context);
+
+        // 使用 FailoverManager 获取故障转移链
+        $failover_chain = [$provider];
+        if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
+            $failover = \WPMind\Failover\FailoverManager::instance();
+            $failover_chain = $failover->get_failover_chain($provider);
         }
 
-        $endpoint = $endpoints[$provider];
-        $api_key = $endpoint['api_key'] ?? '';
+        // 过滤出支持 transcribe 的 provider
+        $failover_chain = array_values(array_filter($failover_chain, function ($p) use ($transcribe_providers) {
+            return in_array($p, $transcribe_providers, true);
+        }));
 
-        if (empty($api_key)) {
-            return new WP_Error('wpmind_api_key_missing', 
-                sprintf(__('服务商 %s 未配置 API Key', 'wpmind'), $provider));
+        if (empty($failover_chain)) {
+            return new WP_Error('wpmind_transcribe_not_supported',
+                __('没有可用的转录服务商（仅 OpenAI 支持 Whisper）', 'wpmind'));
         }
 
-        do_action('wpmind_before_request', 'transcribe', compact('audio_file', 'options'), $context);
-
-        // 确定是文件路径还是 URL
+        // 确定是文件路径还是 URL（在循环外处理，避免重复下载）
+        $is_temp = false;
         if (filter_var($audio_file, FILTER_VALIDATE_URL)) {
-            // 下载远程文件
             $temp_file = download_url($audio_file);
             if (is_wp_error($temp_file)) {
                 return $temp_file;
@@ -1224,97 +1366,153 @@ class PublicAPI {
             $is_temp = true;
         } else {
             $file_path = $audio_file;
-            $is_temp = false;
         }
 
         if (!file_exists($file_path)) {
             return new WP_Error('wpmind_file_not_found', __('音频文件不存在', 'wpmind'));
         }
 
-        // 准备请求
-        $base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
-        $api_url = trailingslashit($base_url) . 'audio/transcriptions';
-
-        $boundary = wp_generate_password(24, false);
-        $body = '';
-
-        // 文件
-        $body .= "--{$boundary}\r\n";
-        $body .= "Content-Disposition: form-data; name=\"file\"; filename=\"audio.mp3\"\r\n";
-        $body .= "Content-Type: audio/mpeg\r\n\r\n";
-        $body .= file_get_contents($file_path) . "\r\n";
-
-        // 模型
-        $body .= "--{$boundary}\r\n";
-        $body .= "Content-Disposition: form-data; name=\"model\"\r\n\r\n";
-        $body .= "whisper-1\r\n";
-
-        // 语言
-        if ($options['language'] !== 'auto') {
-            $body .= "--{$boundary}\r\n";
-            $body .= "Content-Disposition: form-data; name=\"language\"\r\n\r\n";
-            $body .= "{$options['language']}\r\n";
-        }
-
-        // 提示词
-        if (!empty($options['prompt'])) {
-            $body .= "--{$boundary}\r\n";
-            $body .= "Content-Disposition: form-data; name=\"prompt\"\r\n\r\n";
-            $body .= "{$options['prompt']}\r\n";
-        }
-
-        // 格式
-        $response_format = $options['format'] === 'text' ? 'text' : $options['format'];
-        $body .= "--{$boundary}\r\n";
-        $body .= "Content-Disposition: form-data; name=\"response_format\"\r\n\r\n";
-        $body .= "{$response_format}\r\n";
-
-        $body .= "--{$boundary}--\r\n";
-
-        $response = wp_remote_post($api_url, [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $api_key,
-                'Content-Type'  => 'multipart/form-data; boundary=' . $boundary,
-            ],
-            'body'    => $body,
-            'timeout' => 120,
-        ]);
+        // 读取文件内容（在循环外读取，避免重复 IO）
+        $file_content = file_get_contents($file_path);
 
         // 清理临时文件
-        if ($is_temp && file_exists($temp_file)) {
+        if ($is_temp && isset($temp_file) && file_exists($temp_file)) {
             unlink($temp_file);
         }
 
-        if (is_wp_error($response)) {
-            do_action('wpmind_error', $response, 'transcribe', compact('audio_file', 'options'));
-            return new WP_Error('wpmind_transcribe_failed', 
-                sprintf(__('转录请求失败: %s', 'wpmind'), $response->get_error_message()));
+        do_action('wpmind_before_request', 'transcribe', compact('audio_file', 'options'), $context);
+
+        // 获取端点配置
+        $wpmind = \WPMind\WPMind::instance();
+        $endpoints = $wpmind->get_custom_endpoints();
+
+        // 使用故障转移链依次尝试
+        $last_error = null;
+
+        foreach ($failover_chain as $index => $try_provider) {
+            if (!isset($endpoints[$try_provider])) {
+                $last_error = new WP_Error('wpmind_provider_not_found',
+                    sprintf(__('服务商 %s 未配置', 'wpmind'), $try_provider));
+                continue;
+            }
+
+            $endpoint = $endpoints[$try_provider];
+            $api_key = $endpoint['api_key'] ?? '';
+
+            if (empty($api_key)) {
+                $last_error = new WP_Error('wpmind_api_key_missing',
+                    sprintf(__('服务商 %s 未配置 API Key', 'wpmind'), $try_provider));
+                continue;
+            }
+
+            // 准备请求
+            $base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
+            $api_url = trailingslashit($base_url) . 'audio/transcriptions';
+
+            $boundary = wp_generate_password(24, false);
+            $body = '';
+
+            // 文件
+            $body .= "--{$boundary}\r\n";
+            $body .= "Content-Disposition: form-data; name=\"file\"; filename=\"audio.mp3\"\r\n";
+            $body .= "Content-Type: audio/mpeg\r\n\r\n";
+            $body .= $file_content . "\r\n";
+
+            // 模型
+            $body .= "--{$boundary}\r\n";
+            $body .= "Content-Disposition: form-data; name=\"model\"\r\n\r\n";
+            $body .= "whisper-1\r\n";
+
+            // 语言
+            if ($options['language'] !== 'auto') {
+                $body .= "--{$boundary}\r\n";
+                $body .= "Content-Disposition: form-data; name=\"language\"\r\n\r\n";
+                $body .= "{$options['language']}\r\n";
+            }
+
+            // 提示词
+            if (!empty($options['prompt'])) {
+                $body .= "--{$boundary}\r\n";
+                $body .= "Content-Disposition: form-data; name=\"prompt\"\r\n\r\n";
+                $body .= "{$options['prompt']}\r\n";
+            }
+
+            // 格式
+            $response_format = $options['format'] === 'text' ? 'text' : $options['format'];
+            $body .= "--{$boundary}\r\n";
+            $body .= "Content-Disposition: form-data; name=\"response_format\"\r\n\r\n";
+            $body .= "{$response_format}\r\n";
+
+            $body .= "--{$boundary}--\r\n";
+
+            $start_time = microtime(true);
+
+            $response = wp_remote_post($api_url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $api_key,
+                    'Content-Type'  => 'multipart/form-data; boundary=' . $boundary,
+                ],
+                'body'    => $body,
+                'timeout' => 120,
+            ]);
+
+            $latency_ms = (int)((microtime(true) - $start_time) * 1000);
+
+            if (is_wp_error($response)) {
+                // 记录失败
+                if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
+                    \WPMind\Failover\FailoverManager::instance()->record_result($try_provider, false, $latency_ms);
+                }
+
+                $last_error = new WP_Error('wpmind_transcribe_failed',
+                    sprintf(__('转录请求失败: %s', 'wpmind'), $response->get_error_message()));
+                continue;
+            }
+
+            $status_code = wp_remote_retrieve_response_code($response);
+            $resp_body = wp_remote_retrieve_body($response);
+
+            if ($status_code !== 200) {
+                // 记录失败
+                if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
+                    \WPMind\Failover\FailoverManager::instance()->record_result($try_provider, false, $latency_ms);
+                }
+
+                $data = json_decode($resp_body, true);
+                $error_message = $data['error']['message'] ?? $resp_body;
+                $last_error = new WP_Error('wpmind_transcribe_error',
+                    sprintf(__('转录 API 错误 (%d): %s', 'wpmind'), $status_code, $error_message));
+                continue;
+            }
+
+            // 记录成功
+            if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
+                \WPMind\Failover\FailoverManager::instance()->record_result($try_provider, true, $latency_ms);
+            }
+
+            $result = [
+                'text'     => $options['format'] === 'text' ? $resp_body : '',
+                'data'     => $options['format'] !== 'text' ? json_decode($resp_body, true) : null,
+                'provider' => $try_provider,
+                'format'   => $options['format'],
+            ];
+
+            if ($options['format'] !== 'text' && is_array($result['data'])) {
+                $result['text'] = $result['data']['text'] ?? '';
+            }
+
+            do_action('wpmind_after_request', 'transcribe', $result, compact('audio_file', 'options'), []);
+
+            return $result;
         }
 
-        $status_code = wp_remote_retrieve_response_code($response);
-        $body = wp_remote_retrieve_body($response);
-
-        if ($status_code !== 200) {
-            $data = json_decode($body, true);
-            $error_message = $data['error']['message'] ?? $body;
-            return new WP_Error('wpmind_transcribe_error', 
-                sprintf(__('转录 API 错误 (%d): %s', 'wpmind'), $status_code, $error_message));
+        // 所有 Provider 都失败了
+        if ($last_error) {
+            do_action('wpmind_error', $last_error, 'transcribe', compact('audio_file', 'options'));
+            return $last_error;
         }
 
-        $result = [
-            'text'     => $options['format'] === 'text' ? $body : '',
-            'data'     => $options['format'] !== 'text' ? json_decode($body, true) : null,
-            'provider' => $provider,
-            'format'   => $options['format'],
-        ];
-
-        if ($options['format'] !== 'text' && is_array($result['data'])) {
-            $result['text'] = $result['data']['text'] ?? '';
-        }
-
-        do_action('wpmind_after_request', 'transcribe', $result, compact('audio_file', 'options'), []);
-
-        return $result;
+        return new WP_Error('wpmind_transcribe_failed', __('转录请求失败', 'wpmind'));
     }
 
     /**
@@ -1333,104 +1531,165 @@ class PublicAPI {
             'speed'    => 1.0,         // 0.25 - 4.0
             'format'   => 'mp3',       // mp3/opus/aac/flac
             'save_to'  => '',          // 保存路径，空则返回 URL
-            'provider' => 'openai',
+            'provider' => 'auto',      // auto 时使用默认 provider
         ];
         $options = wp_parse_args($options, $defaults);
 
         $context = $options['context'];
 
-        // 获取端点配置
-        $wpmind = \WPMind\WPMind::instance();
-        $endpoints = $wpmind->get_custom_endpoints();
+        // 支持 TTS 的 provider 列表
+        $speech_providers = ['openai', 'deepseek'];
 
+        // 选择服务商（集成路由 + 故障转移）
         $provider = $options['provider'];
-        if (!isset($endpoints[$provider])) {
-            return new WP_Error('wpmind_provider_not_found', 
-                sprintf(__('服务商 %s 未配置', 'wpmind'), $provider));
+        if ($provider === 'auto') {
+            $provider = get_option('wpmind_default_provider', 'openai');
+        }
+        $provider = apply_filters('wpmind_select_provider', $provider, $context);
+
+        // 使用 FailoverManager 获取故障转移链
+        $failover_chain = [$provider];
+        if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
+            $failover = \WPMind\Failover\FailoverManager::instance();
+            $failover_chain = $failover->get_failover_chain($provider);
         }
 
-        $endpoint = $endpoints[$provider];
-        $api_key = $endpoint['api_key'] ?? '';
+        // 过滤出支持 TTS 的 provider
+        $failover_chain = array_values(array_filter($failover_chain, function ($p) use ($speech_providers) {
+            return in_array($p, $speech_providers, true);
+        }));
 
-        if (empty($api_key)) {
-            return new WP_Error('wpmind_api_key_missing', 
-                sprintf(__('服务商 %s 未配置 API Key', 'wpmind'), $provider));
+        if (empty($failover_chain)) {
+            return new WP_Error('wpmind_speech_not_supported',
+                __('没有可用的语音合成服务商', 'wpmind'));
         }
 
         do_action('wpmind_before_request', 'speech', compact('text', 'options'), $context);
 
-        $base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
-        $api_url = trailingslashit($base_url) . 'audio/speech';
+        // 获取端点配置
+        $wpmind = \WPMind\WPMind::instance();
+        $endpoints = $wpmind->get_custom_endpoints();
 
-        $response = wp_remote_post($api_url, [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $api_key,
-                'Content-Type'  => 'application/json',
-            ],
-            'body'    => wp_json_encode([
-                'model'           => $options['model'],
-                'input'           => $text,
-                'voice'           => $options['voice'],
-                'speed'           => $options['speed'],
-                'response_format' => $options['format'],
-            ]),
-            'timeout' => 60,
-        ]);
+        // 使用故障转移链依次尝试
+        $last_error = null;
 
-        if (is_wp_error($response)) {
-            do_action('wpmind_error', $response, 'speech', compact('text', 'options'));
-            return new WP_Error('wpmind_speech_failed', 
-                sprintf(__('语音合成请求失败: %s', 'wpmind'), $response->get_error_message()));
-        }
-
-        $status_code = wp_remote_retrieve_response_code($response);
-        $audio_data = wp_remote_retrieve_body($response);
-
-        if ($status_code !== 200) {
-            $data = json_decode($audio_data, true);
-            $error_message = $data['error']['message'] ?? __('未知错误', 'wpmind');
-            return new WP_Error('wpmind_speech_error', 
-                sprintf(__('语音合成 API 错误 (%d): %s', 'wpmind'), $status_code, $error_message));
-        }
-
-        $result = [
-            'provider' => $provider,
-            'model'    => $options['model'],
-            'voice'    => $options['voice'],
-            'format'   => $options['format'],
-            'size'     => strlen($audio_data),
-        ];
-
-        // 保存到文件或上传到媒体库
-        if (!empty($options['save_to'])) {
-            // 验证路径在 uploads 目录内，防止路径遍历
-            $upload_dir = wp_upload_dir();
-            $save_dir = realpath(dirname($options['save_to']));
-            $base_dir = realpath($upload_dir['basedir']);
-            if ($save_dir === false || $base_dir === false || strpos($save_dir, $base_dir) !== 0) {
-                return new WP_Error('wpmind_invalid_path', __('保存路径必须在 uploads 目录内', 'wpmind'));
-            }
-            file_put_contents($options['save_to'], $audio_data);
-            $result['file'] = $options['save_to'];
-        } else {
-            // 上传到 WordPress 媒体库
-            $upload = wp_upload_bits(
-                'wpmind-speech-' . time() . '.' . $options['format'],
-                null,
-                $audio_data
-            );
-
-            if (!empty($upload['error'])) {
-                return new WP_Error('wpmind_upload_failed', $upload['error']);
+        foreach ($failover_chain as $index => $try_provider) {
+            if (!isset($endpoints[$try_provider])) {
+                $last_error = new WP_Error('wpmind_provider_not_found',
+                    sprintf(__('服务商 %s 未配置', 'wpmind'), $try_provider));
+                continue;
             }
 
-            $result['url'] = $upload['url'];
-            $result['file'] = $upload['file'];
+            $endpoint = $endpoints[$try_provider];
+            $api_key = $endpoint['api_key'] ?? '';
+
+            if (empty($api_key)) {
+                $last_error = new WP_Error('wpmind_api_key_missing',
+                    sprintf(__('服务商 %s 未配置 API Key', 'wpmind'), $try_provider));
+                continue;
+            }
+
+            $base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
+            $api_url = trailingslashit($base_url) . 'audio/speech';
+
+            $start_time = microtime(true);
+
+            $response = wp_remote_post($api_url, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $api_key,
+                    'Content-Type'  => 'application/json',
+                ],
+                'body'    => wp_json_encode([
+                    'model'           => $options['model'],
+                    'input'           => $text,
+                    'voice'           => $options['voice'],
+                    'speed'           => $options['speed'],
+                    'response_format' => $options['format'],
+                ]),
+                'timeout' => 60,
+            ]);
+
+            $latency_ms = (int)((microtime(true) - $start_time) * 1000);
+
+            if (is_wp_error($response)) {
+                // 记录失败
+                if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
+                    \WPMind\Failover\FailoverManager::instance()->record_result($try_provider, false, $latency_ms);
+                }
+
+                $last_error = new WP_Error('wpmind_speech_failed',
+                    sprintf(__('语音合成请求失败: %s', 'wpmind'), $response->get_error_message()));
+                continue;
+            }
+
+            $status_code = wp_remote_retrieve_response_code($response);
+            $audio_data = wp_remote_retrieve_body($response);
+
+            if ($status_code !== 200) {
+                // 记录失败
+                if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
+                    \WPMind\Failover\FailoverManager::instance()->record_result($try_provider, false, $latency_ms);
+                }
+
+                $data = json_decode($audio_data, true);
+                $error_message = $data['error']['message'] ?? __('未知错误', 'wpmind');
+                $last_error = new WP_Error('wpmind_speech_error',
+                    sprintf(__('语音合成 API 错误 (%d): %s', 'wpmind'), $status_code, $error_message));
+                continue;
+            }
+
+            // 记录成功
+            if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
+                \WPMind\Failover\FailoverManager::instance()->record_result($try_provider, true, $latency_ms);
+            }
+
+            $result = [
+                'provider' => $try_provider,
+                'model'    => $options['model'],
+                'voice'    => $options['voice'],
+                'format'   => $options['format'],
+                'size'     => strlen($audio_data),
+            ];
+
+            // 保存到文件或上传到媒体库
+            if (!empty($options['save_to'])) {
+                // 验证路径在 uploads 目录内，防止路径遍历
+                $upload_dir = wp_upload_dir();
+                $save_dir = realpath(dirname($options['save_to']));
+                $base_dir = realpath($upload_dir['basedir']);
+                if ($save_dir === false || $base_dir === false || strpos($save_dir, $base_dir) !== 0) {
+                    return new WP_Error('wpmind_invalid_path', __('保存路径必须在 uploads 目录内', 'wpmind'));
+                }
+                file_put_contents($options['save_to'], $audio_data);
+                $result['file'] = $options['save_to'];
+            } else {
+                // 上传到 WordPress 媒体库
+                $upload = wp_upload_bits(
+                    'wpmind-speech-' . time() . '.' . $options['format'],
+                    null,
+                    $audio_data
+                );
+
+                if (!empty($upload['error'])) {
+                    return new WP_Error('wpmind_upload_failed', $upload['error']);
+                }
+
+                $result['url'] = $upload['url'];
+                $result['file'] = $upload['file'];
+            }
+
+            do_action('wpmind_after_request', 'speech', $result, compact('text', 'options'), []);
+
+            return $result;
         }
 
-        do_action('wpmind_after_request', 'speech', $result, compact('text', 'options'), []);
+        // 所有 Provider 都失败了
+        if ($last_error) {
+            do_action('wpmind_error', $last_error, 'speech', compact('text', 'options'));
+            return $last_error;
+        }
 
-        return $result;
+        return new WP_Error('wpmind_speech_failed', __('语音合成请求失败', 'wpmind'));
     }
 
     // ============================================

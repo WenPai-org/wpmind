@@ -1,5 +1,33 @@
 # WPMind 更新日志
 
+## [3.5.0] - 2026-02-07
+
+### 🔀 模型重选 + 路由统一 (Phase B)
+
+#### B1: Failover 模型重选
+- **model=auto 下移**: failover 循环内每个 provider 动态获取默认模型，不再固化首选 provider 的模型 (N2)
+- **显式模型回退**: 目标 provider 不支持用户指定模型时，自动回退到该 provider 默认模型
+- **model_fallback 标记**: 模型被自动替换时在结果中标注 `model_fallback: true` + `original_model`
+
+#### B2: stream() 接入路由和故障转移
+- **路由接入**: stream() 接入 `wpmind_select_provider` filter (I2)
+- **故障转移**: 通过 FailoverManager 获取故障转移链，fopen 失败自动切换 provider
+- **健康记录**: 成功/失败均记录到 FailoverManager，影响后续路由决策
+
+#### B3: embed() 接入路由和故障转移
+- **路由接入**: embed() 接入 `wpmind_select_provider` filter (I2)
+- **故障转移**: wp_remote_post 失败或 HTTP 错误时自动切换 provider
+- **动态模型**: embed model 在循环内根据 provider 动态选择
+
+#### B4: transcribe/speech 接入路由
+- **路由接入**: transcribe() 和 speech() 接入 `wpmind_select_provider` filter
+- **能力过滤**: failover 链自动过滤不支持 audio API 的 provider
+- **支持列表**: transcribe 仅 OpenAI，speech 支持 OpenAI + DeepSeek
+
+> 基于 Claude + Codex 审计 Phase B 计划，详见 `docs/AI-PIPELINE-AUDIT.md`
+
+---
+
 ## [3.4.0] - 2026-02-07
 
 ### 🛡️ AI 请求链路可靠性修复 (Phase A)
