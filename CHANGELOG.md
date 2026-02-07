@@ -1,5 +1,42 @@
 # WPMind 更新日志
 
+## [3.7.0] - 2026-02-07
+
+### 🏗️ PublicAPI Facade 拆分 + 安全加固
+
+#### 架构重构
+- **PublicAPI.php 拆分**: 2124 行单文件拆分为 Facade + 6 个 Service 类
+  - `PublicAPI.php` (398 行): 瘦 Facade，保留单例、递归保护、状态方法
+  - `Services/AbstractService.php` (194 行): 共享基础设施（provider 解析、failover、缓存）
+  - `Services/ChatService.php` (591 行): chat + stream + SDK 路由 + HTTP 请求
+  - `Services/TextProcessingService.php` (312 行): translate + summarize + moderate
+  - `Services/StructuredOutputService.php` (215 行): structured + batch + schema 验证
+  - `Services/EmbeddingService.php` (126 行): embed
+  - `Services/AudioService.php` (265 行): transcribe + speech
+  - `Services/ImageService.php` (66 行): generate_image（委托 ImageRouter）
+- **依赖注入**: TextProcessingService 注入 ChatService + StructuredOutputService
+- **递归保护留在 Facade**: Service 内部互调不触发递归检查
+- **PSR-4 自动加载**: 现有 autoloader 自动映射 `WPMind\API\Services\*`
+
+#### 安全加固（Codex 审计 9 项）
+- **transcribe() SSRF 防护**: `wp_http_validate_url()` + 协议白名单
+- **transcribe() 路径遍历防护**: `realpath()` + uploads 目录校验
+- **transcribe() 文件验证**: 25MB 大小上限 + 扩展名白名单
+- **stream() 环境检测**: `allow_url_fopen` 配置检查
+- **embed() 响应验证**: JSON 解码显式校验 + 非数组防护
+- **speech() 写入检查**: `file_put_contents()` 返回值验证
+- **ErrorHandler 信息泄露**: 响应体截断到 500 字符
+- **SDKAdapter 空值保护**: `getTokenUsage()` null 安全
+- **SDKAdapter 异常脱敏**: 仅 `WP_DEBUG` 记录详细异常
+
+#### 文档清理
+- 归档 5 个过时文档到 `docs/_archive/`
+- 更新 WPMIND-ROADMAP.md Phase 3/3.5 完成状态
+
+> 所有 15 个公共方法签名不变，`wpmind_*()` 全局函数兼容，7/7 回归测试通过
+
+---
+
 ## [3.6.0] - 2026-02-07
 
 ### 🔗 执行层统一到 WP AI Client SDK (Phase C)
