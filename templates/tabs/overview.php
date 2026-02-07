@@ -70,6 +70,25 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 
 <div class="wpmind-overview">
 
+	<!-- Hero -->
+	<div class="wpmind-overview-hero">
+		<div class="wpmind-overview-hero-content">
+			<h2 class="wpmind-overview-hero-title">
+				<span class="dashicons ri-brain-line"></span>
+				<?php esc_html_e( '文派心思', 'wpmind' ); ?>
+			</h2>
+			<p class="wpmind-overview-hero-desc"><?php esc_html_e( 'WordPress AI 智能路由引擎', 'wpmind' ); ?></p>
+			<div class="wpmind-overview-hero-meta">
+				<span>v<?php echo esc_html( WPMIND_VERSION ); ?></span>
+				<span class="wpmind-overview-hero-sep">&middot;</span>
+				<span><?php echo esc_html( count( $providers ) ); ?> <?php esc_html_e( '个 Provider', 'wpmind' ); ?></span>
+				<span class="wpmind-overview-hero-sep">&middot;</span>
+				<span><?php echo esc_html( $active_count ); ?>/<?php echo esc_html( count( $modules ) ); ?> <?php esc_html_e( '模块启用', 'wpmind' ); ?></span>
+			</div>
+		</div>
+		<span class="wpmind-overview-hero-icon dashicons ri-robot-2-line"></span>
+	</div>
+
 	<!-- 统计卡片 -->
 	<div class="wpmind-overview-stats">
 		<div class="wpmind-overview-stat">
@@ -117,7 +136,8 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 	<div class="wpmind-overview-grid">
 
 		<!-- 左栏：Provider 状态 -->
-		<div class="wpmind-overview-card">
+		<div class="wpmind-overview-card wpmind-overview-card--bg-icon">
+			<span class="wpmind-overview-card-bg dashicons ri-server-line"></span>
 			<div class="wpmind-overview-card-header">
 				<h3><?php esc_html_e( 'Provider 状态', 'wpmind' ); ?></h3>
 				<a href="#services" class="wpmind-overview-card-link wpmind-tab-link" data-tab-link="services"><?php esc_html_e( '管理', 'wpmind' ); ?> →</a>
@@ -145,7 +165,8 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 		</div>
 
 		<!-- 右栏：模块状态 -->
-		<div class="wpmind-overview-card">
+		<div class="wpmind-overview-card wpmind-overview-card--bg-icon">
+			<span class="wpmind-overview-card-bg dashicons ri-puzzle-line"></span>
 			<div class="wpmind-overview-card-header">
 				<h3><?php esc_html_e( '模块状态', 'wpmind' ); ?></h3>
 				<a href="#modules" class="wpmind-overview-card-link wpmind-tab-link" data-tab-link="modules"><?php esc_html_e( '管理', 'wpmind' ); ?> →</a>
@@ -173,34 +194,56 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 	<div class="wpmind-overview-grid">
 
 		<!-- 左栏：本月摘要 -->
-		<div class="wpmind-overview-card">
+		<div class="wpmind-overview-card wpmind-overview-card--accent-blue wpmind-overview-card--bg-icon">
+			<span class="wpmind-overview-card-bg dashicons ri-bar-chart-grouped-line"></span>>
 			<div class="wpmind-overview-card-header">
 				<h3><?php esc_html_e( '本月摘要', 'wpmind' ); ?></h3>
 			</div>
 			<div class="wpmind-overview-card-body">
-				<div class="wpmind-overview-summary-list">
-					<div class="wpmind-overview-summary-item">
-						<span class="wpmind-overview-summary-label"><?php esc_html_e( '最常用模型', 'wpmind' ); ?></span>
-						<span class="wpmind-overview-summary-value"><?php echo esc_html( $top_model ); ?></span>
+				<div class="wpmind-overview-summary-grid">
+					<div class="wpmind-overview-summary-cell">
+						<span class="wpmind-overview-summary-icon" style="background: var(--wpmind-primary-light); color: var(--wpmind-primary);">
+							<span class="dashicons ri-robot-2-line"></span>
+						</span>
+						<div class="wpmind-overview-summary-text">
+							<span class="wpmind-overview-summary-value"><?php echo esc_html( $top_model ); ?></span>
+							<span class="wpmind-overview-summary-label"><?php esc_html_e( '最常用模型', 'wpmind' ); ?></span>
+						</div>
 					</div>
-					<div class="wpmind-overview-summary-item">
-						<span class="wpmind-overview-summary-label"><?php esc_html_e( '平均响应时间', 'wpmind' ); ?></span>
-						<span class="wpmind-overview-summary-value"><?php echo $avg_latency > 0 ? esc_html( number_format_i18n( $avg_latency ) . 'ms' ) : '—'; ?></span>
+					<div class="wpmind-overview-summary-cell">
+						<span class="wpmind-overview-summary-icon" style="background: #fef3c7; color: #d97706;">
+							<span class="dashicons ri-timer-flash-line"></span>
+						</span>
+						<div class="wpmind-overview-summary-text">
+							<span class="wpmind-overview-summary-value"><?php echo $avg_latency > 0 ? esc_html( number_format_i18n( $avg_latency ) . 'ms' ) : '—'; ?></span>
+							<span class="wpmind-overview-summary-label"><?php esc_html_e( '平均响应时间', 'wpmind' ); ?></span>
+						</div>
 					</div>
-					<div class="wpmind-overview-summary-item">
-						<span class="wpmind-overview-summary-label"><?php esc_html_e( '服务可用率', 'wpmind' ); ?></span>
-						<span class="wpmind-overview-summary-value"><?php echo esc_html( $avg_success_rate . '%' ); ?></span>
+					<div class="wpmind-overview-summary-cell">
+						<span class="wpmind-overview-summary-icon" style="background: var(--wpmind-success-light); color: var(--wpmind-success);">
+							<span class="dashicons ri-shield-check-line"></span>
+						</span>
+						<div class="wpmind-overview-summary-text">
+							<span class="wpmind-overview-summary-value"><?php echo esc_html( $avg_success_rate . '%' ); ?></span>
+							<span class="wpmind-overview-summary-label"><?php esc_html_e( '服务可用率', 'wpmind' ); ?></span>
+						</div>
 					</div>
-					<div class="wpmind-overview-summary-item">
-						<span class="wpmind-overview-summary-label"><?php esc_html_e( '本月总 Tokens', 'wpmind' ); ?></span>
-						<span class="wpmind-overview-summary-value"><?php echo esc_html( UsageTracker::format_tokens( ( $month['input_tokens'] ?? 0 ) + ( $month['output_tokens'] ?? 0 ) ) ); ?></span>
+					<div class="wpmind-overview-summary-cell">
+						<span class="wpmind-overview-summary-icon" style="background: #f3e8ff; color: #7c3aed;">
+							<span class="dashicons ri-token-swap-line"></span>
+						</span>
+						<div class="wpmind-overview-summary-text">
+							<span class="wpmind-overview-summary-value"><?php echo esc_html( UsageTracker::format_tokens( ( $month['input_tokens'] ?? 0 ) + ( $month['output_tokens'] ?? 0 ) ) ); ?></span>
+							<span class="wpmind-overview-summary-label"><?php esc_html_e( '本月总 Tokens', 'wpmind' ); ?></span>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 
 		<!-- 右栏：最近活动 -->
-		<div class="wpmind-overview-card">
+		<div class="wpmind-overview-card wpmind-overview-card--accent-green wpmind-overview-card--bg-icon">
+			<span class="wpmind-overview-card-bg dashicons ri-pulse-line"></span>>
 			<div class="wpmind-overview-card-header">
 				<h3><?php esc_html_e( '最近活动', 'wpmind' ); ?></h3>
 				<?php if ( class_exists( 'WPMind\\Modules\\Analytics\\AnalyticsManager' ) ) : ?>
@@ -218,13 +261,21 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 							$model    = $record['model'] ?? '—';
 							$tokens   = ( $record['input_tokens'] ?? 0 ) + ( $record['output_tokens'] ?? 0 );
 							$latency  = $record['latency_ms'] ?? 0;
+							$picon    = UsageTracker::get_provider_icon( $record['provider'] ?? '' );
 						?>
 						<div class="wpmind-overview-activity-item">
 							<span class="wpmind-overview-activity-time"><?php echo esc_html( $time ); ?></span>
-							<span class="wpmind-overview-activity-provider"><?php echo esc_html( $pname ); ?></span>
+							<span class="wpmind-overview-activity-provider">
+								<span class="dashicons <?php echo esc_attr( $picon ); ?>"></span>
+								<?php echo esc_html( $pname ); ?>
+							</span>
 							<span class="wpmind-overview-activity-model"><?php echo esc_html( $model ); ?></span>
-							<span class="wpmind-overview-activity-tokens"><?php echo esc_html( UsageTracker::format_tokens( $tokens ) ); ?></span>
-							<span class="wpmind-overview-activity-latency"><?php echo $latency > 0 ? esc_html( $latency . 'ms' ) : '—'; ?></span>
+							<span class="wpmind-overview-activity-meta">
+								<span class="wpmind-overview-activity-tokens"><?php echo esc_html( UsageTracker::format_tokens( $tokens ) ); ?></span>
+								<?php if ( $latency > 0 ) : ?>
+									<span class="wpmind-overview-activity-latency"><?php echo esc_html( $latency . 'ms' ); ?></span>
+								<?php endif; ?>
+							</span>
 						</div>
 						<?php endforeach; ?>
 					</div>
