@@ -11,7 +11,7 @@
 	justify-content: space-between;
 	background: var(--wpmind-primary);
 	color: #fff;
-	padding: var(--wpmind-space-7, 32px) var(--wpmind-space-8, 40px);
+	padding: var(--wpmind-space-7) var(--wpmind-space-8);
 	margin-bottom: var(--wpmind-space-6);
 	border-radius: 2px;
 	position: relative;

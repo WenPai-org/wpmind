@@ -97,7 +97,7 @@ class AnalyticsModule implements ModuleInterface
      */
     public function get_settings_tab(): ?string
     {
-        return $this->config['settings_tab'] ?? 'dashboard';
+        return $this->config['settings_tab'] ?? 'analytics';
     }
 
     /**
@@ -133,8 +133,8 @@ class AnalyticsModule implements ModuleInterface
     {
         $tab_config = $this->config['settings_tab'] ?? [];
 
-        $tabs['dashboard'] = [
-            'label'    => $tab_config['label'] ?? __('分析面板', 'wpmind'),
+        $tabs['analytics'] = [
+            'label'    => $tab_config['label'] ?? __('数据分析', 'wpmind'),
             'icon'     => $tab_config['icon'] ?? 'dashicons-chart-area',
             'priority' => $tab_config['priority'] ?? 10,
             'template' => __DIR__ . '/templates/dashboard.php',

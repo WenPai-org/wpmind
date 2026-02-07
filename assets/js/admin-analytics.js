@@ -541,7 +541,7 @@
 			}
 		};
 
-		if ( $( '#dashboard' ).hasClass( 'wpmind-tab-pane-active' ) ) {
+		if ( $( '#analytics' ).hasClass( 'wpmind-tab-pane-active' ) ) {
 			safeInit( 'analytics', Admin.ensureChartsInit || AnalyticsCharts.init.bind( AnalyticsCharts ) );
 		}
 	} );
