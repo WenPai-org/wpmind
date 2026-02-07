@@ -195,7 +195,7 @@ class ErrorHandler {
         return self::create($code, $error_message, [
             'provider'  => $provider,
             'http_code' => $http_code,
-            'response'  => $body,
+            'response'  => substr((string) $body, 0, 500),
         ]);
     }
 

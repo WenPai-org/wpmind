@@ -112,11 +112,7 @@ class SDKAdapter {
 				'content'       => $result->toText(),
 				'provider'      => $provider,
 				'model'         => $model,
-				'usage'         => [
-					'prompt_tokens'     => $result->getTokenUsage()->getPromptTokens(),
-					'completion_tokens' => $result->getTokenUsage()->getCompletionTokens(),
-					'total_tokens'      => $result->getTokenUsage()->getTotalTokens(),
-				],
+				'usage'         => $this->extract_token_usage($result),
 				'finish_reason' => $finish_reason,
 			];
 		} catch (\InvalidArgumentException $e) {
@@ -125,6 +121,28 @@ class SDKAdapter {
 			return $this->convert_exception_to_wp_error($e);
 		} catch (\Exception $e) {
 			return $this->convert_exception_to_wp_error($e);
+		}
+	}
+
+	/**
+	 * 安全提取 token 用量
+	 *
+	 * @param object $result SDK 结果对象
+	 * @return array
+	 */
+	private function extract_token_usage(object $result): array {
+		try {
+			$usage = $result->getTokenUsage();
+			if ($usage === null) {
+				return ['prompt_tokens' => 0, 'completion_tokens' => 0, 'total_tokens' => 0];
+			}
+			return [
+				'prompt_tokens'     => $usage->getPromptTokens() ?? 0,
+				'completion_tokens' => $usage->getCompletionTokens() ?? 0,
+				'total_tokens'      => $usage->getTotalTokens() ?? 0,
+			];
+		} catch (\Throwable $e) {
+			return ['prompt_tokens' => 0, 'completion_tokens' => 0, 'total_tokens' => 0];
 		}
 	}
 
@@ -171,9 +189,19 @@ class SDKAdapter {
 			$error_data['status'] = $status;
 		}
 
+		// 仅在 debug 模式下记录完整异常信息
+		if (defined('WP_DEBUG') && WP_DEBUG) {
+			error_log(sprintf('[WPMind SDK] Exception: %s', $message));
+		}
+
+		// 对外返回通用描述，不暴露内部细节
+		$user_message = $status > 0
+			? sprintf(__('SDK 请求失败 (HTTP %d)', 'wpmind'), $status)
+			: __('SDK 请求失败', 'wpmind');
+
 		return new WP_Error(
 			'wpmind_sdk_error',
-			sprintf(__('SDK 错误: %s', 'wpmind'), $message),
+			$user_message,
 			$error_data
 		);
 	}

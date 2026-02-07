@@ -95,9 +95,14 @@ class EmbeddingService extends AbstractService {
 
 			if ($status_code !== 200) {
 				$this->record_result($try_provider, false, $latency_ms);
-				$error_message = $data['error']['message'] ?? __('未知错误', 'wpmind');
+				$error_message = is_array($data) ? ($data['error']['message'] ?? __('未知错误', 'wpmind')) : __('未知错误', 'wpmind');
 				return new WP_Error('wpmind_embed_error',
 					sprintf(__('嵌入 API 错误 (%d): %s', 'wpmind'), $status_code, $error_message));
+			}
+
+			if (!is_array($data)) {
+				$this->record_result($try_provider, false, $latency_ms);
+				return new WP_Error('wpmind_invalid_response', __('嵌入 API 返回了无效的响应格式', 'wpmind'));
 			}
 
 			$this->record_result($try_provider, true, $latency_ms);
