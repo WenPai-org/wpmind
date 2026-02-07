@@ -56,11 +56,6 @@ defined( 'ABSPATH' ) || exit;
 				<a href="#overview" class="wpmind-tab wpmind-tab-active" data-tab="overview">
 					<?php esc_html_e( '概览', 'wpmind' ); ?>
 				</a>
-				<?php if ( $analytics_enabled ) : ?>
-				<a href="#dashboard" class="wpmind-tab" data-tab="dashboard">
-					<?php esc_html_e( '仪表板', 'wpmind' ); ?>
-				</a>
-				<?php endif; ?>
 				<a href="#services" class="wpmind-tab" data-tab="services">
 					<?php esc_html_e( '文本服务', 'wpmind' ); ?>
 				</a>
@@ -70,6 +65,11 @@ defined( 'ABSPATH' ) || exit;
 				<a href="#routing" class="wpmind-tab" data-tab="routing">
 					<?php esc_html_e( '智能路由', 'wpmind' ); ?>
 				</a>
+				<?php if ( $analytics_enabled ) : ?>
+				<a href="#analytics" class="wpmind-tab" data-tab="analytics">
+					<?php esc_html_e( '数据分析', 'wpmind' ); ?>
+				</a>
+				<?php endif; ?>
 				<?php if ( $cost_control_enabled ) : ?>
 				<a href="#budget" class="wpmind-tab" data-tab="budget">
 					<?php esc_html_e( '预算管理', 'wpmind' ); ?>
@@ -81,7 +81,7 @@ defined( 'ABSPATH' ) || exit;
 				</a>
 				<?php endif; ?>
 				<a href="#modules" class="wpmind-tab" data-tab="modules">
-					<?php esc_html_e( '模块', 'wpmind' ); ?>
+					<?php esc_html_e( '模块管理', 'wpmind' ); ?>
 				</a>
 			</nav>
 
@@ -89,11 +89,6 @@ defined( 'ABSPATH' ) || exit;
 			<div id="overview" class="wpmind-tab-pane wpmind-tab-pane-active">
 				<?php include WPMIND_PLUGIN_DIR . 'templates/tabs/overview.php'; ?>
 			</div>
-			<?php if ( $analytics_enabled ) : ?>
-			<div id="dashboard" class="wpmind-tab-pane">
-				<?php include WPMIND_PLUGIN_DIR . 'templates/tabs/dashboard.php'; ?>
-			</div>
-			<?php endif; ?>
 			<div id="services" class="wpmind-tab-pane">
 				<?php include WPMIND_PLUGIN_DIR . 'templates/tabs/services.php'; ?>
 			</div>
@@ -103,6 +98,11 @@ defined( 'ABSPATH' ) || exit;
 			<div id="routing" class="wpmind-tab-pane">
 				<?php include WPMIND_PLUGIN_DIR . 'templates/tabs/routing.php'; ?>
 			</div>
+			<?php if ( $analytics_enabled ) : ?>
+			<div id="analytics" class="wpmind-tab-pane">
+				<?php include WPMIND_PLUGIN_DIR . 'templates/tabs/dashboard.php'; ?>
+			</div>
+			<?php endif; ?>
 			<?php if ( $cost_control_enabled ) : ?>
 			<div id="budget" class="wpmind-tab-pane">
 				<?php include WPMIND_PLUGIN_DIR . 'templates/tabs/budget.php'; ?>

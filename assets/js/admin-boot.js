@@ -78,8 +78,8 @@
 			$panes.removeClass( 'wpmind-tab-pane-active' );
 			$( '#' + tabId ).addClass( 'wpmind-tab-pane-active' );
 
-			// 懒加载图表（仅在首次切换到仪表板时）
-			if ( 'dashboard' === tabId && ! Admin.state.chartsLoaded ) {
+			// 懒加载图表（仅在首次切换到数据分析时）
+			if ( 'analytics' === tabId && ! Admin.state.chartsLoaded ) {
 				Admin.ensureChartsInit();
 			}
 		}
@@ -97,8 +97,8 @@
 
 		Admin.safeInit( 'tabs', initTabs );
 
-		// 图表懒加载：只在仪表板 Tab 激活时初始化
-		if ( $( '#dashboard' ).hasClass( 'wpmind-tab-pane-active' ) ) {
+		// 图表懒加载：只在数据分析 Tab 激活时初始化
+		if ( $( '#analytics' ).hasClass( 'wpmind-tab-pane-active' ) ) {
 			Admin.safeInit( 'analytics', Admin.ensureChartsInit );
 		}
 	} );
