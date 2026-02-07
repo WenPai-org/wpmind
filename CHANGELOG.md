@@ -1,5 +1,33 @@
 # WPMind 更新日志
 
+## [3.8.0] - 2026-02-07
+
+### 🧹 兼容层清理 + 扩展点增强
+
+#### 兼容层清理（-2,245 行）
+- **删除 10 个兼容层文件**: `includes/Usage/`、`includes/Budget/`、`includes/Analytics/` 下的代理类和回退实现
+- **命名空间迁移**: 所有调用方直接引用模块类（`WPMind\Modules\CostControl\*`、`WPMind\Modules\Analytics\*`）
+- **cost-control 模块不可禁用**: `can_disable: false`，用量追踪是路由策略和 API 状态的核心依赖
+- **ModuleLoader 强制启用**: `can_disable: false` 的模块在升级时自动强制启用，防止旧安装 fatal
+- **analytics 模块守卫**: `routing.php` 和 `AjaxController` 添加 `class_exists()` 检查，禁用时优雅降级
+- **wpmind.php 精简**: 删除向后兼容 fallback 代码块，`do_action('wpmind_usage_record')` 保留
+
+#### Provider 懒加载
+- **ProviderRegistrar 重构**: 移除 8 个 `use` 导入，改用字符串 FQCN 常量
+- **`wpmind_provider_map` filter**: 允许第三方注册自定义 Provider
+
+#### 路由策略可插拔
+- **`wpmind_register_routing_strategies` action**: 允许第三方在默认策略注册后添加自定义路由策略
+
+#### 受影响文件（26 个）
+- 修改 16 个文件（命名空间替换 + 守卫 + filter/action）
+- 删除 10 个文件（兼容层代理 + 回退实现）
+- 保留 `includes/Usage/Pricing.php`（共享定价数据类）
+
+> Codex CLI 评审通过，3 个发现已修复（analytics 守卫、ModuleLoader 强制启用、测试更新）
+
+---
+
 ## [3.7.0] - 2026-02-07
 
 ### 🏗️ PublicAPI Facade 拆分 + 安全加固
