@@ -74,6 +74,13 @@ final class AdminAssets {
         );
 
         wp_enqueue_style(
+            'wpmind-overview',
+            WPMIND_PLUGIN_URL . 'assets/css/overview.css',
+            [ 'wpmind-admin' ],
+            WPMIND_VERSION
+        );
+
+        wp_enqueue_style(
             'wpmind-panels',
             WPMIND_PLUGIN_URL . 'assets/css/panels.css',
             [ 'wpmind-admin' ],

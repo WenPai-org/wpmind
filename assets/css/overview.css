@@ -1,0 +1,212 @@
+/* WPMind Overview Tab — Gutenberg design language */
+
+.wpmind-overview {
+	max-width: 1200px;
+}
+
+/* Stat cards row */
+.wpmind-overview-stats {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: var(--wpmind-space-5);
+	margin-bottom: var(--wpmind-space-6);
+}
+
+.wpmind-overview-stat {
+	display: flex;
+	align-items: center;
+	gap: var(--wpmind-space-4);
+	background: #fff;
+	box-shadow: var(--wpmind-shadow);
+	padding: var(--wpmind-space-5) var(--wpmind-space-6);
+}
+
+.wpmind-overview-stat-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 48px;
+	height: 48px;
+	border-radius: 12px;
+	flex-shrink: 0;
+}
+
+.wpmind-overview-stat-icon .dashicons {
+	font-size: 24px;
+	width: 24px;
+	height: 24px;
+}
+
+.wpmind-overview-stat-body {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.wpmind-overview-stat-value {
+	font-size: 1.5em;
+	font-weight: 600;
+	color: var(--wpmind-gray-900);
+	line-height: 1.2;
+}
+
+.wpmind-overview-stat-sub {
+	font-size: 0.6em;
+	font-weight: 400;
+	color: var(--wpmind-gray-400);
+}
+
+.wpmind-overview-stat-label {
+	font-size: var(--wpmind-text-sm);
+	color: var(--wpmind-gray-500);
+	margin-top: 2px;
+}
+
+/* Two-column grid */
+.wpmind-overview-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: var(--wpmind-space-5);
+	margin-bottom: var(--wpmind-space-5);
+}
+
+/* Cards */
+.wpmind-overview-card {
+	background: #fff;
+	box-shadow: var(--wpmind-shadow);
+}
+
+.wpmind-overview-card-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: var(--wpmind-space-4) var(--wpmind-space-6);
+	border-bottom: 1px solid var(--wpmind-gray-200);
+}
+
+.wpmind-overview-card-header h3 {
+	margin: 0;
+	font-size: var(--wpmind-text-base);
+	font-weight: 600;
+	color: var(--wpmind-gray-800);
+}
+
+.wpmind-overview-card-link {
+	font-size: var(--wpmind-text-sm);
+	color: var(--wpmind-primary);
+	text-decoration: none;
+}
+
+.wpmind-overview-card-link:hover {
+	color: var(--wpmind-primary-hover);
+}
+
+.wpmind-overview-card-body {
+	padding: var(--wpmind-space-4) var(--wpmind-space-6);
+}
+
+/* Provider list */
+.wpmind-overview-provider-list,
+.wpmind-overview-module-list {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wpmind-space-2);
+}
+
+.wpmind-overview-provider-item,
+.wpmind-overview-module-item {
+	display: flex;
+	align-items: center;
+	gap: var(--wpmind-space-3);
+	padding: var(--wpmind-space-2) 0;
+}
+
+.wpmind-overview-provider-item .dashicons,
+.wpmind-overview-module-item .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	flex-shrink: 0;
+}
+
+.wpmind-overview-provider-name,
+.wpmind-overview-module-name {
+	font-size: var(--wpmind-text-sm);
+	color: var(--wpmind-gray-700);
+}
+
+.wpmind-overview-badge-core {
+	display: inline-block;
+	font-size: 0.75em;
+	padding: 0 5px;
+	margin-left: 4px;
+	background: #e3f2fd;
+	color: #1565c0;
+	border-radius: 3px;
+	vertical-align: middle;
+}
+
+.wpmind-overview-empty {
+	margin: 0;
+	color: var(--wpmind-gray-400);
+	font-size: var(--wpmind-text-sm);
+}
+
+/* Shortcuts grid */
+.wpmind-overview-shortcuts {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	gap: var(--wpmind-space-3);
+}
+
+.wpmind-overview-shortcut {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--wpmind-space-2);
+	padding: var(--wpmind-space-5) var(--wpmind-space-3);
+	text-decoration: none;
+	color: var(--wpmind-gray-600);
+	border: 1px solid var(--wpmind-gray-200);
+	transition: all 0.15s ease;
+	cursor: pointer;
+}
+
+.wpmind-overview-shortcut:hover {
+	border-color: var(--wpmind-primary);
+	color: var(--wpmind-primary);
+	background: var(--wpmind-primary-light);
+}
+
+.wpmind-overview-shortcut .dashicons {
+	font-size: 24px;
+	width: 24px;
+	height: 24px;
+}
+
+.wpmind-overview-shortcut span:last-child {
+	font-size: var(--wpmind-text-sm);
+	font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 960px) {
+	.wpmind-overview-stats {
+		grid-template-columns: repeat(2, 1fr);
+	}
+	.wpmind-overview-grid {
+		grid-template-columns: 1fr;
+	}
+	.wpmind-overview-shortcuts {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+@media (max-width: 600px) {
+	.wpmind-overview-stats {
+		grid-template-columns: 1fr;
+	}
+	.wpmind-overview-shortcuts {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
