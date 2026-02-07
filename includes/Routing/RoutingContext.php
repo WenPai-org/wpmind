@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace WPMind\Routing;
 
 use WPMind\Failover\ProviderHealthTracker;
-use WPMind\Usage\UsageTracker;
+use WPMind\Modules\CostControl\UsageTracker;
 
 class RoutingContext
 {

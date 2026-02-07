@@ -187,9 +187,9 @@ class PublicAPI {
 		$today_tokens = 0;
 		$month_tokens = 0;
 
-		if (class_exists('\\WPMind\\Usage\\UsageTracker')) {
-			$today_stats = \WPMind\Usage\UsageTracker::get_today_stats();
-			$month_stats = \WPMind\Usage\UsageTracker::get_month_stats();
+		if (class_exists('\\WPMind\\Modules\\CostControl\\UsageTracker')) {
+			$today_stats = \WPMind\Modules\CostControl\UsageTracker::get_today_stats();
+			$month_stats = \WPMind\Modules\CostControl\UsageTracker::get_month_stats();
 			$today_tokens = $today_stats['total_tokens'] ?? 0;
 			$month_tokens = $month_stats['total_tokens'] ?? 0;
 		}

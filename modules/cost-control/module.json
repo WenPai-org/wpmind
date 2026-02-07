@@ -6,7 +6,7 @@
     "author": "WPMind",
     "icon": "ri-money-cny-circle-line",
     "class": "WPMind\\Modules\\CostControl\\CostControlModule",
-    "can_disable": true,
+    "can_disable": false,
     "settings_tab": "cost-control",
     "features": [
         "Token 用量追踪",

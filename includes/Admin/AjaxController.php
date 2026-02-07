@@ -16,10 +16,10 @@ use WPMind\ErrorHandler;
 use WPMind\Failover\FailoverManager;
 use WPMind\Routing\IntelligentRouter;
 use WPMind\Routing\RoutingContext;
-use WPMind\Usage\UsageTracker;
-use WPMind\Budget\BudgetManager;
-use WPMind\Budget\BudgetChecker;
-use WPMind\Analytics\AnalyticsManager;
+use WPMind\Modules\CostControl\UsageTracker;
+use WPMind\Modules\CostControl\BudgetManager;
+use WPMind\Modules\CostControl\BudgetChecker;
+use WPMind\Modules\Analytics\AnalyticsManager;
 
 /**
  * Class AjaxController
@@ -409,6 +409,10 @@ final class AjaxController {
         }
 
         $range = isset( $_POST['range'] ) ? sanitize_text_field( $_POST['range'] ) : '7d';
+
+        if ( ! class_exists( AnalyticsManager::class ) ) {
+            wp_send_json_error( [ 'message' => __( 'Analytics 模块未启用', 'wpmind' ) ] );
+        }
 
         $analytics = AnalyticsManager::instance();
         $data = $analytics->get_analytics_data( $range );

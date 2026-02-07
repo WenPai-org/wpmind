@@ -12,14 +12,6 @@ namespace WPMind\Providers;
 
 use WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication;
 use WordPress\AiClient\Providers\ProviderRegistry;
-use WPMind\Providers\DeepSeek\DeepSeekProvider;
-use WPMind\Providers\Qwen\QwenProvider;
-use WPMind\Providers\Zhipu\ZhipuProvider;
-use WPMind\Providers\Moonshot\MoonshotProvider;
-use WPMind\Providers\Doubao\DoubaoProvider;
-use WPMind\Providers\SiliconFlow\SiliconFlowProvider;
-use WPMind\Providers\Baidu\BaiduProvider;
-use WPMind\Providers\MiniMax\MiniMaxProvider;
 
 /**
  * Provider 注册器
@@ -27,19 +19,27 @@ use WPMind\Providers\MiniMax\MiniMaxProvider;
 class ProviderRegistrar
 {
     private const PROVIDER_MAP = [
-        'deepseek'    => DeepSeekProvider::class,
-        'qwen'        => QwenProvider::class,
-        'zhipu'       => ZhipuProvider::class,
-        'moonshot'    => MoonshotProvider::class,
-        'doubao'      => DoubaoProvider::class,
-        'siliconflow' => SiliconFlowProvider::class,
-        'baidu'       => BaiduProvider::class,
-        'minimax'     => MiniMaxProvider::class,
+        'deepseek'    => 'WPMind\\Providers\\DeepSeek\\DeepSeekProvider',
+        'qwen'        => 'WPMind\\Providers\\Qwen\\QwenProvider',
+        'zhipu'       => 'WPMind\\Providers\\Zhipu\\ZhipuProvider',
+        'moonshot'    => 'WPMind\\Providers\\Moonshot\\MoonshotProvider',
+        'doubao'      => 'WPMind\\Providers\\Doubao\\DoubaoProvider',
+        'siliconflow' => 'WPMind\\Providers\\SiliconFlow\\SiliconFlowProvider',
+        'baidu'       => 'WPMind\\Providers\\Baidu\\BaiduProvider',
+        'minimax'     => 'WPMind\\Providers\\MiniMax\\MiniMaxProvider',
     ];
 
     public static function registerProviders(ProviderRegistry $registry, array $endpoints): void
     {
-        foreach (self::PROVIDER_MAP as $key => $providerClass) {
+        /**
+         * 过滤 Provider 映射表，允许第三方注册自定义 Provider
+         *
+         * @since 3.7.0
+         * @param array<string, string> $map Provider ID => FQCN 映射
+         */
+        $map = apply_filters('wpmind_provider_map', self::PROVIDER_MAP);
+
+        foreach ($map as $key => $providerClass) {
             if (empty($endpoints[$key]['enabled']) || empty($endpoints[$key]['api_key'])) {
                 continue;
             }
@@ -57,11 +57,13 @@ class ProviderRegistrar
 
     public static function getSupportedProviderIds(): array
     {
-        return array_keys(self::PROVIDER_MAP);
+        $map = apply_filters('wpmind_provider_map', self::PROVIDER_MAP);
+        return array_keys($map);
     }
 
     public static function getProviderClass(string $providerId): ?string
     {
-        return self::PROVIDER_MAP[$providerId] ?? null;
+        $map = apply_filters('wpmind_provider_map', self::PROVIDER_MAP);
+        return $map[$providerId] ?? null;
     }
 }

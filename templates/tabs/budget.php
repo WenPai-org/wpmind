@@ -12,9 +12,9 @@
 defined( 'ABSPATH' ) || exit;
 
 // 获取预算设置
-$budget_manager = \WPMind\Budget\BudgetManager::instance();
+$budget_manager = \WPMind\Modules\CostControl\BudgetManager::instance();
 $budget_settings = $budget_manager->get_settings();
-$budget_checker = \WPMind\Budget\BudgetChecker::instance();
+$budget_checker = \WPMind\Modules\CostControl\BudgetChecker::instance();
 $budget_summary = $budget_checker->get_summary();
 ?>
 
@@ -99,7 +99,7 @@ $budget_summary = $budget_checker->get_summary();
                     <div class="wpmind-budget-field">
                         <label for="budget_enforcement_mode"><?php esc_html_e( '超限处理', 'wpmind' ); ?></label>
                         <select id="budget_enforcement_mode" name="enforcement_mode">
-                            <?php foreach ( \WPMind\Budget\BudgetManager::get_mode_options() as $mode => $label ) : ?>
+                            <?php foreach ( \WPMind\Modules\CostControl\BudgetManager::get_mode_options() as $mode => $label ) : ?>
                             <option value="<?php echo esc_attr( $mode ); ?>" <?php selected( $budget_settings['enforcement_mode'] ?? 'alert', $mode ); ?>>
                                 <?php echo esc_html( $label ); ?>
                             </option>

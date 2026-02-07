@@ -550,15 +550,6 @@ final class WPMind {
          * @param int    $latency_ms 延迟（毫秒）
          */
         do_action( 'wpmind_usage_record', $provider, $model, $input_tokens, $output_tokens, $latency_ms );
-
-        // 向后兼容：如果没有模块监听，直接调用旧的类
-        if ( ! did_action( 'wpmind_usage_recorded' ) ) {
-            // 记录用量（兼容层会自动委托给模块或使用回退实现）
-            Usage\UsageTracker::record( $provider, $model, $input_tokens, $output_tokens, $latency_ms );
-
-            // 检查预算并发送告警
-            Budget\BudgetAlert::instance()->check_and_alert();
-        }
     }
 
     /**
