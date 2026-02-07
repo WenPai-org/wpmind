@@ -86,6 +86,16 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 				<span><?php echo esc_html( $active_count ); ?>/<?php echo esc_html( count( $modules ) ); ?> <?php esc_html_e( '模块启用', 'wpmind' ); ?></span>
 			</div>
 		</div>
+		<div class="wpmind-overview-hero-actions">
+			<a href="#services" class="wpmind-overview-hero-btn wpmind-tab-link" data-tab-link="services">
+				<span class="dashicons ri-add-line"></span>
+				<?php esc_html_e( '添加 Provider', 'wpmind' ); ?>
+			</a>
+			<a href="https://wpcommunity.com/c/wpmind/" target="_blank" rel="noopener" class="wpmind-overview-hero-btn wpmind-overview-hero-btn--ghost">
+				<span class="dashicons ri-book-open-line"></span>
+				<?php esc_html_e( '查看文档', 'wpmind' ); ?>
+			</a>
+		</div>
 		<span class="wpmind-overview-hero-icon dashicons ri-robot-2-line"></span>
 	</div>
 
@@ -144,7 +154,11 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 			</div>
 			<div class="wpmind-overview-card-body">
 				<?php if ( empty( $providers ) ) : ?>
-					<p class="wpmind-overview-empty"><?php esc_html_e( '暂无已配置的 Provider', 'wpmind' ); ?></p>
+					<div class="wpmind-overview-empty-state">
+						<span class="wpmind-overview-empty-icon dashicons ri-server-line"></span>
+						<p class="wpmind-overview-empty-text"><?php esc_html_e( '还没有配置 Provider', 'wpmind' ); ?></p>
+						<a href="#services" class="wpmind-overview-empty-action wpmind-tab-link" data-tab-link="services"><?php esc_html_e( '去配置', 'wpmind' ); ?> →</a>
+					</div>
 				<?php else : ?>
 					<div class="wpmind-overview-provider-list">
 						<?php foreach ( $providers as $key => $p ) :
@@ -194,8 +208,8 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 	<div class="wpmind-overview-grid">
 
 		<!-- 左栏：本月摘要 -->
-		<div class="wpmind-overview-card wpmind-overview-card--accent-blue wpmind-overview-card--bg-icon">
-			<span class="wpmind-overview-card-bg dashicons ri-bar-chart-grouped-line"></span>>
+		<div class="wpmind-overview-card wpmind-overview-card--bg-icon">
+			<span class="wpmind-overview-card-bg dashicons ri-bar-chart-grouped-line"></span>
 			<div class="wpmind-overview-card-header">
 				<h3><?php esc_html_e( '本月摘要', 'wpmind' ); ?></h3>
 			</div>
@@ -242,8 +256,8 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 		</div>
 
 		<!-- 右栏：最近活动 -->
-		<div class="wpmind-overview-card wpmind-overview-card--accent-green wpmind-overview-card--bg-icon">
-			<span class="wpmind-overview-card-bg dashicons ri-pulse-line"></span>>
+		<div class="wpmind-overview-card wpmind-overview-card--bg-icon">
+			<span class="wpmind-overview-card-bg dashicons ri-pulse-line"></span>
 			<div class="wpmind-overview-card-header">
 				<h3><?php esc_html_e( '最近活动', 'wpmind' ); ?></h3>
 				<?php if ( class_exists( 'WPMind\\Modules\\Analytics\\AnalyticsManager' ) ) : ?>
@@ -252,11 +266,16 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 			</div>
 			<div class="wpmind-overview-card-body">
 				<?php if ( empty( $recent_history ) ) : ?>
-					<p class="wpmind-overview-empty"><?php esc_html_e( '暂无 API 调用记录', 'wpmind' ); ?></p>
+					<div class="wpmind-overview-empty-state">
+						<span class="wpmind-overview-empty-icon dashicons ri-pulse-line"></span>
+						<p class="wpmind-overview-empty-text"><?php esc_html_e( '暂无 API 调用记录', 'wpmind' ); ?></p>
+						<p class="wpmind-overview-empty-hint"><?php esc_html_e( '使用 AI 功能后，调用记录将显示在这里', 'wpmind' ); ?></p>
+					</div>
 				<?php else : ?>
 					<div class="wpmind-overview-activity-list">
 						<?php foreach ( $recent_history as $record ) :
-							$time     = isset( $record['timestamp'] ) ? wp_date( 'H:i', $record['timestamp'] ) : '—';
+							$ts       = $record['timestamp'] ?? 0;
+							$time_ago = $ts > 0 ? human_time_diff( $ts, current_time( 'timestamp' ) ) . __( '前', 'wpmind' ) : '—';
 							$pname    = UsageTracker::get_provider_display_name( $record['provider'] ?? '' );
 							$model    = $record['model'] ?? '—';
 							$tokens   = ( $record['input_tokens'] ?? 0 ) + ( $record['output_tokens'] ?? 0 );
@@ -264,7 +283,7 @@ $avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_c
 							$picon    = UsageTracker::get_provider_icon( $record['provider'] ?? '' );
 						?>
 						<div class="wpmind-overview-activity-item">
-							<span class="wpmind-overview-activity-time"><?php echo esc_html( $time ); ?></span>
+							<span class="wpmind-overview-activity-time"><?php echo esc_html( $time_ago ); ?></span>
 							<span class="wpmind-overview-activity-provider">
 								<span class="dashicons <?php echo esc_attr( $picon ); ?>"></span>
 								<?php echo esc_html( $pname ); ?>

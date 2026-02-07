@@ -9,7 +9,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	background: linear-gradient(135deg, var(--wpmind-primary) 0%, #6366f1 100%);
+	background: var(--wpmind-primary);
 	color: #fff;
 	padding: var(--wpmind-space-7, 32px) var(--wpmind-space-8, 40px);
 	margin-bottom: var(--wpmind-space-6);
@@ -66,6 +66,51 @@
 	right: 24px;
 	top: 50%;
 	transform: translateY(-50%);
+}
+
+/* Hero action buttons */
+.wpmind-overview-hero-actions {
+	display: flex;
+	gap: var(--wpmind-space-3);
+	position: relative;
+	z-index: 1;
+	flex-shrink: 0;
+}
+
+.wpmind-overview-hero-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 16px;
+	font-size: var(--wpmind-text-sm);
+	font-weight: 500;
+	border-radius: 4px;
+	text-decoration: none;
+	cursor: pointer;
+	transition: opacity 0.15s ease;
+	background: rgba(255, 255, 255, 0.2);
+	color: #fff;
+	border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.wpmind-overview-hero-btn:hover {
+	background: rgba(255, 255, 255, 0.3);
+	color: #fff;
+}
+
+.wpmind-overview-hero-btn--ghost {
+	background: transparent;
+	border-color: rgba(255, 255, 255, 0.25);
+}
+
+.wpmind-overview-hero-btn--ghost:hover {
+	background: rgba(255, 255, 255, 0.1);
+}
+
+.wpmind-overview-hero-btn .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
 }
 
 /* Stat cards row */
@@ -231,13 +276,46 @@
 	font-size: var(--wpmind-text-sm);
 }
 
-/* Card accent borders */
-.wpmind-overview-card--accent-blue {
-	border-top: 3px solid var(--wpmind-primary);
+/* Empty state (guided) */
+.wpmind-overview-empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: var(--wpmind-space-6) var(--wpmind-space-4);
+	text-align: center;
 }
 
-.wpmind-overview-card--accent-green {
-	border-top: 3px solid var(--wpmind-success);
+.wpmind-overview-empty-icon {
+	font-size: 40px !important;
+	width: 40px !important;
+	height: 40px !important;
+	color: var(--wpmind-gray-300);
+	margin-bottom: var(--wpmind-space-3);
+}
+
+.wpmind-overview-empty-text {
+	margin: 0 0 var(--wpmind-space-2) 0;
+	font-size: var(--wpmind-text-sm);
+	font-weight: 500;
+	color: var(--wpmind-gray-500);
+}
+
+.wpmind-overview-empty-hint {
+	margin: 0;
+	font-size: 0.75rem;
+	color: var(--wpmind-gray-400);
+}
+
+.wpmind-overview-empty-action {
+	display: inline-block;
+	font-size: var(--wpmind-text-sm);
+	font-weight: 500;
+	color: var(--wpmind-primary);
+	text-decoration: none;
+}
+
+.wpmind-overview-empty-action:hover {
+	color: var(--wpmind-primary-hover);
 }
 
 /* Summary grid (value card — 2x2) */
@@ -322,9 +400,9 @@
 
 .wpmind-overview-activity-time {
 	color: var(--wpmind-gray-400);
-	font-variant-numeric: tabular-nums;
 	flex-shrink: 0;
-	width: 36px;
+	min-width: 52px;
+	font-size: 0.75rem;
 }
 
 .wpmind-overview-activity-provider {
@@ -463,6 +541,12 @@
 	}
 	.wpmind-overview-hero {
 		padding: var(--wpmind-space-6) var(--wpmind-space-6);
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--wpmind-space-4);
+	}
+	.wpmind-overview-hero-actions {
+		width: 100%;
 	}
 	.wpmind-overview-hero-icon {
 		font-size: 80px !important;
