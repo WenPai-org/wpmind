@@ -28,18 +28,28 @@ $modules       = $module_loader->get_modules();
             <div class="wpmind-module-header">
                 <span class="wpmind-module-icon dashicons <?php echo esc_attr( $module['icon'] ); ?>"></span>
                 <div class="wpmind-module-info">
-                    <h3 class="wpmind-module-name"><?php echo esc_html( $module['name'] ); ?></h3>
+                    <h3 class="wpmind-module-name">
+                        <?php echo esc_html( $module['name'] ); ?>
+                        <?php if ( ! $module['can_disable'] ) : ?>
+                            <span class="wpmind-module-badge-core" title="<?php esc_attr_e( '核心模块，不可禁用', 'wpmind' ); ?>"><?php esc_html_e( '核心', 'wpmind' ); ?></span>
+                        <?php endif; ?>
+                    </h3>
                     <span class="wpmind-module-version">v<?php echo esc_html( $module['version'] ); ?></span>
                 </div>
                 <div class="wpmind-module-toggle">
+                    <?php if ( ! $module['can_disable'] ) : ?>
+                    <span class="wpmind-toggle-locked" title="<?php esc_attr_e( '此模块为核心依赖，路由策略和 API 需要它保持启用', 'wpmind' ); ?>">
+                        <span class="dashicons ri-lock-line"></span>
+                    </span>
+                    <?php else : ?>
                     <label class="wpmind-switch">
                         <input type="checkbox"
                                class="wpmind-module-switch"
                                data-module-id="<?php echo esc_attr( $module_id ); ?>"
-                               <?php checked( $module['enabled'] ); ?>
-                               <?php disabled( ! $module['can_disable'] && $module['enabled'] ); ?>>
+                               <?php checked( $module['enabled'] ); ?>>
                         <span class="wpmind-switch-slider"></span>
                     </label>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="wpmind-module-body">
@@ -47,7 +57,9 @@ $modules       = $module_loader->get_modules();
             </div>
             <div class="wpmind-module-footer">
                 <span class="wpmind-module-status">
-                    <?php if ( $module['enabled'] ) : ?>
+                    <?php if ( ! $module['can_disable'] ) : ?>
+                        <span class="status-core"><span class="dashicons ri-shield-check-line"></span> <?php esc_html_e( '核心模块', 'wpmind' ); ?></span>
+                    <?php elseif ( $module['enabled'] ) : ?>
                         <span class="status-enabled"><span class="dashicons ri-checkbox-circle-line"></span> <?php esc_html_e( '已启用', 'wpmind' ); ?></span>
                     <?php else : ?>
                         <span class="status-disabled"><span class="dashicons ri-close-circle-line"></span> <?php esc_html_e( '已禁用', 'wpmind' ); ?></span>

@@ -167,6 +167,42 @@
     cursor: not-allowed;
 }
 
+/* Core module badge */
+.wpmind-module-badge-core {
+    display: inline-block;
+    font-size: 0.7em;
+    font-weight: 500;
+    padding: 1px 6px;
+    margin-left: 6px;
+    background: #e3f2fd;
+    color: #1565c0;
+    border-radius: 4px;
+    vertical-align: middle;
+    line-height: 1.6;
+}
+
+/* Lock icon for non-disableable modules */
+.wpmind-toggle-locked {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 24px;
+    color: #90a4ae;
+    cursor: help;
+}
+
+.wpmind-toggle-locked .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+/* Core module status */
+.status-core {
+    color: #1565c0;
+}
+
 .wpmind-no-modules {
     grid-column: 1 / -1;
     text-align: center;
