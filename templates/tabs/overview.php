@@ -34,6 +34,38 @@ foreach ( $providers as $p ) {
 		++$down;
 	}
 }
+
+// 价值摘要数据
+$all_stats       = UsageTracker::get_stats();
+$provider_stats  = $all_stats['providers'] ?? [];
+$top_model       = '—';
+$top_model_reqs  = 0;
+foreach ( $provider_stats as $pid => $pdata ) {
+	foreach ( ( $pdata['models'] ?? [] ) as $mname => $mdata ) {
+		if ( ( $mdata['requests'] ?? 0 ) > $top_model_reqs ) {
+			$top_model_reqs = $mdata['requests'];
+			$top_model      = $mname;
+		}
+	}
+}
+
+$recent_history = UsageTracker::get_history( 5 );
+$avg_latency    = 0;
+if ( ! empty( $recent_history ) ) {
+	$latency_sum = array_sum( array_column( $recent_history, 'latency_ms' ) );
+	$avg_latency = (int) round( $latency_sum / count( $recent_history ) );
+}
+
+// 服务可用率
+$total_success_rate = 0;
+$rate_count         = 0;
+foreach ( $providers as $p ) {
+	if ( isset( $p['success_rate'] ) ) {
+		$total_success_rate += $p['success_rate'];
+		++$rate_count;
+	}
+}
+$avg_success_rate = $rate_count > 0 ? (int) round( $total_success_rate / $rate_count ) : 100;
 ?>
 
 <div class="wpmind-overview">
@@ -55,7 +87,7 @@ foreach ( $providers as $p ) {
 				<span class="dashicons ri-token-swap-line"></span>
 			</span>
 			<div class="wpmind-overview-stat-body">
-				<span class="wpmind-overview-stat-value"><?php echo esc_html( UsageTracker::format_tokens( $today['tokens'] ?? 0 ) ); ?></span>
+				<span class="wpmind-overview-stat-value"><?php echo esc_html( UsageTracker::format_tokens( ( $today['input_tokens'] ?? 0 ) + ( $today['output_tokens'] ?? 0 ) ) ); ?></span>
 				<span class="wpmind-overview-stat-label"><?php esc_html_e( '今日 Tokens', 'wpmind' ); ?></span>
 			</div>
 		</div>
@@ -137,6 +169,71 @@ foreach ( $providers as $p ) {
 
 	</div>
 
+	<!-- 价值摘要 + 最近活动 -->
+	<div class="wpmind-overview-grid">
+
+		<!-- 左栏：本月摘要 -->
+		<div class="wpmind-overview-card">
+			<div class="wpmind-overview-card-header">
+				<h3><?php esc_html_e( '本月摘要', 'wpmind' ); ?></h3>
+			</div>
+			<div class="wpmind-overview-card-body">
+				<div class="wpmind-overview-summary-list">
+					<div class="wpmind-overview-summary-item">
+						<span class="wpmind-overview-summary-label"><?php esc_html_e( '最常用模型', 'wpmind' ); ?></span>
+						<span class="wpmind-overview-summary-value"><?php echo esc_html( $top_model ); ?></span>
+					</div>
+					<div class="wpmind-overview-summary-item">
+						<span class="wpmind-overview-summary-label"><?php esc_html_e( '平均响应时间', 'wpmind' ); ?></span>
+						<span class="wpmind-overview-summary-value"><?php echo $avg_latency > 0 ? esc_html( number_format_i18n( $avg_latency ) . 'ms' ) : '—'; ?></span>
+					</div>
+					<div class="wpmind-overview-summary-item">
+						<span class="wpmind-overview-summary-label"><?php esc_html_e( '服务可用率', 'wpmind' ); ?></span>
+						<span class="wpmind-overview-summary-value"><?php echo esc_html( $avg_success_rate . '%' ); ?></span>
+					</div>
+					<div class="wpmind-overview-summary-item">
+						<span class="wpmind-overview-summary-label"><?php esc_html_e( '本月总 Tokens', 'wpmind' ); ?></span>
+						<span class="wpmind-overview-summary-value"><?php echo esc_html( UsageTracker::format_tokens( ( $month['input_tokens'] ?? 0 ) + ( $month['output_tokens'] ?? 0 ) ) ); ?></span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 右栏：最近活动 -->
+		<div class="wpmind-overview-card">
+			<div class="wpmind-overview-card-header">
+				<h3><?php esc_html_e( '最近活动', 'wpmind' ); ?></h3>
+				<?php if ( class_exists( 'WPMind\\Modules\\Analytics\\AnalyticsManager' ) ) : ?>
+					<a href="#analytics" class="wpmind-overview-card-link wpmind-tab-link" data-tab-link="analytics"><?php esc_html_e( '查看全部', 'wpmind' ); ?> →</a>
+				<?php endif; ?>
+			</div>
+			<div class="wpmind-overview-card-body">
+				<?php if ( empty( $recent_history ) ) : ?>
+					<p class="wpmind-overview-empty"><?php esc_html_e( '暂无 API 调用记录', 'wpmind' ); ?></p>
+				<?php else : ?>
+					<div class="wpmind-overview-activity-list">
+						<?php foreach ( $recent_history as $record ) :
+							$time     = isset( $record['timestamp'] ) ? wp_date( 'H:i', $record['timestamp'] ) : '—';
+							$pname    = UsageTracker::get_provider_display_name( $record['provider'] ?? '' );
+							$model    = $record['model'] ?? '—';
+							$tokens   = ( $record['input_tokens'] ?? 0 ) + ( $record['output_tokens'] ?? 0 );
+							$latency  = $record['latency_ms'] ?? 0;
+						?>
+						<div class="wpmind-overview-activity-item">
+							<span class="wpmind-overview-activity-time"><?php echo esc_html( $time ); ?></span>
+							<span class="wpmind-overview-activity-provider"><?php echo esc_html( $pname ); ?></span>
+							<span class="wpmind-overview-activity-model"><?php echo esc_html( $model ); ?></span>
+							<span class="wpmind-overview-activity-tokens"><?php echo esc_html( UsageTracker::format_tokens( $tokens ) ); ?></span>
+							<span class="wpmind-overview-activity-latency"><?php echo $latency > 0 ? esc_html( $latency . 'ms' ) : '—'; ?></span>
+						</div>
+						<?php endforeach; ?>
+					</div>
+				<?php endif; ?>
+			</div>
+		</div>
+
+	</div>
+
 	<!-- 快捷入口 -->
 	<div class="wpmind-overview-card">
 		<div class="wpmind-overview-card-header">
@@ -166,6 +263,21 @@ foreach ( $providers as $p ) {
 				</a>
 			</div>
 		</div>
+	</div>
+
+	<!-- 底部链接 -->
+	<div class="wpmind-overview-footer">
+		<a href="https://wpcommunity.com/c/wpmind/" target="_blank" rel="noopener">
+			<span class="dashicons ri-discuss-line"></span>
+			<?php esc_html_e( '文派社区', 'wpmind' ); ?>
+		</a>
+		<span class="wpmind-overview-footer-sep">&middot;</span>
+		<a href="https://wpmind.developer.cyberforums.com/" target="_blank" rel="noopener">
+			<span class="dashicons ri-book-open-line"></span>
+			<?php esc_html_e( '使用文档', 'wpmind' ); ?>
+		</a>
+		<span class="wpmind-overview-footer-sep">&middot;</span>
+		<span class="wpmind-overview-footer-version">WPMind v<?php echo esc_html( WPMIND_VERSION ); ?></span>
 	</div>
 
 </div>

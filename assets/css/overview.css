@@ -152,6 +152,125 @@
 	font-size: var(--wpmind-text-sm);
 }
 
+/* Summary list (value card) */
+.wpmind-overview-summary-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+}
+
+.wpmind-overview-summary-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: var(--wpmind-space-3) 0;
+	border-bottom: 1px solid var(--wpmind-gray-100);
+}
+
+.wpmind-overview-summary-item:last-child {
+	border-bottom: none;
+}
+
+.wpmind-overview-summary-label {
+	font-size: var(--wpmind-text-sm);
+	color: var(--wpmind-gray-500);
+}
+
+.wpmind-overview-summary-value {
+	font-size: var(--wpmind-text-sm);
+	font-weight: 600;
+	color: var(--wpmind-gray-800);
+}
+
+/* Activity list (recent activity card) */
+.wpmind-overview-activity-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+}
+
+.wpmind-overview-activity-item {
+	display: grid;
+	grid-template-columns: 40px 80px 1fr auto auto;
+	gap: var(--wpmind-space-3);
+	align-items: center;
+	padding: var(--wpmind-space-2) 0;
+	border-bottom: 1px solid var(--wpmind-gray-100);
+	font-size: var(--wpmind-text-sm);
+}
+
+.wpmind-overview-activity-item:last-child {
+	border-bottom: none;
+}
+
+.wpmind-overview-activity-time {
+	color: var(--wpmind-gray-400);
+	font-variant-numeric: tabular-nums;
+}
+
+.wpmind-overview-activity-provider {
+	color: var(--wpmind-gray-700);
+	font-weight: 500;
+}
+
+.wpmind-overview-activity-model {
+	color: var(--wpmind-gray-500);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wpmind-overview-activity-tokens {
+	color: var(--wpmind-gray-600);
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+}
+
+.wpmind-overview-activity-latency {
+	color: var(--wpmind-gray-400);
+	text-align: right;
+	min-width: 50px;
+	font-variant-numeric: tabular-nums;
+}
+
+/* Footer links */
+.wpmind-overview-footer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--wpmind-space-3);
+	padding: var(--wpmind-space-5) 0;
+	margin-top: var(--wpmind-space-2);
+}
+
+.wpmind-overview-footer a {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-size: var(--wpmind-text-sm);
+	color: var(--wpmind-gray-500);
+	text-decoration: none;
+}
+
+.wpmind-overview-footer a:hover {
+	color: var(--wpmind-primary);
+}
+
+.wpmind-overview-footer a .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+}
+
+.wpmind-overview-footer-sep {
+	color: var(--wpmind-gray-300);
+}
+
+.wpmind-overview-footer-version {
+	font-size: var(--wpmind-text-sm);
+	color: var(--wpmind-gray-400);
+}
+
 /* Shortcuts grid */
 .wpmind-overview-shortcuts {
 	display: grid;
@@ -199,6 +318,12 @@
 	}
 	.wpmind-overview-shortcuts {
 		grid-template-columns: repeat(3, 1fr);
+	}
+	.wpmind-overview-activity-item {
+		grid-template-columns: 40px 70px 1fr auto;
+	}
+	.wpmind-overview-activity-latency {
+		display: none;
 	}
 }
 
