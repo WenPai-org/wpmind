@@ -1,5 +1,32 @@
 # WPMind 更新日志
 
+## [3.6.0] - 2026-02-07
+
+### 🔗 执行层统一到 WP AI Client SDK (Phase C)
+
+#### C1: SDKAdapter 适配器类
+- **新增** `includes/SDK/SDKAdapter.php`: 封装 WP AI Client SDK 调用
+- 异常→WP_Error 转换，保留 HTTP 状态码信息用于重试判断
+- GenerativeAiResult→PublicAPI 数组格式转换
+- 支持 SDK 内置 Provider (OpenAI/Anthropic/Google) + WPMind 注册 Provider
+
+#### C2: SDK 路径集成
+- **execute_chat_request()** 增加 SDK 优先路径，失败自动回退原 HTTP 实现
+- **错误分类处理**: 适配错误静默回退（不消耗重试预算），Provider 错误记录失败
+- 健康统计在 SDK 和 HTTP 两条路径下都正常记录
+- 新增 `wpmind_sdk_fallback` action hook 用于监控回退事件
+
+#### C3: 能力 gate + Provider 白名单
+- **should_use_sdk()**: 5 层检查（SDK 可用性、用户配置、能力 gate、Provider 白名单）
+- 默认对 Anthropic/Google 启用 SDK（解决 PublicAPI 中不可用的问题）
+- tools 请求暂不走 SDK（v3.6.0 限制）
+- `wpmind_sdk_providers` filter 允许扩展白名单
+- `wpmind_sdk_enabled` 选项允许全局禁用
+
+> 基于 Claude + Codex 评审共识，详见 `docs/AI-PIPELINE-AUDIT.md` 第 9 节
+
+---
+
 ## [3.5.0] - 2026-02-07
 
 ### 🔀 模型重选 + 路由统一 (Phase B)
