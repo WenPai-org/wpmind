@@ -1,5 +1,25 @@
 # WPMind 更新日志
 
+## [3.4.0] - 2026-02-07
+
+### 🛡️ AI 请求链路可靠性修复 (Phase A)
+
+#### P0 修复
+- **缓存键加入 provider/model**: `generate_cache_key()` 包含服务商和模型参数，避免跨 Provider 缓存污染 (N1)
+- **非 JSON 响应防护**: `execute_chat_request()` 检测 `json_decode` 失败，返回 `wpmind_invalid_response` 错误而非 fatal (N3)
+- **stream() 默认 provider 统一**: 从硬编码 `deepseek` 改为 `get_option()`，与 `chat()` 行为一致 (N4)
+
+#### P1 修复
+- **per-provider 重试逻辑**: 激活 `ErrorHandler::should_retry()` + `get_retry_delay()` 死代码，429/5xx 先重试再 failover (I1)
+  - 非最后 Provider: 最多 1 次重试
+  - 最后 Provider: 最多 3 次重试，指数退避 1s→2s→4s
+  - 不可重试错误 (401/403/配置缺失) 直接跳过
+  - 新增 `wpmind_retry` action hook 用于监控
+
+> 基于 Claude + Codex 两轮审计，详见 `docs/AI-PIPELINE-AUDIT.md`
+
+---
+
 ## [3.3.0] - 2026-02-07
 
 ### 🔧 编码规范化 (Phase 1 完成)
