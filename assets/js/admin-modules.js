@@ -5,31 +5,31 @@
  * @since 3.3.0
  */
 
-(function ($) {
+( function( $ ) {
 	'use strict';
 
-	var Admin = window.WPMindAdmin || (window.WPMindAdmin = {});
+	var Admin = window.WPMindAdmin || ( window.WPMindAdmin = {} );
 	var Toast = Admin.Toast || null;
-	var notifyError = Toast ? Toast.error.bind(Toast) : function (message) {
-		alert(message);
+	var notifyError = Toast ? Toast.error.bind( Toast ) : function( message ) {
+		alert( message );
 	};
 
 	function initModuleSwitches() {
-		$('.wpmind-module-switch').on('change', function () {
-			var $switch = $(this);
-			var moduleId = $switch.data('module-id');
-			var enable = $switch.is(':checked');
-			var $card = $switch.closest('.wpmind-module-card');
+		$( '.wpmind-module-switch' ).on( 'change', function() {
+			var $switch = $( this );
+			var moduleId = $switch.data( 'module-id' );
+			var enable = $switch.is( ':checked' );
+			var $card = $switch.closest( '.wpmind-module-card' );
 
-			$switch.prop('disabled', true);
+			$switch.prop( 'disabled', true );
 
-			if (typeof wpmindData === 'undefined') {
-				notifyError('配置错误');
-				$switch.prop('checked', !enable).prop('disabled', false);
+			if ( 'undefined' === typeof wpmindData ) {
+				notifyError( '配置错误' );
+				$switch.prop( 'checked', ! enable ).prop( 'disabled', false );
 				return;
 			}
 
-			$.ajax({
+			$.ajax( {
 				url: wpmindData.ajaxurl,
 				type: 'POST',
 				data: {
@@ -40,43 +40,45 @@
 					// jQuery may serialize boolean false inconsistently.
 					enable: enable ? '1' : '0'
 				},
-				success: function (response) {
-					if (response.success) {
-						if (response.data.reload) {
+				success: function( response ) {
+					if ( response.success ) {
+						if ( response.data.reload ) {
 							location.reload();
 						} else {
-							$card.toggleClass('is-enabled', enable).toggleClass('is-disabled', !enable);
+							$card.toggleClass( 'is-enabled', enable ).toggleClass( 'is-disabled', ! enable );
 						}
 					} else {
-						notifyError(response.data.message || '操作失败');
-						$switch.prop('checked', !enable);
+						notifyError( response.data.message || '操作失败' );
+						$switch.prop( 'checked', ! enable );
 					}
 				},
-				error: function () {
-					notifyError('网络错误');
-					$switch.prop('checked', !enable);
+				error: function() {
+					notifyError( '网络错误' );
+					$switch.prop( 'checked', ! enable );
 				},
-				complete: function () {
-					$switch.prop('disabled', false);
+				complete: function() {
+					$switch.prop( 'disabled', false );
 				}
-			});
-		});
+			} );
+		} );
 	}
 
 	/**
 	 * Initialize on document ready
 	 */
-	$(function () {
-		if (!$('.wpmind-module-switch').length) return;
+	$( function() {
+		if ( ! $( '.wpmind-module-switch' ).length ) {
+			return;
+		}
 
-		var safeInit = Admin.safeInit || function (label, fn) {
+		var safeInit = Admin.safeInit || function( label, fn ) {
 			try {
 				fn();
-			} catch (error) {
-				console.warn('[WPMind] ' + label + ' init failed:', error);
+			} catch ( error ) {
+				console.warn( '[WPMind] ' + label + ' init failed:', error );
 			}
 		};
 
-		safeInit('modules', initModuleSwitches);
-	});
-})(jQuery);
+		safeInit( 'modules', initModuleSwitches );
+	} );
+} )( jQuery );
