@@ -14,7 +14,7 @@ namespace WPMind\Routing\Strategies;
 
 use WPMind\Routing\AbstractStrategy;
 use WPMind\Routing\RoutingContext;
-use WPMind\Usage\UsageTracker;
+use WPMind\Modules\CostControl\UsageTracker;
 
 class CostStrategy extends AbstractStrategy
 {

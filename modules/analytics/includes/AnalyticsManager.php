@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace WPMind\Modules\Analytics;
 
-use WPMind\Usage\UsageTracker;
+use WPMind\Modules\CostControl\UsageTracker;
 
 class AnalyticsManager
 {

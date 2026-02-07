@@ -64,10 +64,7 @@ $required_files = [
     'modules/geo/GeoModule.php',
     'modules/geo/includes/CrawlerTracker.php',
     'modules/geo/templates/settings.php',
-    'includes/Usage/UsageTracker.php',
-    'includes/Usage/UsageTrackerFallback.php',
-    'includes/Budget/BudgetManager.php',
-    'includes/Budget/BudgetManagerFallback.php',
+    'includes/Usage/Pricing.php',
     'templates/tabs/dashboard.php',
     'templates/tabs/budget.php',
     'templates/settings-page.php',
@@ -168,15 +165,14 @@ if (file_exists($geo_settings) && file_exists($crawler_file)) {
     echo "✅ GEO 模块文件完整\n";
 }
 
-// 7. Fallback 完整性检查
-echo "\n--- Fallback 完整性检查 ---\n";
-$fallback_tracker = $plugin_path . 'includes/Usage/UsageTrackerFallback.php';
-$fallback_manager = $plugin_path . 'includes/Budget/BudgetManagerFallback.php';
+// 7. Cost Control 模块完整性检查
+echo "\n--- Cost Control 模块完整性检查 ---\n";
+$cost_control_tracker = $plugin_path . 'modules/cost-control/includes/UsageTracker.php';
 
 foreach ($dashboard_methods as $method) {
-    if (!check_method($fallback_tracker, $method)) {
-        echo "⚠️ UsageTrackerFallback::$method() 缺失\n";
-        $warnings[] = "Fallback 方法缺失: UsageTrackerFallback::$method()";
+    if (!check_method($cost_control_tracker, $method)) {
+        echo "⚠️ UsageTracker::$method() 缺失\n";
+        $warnings[] = "模块方法缺失: UsageTracker::$method()";
     }
 }
 

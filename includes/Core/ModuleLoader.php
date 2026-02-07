@@ -125,6 +125,15 @@ class ModuleLoader {
 		 *
 		 * @param array $modules Discovered modules.
 		 */
+		// Enforce non-disableable modules are always enabled.
+		foreach ( $this->modules as $module_id => &$module_data ) {
+			if ( ! $module_data['can_disable'] && ! $module_data['enabled'] ) {
+				$module_data['enabled'] = true;
+				update_option( "wpmind_module_{$module_id}_enabled", '1', false );
+			}
+		}
+		unset( $module_data );
+
 		$this->modules = apply_filters( 'wpmind_discovered_modules', $this->modules );
 	}
 

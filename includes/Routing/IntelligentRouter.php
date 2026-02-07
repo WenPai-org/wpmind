@@ -61,6 +61,14 @@ class IntelligentRouter
 
         // 基础策略
         $this->register_strategy(new LoadBalancedStrategy());               // 负载均衡
+
+        /**
+         * 允许第三方注册自定义路由策略
+         *
+         * @since 3.7.0
+         * @param IntelligentRouter $router 路由器实例
+         */
+        do_action('wpmind_register_routing_strategies', $this);
     }
 
     /**
