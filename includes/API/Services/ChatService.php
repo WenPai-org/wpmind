@@ -254,6 +254,14 @@ class ChatService extends AbstractService {
 			];
 
 			$start_time = microtime(true);
+
+			// 检查 allow_url_fopen 是否启用
+			if (!ini_get('allow_url_fopen')) {
+				$last_error = new WP_Error('wpmind_stream_unsupported',
+					__('流式输出需要 PHP allow_url_fopen 配置启用', 'wpmind'));
+				continue;
+			}
+
 			$stream_ctx = stream_context_create($stream_context_options);
 			$stream = @fopen($api_url, 'r', false, $stream_ctx);
 
