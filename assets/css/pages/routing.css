@@ -10,10 +10,13 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: var(--wpmind-space-4) var(--wpmind-space-5);
-	border-bottom: 1px solid var(--wpmind-gray-100);
-	min-height: 54px;
-	box-sizing: border-box;
+	gap: var(--wpmind-space-3);
+	margin-bottom: var(--wpmind-space-2);
+}
+
+.wpmind-routing-desc {
+	color: var(--wpmind-gray-600);
+	margin: 0 0 var(--wpmind-space-6);
 }
 
 .wpmind-routing-title {
@@ -50,13 +53,11 @@
 .wpmind-routing-stats {
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
-	gap: var(--wpmind-space-3);
-	padding: var(--wpmind-space-4) var(--wpmind-space-5);
-	background: var(--wpmind-gray-50);
-	border-bottom: 1px solid var(--wpmind-gray-100);
+	gap: var(--wpmind-space-4);
+	margin-bottom: var(--wpmind-space-6);
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1200px) {
 	.wpmind-routing-stats {
 		grid-template-columns: repeat(2, 1fr);
 	}
@@ -122,12 +123,11 @@
 /* Grid Layout */
 .wpmind-routing-grid {
 	display: grid;
-	grid-template-columns: 1fr 320px;
-	gap: var(--wpmind-space-5);
-	padding: var(--wpmind-space-5);
+	grid-template-columns: 1fr 1fr;
+	gap: var(--wpmind-space-6);
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1200px) {
 	.wpmind-routing-grid {
 		grid-template-columns: 1fr;
 	}
@@ -135,6 +135,10 @@
 
 /* Section Styles */
 .wpmind-routing-section {
+	background: var(--wpmind-gray-50);
+	border: 1px solid var(--wpmind-gray-200);
+	border-radius: var(--wpmind-radius-lg);
+	padding: var(--wpmind-space-5);
 	margin-bottom: var(--wpmind-space-4);
 }
 
@@ -143,17 +147,27 @@
 }
 
 .wpmind-routing-section-title {
-	font-size: var(--wpmind-text-sm);
+	display: flex;
+	align-items: center;
+	gap: var(--wpmind-space-2);
+	font-size: var(--wpmind-text-base);
 	font-weight: 600;
-	color: var(--wpmind-gray-900);
+	color: var(--wpmind-gray-800);
 	margin: 0 0 var(--wpmind-space-2) 0;
 	padding: 0;
 }
 
+.wpmind-routing-section-title .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	color: var(--wpmind-primary);
+}
+
 .wpmind-routing-section-desc {
-	margin: 0 0 var(--wpmind-space-3) 0;
-	font-size: var(--wpmind-text-xs);
-	color: var(--wpmind-gray-500);
+	margin: 0 0 var(--wpmind-space-4) 0;
+	font-size: var(--wpmind-text-sm);
+	color: var(--wpmind-gray-600);
 }
 
 /* Strategy List - Vertical Group Style */
@@ -289,8 +303,8 @@
 
 /* Status Card - 推荐 Provider 卡片 */
 .wpmind-routing-status-card {
-	background: linear-gradient(135deg, var(--wpmind-success-light) 0%, #d1fae5 100%);
-	border: 1px solid #a7f3d0;
+	background: var(--wpmind-success-light);
+	border: 1px solid var(--wpmind-success-light);
 	padding: var(--wpmind-space-4);
 	margin-bottom: var(--wpmind-space-4);
 }
@@ -338,7 +352,7 @@
 .wpmind-routing-status-provider {
 	font-size: var(--wpmind-text-lg);
 	font-weight: 700;
-	color: #065f46;
+	color: var(--wpmind-success);
 }
 
 .wpmind-routing-status-score {
@@ -349,13 +363,13 @@
 
 .wpmind-routing-status-score-label {
 	font-size: var(--wpmind-text-xs);
-	color: #047857;
+	color: var(--wpmind-success);
 }
 
 .wpmind-routing-status-score-value {
 	font-size: var(--wpmind-text-xl);
 	font-weight: 700;
-	color: #065f46;
+	color: var(--wpmind-success);
 }
 
 /* Failover Flow - 故障转移链可视化 */
@@ -417,8 +431,6 @@
 
 /* Provider Scores - 排名区域 */
 .wpmind-routing-ranking {
-	padding: var(--wpmind-space-5);
-	border-top: 1px solid var(--wpmind-gray-100);
 	margin: 0;
 }
 
@@ -433,13 +445,13 @@
 	align-items: center;
 	gap: var(--wpmind-space-3);
 	padding: var(--wpmind-space-3) var(--wpmind-space-4);
-	background: var(--wpmind-gray-50);
+	background: #fff;
 	border: 1px solid var(--wpmind-gray-200);
 }
 
 .wpmind-routing-score-item.is-top {
-	background: linear-gradient(90deg, #fef3c7 0%, #fef9c3 100%);
-	border-color: #fcd34d;
+	background: var(--wpmind-warning-light);
+	border-color: var(--wpmind-warning);
 }
 
 .wpmind-routing-rank {
@@ -457,7 +469,7 @@
 }
 
 .wpmind-routing-score-item.is-top .wpmind-routing-rank {
-	background: #f59e0b;
+	background: var(--wpmind-warning);
 	color: #fff;
 }
 
@@ -491,7 +503,7 @@
 }
 
 .wpmind-routing-score-item.is-top .wpmind-routing-score-fill {
-	background: linear-gradient(90deg, #f59e0b, #fbbf24);
+	background: var(--wpmind-warning);
 }
 
 .wpmind-routing-score-value {
@@ -503,5 +515,5 @@
 }
 
 .wpmind-routing-score-item.is-top .wpmind-routing-score-value {
-	color: #b45309;
+	color: var(--wpmind-warning);
 }

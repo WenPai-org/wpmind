@@ -84,7 +84,10 @@ function wpmind_image_has_api_key( $key, $endpoints ) {
 <form method="post" action="options.php" id="wpmind-image-settings-form">
 	<?php settings_fields( 'wpmind_image_settings' ); ?>
 
-	<h2 class="title"><?php esc_html_e( '全局设置', 'wpmind' ); ?></h2>
+	<h2 class="title">
+		<span class="dashicons ri-settings-3-line"></span>
+		<?php esc_html_e( '全局设置', 'wpmind' ); ?>
+	</h2>
 	<table class="form-table" role="presentation">
 		<tr>
 			<th scope="row">
@@ -111,7 +114,10 @@ function wpmind_image_has_api_key( $key, $endpoints ) {
 		</tr>
 	</table>
 
-	<h2 class="title"><?php esc_html_e( '图像生成服务', 'wpmind' ); ?></h2>
+	<h2 class="title">
+		<span class="dashicons ri-image-line"></span>
+		<?php esc_html_e( '图像生成服务', 'wpmind' ); ?>
+	</h2>
 	<p class="description" style="margin-bottom: 16px;">
 		<?php esc_html_e( '配置图像生成 AI 服务商。启用后可在 AI Experiments 中使用 Image Generation 功能。', 'wpmind' ); ?>
 	</p>

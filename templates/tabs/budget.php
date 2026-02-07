@@ -19,13 +19,19 @@ $budget_summary = $budget_checker->get_summary();
 ?>
 
 <div class="wpmind-budget-panel">
-	<h2 class="title">
-		<span class="dashicons ri-money-cny-circle-line"></span>
-		<?php esc_html_e( '预算限额', 'wpmind' ); ?>
+	<div class="wpmind-budget-header">
+		<h2 class="wpmind-budget-title">
+			<span class="dashicons ri-money-cny-circle-line"></span>
+			<?php esc_html_e( '预算管理', 'wpmind' ); ?>
+		</h2>
 		<?php if ( $budget_settings['enabled'] ) : ?>
 		<span class="wpmind-budget-status-badge wpmind-budget-enabled"><?php esc_html_e( '已启用', 'wpmind' ); ?></span>
 		<?php endif; ?>
-	</h2>
+	</div>
+
+	<p class="wpmind-budget-desc">
+		<?php esc_html_e( '设置 AI 服务的费用限额和告警规则，控制成本支出。', 'wpmind' ); ?>
+	</p>
 
 	<div class="wpmind-budget-content">
 		<div class="wpmind-budget-toggle-row">
@@ -40,7 +46,10 @@ $budget_summary = $budget_checker->get_summary();
 		<div class="wpmind-budget-settings" id="wpmind-budget-settings" style="<?php echo $budget_settings['enabled'] ? '' : 'display:none;'; ?>">
 			<!-- 全局限额 -->
 			<div class="wpmind-budget-section">
-				<h3><?php esc_html_e( '全局限额', 'wpmind' ); ?></h3>
+				<h3>
+					<span class="dashicons ri-wallet-3-line"></span>
+					<?php esc_html_e( '全局限额', 'wpmind' ); ?>
+				</h3>
 				<div class="wpmind-budget-grid">
 					<div class="wpmind-budget-field">
 						<label for="budget_daily_usd"><?php esc_html_e( '每日 USD', 'wpmind' ); ?></label>
@@ -84,7 +93,10 @@ $budget_summary = $budget_checker->get_summary();
 
 			<!-- 告警设置 -->
 			<div class="wpmind-budget-section">
-				<h3><?php esc_html_e( '告警设置', 'wpmind' ); ?></h3>
+				<h3>
+					<span class="dashicons ri-alarm-warning-line"></span>
+					<?php esc_html_e( '告警设置', 'wpmind' ); ?>
+				</h3>
 				<div class="wpmind-budget-row">
 					<div class="wpmind-budget-field">
 						<label for="budget_alert_threshold"><?php esc_html_e( '告警阈值', 'wpmind' ); ?></label>
@@ -111,7 +123,10 @@ $budget_summary = $budget_checker->get_summary();
 
 			<!-- 通知设置 -->
 			<div class="wpmind-budget-section">
-				<h3><?php esc_html_e( '通知方式', 'wpmind' ); ?></h3>
+				<h3>
+					<span class="dashicons ri-notification-3-line"></span>
+					<?php esc_html_e( '通知方式', 'wpmind' ); ?>
+				</h3>
 				<div class="wpmind-budget-checkboxes">
 					<label>
 						<input type="checkbox" name="admin_notice" value="1" <?php checked( $budget_settings['notifications']['admin_notice'] ); ?>>

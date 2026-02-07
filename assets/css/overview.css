@@ -1,149 +1,105 @@
-/* WPMind Overview Tab — Gutenberg design language */
+/* WPMind Overview Tab — Refined single-accent design */
 
 .wpmind-overview {
 	max-width: 1200px;
 }
 
-/* Hero section */
+/* Hero */
 .wpmind-overview-hero {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	background: var(--wpmind-primary);
-	color: #fff;
-	padding: var(--wpmind-space-7) var(--wpmind-space-8);
+	background: var(--wpmind-gray-50, #f9fafb);
+	border: 1px solid var(--wpmind-gray-200);
+	border-left: 3px solid var(--wpmind-primary);
+	padding: var(--wpmind-space-7) var(--wpmind-space-7);
 	margin-bottom: var(--wpmind-space-6);
-	border-radius: 2px;
-	position: relative;
-	overflow: hidden;
-}
-
-.wpmind-overview-hero-content {
-	position: relative;
-	z-index: 1;
 }
 
 .wpmind-overview-hero-title {
 	display: flex;
 	align-items: center;
-	gap: var(--wpmind-space-3);
+	gap: var(--wpmind-space-2);
 	margin: 0 0 var(--wpmind-space-2) 0;
-	font-size: 1.5em;
+	font-size: 20px;
 	font-weight: 700;
-	color: #fff;
+	color: var(--wpmind-gray-900);
 }
 
 .wpmind-overview-hero-title .dashicons {
-	font-size: 28px;
-	width: 28px;
-	height: 28px;
+	font-size: 22px;
+	width: 22px;
+	height: 22px;
+	color: var(--wpmind-primary);
 }
 
-.wpmind-overview-hero-desc {
+.wpmind-overview-hero-subtitle {
 	margin: 0 0 var(--wpmind-space-3) 0;
 	font-size: var(--wpmind-text-base);
-	opacity: 0.9;
+	color: var(--wpmind-gray-600);
 }
 
 .wpmind-overview-hero-meta {
-	display: flex;
-	align-items: center;
-	gap: var(--wpmind-space-2);
+	margin: 0 0 var(--wpmind-space-5) 0;
 	font-size: var(--wpmind-text-sm);
-	opacity: 0.75;
+	color: var(--wpmind-gray-400);
 }
 
-.wpmind-overview-hero-sep {
-	opacity: 0.5;
-}
-
-.wpmind-overview-hero-icon {
-	font-size: 120px !important;
-	width: 120px !important;
-	height: 120px !important;
-	opacity: 0.12;
-	position: absolute;
-	right: 24px;
-	top: 50%;
-	transform: translateY(-50%);
-}
-
-/* Hero action buttons */
 .wpmind-overview-hero-actions {
 	display: flex;
-	gap: var(--wpmind-space-3);
-	position: relative;
-	z-index: 1;
-	flex-shrink: 0;
+	gap: var(--wpmind-space-4);
 }
 
 .wpmind-overview-hero-btn {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	padding: 8px 16px;
 	font-size: var(--wpmind-text-sm);
 	font-weight: 500;
-	border-radius: 4px;
 	text-decoration: none;
-	cursor: pointer;
-	transition: opacity 0.15s ease;
-	background: rgba(255, 255, 255, 0.2);
-	color: #fff;
-	border: 1px solid rgba(255, 255, 255, 0.3);
+	color: var(--wpmind-primary);
 }
 
 .wpmind-overview-hero-btn:hover {
-	background: rgba(255, 255, 255, 0.3);
-	color: #fff;
+	color: var(--wpmind-primary-hover);
 }
 
 .wpmind-overview-hero-btn--ghost {
-	background: transparent;
-	border-color: rgba(255, 255, 255, 0.25);
+	color: var(--wpmind-gray-500);
 }
 
 .wpmind-overview-hero-btn--ghost:hover {
-	background: rgba(255, 255, 255, 0.1);
-}
-
-.wpmind-overview-hero-btn .dashicons {
-	font-size: 16px;
-	width: 16px;
-	height: 16px;
+	color: var(--wpmind-primary);
 }
 
 /* Stat cards row */
 .wpmind-overview-stats {
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
-	gap: var(--wpmind-space-5);
+	gap: var(--wpmind-space-4);
 	margin-bottom: var(--wpmind-space-6);
 }
 
 .wpmind-overview-stat {
 	display: flex;
 	align-items: center;
-	gap: var(--wpmind-space-4);
-	background: #fff;
-	box-shadow: var(--wpmind-shadow);
-	padding: var(--wpmind-space-5) var(--wpmind-space-6);
+	gap: var(--wpmind-space-3);
+	background: var(--wpmind-gray-50, #f9fafb);
+	border: 1px solid var(--wpmind-gray-200);
+	padding: var(--wpmind-space-4) var(--wpmind-space-5);
 }
 
 .wpmind-overview-stat-icon {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 48px;
-	height: 48px;
-	border-radius: 12px;
+	width: 40px;
+	height: 40px;
+	border-radius: 8px;
 	flex-shrink: 0;
+	background: #fff;
+	border: 1px solid var(--wpmind-gray-200);
+	color: var(--wpmind-primary);
 }
 
 .wpmind-overview-stat-icon .dashicons {
-	font-size: 24px;
-	width: 24px;
-	height: 24px;
+	font-size: 20px;
+	width: 20px;
+	height: 20px;
 }
 
 .wpmind-overview-stat-body {
@@ -153,7 +109,7 @@
 }
 
 .wpmind-overview-stat-value {
-	font-size: 1.5em;
+	font-size: 1.25em;
 	font-weight: 600;
 	color: var(--wpmind-gray-900);
 	line-height: 1.2;
@@ -181,38 +137,35 @@
 
 /* Cards */
 .wpmind-overview-card {
-	background: #fff;
-	box-shadow: var(--wpmind-shadow);
+	background: var(--wpmind-gray-50, #f9fafb);
+	border: 1px solid var(--wpmind-gray-200);
 	position: relative;
 	overflow: hidden;
-}
-
-/* Card decorative background icon */
-.wpmind-overview-card--bg-icon .wpmind-overview-card-bg {
-	position: absolute;
-	right: -8px;
-	bottom: -8px;
-	font-size: 80px !important;
-	width: 80px !important;
-	height: 80px !important;
-	opacity: 0.04;
-	pointer-events: none;
-	z-index: 0;
 }
 
 .wpmind-overview-card-header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: var(--wpmind-space-4) var(--wpmind-space-6);
+	padding: var(--wpmind-space-4) var(--wpmind-space-5);
 	border-bottom: 1px solid var(--wpmind-gray-200);
 }
 
 .wpmind-overview-card-header h3 {
+	display: flex;
+	align-items: center;
+	gap: var(--wpmind-space-2);
 	margin: 0;
 	font-size: var(--wpmind-text-base);
 	font-weight: 600;
 	color: var(--wpmind-gray-800);
+}
+
+.wpmind-overview-card-header h3 .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	color: var(--wpmind-primary);
 }
 
 .wpmind-overview-card-link {
@@ -226,7 +179,7 @@
 }
 
 .wpmind-overview-card-body {
-	padding: var(--wpmind-space-4) var(--wpmind-space-6);
+	padding: var(--wpmind-space-4) var(--wpmind-space-5);
 }
 
 /* Provider list */
@@ -264,16 +217,10 @@
 	font-size: 0.75em;
 	padding: 0 5px;
 	margin-left: 4px;
-	background: #e3f2fd;
-	color: #1565c0;
+	background: var(--wpmind-info-light);
+	color: var(--wpmind-info);
 	border-radius: 3px;
 	vertical-align: middle;
-}
-
-.wpmind-overview-empty {
-	margin: 0;
-	color: var(--wpmind-gray-400);
-	font-size: var(--wpmind-text-sm);
 }
 
 /* Empty state (guided) */
@@ -322,7 +269,7 @@
 .wpmind-overview-summary-grid {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
-	gap: var(--wpmind-space-4);
+	gap: var(--wpmind-space-3);
 }
 
 .wpmind-overview-summary-cell {
@@ -330,18 +277,19 @@
 	align-items: center;
 	gap: var(--wpmind-space-3);
 	padding: var(--wpmind-space-3);
-	background: var(--wpmind-gray-50, #f9fafb);
-	border-radius: 8px;
+	background: #fff;
+	border: 1px solid var(--wpmind-gray-200);
+	border-radius: 0;
 }
 
 .wpmind-overview-summary-icon {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 36px;
-	height: 36px;
-	border-radius: 8px;
+	width: 32px;
+	height: 32px;
 	flex-shrink: 0;
+	color: var(--wpmind-primary);
 }
 
 .wpmind-overview-summary-icon .dashicons {
@@ -500,24 +448,24 @@
 	flex-direction: column;
 	align-items: center;
 	gap: var(--wpmind-space-2);
-	padding: var(--wpmind-space-5) var(--wpmind-space-3);
+	padding: var(--wpmind-space-4) var(--wpmind-space-3);
 	text-decoration: none;
 	color: var(--wpmind-gray-600);
+	background: #fff;
 	border: 1px solid var(--wpmind-gray-200);
-	transition: all 0.15s ease;
+	transition: color 0.15s ease, border-color 0.15s ease;
 	cursor: pointer;
 }
 
 .wpmind-overview-shortcut:hover {
 	border-color: var(--wpmind-primary);
 	color: var(--wpmind-primary);
-	background: var(--wpmind-primary-light);
 }
 
 .wpmind-overview-shortcut .dashicons {
-	font-size: 24px;
-	width: 24px;
-	height: 24px;
+	font-size: 20px;
+	width: 20px;
+	height: 20px;
 }
 
 .wpmind-overview-shortcut span:last-child {
@@ -526,7 +474,7 @@
 }
 
 /* Responsive */
-@media (max-width: 960px) {
+@media (max-width: 1200px) {
 	.wpmind-overview-stats {
 		grid-template-columns: repeat(2, 1fr);
 	}
@@ -539,24 +487,15 @@
 	.wpmind-overview-activity-latency {
 		display: none;
 	}
-	.wpmind-overview-hero {
-		padding: var(--wpmind-space-6) var(--wpmind-space-6);
-		flex-direction: column;
-		align-items: flex-start;
-		gap: var(--wpmind-space-4);
-	}
-	.wpmind-overview-hero-actions {
-		width: 100%;
-	}
-	.wpmind-overview-hero-icon {
-		font-size: 80px !important;
-		width: 80px !important;
-		height: 80px !important;
-		right: 12px;
-	}
 }
 
 @media (max-width: 600px) {
+	.wpmind-overview-hero {
+		padding: var(--wpmind-space-5);
+	}
+	.wpmind-overview-hero-title {
+		font-size: 18px;
+	}
 	.wpmind-overview-stats {
 		grid-template-columns: 1fr;
 	}
@@ -565,11 +504,5 @@
 	}
 	.wpmind-overview-summary-grid {
 		grid-template-columns: 1fr;
-	}
-	.wpmind-overview-hero-meta {
-		flex-wrap: wrap;
-	}
-	.wpmind-overview-hero-icon {
-		display: none;
 	}
 }

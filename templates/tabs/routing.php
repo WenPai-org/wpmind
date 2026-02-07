@@ -53,6 +53,10 @@ $strategy_icons = array(
         </button>
     </div>
 
+    <p class="wpmind-routing-desc">
+        <?php esc_html_e( '智能路由根据策略自动选择最优 AI Provider，支持故障转移和负载均衡。', 'wpmind' ); ?>
+    </p>
+
     <!-- 路由统计仪表板 -->
     <div class="wpmind-routing-stats">
         <?php
@@ -108,7 +112,10 @@ $strategy_icons = array(
         <!-- 左栏：策略选择 -->
         <div class="wpmind-routing-left">
             <div class="wpmind-routing-section">
-                <h3 class="wpmind-routing-section-title"><?php esc_html_e( '路由策略', 'wpmind' ); ?></h3>
+                <h3 class="wpmind-routing-section-title">
+                    <span class="dashicons ri-route-line"></span>
+                    <?php esc_html_e( '路由策略', 'wpmind' ); ?>
+                </h3>
                 <p class="wpmind-routing-section-desc"><?php esc_html_e( '选择 AI 服务的路由策略', 'wpmind' ); ?></p>
                 <div class="wpmind-strategy-list">
                     <?php foreach ( $available_strategies as $strategy_name => $strategy_info ) :
@@ -166,7 +173,10 @@ $strategy_icons = array(
             <!-- 故障转移链 -->
             <?php if ( ! empty( $routing_status['failover_chain'] ) ) : ?>
             <div class="wpmind-routing-section">
-                <h3 class="wpmind-routing-section-title"><?php esc_html_e( '故障转移链', 'wpmind' ); ?></h3>
+                <h3 class="wpmind-routing-section-title">
+                    <span class="dashicons ri-shield-check-line"></span>
+                    <?php esc_html_e( '故障转移链', 'wpmind' ); ?>
+                </h3>
                 <div class="wpmind-routing-failover-flow" id="wpmind-failover-chain">
                     <?php
                     $chain = $routing_status['failover_chain'];
@@ -198,7 +208,10 @@ $strategy_icons = array(
     ?>
     <div class="wpmind-routing-section wpmind-routing-priority">
         <div class="wpmind-routing-section-header">
-            <h3 class="wpmind-routing-section-title"><?php esc_html_e( '手动优先级', 'wpmind' ); ?></h3>
+            <h3 class="wpmind-routing-section-title">
+                <span class="dashicons ri-drag-move-2-line"></span>
+                <?php esc_html_e( '手动优先级', 'wpmind' ); ?>
+            </h3>
             <div class="wpmind-routing-priority-actions">
                 <?php if ( $has_manual_priority ) : ?>
                 <button type="button" class="button button-small wpmind-clear-priority" title="<?php esc_attr_e( '清除手动优先级', 'wpmind' ); ?>">
@@ -242,7 +255,10 @@ $strategy_icons = array(
     <!-- Provider 排名 -->
     <?php if ( ! empty( $routing_status['provider_scores'] ) ) : ?>
     <div class="wpmind-routing-section wpmind-routing-ranking">
-        <h3 class="wpmind-routing-section-title"><?php esc_html_e( 'Provider 排名', 'wpmind' ); ?></h3>
+        <h3 class="wpmind-routing-section-title">
+            <span class="dashicons ri-trophy-line"></span>
+            <?php esc_html_e( 'Provider 排名', 'wpmind' ); ?>
+        </h3>
         <p class="wpmind-routing-section-desc"><?php esc_html_e( '基于当前策略的 Provider 得分排名，得分越高越优先被选中', 'wpmind' ); ?></p>
         <div class="wpmind-routing-scores" id="wpmind-routing-scores">
             <?php foreach ( $routing_status['provider_scores'] as $provider_id => $score_data ) :

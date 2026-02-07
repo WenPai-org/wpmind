@@ -9,11 +9,11 @@
    CSS Variables - 设计令牌
    ======================================== */
 :root {
-	/* Primary Colors - WordPress Core Blue */
-	--wpmind-primary: #2271b1;
-	--wpmind-primary-hover: #135e96;
-	--wpmind-primary-light: #f0f6fc;
-	--wpmind-primary-dark: #0a4b78;
+	/* Primary Colors - WPMind Brand Blue */
+	--wpmind-primary: #3858e9;
+	--wpmind-primary-hover: #2d48cc;
+	--wpmind-primary-light: #eef1fd;
+	--wpmind-primary-dark: #2035a8;
 
 	/* Gray Scale */
 	--wpmind-gray-50: #f9fafb;
@@ -33,6 +33,7 @@
 	--wpmind-warning: #d97706;
 	--wpmind-warning-light: #fef3c7;
 	--wpmind-error: #dc2626;
+	--wpmind-error-dark: #b91c1c;
 	--wpmind-error-light: #fee2e2;
 	--wpmind-info: #0284c7;
 	--wpmind-info-light: #e0f2fe;
@@ -249,7 +250,8 @@
 .wpmind-tab-pane .wpmind-analytics-panel,
 .wpmind-tab-pane .wpmind-status-panel,
 .wpmind-tab-pane .wpmind-routing-panel,
-.wpmind-tab-pane .wpmind-budget-panel {
+.wpmind-tab-pane .wpmind-budget-panel,
+.wpmind-tab-pane .wpmind-geo-panel {
 	border: none;
 	box-shadow: none;
 	padding: 0;
@@ -262,8 +264,61 @@
 .wpmind-tab-pane .wpmind-analytics-panel:last-child,
 .wpmind-tab-pane .wpmind-status-panel:last-child,
 .wpmind-tab-pane .wpmind-routing-panel:last-child,
-.wpmind-tab-pane .wpmind-budget-panel:last-child {
+.wpmind-tab-pane .wpmind-budget-panel:last-child,
+.wpmind-tab-pane .wpmind-geo-panel:last-child {
 	margin-bottom: 0;
+}
+
+/* Tab-pane Title - 页面标题统一 14px */
+.wpmind-tab-pane .title {
+	display: flex;
+	align-items: center;
+	gap: var(--wpmind-space-2);
+	font-size: var(--wpmind-text-md);
+	font-weight: 600;
+	color: var(--wpmind-gray-900);
+}
+
+.wpmind-tab-pane .title .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	color: var(--wpmind-primary);
+}
+
+/* Endpoint Card Description - 卡片描述 12px */
+.wpmind-endpoint-card .description {
+	font-size: var(--wpmind-text-sm);
+	color: var(--wpmind-gray-500);
+}
+
+/* ========================================
+   Button Base - 按钮统一基础样式
+   ======================================== */
+
+/* 所有 .button 统一 flex 对齐（修复 icon+text 错位） */
+.wpmind-tab-pane .button {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--wpmind-space-1);
+	vertical-align: middle;
+}
+
+/* 常规按钮图标 16px */
+.wpmind-tab-pane .button .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	line-height: 16px;
+	flex-shrink: 0;
+}
+
+/* 小按钮图标 14px */
+.wpmind-tab-pane .button-small .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+	line-height: 14px;
 }
 
 /* ========================================
@@ -280,13 +335,13 @@
 	align-items: center;
 	gap: var(--wpmind-space-3);
 	padding: var(--wpmind-space-4) var(--wpmind-space-6);
-	border-bottom: 1px solid #ccd0d4;
+	border-bottom: 1px solid var(--wpmind-border-color);
 	min-height: 54px;
 	box-sizing: border-box;
 }
 
 .wpmind-panel-header .dashicons {
-	color: var(--wpmind-gray-600);
+	color: var(--wpmind-primary);
 	font-size: 18px;
 	width: 18px;
 	height: 18px;
@@ -294,8 +349,8 @@
 
 .wpmind-panel-title {
 	font-size: var(--wpmind-text-md);
-	font-weight: 500;
-	color: #1e1e1e;
+	font-weight: 600;
+	color: var(--wpmind-gray-900);
 	margin: 0;
 	flex: 1;
 }
@@ -309,7 +364,7 @@
 	align-items: center;
 	gap: var(--wpmind-space-3);
 	padding: var(--wpmind-space-4) var(--wpmind-space-6);
-	border-top: 1px solid #ccd0d4;
+	border-top: 1px solid var(--wpmind-border-color);
 	background: var(--wpmind-gray-50);
 }
 
@@ -346,7 +401,7 @@
 	gap: var(--wpmind-space-3);
 	padding: var(--wpmind-space-4) var(--wpmind-space-6);
 	background: #fff;
-	border-bottom: 1px solid #ccd0d4;
+	border-bottom: 1px solid var(--wpmind-border-color);
 	min-height: 54px;
 	box-sizing: border-box;
 }
@@ -394,15 +449,15 @@
 }
 
 .wpmind-btn-secondary {
-	background: #f6f7f7;
-	color: #2271b1;
-	border-color: #2271b1;
+	background: var(--wpmind-gray-50);
+	color: var(--wpmind-primary);
+	border-color: var(--wpmind-primary);
 }
 
 .wpmind-btn-secondary:hover {
-	background: #f0f0f1;
-	border-color: #0a4b78;
-	color: #0a4b78;
+	background: var(--wpmind-gray-100);
+	border-color: var(--wpmind-primary-dark);
+	color: var(--wpmind-primary-dark);
 }
 
 .wpmind-btn-tertiary {
@@ -417,12 +472,12 @@
 
 .wpmind-btn-danger {
 	background: #fff;
-	color: #b32d2e;
-	border-color: #b32d2e;
+	color: var(--wpmind-error);
+	border-color: var(--wpmind-error);
 }
 
 .wpmind-btn-danger:hover {
-	background: #b32d2e;
+	background: var(--wpmind-error);
 	color: #fff;
 }
 
@@ -499,7 +554,7 @@
 	display: block;
 	font-size: var(--wpmind-text-xs);
 	font-weight: 500;
-	color: #1e1e1e;
+	color: var(--wpmind-gray-900);
 	margin-bottom: var(--wpmind-space-3);
 	text-transform: uppercase;
 }
@@ -512,9 +567,9 @@
 	min-height: 40px;
 	font-size: var(--wpmind-text-base);
 	line-height: 40px;
-	color: #1e1e1e;
+	color: var(--wpmind-gray-900);
 	background: #fff;
-	border: 1px solid #949494;
+	border: 1px solid var(--wpmind-gray-400);
 	border-radius: 2px;
 	transition: all var(--wpmind-transition-fast);
 }
@@ -537,7 +592,7 @@
 .wpmind-form-help {
 	margin-top: var(--wpmind-space-2);
 	font-size: var(--wpmind-text-sm);
-	color: #757575;
+	color: var(--wpmind-gray-500);
 	font-style: normal;
 }
 
@@ -560,7 +615,7 @@
 	position: relative;
 	width: 36px;
 	height: 18px;
-	background: #949494;
+	background: var(--wpmind-gray-400);
 	border-radius: 9px;
 	transition: background var(--wpmind-transition-fast);
 }
@@ -592,7 +647,7 @@
 
 .wpmind-toggle-label {
 	font-size: var(--wpmind-text-base);
-	color: #1e1e1e;
+	color: var(--wpmind-gray-900);
 }
 
 /* ========================================
@@ -747,13 +802,13 @@
 	gap: var(--wpmind-space-3);
 	padding: var(--wpmind-space-4) var(--wpmind-space-5);
 	background: #fff;
-	border-bottom: 1px solid #ccd0d4;
+	border-bottom: 1px solid var(--wpmind-border-color);
 	cursor: pointer;
 	user-select: none;
 }
 
 .wpmind-endpoint-header:hover {
-	background: #f9f9f9;
+	background: var(--wpmind-gray-50);
 }
 
 .wpmind-endpoint-toggle {
@@ -773,7 +828,7 @@
 	font-size: 20px;
 	width: 20px;
 	height: 20px;
-	color: #757575;
+	color: var(--wpmind-gray-500);
 	transition: transform var(--wpmind-transition-fast);
 }
 
@@ -802,15 +857,15 @@
 .wpmind-endpoint-name {
 	font-weight: 500;
 	font-size: var(--wpmind-text-md);
-	color: #1e1e1e;
+	color: var(--wpmind-gray-900);
 }
 
 .wpmind-endpoint-key {
 	font-size: var(--wpmind-text-xs);
-	background: #f0f0f1;
+	background: var(--wpmind-gray-100);
 	padding: 4px var(--wpmind-space-2);
 	border-radius: 2px;
-	color: #757575;
+	color: var(--wpmind-gray-500);
 	font-family: var(--wpmind-font-mono);
 }
 
@@ -989,53 +1044,48 @@ input.is-invalid {
    Usage Panel - Token 用量统计（block-visibility 风格）
    ======================================== */
 .wpmind-usage-panel {
-	background: #fff;
-	box-shadow: var(--wpmind-shadow);
-	margin: var(--wpmind-space-6) 0;
+	/* padding handled by .wpmind-tab-pane */
 }
 
-.wpmind-usage-panel .title {
-	margin: 0;
-	padding: var(--wpmind-space-4) var(--wpmind-space-6);
-	border-bottom: 1px solid #ccd0d4;
+.wpmind-usage-header {
 	display: flex;
 	align-items: center;
 	gap: var(--wpmind-space-3);
-	font-size: var(--wpmind-text-md);
-	font-weight: 500;
-	color: #1e1e1e;
-	min-height: 54px;
-	box-sizing: border-box;
+	margin-bottom: var(--wpmind-space-2);
 }
 
-.wpmind-usage-panel .title .button {
-	min-height: 32px;
-	display: inline-flex;
+.wpmind-usage-title {
+	display: flex;
 	align-items: center;
 	gap: var(--wpmind-space-2);
-	font-size: var(--wpmind-text-base);
-	border-radius: 0;
-	cursor: pointer;
-	transition: all var(--wpmind-transition-fast);
+	font-size: var(--wpmind-text-md);
+	font-weight: 600;
+	color: var(--wpmind-gray-900);
+	margin: 0;
 }
 
-.wpmind-usage-panel .title .dashicons {
+.wpmind-usage-title .dashicons {
 	font-size: 18px;
 	width: 18px;
 	height: 18px;
-	line-height: 18px;
+	color: var(--wpmind-primary);
+}
+
+.wpmind-usage-desc {
+	color: var(--wpmind-gray-600);
+	margin: 0 0 var(--wpmind-space-6);
 }
 
 .wpmind-last-updated {
 	font-size: var(--wpmind-text-sm);
 	font-weight: 400;
-	color: #757575;
+	color: var(--wpmind-gray-500);
 	margin-right: auto;
 }
 
 .wpmind-usage-note {
 	font-size: var(--wpmind-text-sm);
-	color: #32373c;
+	color: var(--wpmind-gray-700);
 	line-height: var(--wpmind-leading-relaxed);
 	margin: 0 0 var(--wpmind-space-5) 0;
 	padding: var(--wpmind-space-3) var(--wpmind-space-4);
@@ -1046,7 +1096,7 @@ input.is-invalid {
 .wpmind-usage-empty {
 	text-align: center;
 	padding: var(--wpmind-space-10) var(--wpmind-space-6);
-	color: #757575;
+	color: var(--wpmind-gray-500);
 }
 
 .wpmind-usage-empty .dashicons {
@@ -1084,8 +1134,9 @@ input.is-invalid {
 }
 
 .wpmind-usage-card {
-	background: #fff;
-	box-shadow: var(--wpmind-shadow);
+	background: var(--wpmind-gray-50);
+	border: 1px solid var(--wpmind-gray-200);
+	border-radius: var(--wpmind-radius-lg);
 	overflow: hidden;
 }
 
@@ -1093,27 +1144,26 @@ input.is-invalid {
 	display: flex;
 	align-items: center;
 	gap: var(--wpmind-space-2);
-	background: #fff;
-	color: #1e1e1e;
-	padding: var(--wpmind-space-4) var(--wpmind-space-5);
-	font-size: var(--wpmind-text-md);
-	font-weight: 500;
-	border-bottom: 1px solid #ccd0d4;
+	color: var(--wpmind-gray-800);
+	padding: var(--wpmind-space-3) var(--wpmind-space-4);
+	font-size: var(--wpmind-text-base);
+	font-weight: 600;
 }
 
 .wpmind-usage-card-header .dashicons {
 	font-size: 18px;
 	width: 18px;
 	height: 18px;
-	color: #757575;
+	color: var(--wpmind-primary);
 }
 
 .wpmind-usage-card-body {
-	padding: var(--wpmind-space-6);
+	padding: var(--wpmind-space-4) var(--wpmind-space-5);
 	display: flex;
 	justify-content: space-between;
 	gap: var(--wpmind-space-4);
 	background: #fff;
+	border-top: 1px solid var(--wpmind-gray-200);
 }
 
 .wpmind-usage-stat {
@@ -1124,7 +1174,7 @@ input.is-invalid {
 .wpmind-usage-value {
 	display: block;
 	font-weight: 600;
-	color: #1e1e1e;
+	color: var(--wpmind-gray-900);
 	line-height: var(--wpmind-leading-tight);
 }
 
@@ -1136,18 +1186,28 @@ input.is-invalid {
 	display: block;
 	font-size: var(--wpmind-text-xs);
 	font-weight: 500;
-	color: #757575;
+	color: var(--wpmind-gray-500);
 	margin-top: var(--wpmind-space-2);
 	text-transform: uppercase;
 }
 
 /* Provider Usage Grid */
 .wpmind-usage-section-title {
-	font-size: var(--wpmind-text-xs);
-	font-weight: 500;
-	color: #1e1e1e;
-	margin: var(--wpmind-space-6) var(--wpmind-space-6) var(--wpmind-space-4);
-	text-transform: uppercase;
+	display: flex;
+	align-items: center;
+	gap: var(--wpmind-space-2);
+	font-size: var(--wpmind-text-base);
+	font-weight: 600;
+	color: var(--wpmind-gray-800);
+	margin: var(--wpmind-space-6) 0 var(--wpmind-space-4);
+	padding: 0;
+}
+
+.wpmind-usage-section-title .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	color: var(--wpmind-primary);
 }
 
 .wpmind-provider-usage-grid {
@@ -1157,8 +1217,9 @@ input.is-invalid {
 }
 
 .wpmind-provider-usage-item {
-	background: #fff;
-	box-shadow: var(--wpmind-shadow);
+	background: var(--wpmind-gray-50);
+	border: 1px solid var(--wpmind-gray-200);
+	border-radius: var(--wpmind-radius-lg);
 	overflow: hidden;
 }
 
@@ -1167,8 +1228,7 @@ input.is-invalid {
 	align-items: center;
 	gap: var(--wpmind-space-2);
 	padding: var(--wpmind-space-3) var(--wpmind-space-4);
-	background: #fff;
-	border-bottom: 1px solid #ccd0d4;
+	border-bottom: 1px solid var(--wpmind-gray-200);
 }
 
 .wpmind-provider-usage-icon {
@@ -1179,7 +1239,7 @@ input.is-invalid {
 .wpmind-provider-usage-name {
 	font-size: var(--wpmind-text-md);
 	font-weight: 500;
-	color: #1e1e1e;
+	color: var(--wpmind-gray-900);
 	flex: 1;
 }
 
@@ -1196,6 +1256,7 @@ input.is-invalid {
 
 .wpmind-provider-usage-body {
 	padding: var(--wpmind-space-3);
+	background: #fff;
 }
 
 .wpmind-provider-usage-row {
@@ -1398,7 +1459,7 @@ input.is-invalid {
    GEO Tab Styles
    ======================================== */
 .wpmind-geo-panel {
-	padding: var(--wpmind-space-6);
+	/* padding handled by .wpmind-tab-pane */
 }
 
 .wpmind-geo-header {
@@ -1412,16 +1473,16 @@ input.is-invalid {
 	display: flex;
 	align-items: center;
 	gap: var(--wpmind-space-2);
-	font-size: var(--wpmind-text-xl);
+	font-size: var(--wpmind-text-md);
 	font-weight: 600;
 	color: var(--wpmind-gray-900);
 	margin: 0;
 }
 
 .wpmind-geo-title .dashicons {
-	font-size: 24px;
-	width: 24px;
-	height: 24px;
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
 	color: var(--wpmind-primary);
 }
 

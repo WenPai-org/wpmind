@@ -82,7 +82,7 @@
 		order: -1;
 	}
 
-	.wpmind-usage-panel .title {
+	.wpmind-usage-header {
 		flex-wrap: wrap;
 	}
 
@@ -194,7 +194,8 @@
 .wpmind-tab-pane .wpmind-analytics-panel,
 .wpmind-tab-pane .wpmind-status-panel,
 .wpmind-tab-pane .wpmind-routing-panel,
-.wpmind-tab-pane .wpmind-budget-panel {
+.wpmind-tab-pane .wpmind-budget-panel,
+.wpmind-tab-pane .wpmind-geo-panel {
 	border: none;
 	box-shadow: none;
 	padding: 0;
@@ -206,7 +207,8 @@
 .wpmind-tab-pane .wpmind-analytics-panel:last-child,
 .wpmind-tab-pane .wpmind-status-panel:last-child,
 .wpmind-tab-pane .wpmind-routing-panel:last-child,
-.wpmind-tab-pane .wpmind-budget-panel:last-child {
+.wpmind-tab-pane .wpmind-budget-panel:last-child,
+.wpmind-tab-pane .wpmind-geo-panel:last-child {
 	margin-bottom: 0;
 }
 

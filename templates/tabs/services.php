@@ -21,7 +21,10 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 <form method="post" action="options.php" id="wpmind-settings-form">
 	<?php settings_fields( 'wpmind_settings' ); ?>
 
-	<h2 class="title"><?php esc_html_e( '全局设置', 'wpmind' ); ?></h2>
+	<h2 class="title">
+		<span class="dashicons ri-settings-3-line"></span>
+		<?php esc_html_e( '全局设置', 'wpmind' ); ?>
+	</h2>
 	<table class="form-table" role="presentation">
 		<tr>
 			<th scope="row">
@@ -65,7 +68,10 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 		</tr>
 	</table>
 
-	<h2 class="title"><?php esc_html_e( 'AI 服务端点', 'wpmind' ); ?></h2>
+	<h2 class="title">
+		<span class="dashicons ri-cloud-line"></span>
+		<?php esc_html_e( 'AI 服务端点', 'wpmind' ); ?>
+	</h2>
 
 	<div class="wpmind-endpoints-grid">
 		<?php foreach ( $endpoints as $key => $endpoint ) :
