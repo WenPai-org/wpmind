@@ -44,6 +44,14 @@ function wpmind_cleanup_site_data(): void {
         'wpmind_crawler_stats',
         // API Gateway 模块设置
         'wpmind_api_gateway_schema_version',
+        // Exact Cache 模块设置
+        'wpmind_exact_cache_enabled',
+        'wpmind_exact_cache_default_ttl',
+        'wpmind_exact_cache_max_entries',
+        'wpmind_exact_cache_scope_mode',
+        'wpmind_exact_cache_index',
+        'wpmind_exact_cache_stats',
+        'wpmind_exact_cache_daily_stats',
         // 激活标记
         'wpmind_flush_rewrite_rules',
     ];
@@ -58,6 +66,7 @@ function wpmind_cleanup_site_data(): void {
         'wpmind_provider_health',
         'wpmind_budget_notices',
         'wpmind_round_robin_index',
+        'wpmind_daily_stats_lock',
     ];
 
     foreach ( $transients as $transient ) {
@@ -74,6 +83,18 @@ function wpmind_cleanup_site_data(): void {
                 OR option_name LIKE %s",
             '_transient_wpmind_cb_%',
             '_transient_timeout_wpmind_cb_%'
+        )
+    );
+
+    // 删除 Exact Cache transient 缓存条目
+    // 格式: wpmind_ec_{hash}
+    $wpdb->query(
+        $wpdb->prepare(
+            "DELETE FROM {$wpdb->options}
+             WHERE option_name LIKE %s
+                OR option_name LIKE %s",
+            '_transient_wpmind_ec_%',
+            '_transient_timeout_wpmind_ec_%'
         )
     );
 

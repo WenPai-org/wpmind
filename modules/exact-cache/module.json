@@ -1,0 +1,23 @@
+{
+    "id": "exact-cache",
+    "name": "Exact Cache",
+    "description": "AI 请求精确缓存 - 降低 API 成本、加速重复请求",
+    "version": "1.0.0",
+    "author": "WPMind",
+    "icon": "ri-database-2-line",
+    "class": "WPMind\\Modules\\ExactCache\\ExactCacheModule",
+    "can_disable": true,
+    "settings_tab": "exact-cache",
+    "features": [
+        "精确匹配缓存（SHA256 哈希）",
+        "成本节省估算",
+        "7 天趋势统计",
+        "缓存命中率面板",
+        "LRU 自动淘汰",
+        "角色/用户级隔离"
+    ],
+    "requires": {
+        "php": "8.1",
+        "wordpress": "6.0"
+    }
+}

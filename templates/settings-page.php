@@ -50,6 +50,8 @@ defined("ABSPATH") || exit(); ?>
   $analytics_enabled = $analytics_module && $analytics_module["enabled"];
   $api_gateway_module = $module_loader->get_module("api-gateway");
   $api_gateway_enabled = $api_gateway_module && $api_gateway_module["enabled"];
+  $exact_cache_module = $module_loader->get_module("exact-cache");
+  $exact_cache_enabled = $exact_cache_module && $exact_cache_module["enabled"];
   ?>
 		<!-- Tab 卡片 -->
 		<div class="wpmind-tabs-card">
@@ -85,6 +87,11 @@ defined("ABSPATH") || exit(); ?>
 				<?php if ($api_gateway_enabled): ?>
 				<a href="#api-gateway" class="wpmind-tab" data-tab="api-gateway">
 					<?php esc_html_e("API Gateway", "wpmind"); ?>
+				</a>
+				<?php endif; ?>
+				<?php if ($exact_cache_enabled): ?>
+				<a href="#exact-cache" class="wpmind-tab" data-tab="exact-cache">
+					<?php esc_html_e("精确缓存", "wpmind"); ?>
 				</a>
 				<?php endif; ?>
 				<a href="#modules" class="wpmind-tab" data-tab="modules">
@@ -131,6 +138,16 @@ defined("ABSPATH") || exit(); ?>
     $api_gateway_settings = WPMIND_PATH . "modules/api-gateway/templates/settings.php";
     if (file_exists($api_gateway_settings)) {
         include $api_gateway_settings;
+    }
+    ?>
+			</div>
+			<?php endif; ?>
+			<?php if ($exact_cache_enabled): ?>
+			<div id="exact-cache" class="wpmind-tab-pane">
+				<?php
+    $exact_cache_settings = WPMIND_PATH . "modules/exact-cache/templates/settings.php";
+    if (file_exists($exact_cache_settings)) {
+        include $exact_cache_settings;
     }
     ?>
 			</div>
