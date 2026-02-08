@@ -30,6 +30,8 @@ class GatewayAjaxController {
 		add_action( 'wp_ajax_wpmind_create_api_key', [ $this, 'ajax_create_api_key' ] );
 		add_action( 'wp_ajax_wpmind_list_api_keys', [ $this, 'ajax_list_api_keys' ] );
 		add_action( 'wp_ajax_wpmind_revoke_api_key', [ $this, 'ajax_revoke_api_key' ] );
+		add_action( 'wp_ajax_wpmind_update_api_key', [ $this, 'ajax_update_api_key' ] );
+		add_action( 'wp_ajax_wpmind_list_audit_logs', [ $this, 'ajax_list_audit_logs' ] );
 	}
 
 	/**
@@ -178,5 +180,112 @@ class GatewayAjaxController {
 		ApiKeyRepository::revoke_key( $key_id, get_current_user_id(), 'admin_revoke' );
 
 		wp_send_json_success( [ 'message' => __( 'API Key 已吊销', 'wpmind' ) ] );
+	}
+
+	/**
+	 * Update an existing API key.
+	 */
+	public function ajax_update_api_key(): void {
+		check_ajax_referer( 'wpmind_ajax', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+		}
+
+		$key_id = sanitize_text_field( wp_unslash( $_POST['key_id'] ?? '' ) );
+
+		if ( empty( $key_id ) ) {
+			wp_send_json_error( [ 'message' => __( '缺少 Key ID', 'wpmind' ) ] );
+		}
+
+		$row = ApiKeyRepository::find_by_key_id( $key_id );
+		if ( $row === null ) {
+			wp_send_json_error( [ 'message' => __( 'API Key 不存在', 'wpmind' ) ] );
+		}
+
+		$data = [];
+
+		if ( isset( $_POST['name'] ) ) {
+			$data['name'] = sanitize_text_field( wp_unslash( $_POST['name'] ) );
+		}
+		if ( isset( $_POST['rpm_limit'] ) ) {
+			$data['rpm_limit'] = max( 1, min( 10000, absint( $_POST['rpm_limit'] ) ) );
+		}
+		if ( isset( $_POST['tpm_limit'] ) ) {
+			$data['tpm_limit'] = max( 1000, min( 10000000, absint( $_POST['tpm_limit'] ) ) );
+		}
+		if ( isset( $_POST['concurrency_limit'] ) ) {
+			$data['concurrency_limit'] = max( 1, min( 100, absint( $_POST['concurrency_limit'] ) ) );
+		}
+		if ( isset( $_POST['monthly_budget_usd'] ) ) {
+			$data['monthly_budget_usd'] = max( 0.0, (float) $_POST['monthly_budget_usd'] );
+		}
+		if ( isset( $_POST['ip_whitelist'] ) ) {
+			$raw = sanitize_text_field( wp_unslash( $_POST['ip_whitelist'] ) );
+			$ips = [];
+			if ( ! empty( $raw ) ) {
+				foreach ( array_map( 'trim', explode( ',', $raw ) ) as $ip ) {
+					if ( filter_var( $ip, FILTER_VALIDATE_IP ) ) {
+						$ips[] = $ip;
+					}
+				}
+			}
+			$data['ip_whitelist'] = ! empty( $ips ) ? $ips : '';
+		}
+		if ( isset( $_POST['expires_at'] ) ) {
+			$exp = sanitize_text_field( wp_unslash( $_POST['expires_at'] ) );
+			$data['expires_at'] = ! empty( $exp ) ? gmdate( 'Y-m-d H:i:s', strtotime( $exp ) ) : null;
+		}
+
+		if ( empty( $data ) ) {
+			wp_send_json_error( [ 'message' => __( '没有需要更新的字段', 'wpmind' ) ] );
+		}
+
+		$ok = ApiKeyRepository::update_key( $key_id, $data );
+
+		if ( $ok ) {
+			wp_send_json_success( [ 'message' => __( 'API Key 已更新', 'wpmind' ) ] );
+		} else {
+			wp_send_json_error( [ 'message' => __( '更新失败', 'wpmind' ) ] );
+		}
+	}
+
+	/**
+	 * List audit logs with pagination and filters.
+	 */
+	public function ajax_list_audit_logs(): void {
+		check_ajax_referer( 'wpmind_ajax', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+		}
+
+		$page     = max( 1, absint( $_POST['page'] ?? 1 ) );
+		$per_page = 20;
+
+		$filters = [];
+		if ( ! empty( $_POST['key_id'] ) ) {
+			$filters['key_id'] = sanitize_text_field( wp_unslash( $_POST['key_id'] ) );
+		}
+		if ( ! empty( $_POST['event_type'] ) ) {
+			$filters['event_type'] = sanitize_text_field( wp_unslash( $_POST['event_type'] ) );
+		}
+		if ( ! empty( $_POST['date_from'] ) ) {
+			$filters['date_from'] = sanitize_text_field( wp_unslash( $_POST['date_from'] ) );
+		}
+		if ( ! empty( $_POST['date_to'] ) ) {
+			$filters['date_to'] = sanitize_text_field( wp_unslash( $_POST['date_to'] ) );
+		}
+
+		$logs  = AuditLogRepository::list_logs( $filters, $page, $per_page );
+		$total = AuditLogRepository::count_logs( $filters );
+
+		wp_send_json_success( [
+			'logs'        => $logs,
+			'total'       => $total,
+			'page'        => $page,
+			'per_page'    => $per_page,
+			'total_pages' => (int) ceil( $total / $per_page ),
+		] );
 	}
 }

@@ -223,6 +223,86 @@ class ApiKeyRepository {
 	}
 
 	/**
+	 * Update editable fields for an API key.
+	 *
+	 * @param string $key_id The 12-character key identifier.
+	 * @param array  $data   Column => value pairs (whitelisted).
+	 * @return bool True on success, false on failure.
+	 */
+	public static function update_key( string $key_id, array $data ): bool {
+		global $wpdb;
+
+		$allowed = [
+			'name',
+			'rpm_limit',
+			'tpm_limit',
+			'concurrency_limit',
+			'monthly_budget_usd',
+			'ip_whitelist',
+			'expires_at',
+		];
+
+		$update = [];
+		$format = [];
+
+		foreach ( $data as $col => $val ) {
+			if ( ! in_array( $col, $allowed, true ) ) {
+				continue;
+			}
+
+			switch ( $col ) {
+				case 'name':
+					$update[ $col ] = sanitize_text_field( (string) $val );
+					$format[]       = '%s';
+					break;
+
+				case 'rpm_limit':
+				case 'tpm_limit':
+				case 'concurrency_limit':
+					$update[ $col ] = absint( $val );
+					$format[]       = '%d';
+					break;
+
+				case 'monthly_budget_usd':
+					$update[ $col ] = max( 0.0, (float) $val );
+					$format[]       = '%f';
+					break;
+
+				case 'ip_whitelist':
+					$update[ $col ] = is_array( $val )
+						? wp_json_encode( $val )
+						: sanitize_text_field( (string) $val );
+					$format[]       = '%s';
+					break;
+
+				case 'expires_at':
+					$update[ $col ] = empty( $val ) ? null : sanitize_text_field( (string) $val );
+					$format[]       = '%s';
+					break;
+			}
+		}
+
+		if ( empty( $update ) ) {
+			return false;
+		}
+
+		$update['updated_at'] = current_time( 'mysql', true );
+		$format[]             = '%s';
+
+		$result = $wpdb->update(
+			self::table(),
+			$update,
+			[ 'key_id' => $key_id ],
+			$format,
+			[ '%s' ]
+		);
+
+		self::invalidate_cache( $key_id );
+
+		return $result !== false;
+	}
+
+	/**
 	 * List all keys with current month usage, excluding secret columns.
 	 *
 	 * @return array Array of key rows with usage data.

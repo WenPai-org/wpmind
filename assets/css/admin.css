@@ -1857,3 +1857,381 @@ input.is-invalid {
 .wpmind-geo-info-content li {
     margin-bottom: var(--wpmind-space-1);
 }
+
+/* ========================================
+   API Gateway Module
+   ======================================== */
+
+/* Stats grid */
+.wpmind-gw-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--wpmind-space-4);
+    margin-bottom: var(--wpmind-space-6);
+}
+
+@media (max-width: 1200px) {
+    .wpmind-gw-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Sub-tab navigation */
+.wpmind-gw-subtabs {
+    display: flex;
+    gap: var(--wpmind-space-2);
+    margin-bottom: var(--wpmind-space-6);
+    border-bottom: 2px solid var(--wpmind-gray-200);
+    padding-bottom: 0;
+}
+
+.wpmind-gw-subtab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--wpmind-gray-600);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.wpmind-gw-subtab:hover {
+    color: var(--wpmind-primary);
+}
+
+.wpmind-gw-subtab.active {
+    color: var(--wpmind-primary);
+    border-bottom-color: var(--wpmind-primary);
+}
+
+.wpmind-gw-subtab .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* Tab panels */
+.wpmind-gw-panel {
+    display: none;
+}
+
+.wpmind-gw-panel.active {
+    display: block;
+}
+
+/* Settings form */
+.wpmind-gw-form-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.wpmind-gw-form-table th {
+    text-align: left;
+    padding: var(--wpmind-space-3) var(--wpmind-space-4);
+    font-weight: 500;
+    font-size: var(--wpmind-text-base);
+    color: var(--wpmind-gray-700);
+    width: 200px;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--wpmind-gray-100);
+}
+
+.wpmind-gw-form-table td {
+    padding: var(--wpmind-space-3) var(--wpmind-space-4);
+    border-bottom: 1px solid var(--wpmind-gray-100);
+}
+
+.wpmind-gw-form-table input[type="number"],
+.wpmind-gw-form-table input[type="text"],
+.wpmind-gw-form-table input[type="date"] {
+    width: 200px;
+}
+
+/* Buttons */
+.wpmind-gw-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: var(--wpmind-space-2) var(--wpmind-space-4);
+    font-size: var(--wpmind-text-base);
+    font-weight: 500;
+    color: #fff;
+    background: var(--wpmind-primary);
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.wpmind-gw-btn:hover {
+    background: var(--wpmind-primary-hover);
+    color: #fff;
+}
+
+.wpmind-gw-btn-secondary {
+    background: var(--wpmind-gray-500);
+}
+
+.wpmind-gw-btn-secondary:hover {
+    background: var(--wpmind-gray-600);
+}
+
+.wpmind-gw-btn-danger {
+    background: var(--wpmind-error);
+}
+
+.wpmind-gw-btn-danger:hover {
+    background: var(--wpmind-error-dark);
+}
+
+.wpmind-gw-btn-sm {
+    padding: var(--wpmind-space-1) var(--wpmind-space-3);
+    font-size: var(--wpmind-text-sm);
+}
+
+/* Create form panel */
+.wpmind-gw-create-panel {
+    background: var(--wpmind-gray-50);
+    border: 1px solid var(--wpmind-gray-200);
+    padding: var(--wpmind-space-4);
+    margin-bottom: var(--wpmind-space-4);
+}
+
+.wpmind-gw-create-panel h4 {
+    margin: 0 0 var(--wpmind-space-3);
+    font-size: var(--wpmind-text-md);
+    color: var(--wpmind-gray-800);
+}
+
+/* New key success box */
+.wpmind-gw-key-success {
+    background: var(--wpmind-success-light);
+    border: 1px solid var(--wpmind-success);
+    padding: var(--wpmind-space-4);
+    margin-bottom: var(--wpmind-space-4);
+}
+
+.wpmind-gw-key-success strong {
+    display: block;
+    margin-bottom: var(--wpmind-space-2);
+    color: var(--wpmind-gray-800);
+}
+
+.wpmind-gw-key-display {
+    display: flex;
+    gap: var(--wpmind-space-2);
+    align-items: center;
+}
+
+.wpmind-gw-key-display code {
+    flex: 1;
+    padding: var(--wpmind-space-2) var(--wpmind-space-3);
+    background: #fff;
+    border: 1px solid var(--wpmind-gray-300);
+    font-family: var(--wpmind-font-mono);
+    font-size: var(--wpmind-text-base);
+    word-break: break-all;
+}
+
+/* Keys table */
+.wpmind-gw-keys-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: var(--wpmind-space-3);
+}
+
+.wpmind-gw-keys-table th {
+    font-size: var(--wpmind-text-sm);
+    font-weight: 600;
+    color: var(--wpmind-gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.wpmind-gw-keys-table code {
+    font-family: var(--wpmind-font-mono);
+    font-size: var(--wpmind-text-sm);
+    color: var(--wpmind-gray-700);
+}
+
+/* Status badges */
+.wpmind-gw-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    font-size: var(--wpmind-text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.wpmind-gw-badge-active {
+    color: var(--wpmind-success);
+    background: var(--wpmind-success-light);
+}
+
+.wpmind-gw-badge-revoked {
+    color: var(--wpmind-error);
+    background: var(--wpmind-error-light);
+}
+
+/* Inline edit panel */
+.wpmind-gw-edit-row td {
+    padding: 0 !important;
+    border-bottom: 1px solid var(--wpmind-gray-200);
+}
+
+.wpmind-gw-edit-panel {
+    background: var(--wpmind-gray-50);
+    border-top: 1px solid var(--wpmind-gray-200);
+    padding: var(--wpmind-space-4);
+}
+
+.wpmind-gw-edit-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--wpmind-space-3);
+    margin-bottom: var(--wpmind-space-4);
+}
+
+@media (max-width: 1200px) {
+    .wpmind-gw-edit-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.wpmind-gw-edit-field label {
+    display: block;
+    font-size: var(--wpmind-text-sm);
+    font-weight: 500;
+    color: var(--wpmind-gray-600);
+    margin-bottom: var(--wpmind-space-1);
+}
+
+.wpmind-gw-edit-field input {
+    width: 100%;
+}
+
+.wpmind-gw-edit-actions {
+    display: flex;
+    gap: var(--wpmind-space-2);
+}
+
+/* Audit log table */
+.wpmind-gw-log-filters {
+    display: flex;
+    gap: var(--wpmind-space-3);
+    align-items: flex-end;
+    margin-bottom: var(--wpmind-space-4);
+    flex-wrap: wrap;
+}
+
+.wpmind-gw-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wpmind-space-1);
+}
+
+.wpmind-gw-filter-group label {
+    font-size: var(--wpmind-text-sm);
+    font-weight: 500;
+    color: var(--wpmind-gray-600);
+}
+
+.wpmind-gw-filter-group select,
+.wpmind-gw-filter-group input {
+    min-width: 140px;
+}
+
+/* Pagination */
+.wpmind-gw-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--wpmind-space-3) 0;
+    font-size: var(--wpmind-text-sm);
+    color: var(--wpmind-gray-500);
+}
+
+.wpmind-gw-pagination-btns {
+    display: flex;
+    gap: var(--wpmind-space-2);
+}
+
+/* API Docs panel */
+.wpmind-gw-docs-section {
+    margin-bottom: var(--wpmind-space-6);
+}
+
+.wpmind-gw-docs-section h4 {
+    font-size: var(--wpmind-text-md);
+    color: var(--wpmind-gray-800);
+    margin: 0 0 var(--wpmind-space-3);
+}
+
+.wpmind-gw-endpoint-list {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.wpmind-gw-endpoint-list th {
+    text-align: left;
+    font-size: var(--wpmind-text-sm);
+    font-weight: 600;
+    color: var(--wpmind-gray-600);
+}
+
+.wpmind-gw-endpoint-list td {
+    font-size: var(--wpmind-text-base);
+}
+
+.wpmind-gw-endpoint-list code {
+    font-family: var(--wpmind-font-mono);
+    font-size: var(--wpmind-text-sm);
+}
+
+.wpmind-gw-code-block {
+    position: relative;
+    background: var(--wpmind-gray-900);
+    color: var(--wpmind-gray-100);
+    padding: var(--wpmind-space-4);
+    overflow-x: auto;
+    font-family: var(--wpmind-font-mono);
+    font-size: var(--wpmind-text-sm);
+    line-height: var(--wpmind-leading-relaxed);
+}
+
+.wpmind-gw-code-block pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.wpmind-gw-copy-btn {
+    position: absolute;
+    top: var(--wpmind-space-2);
+    right: var(--wpmind-space-2);
+    padding: var(--wpmind-space-1) var(--wpmind-space-2);
+    font-size: var(--wpmind-text-xs);
+    color: var(--wpmind-gray-400);
+    background: var(--wpmind-gray-800);
+    border: 1px solid var(--wpmind-gray-700);
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.wpmind-gw-copy-btn:hover {
+    color: #fff;
+}
+
+/* Save message */
+.wpmind-gw-save-msg {
+    margin-left: var(--wpmind-space-3);
+    color: var(--wpmind-success);
+    font-size: var(--wpmind-text-base);
+}
