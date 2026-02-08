@@ -216,12 +216,15 @@ $ai_summary_data = $crawler_tracker->get_ai_summary();
                                     <li><?php esc_html_e( '关联 Wikidata 实体，消除语义歧义', 'wpmind' ); ?></li>
                                     <li><?php esc_html_e( '控制 AI 爬虫访问，保护敏感内容', 'wpmind' ); ?></li>
                                 </ul>
+                                <p><a href="https://wpcy.com/c/wpmind" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
                             </div>
                         </div>
                     </div><!-- /right -->
                 </div><!-- /grid -->
             </div><!-- /basics -->
             <div class="wpmind-geo-tab-panel" data-panel="content">
+                <div class="wpmind-geo-grid">
+                <div class="wpmind-geo-left">
                 <!-- Markdown Feed -->
                 <div class="wpmind-geo-section">
                     <h3 class="wpmind-geo-section-title">
@@ -339,10 +342,32 @@ $ai_summary_data = $crawler_tracker->get_ai_summary();
                     </div>
                     <?php endif; ?>
                 </div>
+                </div><!-- /left -->
+                <div class="wpmind-geo-right">
+                    <div class="wpmind-geo-section wpmind-geo-info">
+                        <h3 class="wpmind-geo-section-title">
+                            <span class="dashicons ri-lightbulb-line"></span>
+                            <?php esc_html_e( 'AI 内容分发', 'wpmind' ); ?>
+                        </h3>
+                        <div class="wpmind-geo-info-content">
+                            <p><?php esc_html_e( 'AI 搜索引擎通过 Markdown Feed、llms.txt 和 AI Sitemap 等专用通道获取内容。与传统 HTML 不同，这些格式去除了导航、广告等噪音，让 AI 能直接解析核心内容。', 'wpmind' ); ?></p>
+                            <ul>
+                                <li><?php esc_html_e( 'Markdown Feed 提供纯净的结构化内容', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( 'llms.txt 是 AI 时代的 robots.txt，引导 AI 发现内容', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( 'AI Sitemap 包含内容声明等 AI 专属元数据', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( 'AI 摘要让您主动控制 AI 如何描述文章', 'wpmind' ); ?></li>
+                            </ul>
+                            <p><a href="https://wpcy.com/c/wpmind" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
+                        </div>
+                    </div>
+                </div><!-- /right -->
+                </div><!-- /grid -->
             </div><!-- /content -->
 
             <!-- ========== 结构化数据 Tab ========== -->
             <div class="wpmind-geo-tab-panel" data-panel="schema">
+                <div class="wpmind-geo-grid">
+                <div class="wpmind-geo-left">
                 <!-- Schema.org -->
                 <div class="wpmind-geo-section">
                     <h3 class="wpmind-geo-section-title">
@@ -395,10 +420,32 @@ $ai_summary_data = $crawler_tracker->get_ai_summary();
                     </div>
                     <?php endif; ?>
                 </div>
+                </div><!-- /left -->
+                <div class="wpmind-geo-right">
+                    <div class="wpmind-geo-section wpmind-geo-info">
+                        <h3 class="wpmind-geo-section-title">
+                            <span class="dashicons ri-lightbulb-line"></span>
+                            <?php esc_html_e( '语义理解与实体消歧', 'wpmind' ); ?>
+                        </h3>
+                        <div class="wpmind-geo-info-content">
+                            <p><?php esc_html_e( 'Schema.org 结构化数据是 AI 理解内容语义的关键。通过 JSON-LD 标记，AI 不仅知道页面有什么文字，还能理解文章类型、作者、主题等语义关系。', 'wpmind' ); ?></p>
+                            <ul>
+                                <li><?php esc_html_e( 'Article Schema 标记作者、日期、分类等元数据', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( '实体关联通过 Wikidata sameAs 消除语义歧义', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( '结构化数据是从"被爬取"到"被理解"的桥梁', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( 'Google 知识图谱大量基于 Wikidata 数据', 'wpmind' ); ?></li>
+                            </ul>
+                            <p><a href="https://wpcy.com/c/wpmind" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
+                        </div>
+                    </div>
+                </div><!-- /right -->
+                </div><!-- /grid -->
             </div><!-- /schema -->
 
             <!-- ========== AI 控制 Tab ========== -->
             <div class="wpmind-geo-tab-panel" data-panel="control">
+                <div class="wpmind-geo-grid">
+                <div class="wpmind-geo-left">
                 <!-- AI 索引指令 -->
                 <div class="wpmind-geo-section">
                     <h3 class="wpmind-geo-section-title">
@@ -444,10 +491,32 @@ $ai_summary_data = $crawler_tracker->get_ai_summary();
                     </div>
                     <?php endif; ?>
                 </div>
+                </div><!-- /left -->
+                <div class="wpmind-geo-right">
+                    <div class="wpmind-geo-section wpmind-geo-info">
+                        <h3 class="wpmind-geo-section-title">
+                            <span class="dashicons ri-lightbulb-line"></span>
+                            <?php esc_html_e( 'AI 索引权限控制', 'wpmind' ); ?>
+                        </h3>
+                        <div class="wpmind-geo-info-content">
+                            <p><?php esc_html_e( '随着 AI 爬虫大量抓取网站内容用于训练和索引，内容创作者需要明确声明权限意愿。noai 和 nollm 是新兴的 meta robots 指令标准。', 'wpmind' ); ?></p>
+                            <ul>
+                                <li><?php esc_html_e( 'noai — 禁止 AI 搜索引擎索引内容', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( 'nollm — 禁止将内容用于 LLM 训练', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( '内容声明标注 AI 参与程度（原创/辅助/生成）', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( 'X-Robots-Tag HTTP 头对非 HTML 资源生效', 'wpmind' ); ?></li>
+                            </ul>
+                            <p><a href="https://wpcy.com/c/wpmind" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
+                        </div>
+                    </div>
+                </div><!-- /right -->
+                </div><!-- /grid -->
             </div><!-- /control -->
 
             <!-- ========== 爬虫管理 Tab ========== -->
             <div class="wpmind-geo-tab-panel" data-panel="crawlers">
+                <div class="wpmind-geo-grid">
+                <div class="wpmind-geo-left">
                 <!-- robots.txt AI 管理 -->
                 <div class="wpmind-geo-section">
                     <h3 class="wpmind-geo-section-title">
@@ -503,6 +572,26 @@ $ai_summary_data = $crawler_tracker->get_ai_summary();
                     </div>
                     <?php endif; ?>
                 </div>
+                </div><!-- /left -->
+                <div class="wpmind-geo-right">
+                    <div class="wpmind-geo-section wpmind-geo-info">
+                        <h3 class="wpmind-geo-section-title">
+                            <span class="dashicons ri-lightbulb-line"></span>
+                            <?php esc_html_e( 'AI 爬虫生态', 'wpmind' ); ?>
+                        </h3>
+                        <div class="wpmind-geo-info-content">
+                            <p><?php esc_html_e( '目前活跃的 AI 爬虫超过 20 种，来自 OpenAI、Anthropic、Google、百度等公司。通过 robots.txt 可以精细控制每个爬虫的访问权限。', 'wpmind' ); ?></p>
+                            <ul>
+                                <li><?php esc_html_e( 'GPTBot、ClaudeBot 是最活跃的 AI 爬虫', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( '中国 AI 爬虫：百度蜘蛛、搜狗、360、神马', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( '规则通过 WordPress 过滤器注入，不修改物理文件', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( 'Allow 允许爬取，Disallow 禁止爬取', 'wpmind' ); ?></li>
+                            </ul>
+                            <p><a href="https://wpcy.com/c/wpmind" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
+                        </div>
+                    </div>
+                </div><!-- /right -->
+                </div><!-- /grid -->
             </div><!-- /crawlers -->
 
             <!-- 保存按钮 -->
