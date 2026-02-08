@@ -48,6 +48,8 @@ defined("ABSPATH") || exit(); ?>
       $cost_control_module && $cost_control_module["enabled"];
   $analytics_module = $module_loader->get_module("analytics");
   $analytics_enabled = $analytics_module && $analytics_module["enabled"];
+  $api_gateway_module = $module_loader->get_module("api-gateway");
+  $api_gateway_enabled = $api_gateway_module && $api_gateway_module["enabled"];
   ?>
 		<!-- Tab 卡片 -->
 		<div class="wpmind-tabs-card">
@@ -78,6 +80,11 @@ defined("ABSPATH") || exit(); ?>
 				<?php if ($geo_enabled): ?>
 				<a href="#geo" class="wpmind-tab" data-tab="geo">
 					<?php esc_html_e("GEO 优化", "wpmind"); ?>
+				</a>
+				<?php endif; ?>
+				<?php if ($api_gateway_enabled): ?>
+				<a href="#api-gateway" class="wpmind-tab" data-tab="api-gateway">
+					<?php esc_html_e("API Gateway", "wpmind"); ?>
 				</a>
 				<?php endif; ?>
 				<a href="#modules" class="wpmind-tab" data-tab="modules">
@@ -114,6 +121,16 @@ defined("ABSPATH") || exit(); ?>
     $geo_settings = WPMIND_PATH . "modules/geo/templates/settings.php";
     if (file_exists($geo_settings)) {
         include $geo_settings;
+    }
+    ?>
+			</div>
+			<?php endif; ?>
+			<?php if ($api_gateway_enabled): ?>
+			<div id="api-gateway" class="wpmind-tab-pane">
+				<?php
+    $api_gateway_settings = WPMIND_PATH . "modules/api-gateway/templates/settings.php";
+    if (file_exists($api_gateway_settings)) {
+        include $api_gateway_settings;
     }
     ?>
 			</div>
