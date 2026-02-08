@@ -33,19 +33,25 @@ final class RedisRateStore implements RateStoreInterface {
 	 * ARGV[5] = TTL in seconds
 	 * ARGV[6] = cost
 	 *
-	 * Returns: { allowed (0|1), current_count, reset_epoch }
+	 * Members are stored as "{rid}:{cost}" so we can sum actual costs.
+	 * Returns: { allowed (0|1), remaining, reset_epoch }
 	 */
 	private const LUA_CONSUME = <<<'LUA'
 redis.call('ZREMRANGEBYSCORE', KEYS[1], '-inf', ARGV[1])
-local count = redis.call('ZCARD', KEYS[1])
+local members = redis.call('ZRANGE', KEYS[1], 0, -1)
+local used = 0
+for _, m in ipairs(members) do
+    local c = tonumber(string.match(m, ':(%d+)$')) or 1
+    used = used + c
+end
 local limit = tonumber(ARGV[4])
 local cost  = tonumber(ARGV[6])
-if count + cost <= limit then
+if used + cost <= limit then
     redis.call('ZADD', KEYS[1], ARGV[2], ARGV[3])
     redis.call('EXPIRE', KEYS[1], tonumber(ARGV[5]))
-    return {1, limit - count - cost, tonumber(ARGV[2]) + tonumber(ARGV[5])}
+    return {1, limit - used - cost, tonumber(ARGV[2]) + tonumber(ARGV[5])}
 end
-return {0, limit - count, tonumber(ARGV[2]) + tonumber(ARGV[5])}
+return {0, limit - used, tonumber(ARGV[2]) + tonumber(ARGV[5])}
 LUA;
 
 	public function __construct() {

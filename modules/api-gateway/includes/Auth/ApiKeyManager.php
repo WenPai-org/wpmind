@@ -247,13 +247,16 @@ class ApiKeyManager {
 	 * @return string 12-character uppercase alphanumeric string.
 	 */
 	private static function generate_key_id(): string {
-		return substr(
-			strtoupper(
-				str_replace( [ '=', '+', '/' ], '', base64_encode( random_bytes( 12 ) ) )
-			),
-			0,
-			12
-		);
+		$alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+		$len      = strlen( $alphabet );
+		$id       = '';
+
+		$bytes = random_bytes( 12 );
+		for ( $i = 0; $i < 12; $i++ ) {
+			$id .= $alphabet[ ord( $bytes[ $i ] ) % $len ];
+		}
+
+		return $id;
 	}
 
 	/**

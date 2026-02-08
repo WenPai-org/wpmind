@@ -43,6 +43,7 @@ final class RouteMiddleware implements GatewayStageInterface {
 			'embeddings'       => $this->handle_embeddings( $context, $payload ),
 			'responses'        => $this->handle_chat( $context, $payload ),
 			'models'           => $this->handle_models( $context ),
+			'model_detail'     => $this->handle_model_detail( $context ),
 			'status'           => $this->handle_status( $context ),
 			default            => $context->set_error(
 				new \WP_Error(
@@ -135,6 +136,42 @@ final class RouteMiddleware implements GatewayStageInterface {
 		$data        = $transformer->transform_models( $models );
 
 		$context->set_internal_result( $data );
+	}
+
+	/**
+	 * Handle a single model detail request.
+	 *
+	 * @param GatewayRequestContext $context Pipeline context.
+	 */
+	private function handle_model_detail( GatewayRequestContext $context ): void {
+		$model_id = $context->wp_request()->get_param( 'model_id' );
+
+		if ( $model_id === null || $model_id === '' ) {
+			$context->set_error( new \WP_Error(
+				'model_not_found',
+				'Model ID is required.',
+				[ 'status' => 400 ]
+			) );
+			return;
+		}
+
+		$resolved = ModelMapper::resolve( (string) $model_id );
+
+		if ( $resolved === null ) {
+			$context->set_error( new \WP_Error(
+				'model_not_found',
+				sprintf( 'Model "%s" is not available.', $model_id ),
+				[ 'status' => 404 ]
+			) );
+			return;
+		}
+
+		$context->set_internal_result( [
+			'id'       => (string) $model_id,
+			'object'   => 'model',
+			'created'  => 0,
+			'owned_by' => 'wpmind',
+		] );
 	}
 
 	/**

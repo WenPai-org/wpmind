@@ -32,6 +32,7 @@ final class AuthMiddleware implements GatewayStageInterface {
 		'embeddings',
 		'responses',
 		'models',
+		'model_detail',
 	];
 
 	/**
@@ -123,33 +124,44 @@ final class AuthMiddleware implements GatewayStageInterface {
 	/**
 	 * Determine the client IP address from request headers.
 	 *
-	 * Checks proxy headers in order of trust, falling back to REMOTE_ADDR.
+	 * Only trusts proxy headers (X-Forwarded-For, X-Real-IP) when
+	 * REMOTE_ADDR matches a configured trusted proxy. Otherwise
+	 * falls back to REMOTE_ADDR to prevent IP spoofing.
 	 *
 	 * @return string Client IP address.
 	 */
 	private function get_client_ip(): string {
-		$headers = [
-			'HTTP_X_FORWARDED_FOR',
-			'HTTP_X_REAL_IP',
-			'REMOTE_ADDR',
-		];
+		$remote_addr = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) );
 
-		foreach ( $headers as $header ) {
-			$value = sanitize_text_field( wp_unslash( $_SERVER[ $header ] ?? '' ) );
+		if ( $remote_addr === '' ) {
+			return '127.0.0.1';
+		}
 
-			if ( $value === '' ) {
-				continue;
+		$trusted_proxies = (array) apply_filters( 'wpmind_gateway_trusted_proxies', [ '127.0.0.1', '::1' ] );
+
+		if ( in_array( $remote_addr, $trusted_proxies, true ) ) {
+			$proxy_headers = [ 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP' ];
+
+			foreach ( $proxy_headers as $header ) {
+				$value = sanitize_text_field( wp_unslash( $_SERVER[ $header ] ?? '' ) );
+
+				if ( $value === '' ) {
+					continue;
+				}
+
+				if ( $header === 'HTTP_X_FORWARDED_FOR' ) {
+					$parts = explode( ',', $value );
+					$value = trim( $parts[0] );
+				}
+
+				if ( filter_var( $value, FILTER_VALIDATE_IP ) !== false ) {
+					return $value;
+				}
 			}
+		}
 
-			// X-Forwarded-For may contain multiple IPs; take the first.
-			if ( $header === 'HTTP_X_FORWARDED_FOR' ) {
-				$parts = explode( ',', $value );
-				$value = trim( $parts[0] );
-			}
-
-			if ( filter_var( $value, FILTER_VALIDATE_IP ) !== false ) {
-				return $value;
-			}
+		if ( filter_var( $remote_addr, FILTER_VALIDATE_IP ) !== false ) {
+			return $remote_addr;
 		}
 
 		return '127.0.0.1';
