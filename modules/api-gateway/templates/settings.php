@@ -27,20 +27,24 @@ $month_requests = ApiKeyRepository::get_month_total_requests();
 $base_url = rest_url( 'mind/v1' );
 ?>
 
+<!-- Header -->
+<div class="wpmind-geo-header">
+	<h2 class="wpmind-geo-title">
+		<span class="dashicons ri-server-line"></span>
+		<?php esc_html_e( 'API Gateway', 'wpmind' ); ?>
+	</h2>
+	<span class="wpmind-geo-badge"><?php echo $gateway_enabled ? 'ON' : 'OFF'; ?></span>
+</div>
+
+<p class="wpmind-geo-desc">
+	<?php esc_html_e( 'OpenAI 兼容的 API 网关，提供 Bearer 鉴权、速率限制、预算控制和 SSE 流式输出。', 'wpmind' ); ?>
+</p>
+
 <!-- Stat Cards -->
 <div class="wpmind-gw-stats">
 	<div class="wpmind-stat-card">
 		<div class="wpmind-stat-icon">
-			<span class="dashicons dashicons-admin-site-alt3"></span>
-		</div>
-		<div class="wpmind-stat-content">
-			<div class="wpmind-stat-value"><?php echo $gateway_enabled ? 'ON' : 'OFF'; ?></div>
-			<div class="wpmind-stat-label"><?php esc_html_e( '网关状态', 'wpmind' ); ?></div>
-		</div>
-	</div>
-	<div class="wpmind-stat-card">
-		<div class="wpmind-stat-icon">
-			<span class="dashicons dashicons-admin-network"></span>
+			<span class="dashicons ri-key-2-line"></span>
 		</div>
 		<div class="wpmind-stat-content">
 			<div class="wpmind-stat-value"><?php echo esc_html( (string) $total_keys ); ?></div>
@@ -49,7 +53,7 @@ $base_url = rest_url( 'mind/v1' );
 	</div>
 	<div class="wpmind-stat-card">
 		<div class="wpmind-stat-icon">
-			<span class="dashicons dashicons-yes-alt"></span>
+			<span class="dashicons ri-checkbox-circle-line"></span>
 		</div>
 		<div class="wpmind-stat-content">
 			<div class="wpmind-stat-value"><?php echo esc_html( (string) $active_keys ); ?></div>
@@ -58,11 +62,20 @@ $base_url = rest_url( 'mind/v1' );
 	</div>
 	<div class="wpmind-stat-card">
 		<div class="wpmind-stat-icon">
-			<span class="dashicons dashicons-chart-line"></span>
+			<span class="dashicons ri-bar-chart-line"></span>
 		</div>
 		<div class="wpmind-stat-content">
 			<div class="wpmind-stat-value"><?php echo esc_html( number_format( $month_requests ) ); ?></div>
 			<div class="wpmind-stat-label"><?php esc_html_e( '本月请求', 'wpmind' ); ?></div>
+		</div>
+	</div>
+	<div class="wpmind-stat-card">
+		<div class="wpmind-stat-icon">
+			<span class="dashicons ri-speed-line"></span>
+		</div>
+		<div class="wpmind-stat-content">
+			<div class="wpmind-stat-value"><?php echo esc_html( (string) $default_rpm ); ?></div>
+			<div class="wpmind-stat-label"><?php esc_html_e( '默认 RPM', 'wpmind' ); ?></div>
 		</div>
 	</div>
 </div>
@@ -70,19 +83,19 @@ $base_url = rest_url( 'mind/v1' );
 <!-- Sub-tab Navigation -->
 <div class="wpmind-gw-subtabs">
 	<button type="button" class="wpmind-gw-subtab active" data-tab="settings">
-		<span class="dashicons dashicons-admin-generic"></span>
+		<span class="dashicons ri-settings-3-line"></span>
 		<?php esc_html_e( '基础设置', 'wpmind' ); ?>
 	</button>
 	<button type="button" class="wpmind-gw-subtab" data-tab="keys">
-		<span class="dashicons dashicons-admin-network"></span>
+		<span class="dashicons ri-key-2-line"></span>
 		<?php esc_html_e( 'API Key 管理', 'wpmind' ); ?>
 	</button>
 	<button type="button" class="wpmind-gw-subtab" data-tab="docs">
-		<span class="dashicons dashicons-media-document"></span>
+		<span class="dashicons ri-book-open-line"></span>
 		<?php esc_html_e( '接入文档', 'wpmind' ); ?>
 	</button>
 	<button type="button" class="wpmind-gw-subtab" data-tab="logs">
-		<span class="dashicons dashicons-list-view"></span>
+		<span class="dashicons ri-file-list-3-line"></span>
 		<?php esc_html_e( '请求日志', 'wpmind' ); ?>
 	</button>
 </div>
@@ -129,7 +142,7 @@ $base_url = rest_url( 'mind/v1' );
 <div class="wpmind-gw-panel" data-panel="keys">
 	<div style="margin-bottom:var(--wpmind-space-4)">
 		<button type="button" class="wpmind-gw-btn" id="gw-show-create">
-			<span class="dashicons dashicons-plus-alt2" style="font-size:16px;width:16px;height:16px"></span>
+			<span class="dashicons ri-add-line" style="font-size:16px;width:16px;height:16px"></span>
 			<?php esc_html_e( '创建 API Key', 'wpmind' ); ?>
 		</button>
 	</div>

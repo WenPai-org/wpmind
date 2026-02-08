@@ -81,6 +81,17 @@ function wpmind_image_has_api_key( $key, $endpoints ) {
 }
 ?>
 
+<div class="wpmind-geo-header">
+	<h2 class="wpmind-geo-title">
+		<span class="dashicons ri-image-line"></span>
+		<?php esc_html_e( '图片生成', 'wpmind' ); ?>
+	</h2>
+</div>
+
+<p class="wpmind-geo-desc">
+	<?php esc_html_e( '配置 AI 图像生成服务，支持 DALL-E、Imagen、混元、通义万相等多个平台。', 'wpmind' ); ?>
+</p>
+
 <form method="post" action="options.php" id="wpmind-image-settings-form">
 	<?php settings_fields( 'wpmind_image_settings' ); ?>
 

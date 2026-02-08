@@ -21,6 +21,17 @@ $exact_cache_default_ttl = (int) get_option( 'wpmind_exact_cache_default_ttl', 9
 $exact_cache_max_entries = (int) get_option( 'wpmind_exact_cache_max_entries', 500 );
 ?>
 
+<div class="wpmind-geo-header">
+	<h2 class="wpmind-geo-title">
+		<span class="dashicons ri-cloud-line"></span>
+		<?php esc_html_e( '服务配置', 'wpmind' ); ?>
+	</h2>
+</div>
+
+<p class="wpmind-geo-desc">
+	<?php esc_html_e( '配置 AI 服务端点和 API 密钥，支持 OpenAI、Anthropic、Google 及国内主流 AI 服务。', 'wpmind' ); ?>
+</p>
+
 <form method="post" action="options.php" id="wpmind-settings-form">
 	<?php settings_fields( 'wpmind_settings' ); ?>
 
