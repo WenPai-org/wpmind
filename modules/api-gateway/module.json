@@ -1,0 +1,22 @@
+{
+    "id": "api-gateway",
+    "name": "API Gateway",
+    "description": "OpenAI 兼容的 AI API 网关 — 将 WordPress 变为自托管 AI 代理",
+    "version": "1.0.0",
+    "author": "WPMind",
+    "icon": "ri-server-line",
+    "class": "WPMind\\Modules\\ApiGateway\\ApiGatewayModule",
+    "can_disable": true,
+    "settings_tab": "api-gateway",
+    "features": [
+        "OpenAI 兼容 API",
+        "API Key 管理",
+        "速率限制",
+        "SSE 流式输出",
+        "审计日志"
+    ],
+    "requires": {
+        "php": "8.1",
+        "wordpress": "6.4"
+    }
+}
