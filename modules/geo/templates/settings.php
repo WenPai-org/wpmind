@@ -50,6 +50,9 @@ $official_installed = class_exists( 'AI_Experiments\\Experiments\\Markdown_Feeds
 $crawler_tracker = new \WPMind\Modules\Geo\CrawlerTracker();
 $crawler_stats   = $crawler_tracker->get_stats();
 $ai_summary_data = $crawler_tracker->get_ai_summary();
+
+// 知识库链接
+$learn_more_url = 'https://wpcy.com/c/wpmind';
 ?>
 
 <div class="wpmind-geo-panel">
@@ -216,7 +219,7 @@ $ai_summary_data = $crawler_tracker->get_ai_summary();
                                     <li><?php esc_html_e( '关联 Wikidata 实体，消除语义歧义', 'wpmind' ); ?></li>
                                     <li><?php esc_html_e( '控制 AI 爬虫访问，保护敏感内容', 'wpmind' ); ?></li>
                                 </ul>
-                                <p><a href="https://wpcy.com/c/wpmind" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
+                                <p><a href="<?php echo esc_url( $learn_more_url ); ?>" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
                             </div>
                         </div>
                     </div><!-- /right -->
@@ -357,7 +360,7 @@ $ai_summary_data = $crawler_tracker->get_ai_summary();
                                 <li><?php esc_html_e( 'AI Sitemap 包含内容声明等 AI 专属元数据', 'wpmind' ); ?></li>
                                 <li><?php esc_html_e( 'AI 摘要让您主动控制 AI 如何描述文章', 'wpmind' ); ?></li>
                             </ul>
-                            <p><a href="https://wpcy.com/c/wpmind" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
+                            <p><a href="<?php echo esc_url( $learn_more_url ); ?>" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
                         </div>
                     </div>
                 </div><!-- /right -->
@@ -435,7 +438,7 @@ $ai_summary_data = $crawler_tracker->get_ai_summary();
                                 <li><?php esc_html_e( '结构化数据是从"被爬取"到"被理解"的桥梁', 'wpmind' ); ?></li>
                                 <li><?php esc_html_e( 'Google 知识图谱大量基于 Wikidata 数据', 'wpmind' ); ?></li>
                             </ul>
-                            <p><a href="https://wpcy.com/c/wpmind" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
+                            <p><a href="<?php echo esc_url( $learn_more_url ); ?>" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
                         </div>
                     </div>
                 </div><!-- /right -->
@@ -506,7 +509,7 @@ $ai_summary_data = $crawler_tracker->get_ai_summary();
                                 <li><?php esc_html_e( '内容声明标注 AI 参与程度（原创/辅助/生成）', 'wpmind' ); ?></li>
                                 <li><?php esc_html_e( 'X-Robots-Tag HTTP 头对非 HTML 资源生效', 'wpmind' ); ?></li>
                             </ul>
-                            <p><a href="https://wpcy.com/c/wpmind" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
+                            <p><a href="<?php echo esc_url( $learn_more_url ); ?>" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
                         </div>
                     </div>
                 </div><!-- /right -->
@@ -587,7 +590,7 @@ $ai_summary_data = $crawler_tracker->get_ai_summary();
                                 <li><?php esc_html_e( '规则通过 WordPress 过滤器注入，不修改物理文件', 'wpmind' ); ?></li>
                                 <li><?php esc_html_e( 'Allow 允许爬取，Disallow 禁止爬取', 'wpmind' ); ?></li>
                             </ul>
-                            <p><a href="https://wpcy.com/c/wpmind" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
+                            <p><a href="<?php echo esc_url( $learn_more_url ); ?>" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
                         </div>
                     </div>
                 </div><!-- /right -->

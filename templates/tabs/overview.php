@@ -67,6 +67,24 @@ foreach ($providers as $p) {
 }
 $avg_success_rate =
     $rate_count > 0 ? (int) round($total_success_rate / $rate_count) : 100;
+
+$cache_stats = function_exists("wpmind_get_cache_stats")
+    ? wpmind_get_cache_stats()
+    : [
+        "enabled" => false,
+        "hits" => 0,
+        "misses" => 0,
+        "writes" => 0,
+        "hit_rate" => 0,
+        "entries" => 0,
+        "max_entries" => 0,
+    ];
+
+$cache_hit_rate = isset($cache_stats["hit_rate"]) ? (float) $cache_stats["hit_rate"] : 0.0;
+$cache_enabled = !empty($cache_stats["enabled"]);
+$cache_hits = (int) ($cache_stats["hits"] ?? 0);
+$cache_entries = (int) ($cache_stats["entries"] ?? 0);
+$cache_max_entries = (int) ($cache_stats["max_entries"] ?? 0);
 ?>
 
 <div class="wpmind-overview">
@@ -91,6 +109,9 @@ $avg_success_rate =
 			&middot; <?php echo esc_html($active_count); ?>/<?php echo esc_html(
     count($modules),
 ); ?> <?php esc_html_e("模块启用", "wpmind"); ?>
+			&middot; <?php echo $cache_enabled
+     ? esc_html(number_format_i18n($cache_hit_rate, 1) . "%")
+     : "—"; ?> <?php esc_html_e("缓存命中率", "wpmind"); ?>
 		</p>
 		<div class="wpmind-overview-hero-actions">
 			<a href="#services" class="wpmind-overview-hero-btn wpmind-overview-hero-btn--primary wpmind-tab-link" data-tab-link="services"><?php esc_html_e(
@@ -338,6 +359,50 @@ $avg_success_rate =
        ); ?></span>
 							<span class="wpmind-overview-summary-label"><?php esc_html_e(
            "本月总 Tokens",
+           "wpmind",
+       ); ?></span>
+						</div>
+					</div>
+					<div class="wpmind-overview-summary-cell">
+						<span class="wpmind-overview-summary-icon">
+							<span class="dashicons ri-database-2-line"></span>
+						</span>
+						<div class="wpmind-overview-summary-text">
+							<span class="wpmind-overview-summary-value"><?php echo $cache_enabled
+           ? esc_html(number_format_i18n($cache_hit_rate, 1) . "%")
+           : "—"; ?></span>
+							<span class="wpmind-overview-summary-label"><?php esc_html_e(
+           "缓存命中率",
+           "wpmind",
+       ); ?></span>
+						</div>
+					</div>
+					<div class="wpmind-overview-summary-cell">
+						<span class="wpmind-overview-summary-icon">
+							<span class="dashicons ri-stack-line"></span>
+						</span>
+						<div class="wpmind-overview-summary-text">
+							<span class="wpmind-overview-summary-value"><?php echo esc_html(
+           number_format_i18n($cache_entries),
+       ); ?><span class="wpmind-overview-stat-sub">/<?php echo esc_html(
+    number_format_i18n($cache_max_entries),
+); ?></span></span>
+							<span class="wpmind-overview-summary-label"><?php esc_html_e(
+           "缓存占用",
+           "wpmind",
+       ); ?></span>
+						</div>
+					</div>
+					<div class="wpmind-overview-summary-cell">
+						<span class="wpmind-overview-summary-icon">
+							<span class="dashicons ri-flashlight-line"></span>
+						</span>
+						<div class="wpmind-overview-summary-text">
+							<span class="wpmind-overview-summary-value"><?php echo esc_html(
+           number_format_i18n($cache_hits),
+       ); ?></span>
+							<span class="wpmind-overview-summary-label"><?php esc_html_e(
+           "缓存命中次数",
            "wpmind",
        ); ?></span>
 						</div>

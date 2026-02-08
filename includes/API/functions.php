@@ -62,6 +62,31 @@ if (!function_exists('wpmind_get_status')) {
     }
 }
 
+
+/**
+ * 获取精确缓存统计
+ *
+ * @since 4.0.0
+ * @return array
+ */
+if (!function_exists('wpmind_get_cache_stats')) {
+    function wpmind_get_cache_stats(): array {
+        if (!class_exists('WPMind\API\PublicAPI')) {
+            return [
+                'enabled'     => false,
+                'hits'        => 0,
+                'misses'      => 0,
+                'writes'      => 0,
+                'hit_rate'    => 0,
+                'entries'     => 0,
+                'max_entries' => 0,
+            ];
+        }
+
+        return \WPMind\API\PublicAPI::instance()->get_exact_cache_stats();
+    }
+}
+
 /**
  * AI 对话
  *

@@ -42,7 +42,7 @@ $ai_summary      = $crawler_tracker->get_ai_summary();
             <span class="dashicons ri-robot-2-line"></span>
             <?php esc_html_e( 'GEO 优化', 'wpmind' ); ?>
         </h2>
-        <span class="wpmind-geo-badge">v3.1</span>
+        <span class="wpmind-geo-badge"><?php esc_html_e( '限时免费', 'wpmind' ); ?></span>
     </div>
 
     <p class="wpmind-geo-desc">

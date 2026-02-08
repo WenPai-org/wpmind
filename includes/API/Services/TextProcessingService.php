@@ -56,12 +56,10 @@ class TextProcessingService extends AbstractService {
 		$default_provider = get_option('wpmind_default_provider', 'openai');
 		$default_model = $this->get_current_model($default_provider);
 
-		if ($options['cache_ttl'] > 0) {
-			$cache_key = $this->generate_cache_key('translate', $args, $default_provider, $default_model);
-			$cached = get_transient($cache_key);
-			if ($cached !== false) {
-				return $cached;
-			}
+		$cache_key = $this->generate_cache_key('translate', $args, $default_provider, $default_model);
+		$cache_lookup = $this->get_cached_value($cache_key, (int) $options['cache_ttl']);
+		if ($cache_lookup['hit']) {
+			return $cache_lookup['value'];
 		}
 
 		$prompt = $this->build_translate_prompt($text, $from, $to, $options);
@@ -90,9 +88,12 @@ class TextProcessingService extends AbstractService {
 
 		do_action('wpmind_after_request', 'translate', $translated, $args, $result['usage'] ?? []);
 
-		if ($options['cache_ttl'] > 0) {
-			set_transient($cache_key, $translated, $options['cache_ttl']);
-		}
+		$this->set_cached_value($cache_key, $translated, (int) $options['cache_ttl'], [
+			'type'     => 'translate',
+			'context'  => $context,
+			'provider' => $default_provider,
+			'model'    => $default_model,
+		]);
 
 		return $translated;
 	}
@@ -120,12 +121,10 @@ class TextProcessingService extends AbstractService {
 		$default_provider = get_option('wpmind_default_provider', 'openai');
 		$default_model = $this->get_current_model($default_provider);
 
-		if ($options['cache_ttl'] > 0) {
-			$cache_key = $this->generate_cache_key('summarize', compact('text', 'options'), $default_provider, $default_model);
-			$cached = get_transient($cache_key);
-			if ($cached !== false) {
-				return $cached;
-			}
+		$cache_key = $this->generate_cache_key('summarize', compact('text', 'options'), $default_provider, $default_model);
+		$cache_lookup = $this->get_cached_value($cache_key, (int) $options['cache_ttl']);
+		if ($cache_lookup['hit']) {
+			return $cache_lookup['value'];
 		}
 
 		$style_prompts = [
@@ -163,9 +162,12 @@ class TextProcessingService extends AbstractService {
 
 		do_action('wpmind_after_request', 'summarize', $summary, compact('text', 'options'), $result['usage']);
 
-		if ($options['cache_ttl'] > 0) {
-			set_transient($cache_key, $summary, $options['cache_ttl']);
-		}
+		$this->set_cached_value($cache_key, $summary, (int) $options['cache_ttl'], [
+			'type'     => 'summarize',
+			'context'  => $context,
+			'provider' => $default_provider,
+			'model'    => $default_model,
+		]);
 
 		return $summary;
 	}
@@ -192,12 +194,10 @@ class TextProcessingService extends AbstractService {
 		$default_provider = get_option('wpmind_default_provider', 'openai');
 		$default_model = $this->get_current_model($default_provider);
 
-		if ($options['cache_ttl'] > 0) {
-			$cache_key = $this->generate_cache_key('moderate', compact('content', 'options'), $default_provider, $default_model);
-			$cached = get_transient($cache_key);
-			if ($cached !== false) {
-				return $cached;
-			}
+		$cache_key = $this->generate_cache_key('moderate', compact('content', 'options'), $default_provider, $default_model);
+		$cache_lookup = $this->get_cached_value($cache_key, (int) $options['cache_ttl']);
+		if ($cache_lookup['hit']) {
+			return $cache_lookup['value'];
 		}
 
 		$categories = implode('、', $options['categories']);
@@ -251,9 +251,12 @@ class TextProcessingService extends AbstractService {
 
 		do_action('wpmind_after_request', 'moderate', $moderation, compact('content', 'options'), $result['usage']);
 
-		if ($options['cache_ttl'] > 0) {
-			set_transient($cache_key, $moderation, $options['cache_ttl']);
-		}
+		$this->set_cached_value($cache_key, $moderation, (int) $options['cache_ttl'], [
+			'type'     => 'moderate',
+			'context'  => $context,
+			'provider' => $default_provider,
+			'model'    => $default_model,
+		]);
 
 		return $moderation;
 	}
