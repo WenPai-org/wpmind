@@ -25,21 +25,27 @@ class CrawlerTracker {
 	 * @var array
 	 */
 	private const AI_CRAWLERS = array(
-		'GPTBot'           => 'OpenAI',
-		'ChatGPT-User'     => 'OpenAI',
-		'Google-Extended'  => 'Google AI',
-		'Googlebot'        => 'Google',
-		'Bingbot'          => 'Microsoft',
-		'ClaudeBot'        => 'Anthropic',
-		'Claude-Web'       => 'Anthropic',
-		'PerplexityBot'    => 'Perplexity',
-		'Bytespider'       => 'ByteDance',
-		'CCBot'            => 'Common Crawl',
-		'anthropic-ai'     => 'Anthropic',
-		'cohere-ai'        => 'Cohere',
-		'Applebot'         => 'Apple',
-		'FacebookBot'      => 'Meta',
+		'GPTBot'             => 'OpenAI',
+		'ChatGPT-User'       => 'OpenAI',
+		'Google-Extended'    => 'Google AI',
+		'Googlebot'          => 'Google',
+		'Bingbot'            => 'Microsoft',
+		'ClaudeBot'          => 'Anthropic',
+		'Claude-Web'         => 'Anthropic',
+		'PerplexityBot'      => 'Perplexity',
+		'Bytespider'         => 'ByteDance',
+		'CCBot'              => 'Common Crawl',
+		'anthropic-ai'       => 'Anthropic',
+		'cohere-ai'          => 'Cohere',
+		'Applebot'           => 'Apple',
+		'FacebookBot'        => 'Meta',
 		'Meta-ExternalAgent' => 'Meta',
+		'Amazonbot'          => 'Amazon',
+		'Baiduspider'        => '百度',
+		'Sogou web spider'   => '搜狗',
+		'360Spider'          => '360',
+		'YisouSpider'        => '神马搜索',
+		'DuckAssistBot'      => 'DuckDuckGo',
 	);
 
 	/**
@@ -121,6 +127,8 @@ class CrawlerTracker {
 			'PerplexityBot',
 			'anthropic-ai',
 			'cohere-ai',
+			'Bytespider',
+			'DuckAssistBot',
 		);
 
 		return in_array( $pattern, $ai_specific, true );
