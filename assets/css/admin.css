@@ -2238,6 +2238,10 @@ input.is-invalid {
 }
 
 /* === Exact Cache Module === */
+.wpmind-cache-panel .wpmind-geo-badge {
+    margin-right: auto;
+}
+
 .wpmind-cache-trend-chart {
     margin-bottom: var(--wpmind-space-6);
 }
@@ -2268,16 +2272,3 @@ input.is-invalid {
     padding: var(--wpmind-space-3);
 }
 
-.wpmind-cache-actions {
-    display: flex;
-    gap: var(--wpmind-space-3);
-    margin-top: var(--wpmind-space-3);
-}
-
-.wpmind-cache-actions .button .dashicons {
-    font-size: 14px;
-    width: 14px;
-    height: 14px;
-    margin-right: 4px;
-    vertical-align: middle;
-}

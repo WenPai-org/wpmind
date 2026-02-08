@@ -31,6 +31,14 @@ $savings = \WPMind\Modules\ExactCache\CostEstimator::get_estimated_savings();
 			<?php esc_html_e( '精确缓存', 'wpmind' ); ?>
 		</h2>
 		<span class="wpmind-geo-badge">v1.0</span>
+		<button type="button" id="wpmind-flush-cache" class="button button-small" title="<?php esc_attr_e( '清空缓存', 'wpmind' ); ?>">
+			<span class="dashicons ri-delete-bin-line"></span>
+			<?php esc_html_e( '清空缓存', 'wpmind' ); ?>
+		</button>
+		<button type="button" id="wpmind-reset-cache-stats" class="button button-small" title="<?php esc_attr_e( '重置统计', 'wpmind' ); ?>">
+			<span class="dashicons ri-restart-line"></span>
+			<?php esc_html_e( '重置统计', 'wpmind' ); ?>
+		</button>
 	</div>
 
 	<p class="wpmind-geo-desc">
@@ -133,19 +141,4 @@ $savings = \WPMind\Modules\ExactCache\CostEstimator::get_estimated_savings();
 		</button>
 	</p>
 
-	<!-- Cache Management -->
-	<h3>
-		<span class="dashicons ri-tools-line"></span>
-		<?php esc_html_e( '缓存管理', 'wpmind' ); ?>
-	</h3>
-	<div class="wpmind-cache-actions">
-		<button type="button" id="wpmind-flush-cache" class="button">
-			<span class="dashicons ri-delete-bin-line"></span>
-			<?php esc_html_e( '清空缓存', 'wpmind' ); ?>
-		</button>
-		<button type="button" id="wpmind-reset-cache-stats" class="button">
-			<span class="dashicons ri-restart-line"></span>
-			<?php esc_html_e( '重置统计', 'wpmind' ); ?>
-		</button>
-	</div>
 </div>

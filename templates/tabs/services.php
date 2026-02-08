@@ -16,9 +16,6 @@ $wpmind_instance  = \WPMind\wpmind();
 $endpoints        = $wpmind_instance->get_custom_endpoints();
 $default_provider = get_option( 'wpmind_default_provider', '' );
 $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
-$exact_cache_enabled = get_option( 'wpmind_exact_cache_enabled', '1' );
-$exact_cache_default_ttl = (int) get_option( 'wpmind_exact_cache_default_ttl', 900 );
-$exact_cache_max_entries = (int) get_option( 'wpmind_exact_cache_max_entries', 500 );
 ?>
 
 <div class="wpmind-geo-header">
@@ -78,67 +75,6 @@ $exact_cache_max_entries = (int) get_option( 'wpmind_exact_cache_max_entries', 5
 						</option>
 					<?php endforeach; ?>
 				</select>
-			</td>
-		</tr>
-		<tr>
-			<th scope="row">
-				<label for="wpmind_exact_cache_enabled">
-					<?php esc_html_e( 'Exact Cache', 'wpmind' ); ?>
-				</label>
-			</th>
-			<td>
-				<input type="hidden" name="wpmind_exact_cache_enabled" value="0">
-				<label>
-					<input type="checkbox"
-						id="wpmind_exact_cache_enabled"
-						name="wpmind_exact_cache_enabled"
-						value="1"
-						<?php checked( (string) $exact_cache_enabled, '1' ); ?>>
-					<?php esc_html_e( '启用精确缓存（Phase 4.0）', 'wpmind' ); ?>
-				</label>
-				<p class="description">
-					<?php esc_html_e( '命中后直接返回缓存结果，可降低重复请求成本。', 'wpmind' ); ?>
-				</p>
-			</td>
-		</tr>
-		<tr>
-			<th scope="row">
-				<label for="wpmind_exact_cache_default_ttl">
-					<?php esc_html_e( '默认缓存 TTL', 'wpmind' ); ?>
-				</label>
-			</th>
-			<td>
-				<input type="number"
-					id="wpmind_exact_cache_default_ttl"
-					name="wpmind_exact_cache_default_ttl"
-					value="<?php echo esc_attr( $exact_cache_default_ttl ); ?>"
-					min="0"
-					max="86400"
-					step="1"
-					class="small-text">
-				<span class="description">
-					<?php esc_html_e( '秒；0 表示仅使用 API 调用显式传入的 cache_ttl。', 'wpmind' ); ?>
-				</span>
-			</td>
-		</tr>
-		<tr>
-			<th scope="row">
-				<label for="wpmind_exact_cache_max_entries">
-					<?php esc_html_e( '缓存容量上限', 'wpmind' ); ?>
-				</label>
-			</th>
-			<td>
-				<input type="number"
-					id="wpmind_exact_cache_max_entries"
-					name="wpmind_exact_cache_max_entries"
-					value="<?php echo esc_attr( $exact_cache_max_entries ); ?>"
-					min="100"
-					max="50000"
-					step="1"
-					class="small-text">
-				<span class="description">
-					<?php esc_html_e( '按键索引近似 LRU 淘汰，建议 300-5000。', 'wpmind' ); ?>
-				</span>
 			</td>
 		</tr>
 	</table>
