@@ -1,5 +1,43 @@
 # WPMind 更新日志
 
+## [3.10.2] - 2026-02-08
+
+### API Gateway 模块 (Phase 0-10)
+
+将 WordPress 变为 OpenAI 兼容的自托管 AI API 网关。
+
+#### 核心架构
+- **8 级中间件管道**: Auth → Budget → Quota → RequestTransform → Route → ResponseTransform → Error → Log
+- **API Key 系统**: `sk_mind_{key_id}_{secret}` 格式，SHA-256 + 常量时间验证，防时序攻击
+- **3 张数据库表**: `wpmind_api_keys`、`wpmind_api_key_usage`、`wpmind_api_audit_log`
+
+#### REST API 端点 (OpenAI 兼容)
+- `POST /wp-json/mind/v1/chat/completions` — 对话补全（支持流式 SSE）
+- `POST /wp-json/mind/v1/embeddings` — 向量嵌入
+- `POST /wp-json/mind/v1/responses` — Responses API 兼容
+- `GET /wp-json/mind/v1/models` — 模型列表（19 个模型）
+- `GET /wp-json/mind/v1/models/{id}` — 单模型详情
+- `GET /wp-json/mind/v1/status` — 网关状态（管理端点）
+
+#### 功能特性
+- **SSE 流式输出**: CancellationToken + 并发槽位控制 + 心跳保活
+- **速率限制**: Redis 滑动窗口（Lua 原子操作）+ Transient 回退
+- **预算控制**: 月度预算检查 + 用量统计
+- **模型映射**: 18 个默认模型 + 用户自定义别名 + auto 智能路由
+- **错误格式**: 14 种错误码映射为 OpenAI 标准格式
+- **Admin UI**: 设置页（状态卡片 + 基础设置 + API Key 管理）
+
+#### 代码统计
+- 36 个 PHP 文件，5,336 行源代码
+- 5 个 PHPUnit 测试（36 个测试方法）+ 1 个集成测试脚本
+- 部署文档 (DEPLOYMENT.md)
+
+#### 修复
+- `generate_key_id`: `random_bytes(8)` → `(12)` 确保 key_id 始终 12 字符
+- `settings-page.php`: 添加 API Gateway 标签页到设置页导航
+
+---
+
 ## [3.8.0] - 2026-02-07
 
 ### 🧹 兼容层清理 + 扩展点增强
