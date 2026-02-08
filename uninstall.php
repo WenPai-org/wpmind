@@ -42,6 +42,8 @@ function wpmind_cleanup_site_data(): void {
         'wpmind_schema_mode',
         'wpmind_crawler_logs',
         'wpmind_crawler_stats',
+        // API Gateway 模块设置
+        'wpmind_api_gateway_schema_version',
         // 激活标记
         'wpmind_flush_rewrite_rules',
     ];
@@ -85,6 +87,11 @@ function wpmind_cleanup_site_data(): void {
             '_transient_wpmind_llms_txt_%'
         )
     );
+
+    // 删除 API Gateway 模块的数据库表
+    $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wpmind_api_audit_log" );
+    $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wpmind_api_key_usage" );
+    $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wpmind_api_keys" );
 }
 
 // 清理当前站点
