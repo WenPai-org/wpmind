@@ -32,6 +32,8 @@ $ai_excluded_types  = get_option( 'wpmind_ai_excluded_post_types', [] );
 if ( ! is_array( $ai_excluded_types ) ) {
 	$ai_excluded_types = [];
 }
+$ai_sitemap_enabled    = $is_enabled( 'wpmind_ai_sitemap_enabled', '0' );
+$ai_sitemap_max        = (int) get_option( 'wpmind_ai_sitemap_max_entries', 500 );
 
 // 检查官方插件是否安装
 $official_installed = class_exists( 'AI_Experiments\\Experiments\\Markdown_Feeds' );
@@ -293,6 +295,47 @@ $ai_summary      = $crawler_tracker->get_ai_summary();
                 <div class="wpmind-geo-notice wpmind-geo-notice-info" style="margin-top:12px;">
                     <span class="dashicons ri-information-line"></span>
                     <?php esc_html_e( '单篇文章可在编辑器侧边栏的「AI 索引指令」面板中覆盖全局设置。', 'wpmind' ); ?>
+                </div>
+                <?php endif; ?>
+            </div>
+
+            <!-- AI Sitemap 设置 -->
+            <div class="wpmind-geo-section">
+                <h3 class="wpmind-geo-section-title">
+                    <span class="dashicons ri-road-map-line"></span>
+                    <?php esc_html_e( 'AI Sitemap', 'wpmind' ); ?>
+                    <span class="wpmind-geo-new-badge"><?php esc_html_e( 'NEW', 'wpmind' ); ?></span>
+                </h3>
+                <p class="wpmind-geo-section-desc">
+                    <?php esc_html_e( '为 AI 爬虫提供专属 XML Sitemap，包含内容声明和摘要等元数据。', 'wpmind' ); ?>
+                </p>
+
+                <div class="wpmind-geo-options">
+                    <label class="wpmind-geo-option">
+                        <input type="checkbox" name="wpmind_ai_sitemap_enabled" value="1" <?php checked( $ai_sitemap_enabled ); ?>>
+                        <span class="wpmind-geo-option-content">
+                            <span class="wpmind-geo-option-title"><?php esc_html_e( '启用 AI Sitemap', 'wpmind' ); ?></span>
+                            <span class="wpmind-geo-option-desc"><?php esc_html_e( '在 /ai-sitemap.xml 提供 AI 专属站点地图', 'wpmind' ); ?></span>
+                        </span>
+                    </label>
+                </div>
+
+                <?php if ( $ai_sitemap_enabled ) : ?>
+                <div class="wpmind-geo-select-group">
+                    <label class="wpmind-geo-select-label"><?php esc_html_e( '最大条目数：', 'wpmind' ); ?></label>
+                    <input type="number" name="wpmind_ai_sitemap_max_entries" value="<?php echo esc_attr( (string) $ai_sitemap_max ); ?>"
+                           min="10" max="5000" step="10" class="small-text" style="width:80px;">
+                    <span class="description"><?php esc_html_e( '(10-5000)', 'wpmind' ); ?></span>
+                </div>
+
+                <div class="wpmind-geo-urls" style="margin-top:12px;">
+                    <p class="wpmind-geo-url-title"><?php esc_html_e( '访问地址：', 'wpmind' ); ?></p>
+                    <code class="wpmind-geo-url"><?php echo esc_url( home_url( '/ai-sitemap.xml' ) ); ?></code>
+                </div>
+
+                <div class="wpmind-geo-notice wpmind-geo-notice-info" style="margin-top:12px;">
+                    <span class="dashicons ri-information-line"></span>
+                    <?php esc_html_e( '标记了 noai 的内容会自动从 AI Sitemap 中排除。每个 URL 包含 ai:declaration 和 ai:summary 元数据。', 'wpmind' ); ?>
                 </div>
                 <?php endif; ?>
             </div>

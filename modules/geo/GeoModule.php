@@ -26,6 +26,7 @@ require_once __DIR__ . '/includes/LlmsTxtGenerator.php';
 require_once __DIR__ . '/includes/SchemaGenerator.php';
 require_once __DIR__ . '/includes/CrawlerTracker.php';
 require_once __DIR__ . '/includes/AiIndexingManager.php';
+require_once __DIR__ . '/includes/AiSitemapGenerator.php';
 
 /**
  * Class GeoModule
@@ -159,6 +160,11 @@ class GeoModule implements ModuleInterface {
 		if ( $is_enabled( 'wpmind_ai_indexing_enabled', '0' ) ) {
 			$this->components['ai_indexing'] = new AiIndexingManager();
 		}
+
+		// AI Sitemap.
+		if ( $is_enabled( 'wpmind_ai_sitemap_enabled', '0' ) ) {
+			$this->components['ai_sitemap'] = new AiSitemapGenerator();
+		}
 	}
 
 	/**
@@ -206,6 +212,8 @@ class GeoModule implements ModuleInterface {
 				[ 'original', 'ai-assisted', 'ai-generated' ],
 				true
 			) ? sanitize_key( $settings['wpmind_ai_default_declaration'] ) : 'original',
+			'wpmind_ai_sitemap_enabled'      => isset( $settings['wpmind_ai_sitemap_enabled'] ) ? '1' : '0',
+			'wpmind_ai_sitemap_max_entries'   => max( 10, min( 5000, absint( $settings['wpmind_ai_sitemap_max_entries'] ?? 500 ) ) ),
 		);
 
 		foreach ( $options as $key => $value ) {

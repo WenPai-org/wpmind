@@ -41,7 +41,9 @@
 				wpmind_schema_mode: $( 'select[name="wpmind_schema_mode"]' ).val() || 'auto',
 				wpmind_ai_indexing_enabled: $( 'input[name="wpmind_ai_indexing_enabled"]' ).is( ':checked' ) ? 1 : 0,
 				wpmind_ai_default_declaration: $( 'select[name="wpmind_ai_default_declaration"]' ).val() || 'original',
-				wpmind_ai_excluded_post_types: []
+				wpmind_ai_excluded_post_types: [],
+				wpmind_ai_sitemap_enabled: $( 'input[name="wpmind_ai_sitemap_enabled"]' ).is( ':checked' ) ? 1 : 0,
+				wpmind_ai_sitemap_max_entries: $( 'input[name="wpmind_ai_sitemap_max_entries"]' ).val() || 500
 			};
 
 			// Collect checked post type exclusions.
