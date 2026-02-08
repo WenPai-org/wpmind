@@ -25,6 +25,7 @@ require_once __DIR__ . '/includes/MarkdownFeed.php';
 require_once __DIR__ . '/includes/LlmsTxtGenerator.php';
 require_once __DIR__ . '/includes/SchemaGenerator.php';
 require_once __DIR__ . '/includes/CrawlerTracker.php';
+require_once __DIR__ . '/includes/AiIndexingManager.php';
 
 /**
  * Class GeoModule
@@ -153,6 +154,11 @@ class GeoModule implements ModuleInterface {
 
 		// Crawler Tracker.
 		$this->components['crawler_tracker'] = new CrawlerTracker();
+
+		// AI Indexing Manager.
+		if ( $is_enabled( 'wpmind_ai_indexing_enabled', '0' ) ) {
+			$this->components['ai_indexing'] = new AiIndexingManager();
+		}
 	}
 
 	/**
@@ -194,11 +200,24 @@ class GeoModule implements ModuleInterface {
 			'wpmind_llms_txt_enabled'        => isset( $settings['wpmind_llms_txt_enabled'] ) ? '1' : '0',
 			'wpmind_schema_enabled'          => isset( $settings['wpmind_schema_enabled'] ) ? '1' : '0',
 			'wpmind_schema_mode'             => sanitize_key( $settings['wpmind_schema_mode'] ?? 'auto' ),
+			'wpmind_ai_indexing_enabled'     => isset( $settings['wpmind_ai_indexing_enabled'] ) ? '1' : '0',
+			'wpmind_ai_default_declaration'  => in_array(
+				$settings['wpmind_ai_default_declaration'] ?? 'original',
+				[ 'original', 'ai-assisted', 'ai-generated' ],
+				true
+			) ? sanitize_key( $settings['wpmind_ai_default_declaration'] ) : 'original',
 		);
 
 		foreach ( $options as $key => $value ) {
 			update_option( $key, $value, false );
 		}
+
+		// Save AI excluded post types (array).
+		$excluded_types = [];
+		if ( isset( $settings['wpmind_ai_excluded_post_types'] ) && is_array( $settings['wpmind_ai_excluded_post_types'] ) ) {
+			$excluded_types = array_map( 'sanitize_key', $settings['wpmind_ai_excluded_post_types'] );
+		}
+		update_option( 'wpmind_ai_excluded_post_types', $excluded_types, false );
 
 		// Flush rewrite rules if markdown feed setting changed.
 		if ( isset( $settings['wpmind_standalone_markdown_feed'] ) ) {

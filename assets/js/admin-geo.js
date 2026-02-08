@@ -38,8 +38,16 @@
 				wpmind_crawler_tracking: $( 'input[name="wpmind_crawler_tracking"]' ).is( ':checked' ) ? 1 : 0,
 				wpmind_llms_txt_enabled: $( 'input[name="wpmind_llms_txt_enabled"]' ).is( ':checked' ) ? 1 : 0,
 				wpmind_schema_enabled: $( 'input[name="wpmind_schema_enabled"]' ).is( ':checked' ) ? 1 : 0,
-				wpmind_schema_mode: $( 'select[name="wpmind_schema_mode"]' ).val() || 'auto'
+				wpmind_schema_mode: $( 'select[name="wpmind_schema_mode"]' ).val() || 'auto',
+				wpmind_ai_indexing_enabled: $( 'input[name="wpmind_ai_indexing_enabled"]' ).is( ':checked' ) ? 1 : 0,
+				wpmind_ai_default_declaration: $( 'select[name="wpmind_ai_default_declaration"]' ).val() || 'original',
+				wpmind_ai_excluded_post_types: []
 			};
+
+			// Collect checked post type exclusions.
+			$( 'input[name="wpmind_ai_excluded_post_types[]"]:checked' ).each( function() {
+				settings.wpmind_ai_excluded_post_types.push( $( this ).val() );
+			} );
 
 			// Show loading state
 			$button.html( '<span class="dashicons ri-loader-4-line"></span> 保存中...' ).prop( 'disabled', true );
