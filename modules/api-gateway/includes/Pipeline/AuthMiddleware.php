@@ -33,6 +33,7 @@ final class AuthMiddleware implements GatewayStageInterface {
 		'responses',
 		'models',
 		'model_detail',
+		'status',
 	];
 
 	/**
