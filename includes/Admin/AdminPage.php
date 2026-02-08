@@ -80,6 +80,37 @@ final class AdminPage {
             ]
         );
 
+
+        register_setting(
+            'wpmind_settings',
+            'wpmind_exact_cache_enabled',
+            [
+                'type'              => 'string',
+                'sanitize_callback' => [ $this, 'sanitize_exact_cache_enabled' ],
+                'default'           => '1',
+            ]
+        );
+
+        register_setting(
+            'wpmind_settings',
+            'wpmind_exact_cache_default_ttl',
+            [
+                'type'              => 'integer',
+                'sanitize_callback' => [ $this, 'sanitize_exact_cache_ttl' ],
+                'default'           => 900,
+            ]
+        );
+
+        register_setting(
+            'wpmind_settings',
+            'wpmind_exact_cache_max_entries',
+            [
+                'type'              => 'integer',
+                'sanitize_callback' => [ $this, 'sanitize_exact_cache_max_entries' ],
+                'default'           => 500,
+            ]
+        );
+
         register_setting(
             'wpmind_settings',
             'wpmind_default_provider',
@@ -266,6 +297,47 @@ final class AdminPage {
     public function sanitize_timeout( $input ): int {
         $timeout = absint( $input );
         return max( 10, min( 300, $timeout ) );
+    }
+
+    /**
+     * 清理 Exact Cache 开关
+     *
+     * @param mixed $input 输入值
+     * @return string
+     */
+    public function sanitize_exact_cache_enabled( $input ): string {
+        if ( ! empty( $input ) && in_array( (string) $input, [ '1', 'true', 'on', 'yes' ], true ) ) {
+            return '1';
+        }
+
+        return '0';
+    }
+
+    /**
+     * 清理 Exact Cache 默认 TTL
+     *
+     * @param mixed $input 输入值
+     * @return int
+     */
+    public function sanitize_exact_cache_ttl( $input ): int {
+        $ttl = (int) $input;
+        return max( 0, min( 86400, $ttl ) );
+    }
+
+    /**
+     * 清理 Exact Cache 最大条目
+     *
+     * @param mixed $input 输入值
+     * @return int
+     */
+    public function sanitize_exact_cache_max_entries( $input ): int {
+        $entries = (int) $input;
+
+        if ( $entries <= 0 ) {
+            return 500;
+        }
+
+        return min( 50000, max( 100, $entries ) );
     }
 
     /**

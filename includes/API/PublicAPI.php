@@ -203,7 +203,30 @@ class PublicAPI {
 				'month' => $month_tokens,
 				'limit' => 0,
 			],
+			'cache'     => $this->get_exact_cache_stats(),
 		];
+	}
+
+
+	/**
+	 * 获取精确缓存统计
+	 *
+	 * @return array
+	 */
+	public function get_exact_cache_stats(): array {
+		if (!class_exists('\WPMind\Cache\ExactCache')) {
+			return [
+				'enabled'     => false,
+				'hits'        => 0,
+				'misses'      => 0,
+				'writes'      => 0,
+				'hit_rate'    => 0,
+				'entries'     => 0,
+				'max_entries' => 0,
+			];
+		}
+
+		return \WPMind\Cache\ExactCache::instance()->get_stats();
 	}
 
 	/**

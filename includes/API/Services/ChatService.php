@@ -76,12 +76,10 @@ class ChatService extends AbstractService {
 			do_action('wpmind_provider_failover', $provider, $failover_chain[0], $context);
 		}
 
-		if ($options['cache_ttl'] > 0) {
-			$cache_key = $this->generate_cache_key('chat', $args, $provider, $model);
-			$cached = get_transient($cache_key);
-			if ($cached !== false) {
-				return $cached;
-			}
+		$cache_key = $this->generate_cache_key('chat', $args, $provider, $model);
+		$cache_lookup = $this->get_cached_value($cache_key, (int) $options['cache_ttl']);
+		if ($cache_lookup['hit']) {
+			return $cache_lookup['value'];
 		}
 
 		do_action('wpmind_before_request', 'chat', $args, $context);
@@ -158,8 +156,13 @@ class ChatService extends AbstractService {
 		$usage = $result['usage'] ?? [];
 		do_action('wpmind_after_request', 'chat', $result, $args, $usage);
 
-		if ($options['cache_ttl'] > 0 && !is_wp_error($result)) {
-			set_transient($cache_key, $result, $options['cache_ttl']);
+		if (!is_wp_error($result)) {
+			$this->set_cached_value($cache_key, $result, (int) $options['cache_ttl'], [
+				'type'     => 'chat',
+				'context'  => $context,
+				'provider' => $provider,
+				'model'    => $model,
+			]);
 		}
 
 		return $result;

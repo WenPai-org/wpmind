@@ -188,7 +188,100 @@ abstract class AbstractService {
 	 * @return string
 	 */
 	protected function generate_cache_key(string $type, array $args, string $provider = '', string $model = ''): string {
-		$key = 'wpmind_' . $type . '_' . $provider . '_' . $model . '_' . md5(serialize($args));
+		if (class_exists('\WPMind\Cache\ExactCache')) {
+			$key = \WPMind\Cache\ExactCache::instance()->build_key($type, $args, $provider, $model);
+		} else {
+			$key = 'wpmind_' . $type . '_' . $provider . '_' . $model . '_' . md5(serialize($args));
+		}
+
 		return apply_filters('wpmind_cache_key', $key, $type, $args);
+	}
+
+	/**
+	 * 读取缓存值（优先 Exact Cache，失败回退 transient）
+	 *
+	 * @param string $cache_key 缓存键
+	 * @param int    $cache_ttl TTL 秒数
+	 * @return array{hit:bool,value:mixed}
+	 */
+	protected function get_cached_value(string $cache_key, int $cache_ttl): array {
+		$effective_ttl = $this->get_effective_cache_ttl($cache_ttl);
+		if ($effective_ttl <= 0) {
+			return ['hit' => false, 'value' => null];
+		}
+
+		if (class_exists('\WPMind\Cache\ExactCache')) {
+			$cached = \WPMind\Cache\ExactCache::instance()->get($cache_key);
+			if ($cached !== null) {
+				return ['hit' => true, 'value' => $cached];
+			}
+
+			return ['hit' => false, 'value' => null];
+		}
+
+		$cached = get_transient($cache_key);
+		if ($cached !== false) {
+			return ['hit' => true, 'value' => $cached];
+		}
+
+		return ['hit' => false, 'value' => null];
+	}
+
+	/**
+	 * 写入缓存值（优先 Exact Cache，失败回退 transient）
+	 *
+	 * @param string $cache_key 缓存键
+	 * @param mixed  $value 缓存值
+	 * @param int    $cache_ttl TTL 秒数
+	 * @param array  $meta 元数据
+	 * @return void
+	 */
+	protected function set_cached_value(string $cache_key, $value, int $cache_ttl, array $meta = []): void {
+		$effective_ttl = $this->get_effective_cache_ttl($cache_ttl);
+		if ($effective_ttl <= 0) {
+			return;
+		}
+
+		if (class_exists('\WPMind\Cache\ExactCache')) {
+			\WPMind\Cache\ExactCache::instance()->set($cache_key, $value, $effective_ttl, $meta);
+			return;
+		}
+
+		set_transient($cache_key, $value, $effective_ttl);
+	}
+
+	/**
+	 * 计算生效缓存 TTL
+	 *
+	 * 行为说明：
+	 * - cache_ttl > 0 : 使用调用方指定的 TTL
+	 * - cache_ttl = 0 : 当 ExactCache 启用时使用其默认 TTL（自动缓存），
+	 *                    否则不缓存（向后兼容）
+	 * - cache_ttl < 0 : 强制不缓存（显式禁用）
+	 *
+	 * 可通过 `wpmind_exact_cache_auto_cache` filter 关闭自动缓存行为。
+	 *
+	 * @param int $cache_ttl API 调用层传入 TTL
+	 * @return int
+	 */
+	private function get_effective_cache_ttl(int $cache_ttl): int {
+		if ($cache_ttl < 0) {
+			return 0;
+		}
+
+		if ($cache_ttl > 0) {
+			return $cache_ttl;
+		}
+
+		if (!class_exists('\WPMind\Cache\ExactCache')) {
+			return 0;
+		}
+
+		$auto_cache = (bool) apply_filters('wpmind_exact_cache_auto_cache', true);
+		if (!$auto_cache) {
+			return 0;
+		}
+
+		return \WPMind\Cache\ExactCache::instance()->get_default_ttl();
 	}
 }
