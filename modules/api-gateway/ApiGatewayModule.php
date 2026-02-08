@@ -24,6 +24,20 @@ require_once __DIR__ . '/includes/GatewayRequestSchema.php';
 require_once __DIR__ . '/includes/Pipeline/GatewayStageInterface.php';
 require_once __DIR__ . '/includes/Pipeline/GatewayRequestContext.php';
 require_once __DIR__ . '/includes/Pipeline/GatewayPipeline.php';
+require_once __DIR__ . '/includes/RateLimit/RateStoreResult.php';
+require_once __DIR__ . '/includes/RateLimit/RateStoreInterface.php';
+require_once __DIR__ . '/includes/RateLimit/RedisRateStore.php';
+require_once __DIR__ . '/includes/RateLimit/TransientRateStore.php';
+require_once __DIR__ . '/includes/RateLimit/RateLimiter.php';
+require_once __DIR__ . '/includes/Pipeline/AuthMiddleware.php';
+require_once __DIR__ . '/includes/Pipeline/BudgetMiddleware.php';
+require_once __DIR__ . '/includes/Pipeline/QuotaMiddleware.php';
+require_once __DIR__ . '/includes/Transform/ModelMapper.php';
+require_once __DIR__ . '/includes/Transform/RequestTransformer.php';
+require_once __DIR__ . '/includes/Transform/ResponseTransformer.php';
+require_once __DIR__ . '/includes/Pipeline/RequestTransformMiddleware.php';
+require_once __DIR__ . '/includes/Pipeline/ResponseTransformMiddleware.php';
+require_once __DIR__ . '/includes/Pipeline/RouteMiddleware.php';
 
 /**
  * Class ApiGatewayModule
