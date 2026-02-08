@@ -15,7 +15,10 @@
         "Schema.org 结构化数据",
         "AI 爬虫追踪",
         "AI 索引指令 (noai/nollm)",
-        "AI Sitemap (/ai-sitemap.xml)"
+        "AI Sitemap (/ai-sitemap.xml)",
+        "robots.txt AI 爬虫管理",
+        "AI 摘要 (Context Summary)",
+        "实体关联 (Entity Linking)"
     ],
     "requires": {
         "php": "8.1",
