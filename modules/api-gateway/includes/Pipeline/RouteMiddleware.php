@@ -15,6 +15,7 @@ namespace WPMind\Modules\ApiGateway\Pipeline;
 use WPMind\Modules\ApiGateway\Transform\ModelMapper;
 use WPMind\Modules\ApiGateway\Transform\ResponseTransformer;
 use WPMind\Modules\ApiGateway\Stream\SseStreamController;
+use WPMind\Modules\ApiGateway\SchemaManager;
 
 /**
  * Class RouteMiddleware
@@ -40,7 +41,9 @@ final class RouteMiddleware implements GatewayStageInterface {
 		match ( $operation ) {
 			'chat.completions' => $this->handle_chat( $context, $payload ),
 			'embeddings'       => $this->handle_embeddings( $context, $payload ),
+			'responses'        => $this->handle_chat( $context, $payload ),
 			'models'           => $this->handle_models( $context ),
+			'status'           => $this->handle_status( $context ),
 			default            => $context->set_error(
 				new \WP_Error(
 					'unsupported_operation',
@@ -132,5 +135,28 @@ final class RouteMiddleware implements GatewayStageInterface {
 		$data        = $transformer->transform_models( $models );
 
 		$context->set_internal_result( $data );
+	}
+
+	/**
+	 * Handle a gateway status request.
+	 *
+	 * Returns basic gateway health and configuration info.
+	 *
+	 * @param GatewayRequestContext $context Pipeline context.
+	 */
+	private function handle_status( GatewayRequestContext $context ): void {
+		$context->set_internal_result( [
+			'status'         => 'ok',
+			'version'        => '1.0.0',
+			'endpoints'      => [
+				'/mind/v1/chat/completions',
+				'/mind/v1/embeddings',
+				'/mind/v1/responses',
+				'/mind/v1/models',
+				'/mind/v1/models/{model_id}',
+				'/mind/v1/status',
+			],
+			'schema_version' => SchemaManager::get_schema_version(),
+		] );
 	}
 }

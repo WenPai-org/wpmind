@@ -47,6 +47,7 @@ require_once __DIR__ . '/includes/Stream/SseStreamController.php';
 require_once __DIR__ . '/includes/Error/ErrorMapper.php';
 require_once __DIR__ . '/includes/Pipeline/ErrorMiddleware.php';
 require_once __DIR__ . '/includes/Pipeline/LogMiddleware.php';
+require_once __DIR__ . '/includes/RestController.php';
 
 /**
  * Class ApiGatewayModule
@@ -133,10 +134,11 @@ class ApiGatewayModule implements ModuleInterface {
 	/**
 	 * Register REST API routes.
 	 *
-	 * Placeholder — routes will be added in Phase 8.
+	 * Instantiates the RestController and registers all gateway endpoints.
 	 */
 	public function register_rest_routes(): void {
-		// Routes will be registered in Phase 8.
+		$controller = new RestController();
+		$controller->register_routes();
 	}
 
 	/**
