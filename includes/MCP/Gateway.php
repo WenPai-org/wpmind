@@ -214,7 +214,7 @@ final class Gateway {
     }
 
     /**
-     * Ability: wpmind/chat
+     * Ability: mind/chat
      *
      * @param mixed ...$args Callback args.
      * @return array
@@ -228,7 +228,7 @@ final class Gateway {
         if ( '' === $messages || [] === $messages ) {
             return $this->error_result(
                 'wpmind_mcp_chat_missing_prompt',
-                __( 'Missing prompt/messages for wpmind/chat ability.', 'wpmind' )
+                __( 'Missing prompt/messages for mind/chat ability.', 'wpmind' )
             );
         }
 
@@ -252,7 +252,7 @@ final class Gateway {
     }
 
     /**
-     * Ability: wpmind/get-providers
+     * Ability: mind/get-providers
      *
      * @param mixed ...$args Callback args.
      * @return array
@@ -297,7 +297,7 @@ final class Gateway {
     }
 
     /**
-     * Ability: wpmind/get-usage-stats
+     * Ability: mind/get-usage-stats
      *
      * @param mixed ...$args Callback args.
      * @return array
@@ -334,7 +334,7 @@ final class Gateway {
     }
 
     /**
-     * Ability: wpmind/get-budget-status
+     * Ability: mind/get-budget-status
      *
      * @param mixed ...$args Callback args.
      * @return array
@@ -362,7 +362,7 @@ final class Gateway {
     }
 
     /**
-     * Ability: wpmind/switch-strategy
+     * Ability: mind/switch-strategy
      *
      * @param mixed ...$args Callback args.
      * @return array
@@ -374,7 +374,7 @@ final class Gateway {
         if ( '' === $strategy ) {
             return $this->error_result(
                 'wpmind_mcp_switch_strategy_missing',
-                __( 'Missing strategy for wpmind/switch-strategy ability.', 'wpmind' )
+                __( 'Missing strategy for mind/switch-strategy ability.', 'wpmind' )
             );
         }
 
@@ -453,7 +453,7 @@ final class Gateway {
         ];
 
         $definitions = [
-            'wpmind/chat' => [
+            'mind/chat' => [
                 'label'               => __( 'WPMind Chat', 'wpmind' ),
                 'description'         => __( 'Execute routed chat completions via WPMind.', 'wpmind' ),
                 'category'            => self::ABILITY_CATEGORY,
@@ -487,7 +487,7 @@ final class Gateway {
                     ],
                 ],
             ],
-            'wpmind/get-providers' => [
+            'mind/get-providers' => [
                 'label'               => __( 'WPMind Get Providers', 'wpmind' ),
                 'description'         => __( 'Get provider availability, routing and failover status.', 'wpmind' ),
                 'category'            => self::ABILITY_CATEGORY,
@@ -509,7 +509,7 @@ final class Gateway {
                     ],
                 ],
             ],
-            'wpmind/get-usage-stats' => [
+            'mind/get-usage-stats' => [
                 'label'               => __( 'WPMind Get Usage Stats', 'wpmind' ),
                 'description'         => __( 'Get usage, cost, and cache statistics.', 'wpmind' ),
                 'category'            => self::ABILITY_CATEGORY,
@@ -531,7 +531,7 @@ final class Gateway {
                     ],
                 ],
             ],
-            'wpmind/get-budget-status' => [
+            'mind/get-budget-status' => [
                 'label'               => __( 'WPMind Get Budget Status', 'wpmind' ),
                 'description'         => __( 'Get budget guardrail status and thresholds.', 'wpmind' ),
                 'category'            => self::ABILITY_CATEGORY,
@@ -553,7 +553,7 @@ final class Gateway {
                     ],
                 ],
             ],
-            'wpmind/switch-strategy' => [
+            'mind/switch-strategy' => [
                 'label'               => __( 'WPMind Switch Strategy', 'wpmind' ),
                 'description'         => __( 'Switch active routing strategy.', 'wpmind' ),
                 'category'            => self::ABILITY_CATEGORY,
