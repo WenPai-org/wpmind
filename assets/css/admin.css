@@ -1726,7 +1726,7 @@ input.is-invalid {
     padding: var(--wpmind-space-2);
     background: var(--wpmind-gray-100);
     border-radius: var(--wpmind-radius-sm);
-    font-size: var(--wpmind-text-xs;
+    font-size: var(--wpmind-text-xs);
     color: var(--wpmind-gray-700);
     margin-bottom: var(--wpmind-space-2);
     word-break: break-all;
