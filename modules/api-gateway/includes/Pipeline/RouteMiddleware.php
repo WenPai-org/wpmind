@@ -14,6 +14,7 @@ namespace WPMind\Modules\ApiGateway\Pipeline;
 
 use WPMind\Modules\ApiGateway\Transform\ModelMapper;
 use WPMind\Modules\ApiGateway\Transform\ResponseTransformer;
+use WPMind\Modules\ApiGateway\Stream\SseStreamController;
 
 /**
  * Class RouteMiddleware
@@ -67,13 +68,15 @@ final class RouteMiddleware implements GatewayStageInterface {
 		}
 
 		if ( $stream ) {
-			// Streaming will be fully implemented in Phase 6.
-			// For now, set a flag so the response layer knows.
-			$context->set_response_header( 'X-WPMind-Stream', 'pending' );
-			$context->set_internal_result( [
-				'stream'  => true,
-				'pending' => true,
-			] );
+			// Phase 6: SSE streaming via SseStreamController.
+			// If slot acquisition fails, the controller sets an error
+			// on the context and returns, allowing the pipeline to
+			// produce a normal JSON error response.
+			$controller = new SseStreamController();
+			$controller->serve_chat_stream( $context );
+
+			// If we reach here, slot acquisition failed and the error
+			// is already set on the context. The pipeline continues.
 			return;
 		}
 

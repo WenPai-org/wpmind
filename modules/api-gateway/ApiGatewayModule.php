@@ -38,6 +38,15 @@ require_once __DIR__ . '/includes/Transform/ResponseTransformer.php';
 require_once __DIR__ . '/includes/Pipeline/RequestTransformMiddleware.php';
 require_once __DIR__ . '/includes/Pipeline/ResponseTransformMiddleware.php';
 require_once __DIR__ . '/includes/Pipeline/RouteMiddleware.php';
+require_once __DIR__ . '/includes/Stream/CancellationToken.php';
+require_once __DIR__ . '/includes/Stream/SseSlot.php';
+require_once __DIR__ . '/includes/Stream/StreamResult.php';
+require_once __DIR__ . '/includes/Stream/SseConcurrencyGuard.php';
+require_once __DIR__ . '/includes/Stream/UpstreamStreamClient.php';
+require_once __DIR__ . '/includes/Stream/SseStreamController.php';
+require_once __DIR__ . '/includes/Error/ErrorMapper.php';
+require_once __DIR__ . '/includes/Pipeline/ErrorMiddleware.php';
+require_once __DIR__ . '/includes/Pipeline/LogMiddleware.php';
 
 /**
  * Class ApiGatewayModule
