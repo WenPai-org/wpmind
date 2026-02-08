@@ -62,6 +62,10 @@ LUA;
 	 * {@inheritDoc}
 	 */
 	public function consume( string $key, int $window_sec, int $cost, int $limit, string $rid, int $now ): RateStoreResult {
+		if ( str_contains( $rid, ':' ) ) {
+			throw new \InvalidArgumentException( 'Request ID must not contain colons.' );
+		}
+
 		$window_start = $now - $window_sec;
 		$member       = "{$rid}:{$cost}";
 		$ttl          = $window_sec * 2;

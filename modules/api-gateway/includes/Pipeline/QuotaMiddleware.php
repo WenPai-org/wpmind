@@ -82,8 +82,8 @@ final class QuotaMiddleware implements GatewayStageInterface {
 	 * @return int Estimated token count.
 	 */
 	private function estimate_tokens( string $body ): int {
-		$length = strlen( $body );
+		$length = mb_strlen( $body, 'UTF-8' );
 
-		return max( 1, (int) ( $length / 4 ) );
+		return max( 1, (int) ( $length / 3 ) );
 	}
 }

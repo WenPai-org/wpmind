@@ -74,10 +74,7 @@ final class ResponseTransformer {
 			'object' => 'list',
 			'data'   => $data,
 			'model'  => $model,
-			'usage'  => [
-				'prompt_tokens' => 0,
-				'total_tokens'  => 0,
-			],
+			'usage'  => $this->extract_usage( $result ),
 		];
 	}
 

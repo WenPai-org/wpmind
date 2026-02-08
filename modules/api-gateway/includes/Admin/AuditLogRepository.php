@@ -30,16 +30,12 @@ class AuditLogRepository {
 	}
 
 	/**
-	 * List audit log entries with pagination and filters.
+	 * Build WHERE clause and parameter values from filters.
 	 *
-	 * @param array $filters  Optional filters: key_id, event_type, date_from, date_to.
-	 * @param int   $page     Page number (1-based).
-	 * @param int   $per_page Items per page.
-	 * @return array Array of row arrays.
+	 * @param array $filters Optional filters: key_id, event_type, date_from, date_to.
+	 * @return array{string, array} Tuple of [ where_sql, values ].
 	 */
-	public static function list_logs( array $filters = [], int $page = 1, int $per_page = 20 ): array {
-		global $wpdb;
-
+	private static function build_where_clause( array $filters ): array {
 		$where  = [];
 		$values = [];
 
@@ -64,17 +60,30 @@ class AuditLogRepository {
 		}
 
 		$where_sql = ! empty( $where ) ? 'WHERE ' . implode( ' AND ', $where ) : '';
-		$offset    = max( 0, ( $page - 1 ) * $per_page );
 
-		$table = self::table();
-		$sql   = "SELECT * FROM {$table} {$where_sql} ORDER BY created_at DESC LIMIT %d OFFSET %d";
+		return [ $where_sql, $values ];
+	}
 
-		$values[] = $per_page;
-		$values[] = $offset;
+	/**
+	 * List audit log entries with pagination and filters.
+	 *
+	 * @param array $filters  Optional filters: key_id, event_type, date_from, date_to.
+	 * @param int   $page     Page number (1-based).
+	 * @param int   $per_page Items per page.
+	 * @return array Array of row arrays.
+	 */
+	public static function list_logs( array $filters = [], int $page = 1, int $per_page = 20 ): array {
+		global $wpdb;
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		[ $where_sql, $filter_values ] = self::build_where_clause( $filters );
+
+		$offset = max( 0, ( $page - 1 ) * $per_page );
+
+		$sql    = "SELECT * FROM %i {$where_sql} ORDER BY created_at DESC LIMIT %d OFFSET %d";
+		$params = array_merge( [ self::table() ], $filter_values, [ $per_page, $offset ] );
+
 		$results = $wpdb->get_results(
-			$wpdb->prepare( $sql, ...$values ),
+			$wpdb->prepare( $sql, ...$params ),
 			ARRAY_A
 		);
 
@@ -90,39 +99,11 @@ class AuditLogRepository {
 	public static function count_logs( array $filters = [] ): int {
 		global $wpdb;
 
-		$where  = [];
-		$values = [];
+		[ $where_sql, $filter_values ] = self::build_where_clause( $filters );
 
-		if ( ! empty( $filters['key_id'] ) ) {
-			$where[]  = 'key_id = %s';
-			$values[] = sanitize_text_field( $filters['key_id'] );
-		}
+		$sql    = "SELECT COUNT(*) FROM %i {$where_sql}";
+		$params = array_merge( [ self::table() ], $filter_values );
 
-		if ( ! empty( $filters['event_type'] ) ) {
-			$where[]  = 'event_type = %s';
-			$values[] = sanitize_text_field( $filters['event_type'] );
-		}
-
-		if ( ! empty( $filters['date_from'] ) ) {
-			$where[]  = 'created_at >= %s';
-			$values[] = sanitize_text_field( $filters['date_from'] ) . ' 00:00:00';
-		}
-
-		if ( ! empty( $filters['date_to'] ) ) {
-			$where[]  = 'created_at <= %s';
-			$values[] = sanitize_text_field( $filters['date_to'] ) . ' 23:59:59';
-		}
-
-		$where_sql = ! empty( $where ) ? 'WHERE ' . implode( ' AND ', $where ) : '';
-		$table     = self::table();
-		$sql       = "SELECT COUNT(*) FROM {$table} {$where_sql}";
-
-		if ( ! empty( $values ) ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-			return (int) $wpdb->get_var( $wpdb->prepare( $sql, ...$values ) );
-		}
-
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		return (int) $wpdb->get_var( $sql );
+		return (int) $wpdb->get_var( $wpdb->prepare( $sql, ...$params ) );
 	}
 }

@@ -208,15 +208,15 @@ class ApiGatewayModule implements ModuleInterface {
 		$now          = current_time( 'mysql', true );
 		$tokens       = $result->tokens_used;
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$wpdb->query( $wpdb->prepare(
-			"INSERT INTO {$usage_table} (key_id, window_month, total_requests, total_input_tokens, total_output_tokens, total_tokens, total_cost_usd, updated_at)
+			"INSERT INTO %i (key_id, window_month, request_count, input_tokens, output_tokens, total_tokens, total_cost_usd, updated_at)
 			VALUES (%s, %s, 1, 0, %d, %d, 0, %s)
 			ON DUPLICATE KEY UPDATE
-				total_requests = total_requests + 1,
-				total_output_tokens = total_output_tokens + %d,
+				request_count = request_count + 1,
+				output_tokens = output_tokens + %d,
 				total_tokens = total_tokens + %d,
 				updated_at = %s",
+			$usage_table,
 			$key_id,
 			$window_month,
 			$tokens,

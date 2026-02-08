@@ -44,7 +44,7 @@ final class RequestTransformer {
 			default            => [
 				'error' => new \WP_Error(
 					'unsupported_operation',
-					sprintf( 'Unsupported operation: %s', $operation ),
+					sprintf( 'Unsupported operation: %s', sanitize_text_field( $operation ) ),
 					[ 'status' => 400 ]
 				),
 			],
@@ -106,7 +106,7 @@ final class RequestTransformer {
 			return [
 				'error' => new \WP_Error(
 					'model_not_found',
-					sprintf( 'Model "%s" is not available.', $model ),
+					sprintf( 'Model "%s" is not available.', sanitize_text_field( (string) $model ) ),
 					[ 'status' => 400 ]
 				),
 			];
@@ -190,7 +190,7 @@ final class RequestTransformer {
 			return [
 				'error' => new \WP_Error(
 					'model_not_found',
-					sprintf( 'Model "%s" is not available.', $model ),
+					sprintf( 'Model "%s" is not available.', sanitize_text_field( (string) $model ) ),
 					[ 'status' => 400 ]
 				),
 			];
@@ -234,7 +234,7 @@ final class RequestTransformer {
 			return [
 				'error' => new \WP_Error(
 					'model_not_found',
-					sprintf( 'Model "%s" is not available.', $model ),
+					sprintf( 'Model "%s" is not available.', sanitize_text_field( (string) $model ) ),
 					[ 'status' => 400 ]
 				),
 			];

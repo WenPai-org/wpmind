@@ -304,6 +304,7 @@
 .wpmind-tab-pane .button {
     display: inline-flex;
     align-items: center;
+    text-decoration: none;
     gap: var(--wpmind-space-1);
     vertical-align: middle;
 }

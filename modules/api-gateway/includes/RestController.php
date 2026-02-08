@@ -56,7 +56,7 @@ final class RestController {
 			[
 				'methods'             => 'POST',
 				'callback'            => [ $this, 'handle_chat_completions' ],
-				'permission_callback' => '__return_true',
+				'permission_callback' => [ $this, 'check_bearer_present' ],
 				'args'                => GatewayRequestSchema::chat_completions(),
 			]
 		);
@@ -68,7 +68,7 @@ final class RestController {
 			[
 				'methods'             => 'POST',
 				'callback'            => [ $this, 'handle_embeddings' ],
-				'permission_callback' => '__return_true',
+				'permission_callback' => [ $this, 'check_bearer_present' ],
 				'args'                => GatewayRequestSchema::embeddings(),
 			]
 		);
@@ -80,7 +80,7 @@ final class RestController {
 			[
 				'methods'             => 'POST',
 				'callback'            => [ $this, 'handle_responses' ],
-				'permission_callback' => '__return_true',
+				'permission_callback' => [ $this, 'check_bearer_present' ],
 				'args'                => GatewayRequestSchema::responses(),
 			]
 		);
@@ -92,7 +92,7 @@ final class RestController {
 			[
 				'methods'             => 'GET',
 				'callback'            => [ $this, 'handle_models' ],
-				'permission_callback' => '__return_true',
+				'permission_callback' => [ $this, 'check_bearer_present' ],
 				'args'                => GatewayRequestSchema::models(),
 			]
 		);
@@ -104,7 +104,14 @@ final class RestController {
 			[
 				'methods'             => 'GET',
 				'callback'            => [ $this, 'handle_model_detail' ],
-				'permission_callback' => '__return_true',
+				'permission_callback' => [ $this, 'check_bearer_present' ],
+				'args'                => [
+					'model_id' => [
+						'type'              => 'string',
+						'required'          => true,
+						'sanitize_callback' => 'sanitize_text_field',
+					],
+				],
 			]
 		);
 
@@ -115,7 +122,7 @@ final class RestController {
 			[
 				'methods'             => 'GET',
 				'callback'            => [ $this, 'handle_status' ],
-				'permission_callback' => '__return_true',
+				'permission_callback' => [ $this, 'check_bearer_present' ],
 			]
 		);
 	}
@@ -180,6 +187,17 @@ final class RestController {
 	 */
 	public function handle_status( \WP_REST_Request $request ): \WP_REST_Response {
 		return $this->get_pipeline()->handle( 'status', $request );
+	}
+
+	/**
+	 * Check that a Bearer token is present in the Authorization header.
+	 *
+	 * @param \WP_REST_Request $request REST request.
+	 * @return bool
+	 */
+	public function check_bearer_present( \WP_REST_Request $request ): bool {
+		$auth = $request->get_header( 'authorization' );
+		return ! empty( $auth ) && str_starts_with( strtolower( $auth ), 'bearer ' );
 	}
 
 	/**

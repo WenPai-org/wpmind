@@ -69,9 +69,11 @@ final class BudgetMiddleware implements GatewayStageInterface {
 		$table        = $wpdb->prefix . 'wpmind_api_key_usage';
 		$window_month = gmdate( 'Y-m' );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$result = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT total_cost_usd FROM {$table} WHERE key_id = %s AND window_month = %s LIMIT 1",
+				'SELECT total_cost_usd FROM %i WHERE key_id = %s AND window_month = %s LIMIT 1',
+				$table,
 				$key_id,
 				$window_month
 			)

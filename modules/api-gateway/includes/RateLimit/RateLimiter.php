@@ -105,7 +105,8 @@ final class RateLimiter {
 	private function consume_with_fallback( string $key, int $window_sec, int $cost, int $limit, string $rid, int $now ): RateStoreResult {
 		try {
 			return $this->primary->consume( $key, $window_sec, $cost, $limit, $rid, $now );
-		} catch ( \Throwable $e ) {
+		} catch ( \Exception $e ) {
+			error_log( '[WPMind] RateLimiter primary store failed: ' . $e->getMessage() );
 			return $this->fallback->consume( $key, $window_sec, $cost, $limit, $rid, $now );
 		}
 	}
@@ -117,11 +118,8 @@ final class RateLimiter {
 	 * @param string $rid Request ID.
 	 */
 	private function rollback_with_fallback( string $key, string $rid ): void {
-		try {
-			$this->primary->rollback( $key, $rid );
-		} catch ( \Throwable $e ) {
-			$this->fallback->rollback( $key, $rid );
-		}
+		try { $this->primary->rollback( $key, $rid ); } catch ( \Throwable $e ) { /* ignore */ }
+		try { $this->fallback->rollback( $key, $rid ); } catch ( \Throwable $e ) { /* ignore */ }
 	}
 
 	/**

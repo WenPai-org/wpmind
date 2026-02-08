@@ -35,6 +35,7 @@ final class TransientRateStore implements RateStoreInterface {
 		$reset    = $now + $window_sec;
 
 		if ( ! $this->acquire_lock( $lock_key ) ) {
+			error_log( '[WPMind] TransientRateStore: lock acquisition failed for ' . $key . ', failing open.' );
 			return new RateStoreResult( true, $limit, $reset );
 		}
 
@@ -96,13 +97,17 @@ final class TransientRateStore implements RateStoreInterface {
 	 * @return bool True if lock acquired.
 	 */
 	private function acquire_lock( string $lock_key ): bool {
-		$existing = get_transient( $lock_key );
-
-		if ( $existing !== false ) {
-			return false;
+		if ( wp_using_ext_object_cache() ) {
+			return wp_cache_add( $lock_key, 1, 'wpmind_rate', self::LOCK_TTL );
 		}
 
-		return set_transient( $lock_key, 1, self::LOCK_TTL );
+		global $wpdb;
+
+		return (bool) $wpdb->query( $wpdb->prepare(
+			"INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'no')",
+			'_transient_' . $lock_key,
+			time()
+		) );
 	}
 
 	/**
@@ -111,6 +116,11 @@ final class TransientRateStore implements RateStoreInterface {
 	 * @param string $lock_key Transient key for the lock.
 	 */
 	private function release_lock( string $lock_key ): void {
+		if ( wp_using_ext_object_cache() ) {
+			wp_cache_delete( $lock_key, 'wpmind_rate' );
+			return;
+		}
+
 		delete_transient( $lock_key );
 	}
 

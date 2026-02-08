@@ -75,6 +75,7 @@ final class AuthMiddleware implements GatewayStageInterface {
 			return;
 		}
 
+		$context->set_client_ip( $client_ip );
 		$context->set_auth_result( $result );
 	}
 
