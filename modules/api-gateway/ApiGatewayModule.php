@@ -48,6 +48,7 @@ require_once __DIR__ . '/includes/Error/ErrorMapper.php';
 require_once __DIR__ . '/includes/Pipeline/ErrorMiddleware.php';
 require_once __DIR__ . '/includes/Pipeline/LogMiddleware.php';
 require_once __DIR__ . '/includes/RestController.php';
+require_once __DIR__ . '/includes/Admin/AuditLogRepository.php';
 require_once __DIR__ . '/includes/Admin/GatewayAjaxController.php';
 
 /**

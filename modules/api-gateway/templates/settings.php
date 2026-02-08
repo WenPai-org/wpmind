@@ -23,118 +23,161 @@ $log_prompts      = get_option( 'wpmind_gateway_log_prompts', '0' ) === '1';
 $total_keys     = ApiKeyRepository::count_keys();
 $active_keys    = ApiKeyRepository::count_active_keys();
 $month_requests = ApiKeyRepository::get_month_total_requests();
+
+$base_url = rest_url( 'mind/v1' );
 ?>
 
-<style>
-.wpmind-gw-stats{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
-.wpmind-gw-stat{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:16px 20px;flex:1;min-width:140px}
-.wpmind-gw-stat-val{font-size:24px;font-weight:700;color:#1d2327}
-.wpmind-gw-stat-lbl{font-size:12px;color:#646970;margin-top:4px}
-.wpmind-gw-tabs{display:flex;gap:0;border-bottom:2px solid #e0e0e0;margin-bottom:20px}
-.wpmind-gw-tab{padding:10px 20px;cursor:pointer;border:none;background:none;font-size:14px;color:#646970;border-bottom:2px solid transparent;margin-bottom:-2px}
-.wpmind-gw-tab.active{color:#2271b1;border-bottom-color:#2271b1;font-weight:600}
-.wpmind-gw-panel{display:none}.wpmind-gw-panel.active{display:block}
-.wpmind-gw-form label{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0}
-.wpmind-gw-form .lbl{min-width:180px;font-weight:500}
-.wpmind-gw-form input[type=number]{width:120px}
-.wpmind-gw-btn{background:#2271b1;color:#fff;border:none;padding:8px 20px;border-radius:4px;cursor:pointer;font-size:13px}
-.wpmind-gw-btn:hover{background:#135e96}
-.wpmind-gw-btn-danger{background:#d63638}.wpmind-gw-btn-danger:hover{background:#a02021}
-.wpmind-gw-btn-sm{padding:4px 12px;font-size:12px}
-.wpmind-gw-keys-table{width:100%;border-collapse:collapse;margin-top:12px}
-</style>
-
+<!-- Stat Cards -->
 <div class="wpmind-gw-stats">
-	<div class="wpmind-gw-stat">
-		<div class="wpmind-gw-stat-val"><?php echo $gateway_enabled ? '✓ ON' : '✗ OFF'; ?></div>
-		<div class="wpmind-gw-stat-lbl"><?php esc_html_e( '网关状态', 'wpmind' ); ?></div>
+	<div class="wpmind-stat-card">
+		<div class="wpmind-stat-icon">
+			<span class="dashicons dashicons-admin-site-alt3"></span>
+		</div>
+		<div class="wpmind-stat-content">
+			<div class="wpmind-stat-value"><?php echo $gateway_enabled ? 'ON' : 'OFF'; ?></div>
+			<div class="wpmind-stat-label"><?php esc_html_e( '网关状态', 'wpmind' ); ?></div>
+		</div>
 	</div>
-	<div class="wpmind-gw-stat">
-		<div class="wpmind-gw-stat-val"><?php echo esc_html( (string) $total_keys ); ?></div>
-		<div class="wpmind-gw-stat-lbl"><?php esc_html_e( 'API Keys', 'wpmind' ); ?></div>
+	<div class="wpmind-stat-card">
+		<div class="wpmind-stat-icon">
+			<span class="dashicons dashicons-admin-network"></span>
+		</div>
+		<div class="wpmind-stat-content">
+			<div class="wpmind-stat-value"><?php echo esc_html( (string) $total_keys ); ?></div>
+			<div class="wpmind-stat-label"><?php esc_html_e( 'API Keys', 'wpmind' ); ?></div>
+		</div>
 	</div>
-	<div class="wpmind-gw-stat">
-		<div class="wpmind-gw-stat-val"><?php echo esc_html( (string) $active_keys ); ?></div>
-		<div class="wpmind-gw-stat-lbl"><?php esc_html_e( '活跃 Keys', 'wpmind' ); ?></div>
+	<div class="wpmind-stat-card">
+		<div class="wpmind-stat-icon">
+			<span class="dashicons dashicons-yes-alt"></span>
+		</div>
+		<div class="wpmind-stat-content">
+			<div class="wpmind-stat-value"><?php echo esc_html( (string) $active_keys ); ?></div>
+			<div class="wpmind-stat-label"><?php esc_html_e( '活跃 Keys', 'wpmind' ); ?></div>
+		</div>
 	</div>
-	<div class="wpmind-gw-stat">
-		<div class="wpmind-gw-stat-val"><?php echo esc_html( number_format( $month_requests ) ); ?></div>
-		<div class="wpmind-gw-stat-lbl"><?php esc_html_e( '本月请求', 'wpmind' ); ?></div>
+	<div class="wpmind-stat-card">
+		<div class="wpmind-stat-icon">
+			<span class="dashicons dashicons-chart-line"></span>
+		</div>
+		<div class="wpmind-stat-content">
+			<div class="wpmind-stat-value"><?php echo esc_html( number_format( $month_requests ) ); ?></div>
+			<div class="wpmind-stat-label"><?php esc_html_e( '本月请求', 'wpmind' ); ?></div>
+		</div>
 	</div>
 </div>
 
-<div class="wpmind-gw-tabs">
-	<button type="button" class="wpmind-gw-tab active" data-tab="settings"><?php esc_html_e( '基础设置', 'wpmind' ); ?></button>
-	<button type="button" class="wpmind-gw-tab" data-tab="keys"><?php esc_html_e( 'API Key 管理', 'wpmind' ); ?></button>
+<!-- Sub-tab Navigation -->
+<div class="wpmind-gw-subtabs">
+	<button type="button" class="wpmind-gw-subtab active" data-tab="settings">
+		<span class="dashicons dashicons-admin-generic"></span>
+		<?php esc_html_e( '基础设置', 'wpmind' ); ?>
+	</button>
+	<button type="button" class="wpmind-gw-subtab" data-tab="keys">
+		<span class="dashicons dashicons-admin-network"></span>
+		<?php esc_html_e( 'API Key 管理', 'wpmind' ); ?>
+	</button>
+	<button type="button" class="wpmind-gw-subtab" data-tab="docs">
+		<span class="dashicons dashicons-media-document"></span>
+		<?php esc_html_e( '接入文档', 'wpmind' ); ?>
+	</button>
+	<button type="button" class="wpmind-gw-subtab" data-tab="logs">
+		<span class="dashicons dashicons-list-view"></span>
+		<?php esc_html_e( '请求日志', 'wpmind' ); ?>
+	</button>
 </div>
 
-<!-- Settings Panel -->
+<!-- Panel 1: Settings -->
 <div class="wpmind-gw-panel active" data-panel="settings">
-	<div class="wpmind-gw-form" id="wpmind-gw-settings-form">
-		<label>
-			<span class="lbl"><?php esc_html_e( '启用网关', 'wpmind' ); ?></span>
-			<input type="checkbox" id="gw-enabled" value="1" <?php checked( $gateway_enabled ); ?>>
-		</label>
-		<label>
-			<span class="lbl"><?php esc_html_e( '默认 RPM 限制', 'wpmind' ); ?></span>
-			<input type="number" id="gw-rpm" value="<?php echo esc_attr( (string) $default_rpm ); ?>" min="1" max="10000">
-		</label>
-		<label>
-			<span class="lbl"><?php esc_html_e( '默认 TPM 限制', 'wpmind' ); ?></span>
-			<input type="number" id="gw-tpm" value="<?php echo esc_attr( (string) $default_tpm ); ?>" min="1000" max="10000000">
-		</label>
-		<label>
-			<span class="lbl"><?php esc_html_e( 'SSE 全局并发', 'wpmind' ); ?></span>
-			<input type="number" id="gw-sse" value="<?php echo esc_attr( (string) $sse_global_limit ); ?>" min="1" max="200">
-		</label>
-		<label>
-			<span class="lbl"><?php esc_html_e( '请求体上限 (MB)', 'wpmind' ); ?></span>
-			<input type="number" id="gw-body-mb" value="<?php echo esc_attr( (string) $max_body_mb ); ?>" min="1" max="100">
-		</label>
-		<label>
-			<span class="lbl"><?php esc_html_e( 'Max Tokens 上限', 'wpmind' ); ?></span>
-			<input type="number" id="gw-tokens-cap" value="<?php echo esc_attr( (string) $max_tokens_cap ); ?>" min="256" max="1000000">
-		</label>
-		<label>
-			<span class="lbl"><?php esc_html_e( '记录 Prompt 内容', 'wpmind' ); ?></span>
-			<input type="checkbox" id="gw-log-prompts" value="1" <?php checked( $log_prompts ); ?>>
-		</label>
-		<div style="padding:16px 0">
-			<button type="button" class="wpmind-gw-btn" id="gw-save-settings"><?php esc_html_e( '保存设置', 'wpmind' ); ?></button>
-			<span id="gw-save-msg" style="margin-left:12px;color:#00a32a;display:none"></span>
-		</div>
+	<table class="wpmind-gw-form-table">
+		<tr>
+			<th><?php esc_html_e( '启用网关', 'wpmind' ); ?></th>
+			<td><input type="checkbox" id="gw-enabled" value="1" <?php checked( $gateway_enabled ); ?>></td>
+		</tr>
+		<tr>
+			<th><?php esc_html_e( '默认 RPM 限制', 'wpmind' ); ?></th>
+			<td><input type="number" id="gw-rpm" value="<?php echo esc_attr( (string) $default_rpm ); ?>" min="1" max="10000"></td>
+		</tr>
+		<tr>
+			<th><?php esc_html_e( '默认 TPM 限制', 'wpmind' ); ?></th>
+			<td><input type="number" id="gw-tpm" value="<?php echo esc_attr( (string) $default_tpm ); ?>" min="1000" max="10000000"></td>
+		</tr>
+		<tr>
+			<th><?php esc_html_e( 'SSE 全局并发', 'wpmind' ); ?></th>
+			<td><input type="number" id="gw-sse" value="<?php echo esc_attr( (string) $sse_global_limit ); ?>" min="1" max="200"></td>
+		</tr>
+		<tr>
+			<th><?php esc_html_e( '请求体上限 (MB)', 'wpmind' ); ?></th>
+			<td><input type="number" id="gw-body-mb" value="<?php echo esc_attr( (string) $max_body_mb ); ?>" min="1" max="100"></td>
+		</tr>
+		<tr>
+			<th><?php esc_html_e( 'Max Tokens 上限', 'wpmind' ); ?></th>
+			<td><input type="number" id="gw-tokens-cap" value="<?php echo esc_attr( (string) $max_tokens_cap ); ?>" min="256" max="1000000"></td>
+		</tr>
+		<tr>
+			<th><?php esc_html_e( '记录 Prompt 内容', 'wpmind' ); ?></th>
+			<td><input type="checkbox" id="gw-log-prompts" value="1" <?php checked( $log_prompts ); ?>></td>
+		</tr>
+	</table>
+	<div style="padding:var(--wpmind-space-4) 0">
+		<button type="button" class="wpmind-gw-btn" id="gw-save-settings"><?php esc_html_e( '保存设置', 'wpmind' ); ?></button>
+		<span id="gw-save-msg" class="wpmind-gw-save-msg" style="display:none"></span>
 	</div>
 </div>
 
-<!-- API Keys Panel -->
+<!-- Panel 2: API Key Management -->
 <div class="wpmind-gw-panel" data-panel="keys">
-	<div style="margin-bottom:16px">
-		<button type="button" class="wpmind-gw-btn" id="gw-show-create"><?php esc_html_e( '+ 创建 API Key', 'wpmind' ); ?></button>
+	<div style="margin-bottom:var(--wpmind-space-4)">
+		<button type="button" class="wpmind-gw-btn" id="gw-show-create">
+			<span class="dashicons dashicons-plus-alt2" style="font-size:16px;width:16px;height:16px"></span>
+			<?php esc_html_e( '创建 API Key', 'wpmind' ); ?>
+		</button>
 	</div>
 
-	<!-- Create Key Form (hidden by default) -->
-	<div id="gw-create-form" style="display:none;background:#f6f7f7;padding:16px;border-radius:6px;margin-bottom:16px">
-		<h4 style="margin:0 0 12px"><?php esc_html_e( '创建新 API Key', 'wpmind' ); ?></h4>
-		<div class="wpmind-gw-form">
-			<label><span class="lbl"><?php esc_html_e( '名称', 'wpmind' ); ?></span><input type="text" id="ck-name" placeholder="My App" style="width:200px"></label>
-			<label><span class="lbl">RPM</span><input type="number" id="ck-rpm" value="<?php echo esc_attr( (string) $default_rpm ); ?>" min="1"></label>
-			<label><span class="lbl">TPM</span><input type="number" id="ck-tpm" value="<?php echo esc_attr( (string) $default_tpm ); ?>" min="1000"></label>
-			<label><span class="lbl"><?php esc_html_e( '并发限制', 'wpmind' ); ?></span><input type="number" id="ck-concurrency" value="2" min="1" max="100"></label>
-			<label><span class="lbl"><?php esc_html_e( '月预算 (USD)', 'wpmind' ); ?></span><input type="number" id="ck-budget" value="0" min="0" step="0.01"></label>
-			<label><span class="lbl"><?php esc_html_e( 'IP 白名单', 'wpmind' ); ?></span><input type="text" id="ck-ips" placeholder="1.2.3.4, 5.6.7.8" style="width:200px"></label>
-			<label><span class="lbl"><?php esc_html_e( '过期时间', 'wpmind' ); ?></span><input type="date" id="ck-expires"></label>
+	<!-- Create Key Form -->
+	<div id="gw-create-form" class="wpmind-gw-create-panel" style="display:none">
+		<h4><?php esc_html_e( '创建新 API Key', 'wpmind' ); ?></h4>
+		<div class="wpmind-gw-edit-grid">
+			<div class="wpmind-gw-edit-field">
+				<label><?php esc_html_e( '名称', 'wpmind' ); ?></label>
+				<input type="text" id="ck-name" placeholder="My App">
+			</div>
+			<div class="wpmind-gw-edit-field">
+				<label>RPM</label>
+				<input type="number" id="ck-rpm" value="<?php echo esc_attr( (string) $default_rpm ); ?>" min="1">
+			</div>
+			<div class="wpmind-gw-edit-field">
+				<label>TPM</label>
+				<input type="number" id="ck-tpm" value="<?php echo esc_attr( (string) $default_tpm ); ?>" min="1000">
+			</div>
+			<div class="wpmind-gw-edit-field">
+				<label><?php esc_html_e( '并发限制', 'wpmind' ); ?></label>
+				<input type="number" id="ck-concurrency" value="2" min="1" max="100">
+			</div>
+			<div class="wpmind-gw-edit-field">
+				<label><?php esc_html_e( '月预算 (USD)', 'wpmind' ); ?></label>
+				<input type="number" id="ck-budget" value="0" min="0" step="0.01">
+			</div>
+			<div class="wpmind-gw-edit-field">
+				<label><?php esc_html_e( 'IP 白名单', 'wpmind' ); ?></label>
+				<input type="text" id="ck-ips" placeholder="1.2.3.4, 5.6.7.8">
+			</div>
+			<div class="wpmind-gw-edit-field">
+				<label><?php esc_html_e( '过期时间', 'wpmind' ); ?></label>
+				<input type="date" id="ck-expires">
+			</div>
 		</div>
-		<div style="padding:12px 0;display:flex;gap:8px">
+		<div class="wpmind-gw-edit-actions">
 			<button type="button" class="wpmind-gw-btn" id="gw-create-key"><?php esc_html_e( '创建', 'wpmind' ); ?></button>
-			<button type="button" class="wpmind-gw-btn" style="background:#646970" id="gw-cancel-create"><?php esc_html_e( '取消', 'wpmind' ); ?></button>
+			<button type="button" class="wpmind-gw-btn wpmind-gw-btn-secondary" id="gw-cancel-create"><?php esc_html_e( '取消', 'wpmind' ); ?></button>
 		</div>
 	</div>
 
-	<!-- New Key Display (hidden) -->
-	<div id="gw-new-key-box" style="display:none;background:#e7f5e7;border:1px solid #00a32a;padding:16px;border-radius:6px;margin-bottom:16px">
+	<!-- New Key Display -->
+	<div id="gw-new-key-box" class="wpmind-gw-key-success" style="display:none">
 		<strong><?php esc_html_e( 'API Key 创建成功！请立即复制，此 Key 不会再次显示。', 'wpmind' ); ?></strong>
-		<div style="margin-top:8px;display:flex;gap:8px;align-items:center">
-			<code id="gw-raw-key" style="padding:8px 12px;background:#fff;border:1px solid #ccc;border-radius:4px;font-size:13px;word-break:break-all;flex:1"></code>
+		<div class="wpmind-gw-key-display">
+			<code id="gw-raw-key"></code>
 			<button type="button" class="wpmind-gw-btn wpmind-gw-btn-sm" id="gw-copy-key"><?php esc_html_e( '复制', 'wpmind' ); ?></button>
 		</div>
 	</div>
@@ -146,16 +189,145 @@ $month_requests = ApiKeyRepository::get_month_total_requests();
 				<th>Key Prefix</th>
 				<th><?php esc_html_e( '名称', 'wpmind' ); ?></th>
 				<th><?php esc_html_e( '状态', 'wpmind' ); ?></th>
-				<th>RPM/TPM</th>
+				<th>RPM / TPM</th>
 				<th><?php esc_html_e( '本月请求', 'wpmind' ); ?></th>
+				<th>Tokens</th>
 				<th><?php esc_html_e( '最后使用', 'wpmind' ); ?></th>
 				<th><?php esc_html_e( '操作', 'wpmind' ); ?></th>
 			</tr>
 		</thead>
 		<tbody id="gw-keys-tbody">
-			<tr><td colspan="7" style="text-align:center;color:#646970"><?php esc_html_e( '加载中...', 'wpmind' ); ?></td></tr>
+			<tr><td colspan="8" style="text-align:center;color:var(--wpmind-gray-400)"><?php esc_html_e( '加载中...', 'wpmind' ); ?></td></tr>
 		</tbody>
 	</table>
+</div>
+
+<!-- Panel 3: API Docs -->
+<div class="wpmind-gw-panel" data-panel="docs">
+	<div class="wpmind-gw-docs-section">
+		<h4>Base URL</h4>
+		<div class="wpmind-gw-code-block">
+			<pre><?php echo esc_html( $base_url ); ?></pre>
+			<button type="button" class="wpmind-gw-copy-btn" data-copy="<?php echo esc_attr( $base_url ); ?>"><?php esc_html_e( '复制', 'wpmind' ); ?></button>
+		</div>
+	</div>
+
+	<div class="wpmind-gw-docs-section">
+		<h4><?php esc_html_e( '可用端点', 'wpmind' ); ?></h4>
+		<table class="wpmind-gw-endpoint-list widefat striped">
+			<thead>
+				<tr>
+					<th><?php esc_html_e( '方法', 'wpmind' ); ?></th>
+					<th><?php esc_html_e( '路径', 'wpmind' ); ?></th>
+					<th><?php esc_html_e( '说明', 'wpmind' ); ?></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><code>POST</code></td>
+					<td><code>/chat/completions</code></td>
+					<td><?php esc_html_e( '聊天补全（兼容 OpenAI）', 'wpmind' ); ?></td>
+				</tr>
+				<tr>
+					<td><code>GET</code></td>
+					<td><code>/models</code></td>
+					<td><?php esc_html_e( '列出可用模型', 'wpmind' ); ?></td>
+				</tr>
+				<tr>
+					<td><code>POST</code></td>
+					<td><code>/embeddings</code></td>
+					<td><?php esc_html_e( '文本向量化', 'wpmind' ); ?></td>
+				</tr>
+				<tr>
+					<td><code>POST</code></td>
+					<td><code>/responses</code></td>
+					<td><?php esc_html_e( 'Responses API（兼容 OpenAI）', 'wpmind' ); ?></td>
+				</tr>
+				<tr>
+					<td><code>GET</code></td>
+					<td><code>/status</code></td>
+					<td><?php esc_html_e( '网关状态检查', 'wpmind' ); ?></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div class="wpmind-gw-docs-section">
+		<h4><?php esc_html_e( 'curl 示例', 'wpmind' ); ?></h4>
+		<div class="wpmind-gw-code-block">
+			<pre>curl <?php echo esc_html( $base_url ); ?>/chat/completions \
+  -H "Authorization: Bearer sk_mind_YOUR_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "deepseek-chat",
+  "messages": [{"role": "user", "content": "Hello"}],
+  "stream": true
+}'</pre>
+			<button type="button" class="wpmind-gw-copy-btn" data-copy-pre="1"><?php esc_html_e( '复制', 'wpmind' ); ?></button>
+		</div>
+	</div>
+
+	<div class="wpmind-gw-docs-section">
+		<h4><?php esc_html_e( '认证方式', 'wpmind' ); ?></h4>
+		<p style="color:var(--wpmind-gray-600);font-size:var(--wpmind-text-base)">
+			<?php esc_html_e( '在请求头中添加 Authorization: Bearer sk_mind_YOUR_KEY。所有端点均需要有效的 API Key 认证。', 'wpmind' ); ?>
+		</p>
+	</div>
+</div>
+
+<!-- Panel 4: Audit Logs -->
+<div class="wpmind-gw-panel" data-panel="logs">
+	<div class="wpmind-gw-log-filters">
+		<div class="wpmind-gw-filter-group">
+			<label>Key</label>
+			<select id="log-filter-key">
+				<option value=""><?php esc_html_e( '全部', 'wpmind' ); ?></option>
+			</select>
+		</div>
+		<div class="wpmind-gw-filter-group">
+			<label><?php esc_html_e( '事件类型', 'wpmind' ); ?></label>
+			<select id="log-filter-event">
+				<option value=""><?php esc_html_e( '全部', 'wpmind' ); ?></option>
+				<option value="api_request">api_request</option>
+				<option value="api_stream_request">api_stream_request</option>
+				<option value="key_created">key_created</option>
+				<option value="key_revoked">key_revoked</option>
+			</select>
+		</div>
+		<div class="wpmind-gw-filter-group">
+			<label><?php esc_html_e( '开始日期', 'wpmind' ); ?></label>
+			<input type="date" id="log-filter-from">
+		</div>
+		<div class="wpmind-gw-filter-group">
+			<label><?php esc_html_e( '结束日期', 'wpmind' ); ?></label>
+			<input type="date" id="log-filter-to">
+		</div>
+		<div class="wpmind-gw-filter-group">
+			<button type="button" class="wpmind-gw-btn wpmind-gw-btn-sm" id="log-filter-apply"><?php esc_html_e( '筛选', 'wpmind' ); ?></button>
+		</div>
+	</div>
+
+	<table class="widefat striped">
+		<thead>
+			<tr>
+				<th><?php esc_html_e( '时间', 'wpmind' ); ?></th>
+				<th>Key</th>
+				<th><?php esc_html_e( '事件', 'wpmind' ); ?></th>
+				<th><?php esc_html_e( '详情', 'wpmind' ); ?></th>
+			</tr>
+		</thead>
+		<tbody id="gw-logs-tbody">
+			<tr><td colspan="4" style="text-align:center;color:var(--wpmind-gray-400)"><?php esc_html_e( '点击"筛选"加载日志', 'wpmind' ); ?></td></tr>
+		</tbody>
+	</table>
+
+	<div class="wpmind-gw-pagination" id="gw-logs-pagination" style="display:none">
+		<span id="gw-logs-info"></span>
+		<div class="wpmind-gw-pagination-btns">
+			<button type="button" class="wpmind-gw-btn wpmind-gw-btn-sm wpmind-gw-btn-secondary" id="log-prev" disabled><?php esc_html_e( '上一页', 'wpmind' ); ?></button>
+			<button type="button" class="wpmind-gw-btn wpmind-gw-btn-sm wpmind-gw-btn-secondary" id="log-next" disabled><?php esc_html_e( '下一页', 'wpmind' ); ?></button>
+		</div>
+	</div>
 </div>
 
 <script>
@@ -163,18 +335,19 @@ $month_requests = ApiKeyRepository::get_month_total_requests();
 	'use strict';
 	var ajaxurl = '<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>';
 	var nonce   = '<?php echo esc_js( wp_create_nonce( 'wpmind_ajax' ) ); ?>';
+	var logPage = 1;
 
-	// Tab switching.
-	$( '.wpmind-gw-tab' ).on( 'click', function() {
+	/* ---- Tab switching ---- */
+	$( '.wpmind-gw-subtab' ).on( 'click', function() {
 		var tab = $( this ).data( 'tab' );
-		$( '.wpmind-gw-tab' ).removeClass( 'active' );
+		$( '.wpmind-gw-subtab' ).removeClass( 'active' );
 		$( this ).addClass( 'active' );
 		$( '.wpmind-gw-panel' ).removeClass( 'active' );
 		$( '[data-panel="' + tab + '"]' ).addClass( 'active' );
 		if ( tab === 'keys' ) loadKeys();
 	} );
 
-	// Save settings.
+	/* ---- Save settings ---- */
 	$( '#gw-save-settings' ).on( 'click', function() {
 		var $btn = $( this ), $msg = $( '#gw-save-msg' );
 		$btn.prop( 'disabled', true );
@@ -189,16 +362,16 @@ $month_requests = ApiKeyRepository::get_month_total_requests();
 			max_tokens_cap: $( '#gw-tokens-cap' ).val(),
 			log_prompts: $( '#gw-log-prompts' ).is( ':checked' ) ? '1' : ''
 		}, function( r ) {
-			$msg.text( ( r.data && r.data.message ) || '保存失败' ).show();
+			$msg.text( ( r.data && r.data.message ) || '<?php echo esc_js( __( '保存失败', 'wpmind' ) ); ?>' ).show();
 			setTimeout( function() { $msg.fadeOut(); }, 3000 );
 		} ).always( function() { $btn.prop( 'disabled', false ); } );
 	} );
 
-	// Show/hide create form.
+	/* ---- Create key form toggle ---- */
 	$( '#gw-show-create' ).on( 'click', function() { $( '#gw-create-form' ).slideDown(); } );
 	$( '#gw-cancel-create' ).on( 'click', function() { $( '#gw-create-form' ).slideUp(); } );
 
-	// Create key.
+	/* ---- Create key ---- */
 	$( '#gw-create-key' ).on( 'click', function() {
 		var $btn = $( this );
 		$btn.prop( 'disabled', true );
@@ -220,65 +393,199 @@ $month_requests = ApiKeyRepository::get_month_total_requests();
 				$( '#ck-name' ).val( '' );
 				loadKeys();
 			} else {
-				alert( ( r.data && r.data.message ) || '创建失败' );
+				alert( ( r.data && r.data.message ) || '<?php echo esc_js( __( '创建失败', 'wpmind' ) ); ?>' );
 			}
 		} ).always( function() { $btn.prop( 'disabled', false ); } );
 	} );
 
-	// Copy key.
+	/* ---- Copy key ---- */
 	$( '#gw-copy-key' ).on( 'click', function() {
-		var text = $( '#gw-raw-key' ).text();
-		if ( navigator.clipboard ) {
-			navigator.clipboard.writeText( text ).then( function() {
-				$( '#gw-copy-key' ).text( '<?php echo esc_js( __( '已复制', 'wpmind' ) ); ?>' );
-				setTimeout( function() { $( '#gw-copy-key' ).text( '<?php echo esc_js( __( '复制', 'wpmind' ) ); ?>' ); }, 2000 );
-			} );
-		}
+		copyText( $( '#gw-raw-key' ).text(), $( this ) );
 	} );
 
-	// Load keys.
+	/* ---- Load keys ---- */
 	function loadKeys() {
 		$.post( ajaxurl, { action: 'wpmind_list_api_keys', nonce: nonce }, function( r ) {
 			var $tb = $( '#gw-keys-tbody' );
 			$tb.empty();
 			if ( ! r.success || ! r.data || ! r.data.keys || ! r.data.keys.length ) {
-				$tb.html( '<tr><td colspan="7" style="text-align:center;color:#646970"><?php echo esc_js( __( '暂无 API Key', 'wpmind' ) ); ?></td></tr>' );
+				$tb.html( '<tr><td colspan="8" style="text-align:center;color:var(--wpmind-gray-400)"><?php echo esc_js( __( '暂无 API Key', 'wpmind' ) ); ?></td></tr>' );
 				return;
 			}
+			// Also populate log filter dropdown.
+			var $sel = $( '#log-filter-key' );
+			$sel.find( 'option:gt(0)' ).remove();
 			$.each( r.data.keys, function( i, k ) {
-				var statusBadge = k.status === 'active'
-					? '<span style="color:#00a32a">Active</span>'
-					: '<span style="color:#d63638">' + k.status + '</span>';
+				$sel.append( '<option value="' + k.key_id + '">sk_mind_' + k.key_prefix + '... (' + ( k.name || '-' ) + ')</option>' );
+				var badge = k.status === 'active'
+					? '<span class="wpmind-gw-badge wpmind-gw-badge-active">Active</span>'
+					: '<span class="wpmind-gw-badge wpmind-gw-badge-revoked">' + k.status + '</span>';
 				var lastUsed = k.last_used_at || '-';
-				var actions = k.status === 'active'
-					? '<button class="wpmind-gw-btn wpmind-gw-btn-sm wpmind-gw-btn-danger gw-revoke" data-kid="' + k.key_id + '"><?php echo esc_js( __( '吊销', 'wpmind' ) ); ?></button>'
-					: '-';
+				var actions = '';
+				if ( k.status === 'active' ) {
+					actions = '<button class="wpmind-gw-btn wpmind-gw-btn-sm gw-edit-key" data-kid="' + k.key_id + '"><?php echo esc_js( __( '编辑', 'wpmind' ) ); ?></button> ';
+					actions += '<button class="wpmind-gw-btn wpmind-gw-btn-sm wpmind-gw-btn-danger gw-revoke" data-kid="' + k.key_id + '"><?php echo esc_js( __( '吊销', 'wpmind' ) ); ?></button>';
+				} else {
+					actions = '-';
+				}
+				var ipw = '';
+				try { ipw = k.ip_whitelist ? ( typeof k.ip_whitelist === 'string' ? ( k.ip_whitelist.charAt(0) === '[' ? JSON.parse( k.ip_whitelist ).join( ', ' ) : k.ip_whitelist ) : '' ) : ''; } catch(e) { ipw = k.ip_whitelist || ''; }
 				$tb.append(
-					'<tr>' +
+					'<tr data-key-id="' + k.key_id + '">' +
 					'<td><code>sk_mind_' + k.key_prefix + '...</code></td>' +
 					'<td>' + ( k.name || '-' ) + '</td>' +
-					'<td>' + statusBadge + '</td>' +
+					'<td>' + badge + '</td>' +
 					'<td>' + k.rpm_limit + ' / ' + k.tpm_limit + '</td>' +
 					'<td>' + ( k.usage_request_count || 0 ) + '</td>' +
+					'<td>' + Number( k.usage_total_tokens || 0 ).toLocaleString() + '</td>' +
 					'<td>' + lastUsed + '</td>' +
 					'<td>' + actions + '</td>' +
 					'</tr>'
 				);
+				// Inline edit row.
+				if ( k.status === 'active' ) {
+					$tb.append(
+						'<tr class="wpmind-gw-edit-row" data-edit-for="' + k.key_id + '" style="display:none"><td colspan="8">' +
+						'<div class="wpmind-gw-edit-panel">' +
+						'<div class="wpmind-gw-edit-grid">' +
+						editField( '<?php echo esc_js( __( '名称', 'wpmind' ) ); ?>', 'text', 'ek-name-' + k.key_id, k.name || '' ) +
+						editField( 'RPM', 'number', 'ek-rpm-' + k.key_id, k.rpm_limit ) +
+						editField( 'TPM', 'number', 'ek-tpm-' + k.key_id, k.tpm_limit ) +
+						editField( '<?php echo esc_js( __( '并发', 'wpmind' ) ); ?>', 'number', 'ek-conc-' + k.key_id, k.concurrency_limit ) +
+						editField( '<?php echo esc_js( __( '月预算 (USD)', 'wpmind' ) ); ?>', 'number', 'ek-budget-' + k.key_id, k.monthly_budget_usd || 0 ) +
+						editField( 'IP <?php echo esc_js( __( '白名单', 'wpmind' ) ); ?>', 'text', 'ek-ips-' + k.key_id, ipw ) +
+						editField( '<?php echo esc_js( __( '过期时间', 'wpmind' ) ); ?>', 'date', 'ek-exp-' + k.key_id, k.expires_at ? k.expires_at.substring( 0, 10 ) : '' ) +
+						'</div>' +
+						'<div class="wpmind-gw-edit-actions">' +
+						'<button class="wpmind-gw-btn wpmind-gw-btn-sm gw-save-edit" data-kid="' + k.key_id + '"><?php echo esc_js( __( '保存', 'wpmind' ) ); ?></button> ' +
+						'<button class="wpmind-gw-btn wpmind-gw-btn-sm wpmind-gw-btn-secondary gw-cancel-edit" data-kid="' + k.key_id + '"><?php echo esc_js( __( '取消', 'wpmind' ) ); ?></button>' +
+						'</div></div></td></tr>'
+					);
+				}
 			} );
 		} );
 	}
 
-	// Revoke key.
+	function editField( label, type, id, val ) {
+		var step = type === 'number' ? ' step="any"' : '';
+		return '<div class="wpmind-gw-edit-field"><label>' + label + '</label><input type="' + type + '" id="' + id + '" value="' + val + '"' + step + '></div>';
+	}
+
+	/* ---- Toggle inline edit ---- */
+	$( document ).on( 'click', '.gw-edit-key', function() {
+		var kid = $( this ).data( 'kid' );
+		var $row = $( '[data-edit-for="' + kid + '"]' );
+		$( '.wpmind-gw-edit-row' ).not( $row ).slideUp();
+		$row.slideToggle();
+	} );
+
+	$( document ).on( 'click', '.gw-cancel-edit', function() {
+		$( '[data-edit-for="' + $( this ).data( 'kid' ) + '"]' ).slideUp();
+	} );
+
+	/* ---- Save edit ---- */
+	$( document ).on( 'click', '.gw-save-edit', function() {
+		var $btn = $( this ), kid = $btn.data( 'kid' );
+		$btn.prop( 'disabled', true );
+		$.post( ajaxurl, {
+			action: 'wpmind_update_api_key',
+			nonce: nonce,
+			key_id: kid,
+			name: $( '#ek-name-' + kid ).val(),
+			rpm_limit: $( '#ek-rpm-' + kid ).val(),
+			tpm_limit: $( '#ek-tpm-' + kid ).val(),
+			concurrency_limit: $( '#ek-conc-' + kid ).val(),
+			monthly_budget_usd: $( '#ek-budget-' + kid ).val(),
+			ip_whitelist: $( '#ek-ips-' + kid ).val(),
+			expires_at: $( '#ek-exp-' + kid ).val()
+		}, function( r ) {
+			if ( r.success ) {
+				loadKeys();
+			} else {
+				alert( ( r.data && r.data.message ) || '<?php echo esc_js( __( '更新失败', 'wpmind' ) ); ?>' );
+			}
+		} ).always( function() { $btn.prop( 'disabled', false ); } );
+	} );
+
+	/* ---- Revoke key ---- */
 	$( document ).on( 'click', '.gw-revoke', function() {
 		if ( ! confirm( '<?php echo esc_js( __( '确定要吊销此 API Key？此操作不可撤销。', 'wpmind' ) ); ?>' ) ) return;
 		var $btn = $( this ), kid = $btn.data( 'kid' );
 		$btn.prop( 'disabled', true );
 		$.post( ajaxurl, { action: 'wpmind_revoke_api_key', nonce: nonce, key_id: kid }, function( r ) {
-			if ( r.success ) { loadKeys(); } else { alert( ( r.data && r.data.message ) || '吊销失败' ); }
+			if ( r.success ) { loadKeys(); } else { alert( ( r.data && r.data.message ) || '<?php echo esc_js( __( '吊销失败', 'wpmind' ) ); ?>' ); }
 		} ).always( function() { $btn.prop( 'disabled', false ); } );
 	} );
 
-	// Auto-load keys when keys tab is first shown.
+	/* ---- Audit logs ---- */
+	$( '#log-filter-apply' ).on( 'click', function() { logPage = 1; loadLogs(); } );
+	$( '#log-prev' ).on( 'click', function() { if ( logPage > 1 ) { logPage--; loadLogs(); } } );
+	$( '#log-next' ).on( 'click', function() { logPage++; loadLogs(); } );
+
+	function loadLogs() {
+		var data = {
+			action: 'wpmind_list_audit_logs',
+			nonce: nonce,
+			page: logPage,
+			key_id: $( '#log-filter-key' ).val(),
+			event_type: $( '#log-filter-event' ).val(),
+			date_from: $( '#log-filter-from' ).val(),
+			date_to: $( '#log-filter-to' ).val()
+		};
+		$.post( ajaxurl, data, function( r ) {
+			var $tb = $( '#gw-logs-tbody' );
+			$tb.empty();
+			if ( ! r.success || ! r.data || ! r.data.logs || ! r.data.logs.length ) {
+				$tb.html( '<tr><td colspan="4" style="text-align:center;color:var(--wpmind-gray-400)"><?php echo esc_js( __( '暂无日志', 'wpmind' ) ); ?></td></tr>' );
+				$( '#gw-logs-pagination' ).hide();
+				return;
+			}
+			$.each( r.data.logs, function( i, log ) {
+				var detail = '';
+				try {
+					var d = JSON.parse( log.detail_json || '{}' );
+					var parts = [];
+					if ( d.model ) parts.push( d.model );
+					if ( d.tokens_used ) parts.push( d.tokens_used + ' tokens' );
+					if ( d.finish_reason ) parts.push( d.finish_reason );
+					if ( d.status_code ) parts.push( 'HTTP ' + d.status_code );
+					detail = parts.join( ' | ' );
+				} catch(e) { detail = log.detail_json || ''; }
+				$tb.append(
+					'<tr>' +
+					'<td>' + ( log.created_at || '-' ) + '</td>' +
+					'<td><code>' + ( log.key_id || '-' ) + '</code></td>' +
+					'<td>' + ( log.event_type || '-' ) + '</td>' +
+					'<td>' + detail + '</td>' +
+					'</tr>'
+				);
+			} );
+			var d = r.data;
+			$( '#gw-logs-pagination' ).show();
+			$( '#gw-logs-info' ).text( '<?php echo esc_js( __( '共', 'wpmind' ) ); ?> ' + d.total + ' <?php echo esc_js( __( '条，第', 'wpmind' ) ); ?> ' + d.page + ' / ' + d.total_pages + ' <?php echo esc_js( __( '页', 'wpmind' ) ); ?>' );
+			$( '#log-prev' ).prop( 'disabled', d.page <= 1 );
+			$( '#log-next' ).prop( 'disabled', d.page >= d.total_pages );
+		} );
+	}
+
+	/* ---- Copy helpers ---- */
+	function copyText( text, $btn ) {
+		if ( navigator.clipboard ) {
+			navigator.clipboard.writeText( text ).then( function() {
+				var orig = $btn.text();
+				$btn.text( '<?php echo esc_js( __( '已复制', 'wpmind' ) ); ?>' );
+				setTimeout( function() { $btn.text( orig ); }, 2000 );
+			} );
+		}
+	}
+
+	$( document ).on( 'click', '.wpmind-gw-copy-btn', function() {
+		var $btn = $( this );
+		var text = $btn.data( 'copy' ) || $btn.closest( '.wpmind-gw-code-block' ).find( 'pre' ).text();
+		copyText( text, $btn );
+	} );
+
+	/* ---- Auto-load keys ---- */
 	loadKeys();
 } )( jQuery );
 </script>
