@@ -117,6 +117,9 @@ class GeoModule implements ModuleInterface {
 		// Register AJAX handlers.
 		add_action( 'wp_ajax_wpmind_save_geo_settings', array( $this, 'ajax_save_settings' ) );
 
+		// Deferred rewrite flush (set by AJAX save, executed on next page load).
+		add_action( 'admin_init', array( $this, 'maybe_flush_rewrite_rules' ) );
+
 		/**
 		 * Fires when GEO module is initialized.
 		 *
@@ -184,6 +187,16 @@ class GeoModule implements ModuleInterface {
 	}
 
 	/**
+	 * Flush rewrite rules if flagged by AJAX save.
+	 */
+	public function maybe_flush_rewrite_rules(): void {
+		if ( get_transient( 'wpmind_flush_rewrite_rules' ) ) {
+			delete_transient( 'wpmind_flush_rewrite_rules' );
+			flush_rewrite_rules();
+		}
+	}
+
+	/**
 	 * AJAX handler for saving GEO settings.
 	 */
 	public function ajax_save_settings(): void {
@@ -197,39 +210,54 @@ class GeoModule implements ModuleInterface {
 
 		// Sanitize and save settings.
 		// Use string '1'/'0' instead of boolean for reliable storage.
+		// Compare by value (not isset) because JS always sends 0/1 for checkboxes.
+		$to_bool = function( $key ) use ( $settings ): string {
+			return ( (string) ( $settings[ $key ] ?? '0' ) ) === '1' ? '1' : '0';
+		};
+
 		$options = array(
-			'wpmind_geo_enabled'             => isset( $settings['wpmind_geo_enabled'] ) ? '1' : '0',
-			'wpmind_standalone_markdown_feed' => isset( $settings['wpmind_standalone_markdown_feed'] ) ? '1' : '0',
-			'wpmind_chinese_optimize'        => isset( $settings['wpmind_chinese_optimize'] ) ? '1' : '0',
-			'wpmind_geo_signals'             => isset( $settings['wpmind_geo_signals'] ) ? '1' : '0',
-			'wpmind_crawler_tracking'        => isset( $settings['wpmind_crawler_tracking'] ) ? '1' : '0',
-			'wpmind_llms_txt_enabled'        => isset( $settings['wpmind_llms_txt_enabled'] ) ? '1' : '0',
-			'wpmind_schema_enabled'          => isset( $settings['wpmind_schema_enabled'] ) ? '1' : '0',
+			'wpmind_geo_enabled'             => $to_bool( 'wpmind_geo_enabled' ),
+			'wpmind_standalone_markdown_feed' => $to_bool( 'wpmind_standalone_markdown_feed' ),
+			'wpmind_chinese_optimize'        => $to_bool( 'wpmind_chinese_optimize' ),
+			'wpmind_geo_signals'             => $to_bool( 'wpmind_geo_signals' ),
+			'wpmind_crawler_tracking'        => $to_bool( 'wpmind_crawler_tracking' ),
+			'wpmind_llms_txt_enabled'        => $to_bool( 'wpmind_llms_txt_enabled' ),
+			'wpmind_schema_enabled'          => $to_bool( 'wpmind_schema_enabled' ),
 			'wpmind_schema_mode'             => sanitize_key( $settings['wpmind_schema_mode'] ?? 'auto' ),
-			'wpmind_ai_indexing_enabled'     => isset( $settings['wpmind_ai_indexing_enabled'] ) ? '1' : '0',
-			'wpmind_ai_default_declaration'  => in_array(
-				$settings['wpmind_ai_default_declaration'] ?? 'original',
-				[ 'original', 'ai-assisted', 'ai-generated' ],
-				true
-			) ? sanitize_key( $settings['wpmind_ai_default_declaration'] ) : 'original',
-			'wpmind_ai_sitemap_enabled'      => isset( $settings['wpmind_ai_sitemap_enabled'] ) ? '1' : '0',
-			'wpmind_ai_sitemap_max_entries'   => max( 10, min( 5000, absint( $settings['wpmind_ai_sitemap_max_entries'] ?? 500 ) ) ),
+			'wpmind_ai_indexing_enabled'     => $to_bool( 'wpmind_ai_indexing_enabled' ),
+			'wpmind_ai_sitemap_enabled'      => $to_bool( 'wpmind_ai_sitemap_enabled' ),
 		);
 
 		foreach ( $options as $key => $value ) {
 			update_option( $key, $value, false );
 		}
 
-		// Save AI excluded post types (array).
-		$excluded_types = [];
-		if ( isset( $settings['wpmind_ai_excluded_post_types'] ) && is_array( $settings['wpmind_ai_excluded_post_types'] ) ) {
-			$excluded_types = array_map( 'sanitize_key', $settings['wpmind_ai_excluded_post_types'] );
-		}
-		update_option( 'wpmind_ai_excluded_post_types', $excluded_types, false );
+		// Save AI indexing sub-settings only when enabled (avoid overwriting with defaults).
+		if ( $options['wpmind_ai_indexing_enabled'] === '1' ) {
+			$declaration = in_array(
+				$settings['wpmind_ai_default_declaration'] ?? 'original',
+				[ 'original', 'ai-assisted', 'ai-generated' ],
+				true
+			) ? sanitize_key( $settings['wpmind_ai_default_declaration'] ) : 'original';
+			update_option( 'wpmind_ai_default_declaration', $declaration, false );
 
-		// Flush rewrite rules if markdown feed setting changed.
-		if ( isset( $settings['wpmind_standalone_markdown_feed'] ) ) {
-			flush_rewrite_rules();
+			$excluded_types = [];
+			if ( isset( $settings['wpmind_ai_excluded_post_types'] ) && is_array( $settings['wpmind_ai_excluded_post_types'] ) ) {
+				$excluded_types = array_map( 'sanitize_key', $settings['wpmind_ai_excluded_post_types'] );
+			}
+			update_option( 'wpmind_ai_excluded_post_types', $excluded_types, false );
+		}
+
+		// Save AI sitemap sub-settings only when enabled.
+		if ( $options['wpmind_ai_sitemap_enabled'] === '1' ) {
+			$max_entries = max( 10, min( 5000, absint( $settings['wpmind_ai_sitemap_max_entries'] ?? 500 ) ) );
+			update_option( 'wpmind_ai_sitemap_max_entries', $max_entries, false );
+		}
+
+		// Flush rewrite rules if markdown feed or AI sitemap setting changed.
+		if ( isset( $settings['wpmind_standalone_markdown_feed'] ) || isset( $settings['wpmind_ai_sitemap_enabled'] ) ) {
+			// Schedule flush for next page load to ensure routes are registered.
+			set_transient( 'wpmind_flush_rewrite_rules', '1', 60 );
 		}
 
 		wp_send_json_success( array( 'message' => __( '设置已保存', 'wpmind' ) ) );
