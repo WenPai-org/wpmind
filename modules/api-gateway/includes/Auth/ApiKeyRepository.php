@@ -184,4 +184,76 @@ class ApiKeyRepository {
 			$wpdb->prepare( "SELECT COUNT(*) FROM %i", self::table() )
 		);
 	}
+
+	/**
+	 * Count active API keys.
+	 *
+	 * @return int Number of active keys.
+	 */
+	public static function count_active_keys(): int {
+		global $wpdb;
+
+		return (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM %i WHERE status = %s",
+				self::table(),
+				'active'
+			)
+		);
+	}
+
+	/**
+	 * Get total request count for the current month across all keys.
+	 *
+	 * @return int Total requests this month.
+	 */
+	public static function get_month_total_requests(): int {
+		global $wpdb;
+
+		$usage_table  = $wpdb->prefix . 'wpmind_api_key_usage';
+		$window_month = gmdate( 'Y-m' );
+
+		return (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COALESCE(SUM(request_count), 0) FROM %i WHERE window_month = %s",
+				$usage_table,
+				$window_month
+			)
+		);
+	}
+
+	/**
+	 * List all keys with current month usage, excluding secret columns.
+	 *
+	 * @return array Array of key rows with usage data.
+	 */
+	public static function list_all_with_usage(): array {
+		global $wpdb;
+
+		$keys_table  = self::table();
+		$usage_table = $wpdb->prefix . 'wpmind_api_key_usage';
+		$window_month = gmdate( 'Y-m' );
+
+		$results = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT k.id, k.key_id, k.key_prefix, k.name, k.owner_user_id,
+						k.rpm_limit, k.tpm_limit, k.concurrency_limit,
+						k.monthly_budget_usd, k.ip_whitelist, k.status,
+						k.last_used_at, k.expires_at, k.revoked_at,
+						k.created_at, k.updated_at,
+						COALESCE(u.request_count, 0) AS usage_request_count,
+						COALESCE(u.total_tokens, 0) AS usage_total_tokens,
+						COALESCE(u.total_cost_usd, 0) AS usage_total_cost_usd
+				FROM %i AS k
+				LEFT JOIN %i AS u ON k.key_id = u.key_id AND u.window_month = %s
+				ORDER BY k.created_at DESC",
+				$keys_table,
+				$usage_table,
+				$window_month
+			),
+			ARRAY_A
+		);
+
+		return is_array( $results ) ? $results : [];
+	}
 }
