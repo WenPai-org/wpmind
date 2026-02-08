@@ -14,7 +14,8 @@
         "llms.txt 生成器",
         "Schema.org 结构化数据",
         "AI 爬虫追踪",
-        "AI 索引指令 (noai/nollm)"
+        "AI 索引指令 (noai/nollm)",
+        "AI Sitemap (/ai-sitemap.xml)"
     ],
     "requires": {
         "php": "8.1",

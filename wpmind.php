@@ -3,7 +3,7 @@
  * Plugin Name: WPMind
  * Plugin URI: https://wpcy.com/mind
  * Description: 文派心思 - WordPress AI 自定义端点扩展，支持国内外多种 AI 服务
- * Version: 3.9.27
+ * Version: 3.9.28
  * Author: 文派心思
  * Author URI: https://wpcy.com/mind
  * License: GPL-2.0-or-later
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-    define( 'WPMIND_VERSION', '3.9.27' );
+    define( 'WPMIND_VERSION', '3.9.28' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
     define( 'WPMIND_PLUGIN_FILE', __FILE__ );
@@ -313,8 +313,8 @@ final class WPMind {
         // AI 过滤器 - 对齐官方 WordPress AI 插件 filter hook
         add_filter( 'ai_experiments_preferred_models_for_text_generation', [ $this, 'filter_preferred_models' ] );
         add_filter( 'wp_ai_client_default_request_timeout', [ $this, 'filter_request_timeout' ] );
-        add_filter( 'mcp_adapter_default_server_config', [ $this, 'filter_mcp_config' ] );
-        
+        $this->init_mcp_gateway();
+
         // 图像生成能力
         add_filter( 'ai_experiments_image_generation_handler', [ $this, 'handle_image_generation' ], 10, 2 );
 
@@ -383,15 +383,16 @@ final class WPMind {
     }
 
     /**
-     * 过滤 MCP 配置
+     * 初始化 MCP Gateway
      *
-     * @param array $config MCP 配置
-     * @return array 修改后的配置
+     * @return void
      */
-    public function filter_mcp_config( array $config ): array {
-        $config['name'] = 'wpmind-mcp';
-        $config['version'] = WPMIND_VERSION;
-        return $config;
+    private function init_mcp_gateway(): void {
+        if ( ! class_exists( '\WPMind\MCP\Gateway' ) ) {
+            return;
+        }
+
+        \WPMind\MCP\Gateway::instance()->init();
     }
 
     /**
