@@ -27,6 +27,9 @@ require_once __DIR__ . '/includes/SchemaGenerator.php';
 require_once __DIR__ . '/includes/CrawlerTracker.php';
 require_once __DIR__ . '/includes/AiIndexingManager.php';
 require_once __DIR__ . '/includes/AiSitemapGenerator.php';
+require_once __DIR__ . '/includes/RobotsTxtManager.php';
+require_once __DIR__ . '/includes/AiSummaryManager.php';
+require_once __DIR__ . '/includes/EntityLinker.php';
 
 /**
  * Class GeoModule
@@ -168,6 +171,21 @@ class GeoModule implements ModuleInterface {
 		if ( $is_enabled( 'wpmind_ai_sitemap_enabled', '0' ) ) {
 			$this->components['ai_sitemap'] = new AiSitemapGenerator();
 		}
+
+		// robots.txt AI Crawler Management.
+		if ( $is_enabled( 'wpmind_robots_ai_enabled', '0' ) ) {
+			$this->components['robots_txt'] = new RobotsTxtManager();
+		}
+
+		// AI Summary.
+		if ( $is_enabled( 'wpmind_ai_summary_enabled', '0' ) ) {
+			$this->components['ai_summary'] = new AiSummaryManager();
+		}
+
+		// Entity Linker.
+		if ( $is_enabled( 'wpmind_entity_linker_enabled', '0' ) ) {
+			$this->components['entity_linker'] = new EntityLinker();
+		}
 	}
 
 	/**
@@ -226,6 +244,9 @@ class GeoModule implements ModuleInterface {
 			'wpmind_schema_mode'             => sanitize_key( $settings['wpmind_schema_mode'] ?? 'auto' ),
 			'wpmind_ai_indexing_enabled'     => $to_bool( 'wpmind_ai_indexing_enabled' ),
 			'wpmind_ai_sitemap_enabled'      => $to_bool( 'wpmind_ai_sitemap_enabled' ),
+			'wpmind_robots_ai_enabled'       => $to_bool( 'wpmind_robots_ai_enabled' ),
+			'wpmind_ai_summary_enabled'      => $to_bool( 'wpmind_ai_summary_enabled' ),
+			'wpmind_entity_linker_enabled'   => $to_bool( 'wpmind_entity_linker_enabled' ),
 		);
 
 		foreach ( $options as $key => $value ) {
@@ -252,6 +273,25 @@ class GeoModule implements ModuleInterface {
 		if ( $options['wpmind_ai_sitemap_enabled'] === '1' ) {
 			$max_entries = max( 10, min( 5000, absint( $settings['wpmind_ai_sitemap_max_entries'] ?? 500 ) ) );
 			update_option( 'wpmind_ai_sitemap_max_entries', $max_entries, false );
+		}
+
+		// Save robots.txt AI rules only when enabled.
+		if ( $options['wpmind_robots_ai_enabled'] === '1' ) {
+			$raw_rules = $settings['wpmind_robots_ai_rules'] ?? [];
+			if ( is_array( $raw_rules ) ) {
+				$manager = new RobotsTxtManager();
+				$manager->save_rules( $raw_rules );
+			}
+		}
+
+		// Save AI summary sub-settings only when enabled.
+		if ( $options['wpmind_ai_summary_enabled'] === '1' ) {
+			$fallback = in_array(
+				$settings['wpmind_ai_summary_fallback'] ?? 'excerpt',
+				[ 'excerpt', 'none' ],
+				true
+			) ? sanitize_key( $settings['wpmind_ai_summary_fallback'] ) : 'excerpt';
+			update_option( 'wpmind_ai_summary_fallback', $fallback, false );
 		}
 
 		// Flush rewrite rules if markdown feed or AI sitemap setting changed.

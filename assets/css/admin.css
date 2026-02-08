@@ -852,9 +852,9 @@
 }
 
 .wpmind-provider-icon {
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
     flex-shrink: 0;
     display: inline-flex;
     align-items: center;
@@ -863,7 +863,7 @@
 
 .wpmind-endpoint-name {
     font-weight: 500;
-    font-size: var(--wpmind-text-md);
+    font-size: var(--wpmind-text-sm);
     color: var(--wpmind-gray-900);
 }
 
@@ -1515,6 +1515,74 @@ input.is-invalid {
     grid-template-columns: repeat(4, 1fr);
     gap: var(--wpmind-space-4);
     margin-bottom: var(--wpmind-space-6);
+}
+
+/* Sub-tab navigation */
+.wpmind-geo-subtabs {
+    display: flex;
+    gap: var(--wpmind-space-2);
+    margin-bottom: var(--wpmind-space-6);
+    border-bottom: 2px solid var(--wpmind-gray-200);
+    padding-bottom: 0;
+}
+
+.wpmind-geo-subtab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--wpmind-gray-600);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.wpmind-geo-subtab:hover {
+    color: var(--wpmind-primary);
+}
+
+.wpmind-geo-subtab.active {
+    color: var(--wpmind-primary);
+    border-bottom-color: var(--wpmind-primary);
+}
+
+.wpmind-geo-subtab .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* Tab panels */
+.wpmind-geo-tab-panel {
+    display: none;
+}
+
+.wpmind-geo-tab-panel.active {
+    display: block;
+}
+
+/* Full-width grid when sidebar is hidden */
+.wpmind-geo-grid-full {
+    grid-template-columns: 1fr !important;
+}
+
+/* NEW badge */
+.wpmind-geo-new-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--wpmind-primary);
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 @media (max-width: 1200px) {
