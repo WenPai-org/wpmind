@@ -161,8 +161,8 @@ $month_requests = ApiKeyRepository::get_month_total_requests();
 <script>
 ( function( $ ) {
 	'use strict';
-	var ajaxurl = window.wpmindData ? wpmindData.ajaxurl : ajaxurl;
-	var nonce   = window.wpmindData ? wpmindData.nonce : '';
+	var ajaxurl = '<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>';
+	var nonce   = '<?php echo esc_js( wp_create_nonce( 'wpmind_ajax' ) ); ?>';
 
 	// Tab switching.
 	$( '.wpmind-gw-tab' ).on( 'click', function() {
