@@ -26,6 +26,12 @@ $crawler_tracking  = $is_enabled( 'wpmind_crawler_tracking', '1' );
 $llms_txt_enabled  = $is_enabled( 'wpmind_llms_txt_enabled', '1' );
 $schema_enabled    = $is_enabled( 'wpmind_schema_enabled', '1' );
 $schema_mode       = get_option( 'wpmind_schema_mode', 'auto' );
+$ai_indexing        = $is_enabled( 'wpmind_ai_indexing_enabled', '0' );
+$ai_declaration     = get_option( 'wpmind_ai_default_declaration', 'original' );
+$ai_excluded_types  = get_option( 'wpmind_ai_excluded_post_types', [] );
+if ( ! is_array( $ai_excluded_types ) ) {
+	$ai_excluded_types = [];
+}
 
 // 检查官方插件是否安装
 $official_installed = class_exists( 'AI_Experiments\\Experiments\\Markdown_Feeds' );
@@ -234,6 +240,59 @@ $ai_summary      = $crawler_tracker->get_ai_summary();
                         <option value="merge" <?php selected( $schema_mode, 'merge' ); ?> disabled><?php esc_html_e( '合并 - 与现有 Schema 合并 (即将推出)', 'wpmind' ); ?></option>
                         <option value="force" <?php selected( $schema_mode, 'force' ); ?>><?php esc_html_e( '强制 - 始终输出（可能重复）', 'wpmind' ); ?></option>
                     </select>
+                </div>
+                <?php endif; ?>
+            </div>
+
+            <!-- AI 索引指令设置 -->
+            <div class="wpmind-geo-section">
+                <h3 class="wpmind-geo-section-title">
+                    <span class="dashicons ri-shield-check-line"></span>
+                    <?php esc_html_e( 'AI 索引指令', 'wpmind' ); ?>
+                    <span class="wpmind-geo-new-badge"><?php esc_html_e( 'NEW', 'wpmind' ); ?></span>
+                </h3>
+                <p class="wpmind-geo-section-desc">
+                    <?php esc_html_e( '控制 AI 爬虫对内容的索引和训练权限。', 'wpmind' ); ?>
+                </p>
+
+                <div class="wpmind-geo-options">
+                    <label class="wpmind-geo-option">
+                        <input type="checkbox" name="wpmind_ai_indexing_enabled" value="1" <?php checked( $ai_indexing ); ?>>
+                        <span class="wpmind-geo-option-content">
+                            <span class="wpmind-geo-option-title"><?php esc_html_e( '启用 AI 索引指令', 'wpmind' ); ?></span>
+                            <span class="wpmind-geo-option-desc"><?php esc_html_e( '输出 noai/nollm meta 标签和 X-Robots-Tag HTTP 头', 'wpmind' ); ?></span>
+                        </span>
+                    </label>
+                </div>
+
+                <?php if ( $ai_indexing ) : ?>
+                <div class="wpmind-geo-select-group">
+                    <label class="wpmind-geo-select-label"><?php esc_html_e( '默认内容声明：', 'wpmind' ); ?></label>
+                    <select name="wpmind_ai_default_declaration" class="wpmind-geo-select">
+                        <option value="original" <?php selected( $ai_declaration, 'original' ); ?>><?php esc_html_e( '原创内容 (original)', 'wpmind' ); ?></option>
+                        <option value="ai-assisted" <?php selected( $ai_declaration, 'ai-assisted' ); ?>><?php esc_html_e( 'AI 辅助创作 (ai-assisted)', 'wpmind' ); ?></option>
+                        <option value="ai-generated" <?php selected( $ai_declaration, 'ai-generated' ); ?>><?php esc_html_e( 'AI 生成内容 (ai-generated)', 'wpmind' ); ?></option>
+                    </select>
+                </div>
+
+                <div class="wpmind-geo-select-group" style="margin-top:12px;">
+                    <label class="wpmind-geo-select-label"><?php esc_html_e( '排除的内容类型：', 'wpmind' ); ?></label>
+                    <p class="description" style="margin-bottom:8px;"><?php esc_html_e( '勾选的内容类型将输出 noai, nollm 指令，禁止 AI 索引和训练。', 'wpmind' ); ?></p>
+                    <?php
+                    $public_types = get_post_types( [ 'public' => true ], 'objects' );
+                    foreach ( $public_types as $type ) :
+                    ?>
+                    <label style="display:block;margin-bottom:4px;">
+                        <input type="checkbox" name="wpmind_ai_excluded_post_types[]" value="<?php echo esc_attr( $type->name ); ?>"
+                               <?php checked( in_array( $type->name, $ai_excluded_types, true ) ); ?>>
+                        <?php echo esc_html( $type->labels->name ); ?> <code style="font-size:11px;">(<?php echo esc_html( $type->name ); ?>)</code>
+                    </label>
+                    <?php endforeach; ?>
+                </div>
+
+                <div class="wpmind-geo-notice wpmind-geo-notice-info" style="margin-top:12px;">
+                    <span class="dashicons ri-information-line"></span>
+                    <?php esc_html_e( '单篇文章可在编辑器侧边栏的「AI 索引指令」面板中覆盖全局设置。', 'wpmind' ); ?>
                 </div>
                 <?php endif; ?>
             </div>

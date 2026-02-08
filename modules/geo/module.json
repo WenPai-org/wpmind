@@ -13,7 +13,8 @@
         "单篇 .md 后缀支持",
         "llms.txt 生成器",
         "Schema.org 结构化数据",
-        "AI 爬虫追踪"
+        "AI 爬虫追踪",
+        "AI 索引指令 (noai/nollm)"
     ],
     "requires": {
         "php": "8.1",
