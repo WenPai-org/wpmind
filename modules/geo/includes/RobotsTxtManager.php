@@ -82,6 +82,26 @@ class RobotsTxtManager {
 			'company'     => 'Amazon',
 			'description' => 'Amazon AI 爬虫',
 		],
+		'Baiduspider'        => [
+			'company'     => '百度',
+			'description' => '百度搜索 / 文心一言',
+		],
+		'Sogou web spider'   => [
+			'company'     => '搜狗',
+			'description' => '搜狗搜索 / AI 搜索',
+		],
+		'360Spider'          => [
+			'company'     => '360',
+			'description' => '360 搜索 / AI 搜索',
+		],
+		'YisouSpider'        => [
+			'company'     => '神马搜索',
+			'description' => '阿里神马搜索',
+		],
+		'DuckAssistBot'      => [
+			'company'     => 'DuckDuckGo',
+			'description' => 'DuckDuckGo AI 助手',
+		],
 	];
 
 	/**

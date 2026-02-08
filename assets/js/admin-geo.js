@@ -41,19 +41,6 @@
 			$( '.wpmind-geo-tab-panel' ).removeClass( 'active' );
 			$( '.wpmind-geo-tab-panel[data-panel="' + tab + '"]' ).addClass( 'active' );
 
-			// Show/hide right sidebar based on tab.
-			var $sidebar = $( '.wpmind-geo-right[data-sidebar-for]' );
-			if ( $sidebar.length ) {
-				var showFor = $sidebar.data( 'sidebar-for' );
-				if ( tab === showFor ) {
-					$sidebar.show();
-					$( '.wpmind-geo-grid' ).removeClass( 'wpmind-geo-grid-full' );
-				} else {
-					$sidebar.hide();
-					$( '.wpmind-geo-grid' ).addClass( 'wpmind-geo-grid-full' );
-				}
-			}
-
 			// Remember active tab.
 			try {
 				sessionStorage.setItem( 'wpmind_geo_subtab', tab );

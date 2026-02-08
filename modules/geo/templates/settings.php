@@ -123,52 +123,104 @@ $ai_summary_data = $crawler_tracker->get_ai_summary();
         </button>
     </div>
 
-    <div class="wpmind-geo-grid">
-        <!-- 左栏：设置面板 -->
-        <div class="wpmind-geo-left">
+    <div class="wpmind-geo-content">
 
             <!-- ========== 基础设置 Tab ========== -->
             <div class="wpmind-geo-tab-panel active" data-panel="basics">
-                <div class="wpmind-geo-section">
-                    <h3 class="wpmind-geo-section-title">
-                        <span class="dashicons ri-magic-line"></span>
-                        <?php esc_html_e( 'GEO 增强', 'wpmind' ); ?>
-                    </h3>
-                    <p class="wpmind-geo-section-desc"><?php esc_html_e( '优化内容结构，提高 AI 引用率。', 'wpmind' ); ?></p>
-                    <div class="wpmind-geo-options">
-                        <label class="wpmind-geo-option">
-                            <input type="checkbox" name="wpmind_geo_enabled" value="1" <?php checked( $geo_enabled ); ?>>
-                            <span class="wpmind-geo-option-content">
-                                <span class="wpmind-geo-option-title"><?php esc_html_e( '启用 GEO 增强', 'wpmind' ); ?></span>
-                                <span class="wpmind-geo-option-desc"><?php esc_html_e( '总开关，控制所有 GEO 优化功能', 'wpmind' ); ?></span>
-                            </span>
-                        </label>
-                        <label class="wpmind-geo-option">
-                            <input type="checkbox" name="wpmind_chinese_optimize" value="1" <?php checked( $chinese_optimize ); ?>>
-                            <span class="wpmind-geo-option-content">
-                                <span class="wpmind-geo-option-title"><?php esc_html_e( '中文内容优化', 'wpmind' ); ?></span>
-                                <span class="wpmind-geo-option-desc"><?php esc_html_e( '优化中英文混排、标点符号、段落结构', 'wpmind' ); ?></span>
-                            </span>
-                        </label>
-                        <label class="wpmind-geo-option">
-                            <input type="checkbox" name="wpmind_geo_signals" value="1" <?php checked( $geo_signals ); ?>>
-                            <span class="wpmind-geo-option-content">
-                                <span class="wpmind-geo-option-title"><?php esc_html_e( 'GEO 信号注入', 'wpmind' ); ?></span>
-                                <span class="wpmind-geo-option-desc"><?php esc_html_e( '添加作者信息、发布日期、引用格式等权威性信号', 'wpmind' ); ?></span>
-                            </span>
-                        </label>
-                        <label class="wpmind-geo-option">
-                            <input type="checkbox" name="wpmind_crawler_tracking" value="1" <?php checked( $crawler_tracking ); ?>>
-                            <span class="wpmind-geo-option-content">
-                                <span class="wpmind-geo-option-title"><?php esc_html_e( 'AI 爬虫追踪', 'wpmind' ); ?></span>
-                                <span class="wpmind-geo-option-desc"><?php esc_html_e( '记录 GPTBot、ClaudeBot 等 AI 爬虫的访问', 'wpmind' ); ?></span>
-                            </span>
-                        </label>
-                    </div>
-                </div>
-            </div><!-- /basics -->
+                <div class="wpmind-geo-grid">
+                    <div class="wpmind-geo-left">
+                        <div class="wpmind-geo-section">
+                            <h3 class="wpmind-geo-section-title">
+                                <span class="dashicons ri-magic-line"></span>
+                                <?php esc_html_e( 'GEO 增强', 'wpmind' ); ?>
+                            </h3>
+                            <p class="wpmind-geo-section-desc"><?php esc_html_e( '优化内容结构，提高 AI 引用率。', 'wpmind' ); ?></p>
+                            <div class="wpmind-geo-options">
+                                <label class="wpmind-geo-option">
+                                    <input type="checkbox" name="wpmind_geo_enabled" value="1" <?php checked( $geo_enabled ); ?>>
+                                    <span class="wpmind-geo-option-content">
+                                        <span class="wpmind-geo-option-title"><?php esc_html_e( '启用 GEO 增强', 'wpmind' ); ?></span>
+                                        <span class="wpmind-geo-option-desc"><?php esc_html_e( '总开关，控制所有 GEO 优化功能', 'wpmind' ); ?></span>
+                                    </span>
+                                </label>
+                                <label class="wpmind-geo-option">
+                                    <input type="checkbox" name="wpmind_chinese_optimize" value="1" <?php checked( $chinese_optimize ); ?>>
+                                    <span class="wpmind-geo-option-content">
+                                        <span class="wpmind-geo-option-title"><?php esc_html_e( '中文内容优化', 'wpmind' ); ?></span>
+                                        <span class="wpmind-geo-option-desc"><?php esc_html_e( '优化中英文混排、标点符号、段落结构', 'wpmind' ); ?></span>
+                                    </span>
+                                </label>
+                                <label class="wpmind-geo-option">
+                                    <input type="checkbox" name="wpmind_geo_signals" value="1" <?php checked( $geo_signals ); ?>>
+                                    <span class="wpmind-geo-option-content">
+                                        <span class="wpmind-geo-option-title"><?php esc_html_e( 'GEO 信号注入', 'wpmind' ); ?></span>
+                                        <span class="wpmind-geo-option-desc"><?php esc_html_e( '添加作者信息、发布日期、引用格式等权威性信号', 'wpmind' ); ?></span>
+                                    </span>
+                                </label>
+                                <label class="wpmind-geo-option">
+                                    <input type="checkbox" name="wpmind_crawler_tracking" value="1" <?php checked( $crawler_tracking ); ?>>
+                                    <span class="wpmind-geo-option-content">
+                                        <span class="wpmind-geo-option-title"><?php esc_html_e( 'AI 爬虫追踪', 'wpmind' ); ?></span>
+                                        <span class="wpmind-geo-option-desc"><?php esc_html_e( '记录 GPTBot、ClaudeBot 等 AI 爬虫的访问', 'wpmind' ); ?></span>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div><!-- /left -->
 
-            <!-- ========== 内容输出 Tab ========== -->
+                    <!-- 右栏：爬虫统计 + GEO 说明 -->
+                    <div class="wpmind-geo-right">
+                        <div class="wpmind-geo-section">
+                            <h3 class="wpmind-geo-section-title">
+                                <span class="dashicons ri-bar-chart-2-line"></span>
+                                <?php esc_html_e( 'AI 爬虫统计', 'wpmind' ); ?>
+                            </h3>
+                            <?php if ( empty( $crawler_stats ) ) : ?>
+                            <div class="wpmind-geo-empty">
+                                <span class="dashicons ri-robot-2-line"></span>
+                                <p><?php esc_html_e( '暂无爬虫访问记录', 'wpmind' ); ?></p>
+                                <p class="wpmind-geo-empty-hint"><?php esc_html_e( '启用 Markdown Feed 后，AI 爬虫的访问将被记录在这里。', 'wpmind' ); ?></p>
+                            </div>
+                            <?php else : ?>
+                            <div class="wpmind-crawler-list">
+                                <?php foreach ( $crawler_stats as $crawler => $data ) :
+                                    $is_ai = $data['is_ai'];
+                                ?>
+                                <div class="wpmind-crawler-item <?php echo $is_ai ? 'is-ai' : ''; ?>">
+                                    <div class="wpmind-crawler-info">
+                                        <span class="wpmind-crawler-name"><?php echo esc_html( $crawler ); ?></span>
+                                        <span class="wpmind-crawler-company"><?php echo esc_html( $data['company'] ); ?></span>
+                                        <?php if ( $is_ai ) : ?>
+                                        <span class="wpmind-crawler-badge"><?php esc_html_e( 'AI', 'wpmind' ); ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="wpmind-crawler-stats">
+                                        <span class="wpmind-crawler-hits"><?php echo esc_html( number_format( $data['total_hits'] ) ); ?></span>
+                                        <span class="wpmind-crawler-label"><?php esc_html_e( '次访问', 'wpmind' ); ?></span>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                        <div class="wpmind-geo-section wpmind-geo-info">
+                            <h3 class="wpmind-geo-section-title">
+                                <span class="dashicons ri-lightbulb-line"></span>
+                                <?php esc_html_e( '什么是 GEO？', 'wpmind' ); ?>
+                            </h3>
+                            <div class="wpmind-geo-info-content">
+                                <p><?php esc_html_e( 'GEO (Generative Engine Optimization) 是针对 AI 搜索引擎的优化策略，帮助您的内容在 ChatGPT、Claude、Perplexity 等 AI 助手中获得更好的引用和展示。', 'wpmind' ); ?></p>
+                                <ul>
+                                    <li><?php esc_html_e( '提供结构化 Markdown 格式，便于 AI 解析', 'wpmind' ); ?></li>
+                                    <li><?php esc_html_e( '注入权威性信号，提高内容可信度', 'wpmind' ); ?></li>
+                                    <li><?php esc_html_e( '关联 Wikidata 实体，消除语义歧义', 'wpmind' ); ?></li>
+                                    <li><?php esc_html_e( '控制 AI 爬虫访问，保护敏感内容', 'wpmind' ); ?></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div><!-- /right -->
+                </div><!-- /grid -->
+            </div><!-- /basics -->
             <div class="wpmind-geo-tab-panel" data-panel="content">
                 <!-- Markdown Feed -->
                 <div class="wpmind-geo-section">
@@ -460,60 +512,6 @@ $ai_summary_data = $crawler_tracker->get_ai_summary();
                     <?php esc_html_e( '保存设置', 'wpmind' ); ?>
                 </button>
             </div>
-        </div><!-- /wpmind-geo-left -->
 
-        <!-- 右栏：爬虫统计 (仅基础设置 tab 显示) -->
-        <div class="wpmind-geo-right" data-sidebar-for="basics">
-            <div class="wpmind-geo-section">
-                <h3 class="wpmind-geo-section-title">
-                    <span class="dashicons ri-bar-chart-2-line"></span>
-                    <?php esc_html_e( 'AI 爬虫统计', 'wpmind' ); ?>
-                </h3>
-                <?php if ( empty( $crawler_stats ) ) : ?>
-                <div class="wpmind-geo-empty">
-                    <span class="dashicons ri-robot-2-line"></span>
-                    <p><?php esc_html_e( '暂无爬虫访问记录', 'wpmind' ); ?></p>
-                    <p class="wpmind-geo-empty-hint"><?php esc_html_e( '启用 Markdown Feed 后，AI 爬虫的访问将被记录在这里。', 'wpmind' ); ?></p>
-                </div>
-                <?php else : ?>
-                <div class="wpmind-crawler-list">
-                    <?php foreach ( $crawler_stats as $crawler => $data ) :
-                        $is_ai = $data['is_ai'];
-                    ?>
-                    <div class="wpmind-crawler-item <?php echo $is_ai ? 'is-ai' : ''; ?>">
-                        <div class="wpmind-crawler-info">
-                            <span class="wpmind-crawler-name"><?php echo esc_html( $crawler ); ?></span>
-                            <span class="wpmind-crawler-company"><?php echo esc_html( $data['company'] ); ?></span>
-                            <?php if ( $is_ai ) : ?>
-                            <span class="wpmind-crawler-badge"><?php esc_html_e( 'AI', 'wpmind' ); ?></span>
-                            <?php endif; ?>
-                        </div>
-                        <div class="wpmind-crawler-stats">
-                            <span class="wpmind-crawler-hits"><?php echo esc_html( number_format( $data['total_hits'] ) ); ?></span>
-                            <span class="wpmind-crawler-label"><?php esc_html_e( '次访问', 'wpmind' ); ?></span>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-                <?php endif; ?>
-            </div>
-
-            <!-- GEO 说明 -->
-            <div class="wpmind-geo-section wpmind-geo-info">
-                <h3 class="wpmind-geo-section-title">
-                    <span class="dashicons ri-lightbulb-line"></span>
-                    <?php esc_html_e( '什么是 GEO？', 'wpmind' ); ?>
-                </h3>
-                <div class="wpmind-geo-info-content">
-                    <p><?php esc_html_e( 'GEO (Generative Engine Optimization) 是针对 AI 搜索引擎的优化策略，帮助您的内容在 ChatGPT、Claude、Perplexity 等 AI 助手中获得更好的引用和展示。', 'wpmind' ); ?></p>
-                    <ul>
-                        <li><?php esc_html_e( '提供结构化 Markdown 格式，便于 AI 解析', 'wpmind' ); ?></li>
-                        <li><?php esc_html_e( '注入权威性信号，提高内容可信度', 'wpmind' ); ?></li>
-                        <li><?php esc_html_e( '关联 Wikidata 实体，消除语义歧义', 'wpmind' ); ?></li>
-                        <li><?php esc_html_e( '控制 AI 爬虫访问，保护敏感内容', 'wpmind' ); ?></li>
-                    </ul>
-                </div>
-            </div>
-        </div><!-- /wpmind-geo-right -->
-    </div><!-- /wpmind-geo-grid -->
+    </div><!-- /wpmind-geo-content -->
 </div><!-- /wpmind-geo-panel -->
