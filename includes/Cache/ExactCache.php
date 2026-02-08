@@ -267,6 +267,24 @@ final class ExactCache {
 	}
 
 	/**
+	 * 获取索引条目列表（供管理界面使用）
+	 *
+	 * @return array<int, array{key: string, last_access: int}>
+	 */
+	public function get_entries(): array {
+		$index = $this->load_index();
+		arsort($index, SORT_NUMERIC);
+		$entries = [];
+		foreach ($index as $key => $timestamp) {
+			$entries[] = [
+				'key'         => $key,
+				'last_access' => (int) $timestamp,
+			];
+		}
+		return $entries;
+	}
+
+	/**
 	 * 构建缓存作用域（避免跨站点/跨角色污染）
 	 *
 	 * @return array
