@@ -249,7 +249,7 @@ class ApiKeyManager {
 	private static function generate_key_id(): string {
 		return substr(
 			strtoupper(
-				str_replace( [ '=', '+', '/' ], '', base64_encode( random_bytes( 8 ) ) )
+				str_replace( [ '=', '+', '/' ], '', base64_encode( random_bytes( 12 ) ) )
 			),
 			0,
 			12
