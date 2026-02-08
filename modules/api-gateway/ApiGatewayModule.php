@@ -48,6 +48,7 @@ require_once __DIR__ . '/includes/Error/ErrorMapper.php';
 require_once __DIR__ . '/includes/Pipeline/ErrorMiddleware.php';
 require_once __DIR__ . '/includes/Pipeline/LogMiddleware.php';
 require_once __DIR__ . '/includes/RestController.php';
+require_once __DIR__ . '/includes/Admin/GatewayAjaxController.php';
 
 /**
  * Class ApiGatewayModule
@@ -122,6 +123,12 @@ class ApiGatewayModule implements ModuleInterface {
 
 		// Register settings tab.
 		add_filter( 'wpmind_settings_tabs', array( $this, 'register_settings_tab' ) );
+
+		// Register admin AJAX handlers.
+		if ( is_admin() ) {
+			$ajax_controller = new Admin\GatewayAjaxController();
+			$ajax_controller->register_hooks();
+		}
 
 		/**
 		 * Fires when API Gateway module is initialized.
