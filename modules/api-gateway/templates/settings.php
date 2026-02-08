@@ -189,7 +189,7 @@ $month_requests = ApiKeyRepository::get_month_total_requests();
 			max_tokens_cap: $( '#gw-tokens-cap' ).val(),
 			log_prompts: $( '#gw-log-prompts' ).is( ':checked' ) ? '1' : ''
 		}, function( r ) {
-			$msg.text( r.success ? r.data.message : ( r.data.message || 'Error' ) ).show();
+			$msg.text( ( r.data && r.data.message ) || '保存失败' ).show();
 			setTimeout( function() { $msg.fadeOut(); }, 3000 );
 		} ).always( function() { $btn.prop( 'disabled', false ); } );
 	} );
@@ -220,7 +220,7 @@ $month_requests = ApiKeyRepository::get_month_total_requests();
 				$( '#ck-name' ).val( '' );
 				loadKeys();
 			} else {
-				alert( r.data.message || 'Error' );
+				alert( ( r.data && r.data.message ) || '创建失败' );
 			}
 		} ).always( function() { $btn.prop( 'disabled', false ); } );
 	} );
@@ -241,7 +241,7 @@ $month_requests = ApiKeyRepository::get_month_total_requests();
 		$.post( ajaxurl, { action: 'wpmind_list_api_keys', nonce: nonce }, function( r ) {
 			var $tb = $( '#gw-keys-tbody' );
 			$tb.empty();
-			if ( ! r.success || ! r.data.keys.length ) {
+			if ( ! r.success || ! r.data || ! r.data.keys || ! r.data.keys.length ) {
 				$tb.html( '<tr><td colspan="7" style="text-align:center;color:#646970"><?php echo esc_js( __( '暂无 API Key', 'wpmind' ) ); ?></td></tr>' );
 				return;
 			}
@@ -274,7 +274,7 @@ $month_requests = ApiKeyRepository::get_month_total_requests();
 		var $btn = $( this ), kid = $btn.data( 'kid' );
 		$btn.prop( 'disabled', true );
 		$.post( ajaxurl, { action: 'wpmind_revoke_api_key', nonce: nonce, key_id: kid }, function( r ) {
-			if ( r.success ) { loadKeys(); } else { alert( r.data.message || 'Error' ); }
+			if ( r.success ) { loadKeys(); } else { alert( ( r.data && r.data.message ) || '吊销失败' ); }
 		} ).always( function() { $btn.prop( 'disabled', false ); } );
 	} );
 
