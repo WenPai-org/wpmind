@@ -39,6 +39,8 @@ final class RequestTransformer {
 			'embeddings'       => $this->transform_embeddings( $request ),
 			'responses'        => $this->transform_responses( $request ),
 			'models'           => [ 'payload' => [ 'operation' => 'models' ] ],
+			'model_detail'     => [ 'payload' => [ 'operation' => 'model_detail' ] ],
+			'status'           => [ 'payload' => [ 'operation' => 'status' ] ],
 			default            => [
 				'error' => new \WP_Error(
 					'unsupported_operation',

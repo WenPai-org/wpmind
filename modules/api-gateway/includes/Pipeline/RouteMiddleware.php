@@ -144,7 +144,7 @@ final class RouteMiddleware implements GatewayStageInterface {
 	 * @param GatewayRequestContext $context Pipeline context.
 	 */
 	private function handle_model_detail( GatewayRequestContext $context ): void {
-		$model_id = $context->wp_request()->get_param( 'model_id' );
+		$model_id = $context->rest_request()->get_param( 'model_id' );
 
 		if ( $model_id === null || $model_id === '' ) {
 			$context->set_error( new \WP_Error(
