@@ -98,6 +98,21 @@ final class ErrorMapper {
 			'code'   => 'insufficient_permissions',
 			'status' => 403,
 		],
+		'sse_concurrency_exceeded' => [
+			'type'   => 'rate_limit_exceeded',
+			'code'   => 'rate_limit_exceeded',
+			'status' => 429,
+		],
+		'sse_lock_timeout'       => [
+			'type'   => 'server_error',
+			'code'   => 'server_error',
+			'status' => 503,
+		],
+		'unsupported_operation'  => [
+			'type'   => 'invalid_request_error',
+			'code'   => 'unsupported_operation',
+			'status' => 400,
+		],
 	];
 
 	/**

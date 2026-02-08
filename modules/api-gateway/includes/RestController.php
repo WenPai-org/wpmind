@@ -167,7 +167,7 @@ final class RestController {
 	 * @return \WP_REST_Response
 	 */
 	public function handle_model_detail( \WP_REST_Request $request ): \WP_REST_Response {
-		return $this->get_pipeline()->handle( 'models', $request );
+		return $this->get_pipeline()->handle( 'model_detail', $request );
 	}
 
 	/**

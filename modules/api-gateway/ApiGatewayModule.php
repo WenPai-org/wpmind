@@ -130,6 +130,9 @@ class ApiGatewayModule implements ModuleInterface {
 			$ajax_controller->register_hooks();
 		}
 
+		// Audit logging for SSE streams (bypasses pipeline finalization).
+		add_action( 'wpmind_gateway_sse_complete', array( $this, 'log_sse_completion' ), 10, 3 );
+
 		/**
 		 * Fires when API Gateway module is initialized.
 		 *
@@ -162,5 +165,65 @@ class ApiGatewayModule implements ModuleInterface {
 			'priority' => 35,
 		);
 		return $tabs;
+	}
+
+	/**
+	 * Log SSE stream completion for audit and usage tracking.
+	 *
+	 * SSE streams exit() before pipeline finalization, so this
+	 * hook ensures audit logs and usage counters are still updated.
+	 *
+	 * @param string                              $request_id Request ID.
+	 * @param string                              $key_id     API key ID.
+	 * @param Stream\StreamResult                 $result     Stream result.
+	 */
+	public function log_sse_completion( string $request_id, string $key_id, Stream\StreamResult $result ): void {
+		global $wpdb;
+
+		// Audit log.
+		$audit_table = $wpdb->prefix . 'wpmind_api_audit_log';
+		$wpdb->insert(
+			$audit_table,
+			[
+				'event_type'    => 'api_stream_request',
+				'key_id'        => $key_id,
+				'actor_user_id' => 0,
+				'request_id'    => $request_id,
+				'ip_hash'       => hash( 'sha256', sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) ) ),
+				'user_agent'    => sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ?? '' ) ),
+				'detail_json'   => wp_json_encode( [
+					'tokens_used'   => $result->tokens_used,
+					'finish_reason' => $result->finish_reason,
+					'stream'        => true,
+				] ),
+				'created_at'    => current_time( 'mysql', true ),
+			],
+			[ '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s' ]
+		);
+
+		// Usage upsert.
+		$usage_table  = $wpdb->prefix . 'wpmind_api_key_usage';
+		$window_month = gmdate( 'Y-m' );
+		$now          = current_time( 'mysql', true );
+		$tokens       = $result->tokens_used;
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$wpdb->query( $wpdb->prepare(
+			"INSERT INTO {$usage_table} (key_id, window_month, total_requests, total_input_tokens, total_output_tokens, total_tokens, total_cost_usd, updated_at)
+			VALUES (%s, %s, 1, 0, %d, %d, 0, %s)
+			ON DUPLICATE KEY UPDATE
+				total_requests = total_requests + 1,
+				total_output_tokens = total_output_tokens + %d,
+				total_tokens = total_tokens + %d,
+				updated_at = %s",
+			$key_id,
+			$window_month,
+			$tokens,
+			$tokens,
+			$now,
+			$tokens,
+			$tokens,
+			$now
+		) );
 	}
 }
