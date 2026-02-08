@@ -4,66 +4,105 @@
 	max-width: 1200px;
 }
 
-/* Hero */
+/* Hero — card style */
 .wpmind-overview-hero {
-	background: var(--wpmind-gray-50, #f9fafb);
-	border: 1px solid var(--wpmind-gray-200);
-	border-left: 3px solid var(--wpmind-primary);
-	padding: var(--wpmind-space-7) var(--wpmind-space-7);
+	background: #fff;
+	border: none;
+	border-bottom: 1px solid var(--wpmind-gray-200);
+	padding: var(--wpmind-space-8) var(--wpmind-space-8);
 	margin-bottom: var(--wpmind-space-6);
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	position: relative;
+	overflow: hidden;
+}
+
+.wpmind-overview-hero::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	opacity: 0.035;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ccircle cx='30' cy='30' r='1.5' fill='%233858e9'/%3E%3Ccircle cx='0' cy='0' r='1' fill='%233858e9'/%3E%3Ccircle cx='60' cy='0' r='1' fill='%233858e9'/%3E%3Ccircle cx='0' cy='60' r='1' fill='%233858e9'/%3E%3Ccircle cx='60' cy='60' r='1' fill='%233858e9'/%3E%3Cpath d='M30 0v12M30 48v12M0 30h12M48 30h12' stroke='%233858e9' stroke-width='0.5' fill='none'/%3E%3C/svg%3E");
+	background-size: 60px 60px;
+	background-repeat: repeat;
+	pointer-events: none;
+}
+
+.wpmind-overview-hero-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: var(--wpmind-space-4);
+}
+
+.wpmind-overview-hero-icon .dashicons {
+	font-size: 28px;
+	width: 28px;
+	height: 28px;
+	color: var(--wpmind-gray-900);
 }
 
 .wpmind-overview-hero-title {
-	display: flex;
-	align-items: center;
-	gap: var(--wpmind-space-2);
 	margin: 0 0 var(--wpmind-space-2) 0;
 	font-size: 20px;
 	font-weight: 700;
 	color: var(--wpmind-gray-900);
 }
 
-.wpmind-overview-hero-title .dashicons {
-	font-size: 22px;
-	width: 22px;
-	height: 22px;
-	color: var(--wpmind-primary);
-}
-
 .wpmind-overview-hero-subtitle {
 	margin: 0 0 var(--wpmind-space-3) 0;
 	font-size: var(--wpmind-text-base);
 	color: var(--wpmind-gray-600);
+	line-height: 1.6;
 }
 
 .wpmind-overview-hero-meta {
-	margin: 0 0 var(--wpmind-space-5) 0;
+	margin: 0 0 var(--wpmind-space-6) 0;
 	font-size: var(--wpmind-text-sm);
 	color: var(--wpmind-gray-400);
 }
 
 .wpmind-overview-hero-actions {
 	display: flex;
-	gap: var(--wpmind-space-4);
+	flex-wrap: wrap;
+	gap: var(--wpmind-space-3);
 }
 
 .wpmind-overview-hero-btn {
-	font-size: var(--wpmind-text-sm);
-	font-weight: 500;
+	display: inline-flex;
+	align-items: center;
+	padding: 6px 12px;
+	font-size: 13px;
+	font-weight: 400;
 	text-decoration: none;
+	border-radius: 2px;
+	height: 36px;
+	box-sizing: border-box;
+	transition: box-shadow 0.1s linear;
+}
+
+.wpmind-overview-hero-btn--primary {
+	background: var(--wpmind-primary);
+	color: #fff;
+	border: 1px solid var(--wpmind-primary);
+}
+
+.wpmind-overview-hero-btn--primary:hover {
+	background: var(--wpmind-primary-hover);
+	border-color: var(--wpmind-primary-hover);
+	color: #fff;
+}
+
+.wpmind-overview-hero-btn--secondary {
+	background: transparent;
 	color: var(--wpmind-primary);
+	border: 1px solid var(--wpmind-primary);
 }
 
-.wpmind-overview-hero-btn:hover {
-	color: var(--wpmind-primary-hover);
-}
-
-.wpmind-overview-hero-btn--ghost {
-	color: var(--wpmind-gray-500);
-}
-
-.wpmind-overview-hero-btn--ghost:hover {
-	color: var(--wpmind-primary);
+.wpmind-overview-hero-btn--secondary:hover {
+	background: var(--wpmind-primary);
+	color: #fff;
 }
 
 /* Stat cards row */
@@ -398,79 +437,48 @@
 	font-size: 0.75rem;
 }
 
-/* Footer links */
-.wpmind-overview-footer {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: var(--wpmind-space-3);
-	padding: var(--wpmind-space-5) 0;
-	margin-top: var(--wpmind-space-2);
-}
-
-.wpmind-overview-footer a {
-	display: inline-flex;
-	align-items: center;
-	gap: 4px;
-	font-size: var(--wpmind-text-sm);
-	color: var(--wpmind-gray-500);
-	text-decoration: none;
-}
-
-.wpmind-overview-footer a:hover {
-	color: var(--wpmind-primary);
-}
-
-.wpmind-overview-footer a .dashicons {
-	font-size: 14px;
-	width: 14px;
-	height: 14px;
-}
-
-.wpmind-overview-footer-sep {
-	color: var(--wpmind-gray-300);
-}
-
-.wpmind-overview-footer-version {
-	font-size: var(--wpmind-text-sm);
-	color: var(--wpmind-gray-400);
-}
-
-/* Shortcuts grid */
-.wpmind-overview-shortcuts {
-	display: grid;
-	grid-template-columns: repeat(5, 1fr);
-	gap: var(--wpmind-space-3);
-}
-
-.wpmind-overview-shortcut {
+/* Link list inside cards */
+.wpmind-overview-link-list {
 	display: flex;
 	flex-direction: column;
+	gap: 0;
+}
+
+.wpmind-overview-link-item {
+	display: inline-flex;
 	align-items: center;
 	gap: var(--wpmind-space-2);
-	padding: var(--wpmind-space-4) var(--wpmind-space-3);
-	text-decoration: none;
-	color: var(--wpmind-gray-600);
-	background: #fff;
-	border: 1px solid var(--wpmind-gray-200);
-	transition: color 0.15s ease, border-color 0.15s ease;
-	cursor: pointer;
-}
-
-.wpmind-overview-shortcut:hover {
-	border-color: var(--wpmind-primary);
-	color: var(--wpmind-primary);
-}
-
-.wpmind-overview-shortcut .dashicons {
-	font-size: 20px;
-	width: 20px;
-	height: 20px;
-}
-
-.wpmind-overview-shortcut span:last-child {
+	padding: var(--wpmind-space-3) var(--wpmind-space-2);
 	font-size: var(--wpmind-text-sm);
-	font-weight: 500;
+	color: var(--wpmind-primary);
+	text-decoration: none;
+	border-bottom: 1px solid var(--wpmind-gray-100);
+	transition: background 0.1s ease;
+}
+
+.wpmind-overview-link-item:last-child {
+	border-bottom: none;
+}
+
+.wpmind-overview-link-item:hover {
+	background: var(--wpmind-gray-50, #f9fafb);
+	color: var(--wpmind-primary-hover);
+}
+
+.wpmind-overview-link-item .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	color: var(--wpmind-gray-400);
+	flex-shrink: 0;
+}
+
+/* Footer version */
+.wpmind-overview-footer {
+	text-align: center;
+	padding: var(--wpmind-space-2) 0;
+	font-size: 0.75rem;
+	color: var(--wpmind-gray-400);
 }
 
 /* Responsive */
@@ -481,9 +489,6 @@
 	.wpmind-overview-grid {
 		grid-template-columns: 1fr;
 	}
-	.wpmind-overview-shortcuts {
-		grid-template-columns: repeat(3, 1fr);
-	}
 	.wpmind-overview-activity-latency {
 		display: none;
 	}
@@ -491,16 +496,13 @@
 
 @media (max-width: 600px) {
 	.wpmind-overview-hero {
-		padding: var(--wpmind-space-5);
+		padding: var(--wpmind-space-6);
 	}
 	.wpmind-overview-hero-title {
 		font-size: 18px;
 	}
 	.wpmind-overview-stats {
 		grid-template-columns: 1fr;
-	}
-	.wpmind-overview-shortcuts {
-		grid-template-columns: repeat(2, 1fr);
 	}
 	.wpmind-overview-summary-grid {
 		grid-template-columns: 1fr;
