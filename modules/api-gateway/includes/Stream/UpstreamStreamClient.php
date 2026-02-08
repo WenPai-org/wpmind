@@ -58,8 +58,8 @@ final class UpstreamStreamClient {
 				throw new \RuntimeException( 'Stream cancelled: ' . $token->get_reason() );
 			}
 
-			// Estimate tokens from chunk text (rough: 1 token per 4 chars).
-			$tokens_used += max( 1, (int) ceil( mb_strlen( $delta ) / 4 ) );
+			// Estimate tokens from chunk text (rough: 1 token per 3 chars for mixed CJK/Latin).
+			$tokens_used += max( 1, (int) ceil( mb_strlen( $delta, 'UTF-8' ) / 3 ) );
 
 			$on_chunk( $delta, $raw_json );
 		};
@@ -74,7 +74,7 @@ final class UpstreamStreamClient {
 				$finish_reason = 'error';
 				$error_msg     = $result->get_error_message();
 			}
-		} catch ( \RuntimeException $e ) {
+		} catch ( \Throwable $e ) {
 			if ( $cancelled ) {
 				$finish_reason = 'cancelled';
 				$error_msg     = $token->get_reason();

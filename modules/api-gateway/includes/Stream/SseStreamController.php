@@ -150,7 +150,10 @@ final class SseStreamController {
 				$this->send_sse_event( wp_json_encode( $final_chunk ) );
 			}
 
-			// Step 10: Send [DONE] marker.
+			// Step 10: Send error event if applicable, then [DONE] marker.
+			if ( $result->finish_reason === 'error' && $result->error !== null ) {
+				$this->send_sse_event( wp_json_encode( [ 'error' => $result->error ] ) );
+			}
 			$this->send_sse_event( '[DONE]' );
 
 			/**
@@ -182,14 +185,14 @@ final class SseStreamController {
 		header( 'Cache-Control: no-cache, no-store, must-revalidate' );
 		header( 'Connection: keep-alive' );
 		header( 'X-Accel-Buffering: no' );
-		header( 'X-Request-Id: ' . $request_id );
+		header( 'X-Request-Id: ' . str_replace( [ "\r", "\n" ], '', $request_id ) );
 
 		// Apply any headers set by earlier pipeline stages.
 		foreach ( $context->get_response_headers() as $name => $value ) {
 			if ( strtolower( $name ) === 'x-wpmind-stream' ) {
 				continue; // Skip the pending marker.
 			}
-			header( $name . ': ' . $value );
+			header( str_replace( [ "\r", "\n" ], '', $name . ': ' . $value ) );
 		}
 
 		// Flush headers immediately.
@@ -209,6 +212,7 @@ final class SseStreamController {
 	 * @param string $data Event data payload.
 	 */
 	private function send_sse_event( string $data ): void {
+		$data = str_replace( [ "\r\n", "\r", "\n" ], '', $data );
 		echo 'data: ' . $data . "\n\n";
 
 		if ( ob_get_level() ) {

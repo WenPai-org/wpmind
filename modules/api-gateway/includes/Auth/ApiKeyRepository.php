@@ -61,7 +61,22 @@ class ApiKeyRepository {
 	public static function insert_key( array $data ): int {
 		global $wpdb;
 
-		$wpdb->insert( self::table(), $data );
+		$format = [];
+		foreach ( $data as $col => $val ) {
+			if ( is_int( $val ) ) {
+				$format[] = '%d';
+			} elseif ( is_float( $val ) ) {
+				$format[] = '%f';
+			} else {
+				$format[] = '%s';
+			}
+		}
+
+		$result = $wpdb->insert( self::table(), $data, $format );
+
+		if ( false === $result ) {
+			return 0;
+		}
 
 		return (int) $wpdb->insert_id;
 	}
@@ -142,6 +157,19 @@ class ApiKeyRepository {
 			[ 'key_id' => $key_id ],
 			[ '%s', '%s', '%s' ],
 			[ '%s' ]
+		);
+
+		$audit_table = $wpdb->prefix . 'wpmind_api_audit_log';
+		$wpdb->insert(
+			$audit_table,
+			[
+				'event_type'    => 'key_revoked',
+				'key_id'        => $key_id,
+				'actor_user_id' => $actor_user_id,
+				'detail_json'   => wp_json_encode( [ 'reason' => $reason ] ),
+				'created_at'    => $now,
+			],
+			[ '%s', '%s', '%d', '%s', '%s' ]
 		);
 
 		self::invalidate_cache( $key_id );

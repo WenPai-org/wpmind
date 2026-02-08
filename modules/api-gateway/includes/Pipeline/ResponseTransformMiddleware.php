@@ -38,8 +38,20 @@ final class ResponseTransformMiddleware implements GatewayStageInterface {
 			return;
 		}
 
-		$result    = $context->get_internal_result();
-		$payload   = $context->get_internal_payload();
+		$result = $context->get_internal_result();
+
+		if ( $result === null ) {
+			$context->set_error(
+				new \WP_Error(
+					'empty_upstream_result',
+					'No result from upstream provider.',
+					[ 'status' => 502 ]
+				)
+			);
+			return;
+		}
+
+		$payload   = $context->get_internal_payload() ?? [];
 		$operation = $context->operation();
 
 		$original_model = $payload['original_model'] ?? $payload['model'] ?? '';

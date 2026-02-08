@@ -52,8 +52,16 @@ class SchemaManager {
 			return;
 		}
 
+		$lock_key = 'wpmind_api_gateway_schema_lock';
+		if ( get_transient( $lock_key ) ) {
+			return;
+		}
+		set_transient( $lock_key, 1, 30 );
+
 		self::create_tables();
-		update_option( self::VERSION_OPTION, self::SCHEMA_VERSION, true );
+		update_option( self::VERSION_OPTION, self::SCHEMA_VERSION, false );
+
+		delete_transient( $lock_key );
 	}
 
 	/**

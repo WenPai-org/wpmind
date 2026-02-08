@@ -48,6 +48,17 @@ final class RequestTransformMiddleware implements GatewayStageInterface {
 			return;
 		}
 
+		if ( ! isset( $result['payload'] ) || ! is_array( $result['payload'] ) ) {
+			$context->set_error(
+				new \WP_Error(
+					'transform_failed',
+					'Request transform did not produce a valid payload.',
+					[ 'status' => 500 ]
+				)
+			);
+			return;
+		}
+
 		$context->set_internal_payload( $result['payload'] );
 	}
 }

@@ -84,7 +84,7 @@ class GatewayAjaxController {
 		$rpm_limit         = absint( wp_unslash( $_POST['rpm_limit'] ?? 60 ) );
 		$tpm_limit         = absint( wp_unslash( $_POST['tpm_limit'] ?? 100000 ) );
 		$concurrency_limit = absint( wp_unslash( $_POST['concurrency_limit'] ?? 2 ) );
-		$monthly_budget    = (float) ( $_POST['monthly_budget_usd'] ?? 0 );
+		$monthly_budget    = (float) wp_unslash( $_POST['monthly_budget_usd'] ?? 0 );
 		$ip_whitelist_raw  = sanitize_text_field( wp_unslash( $_POST['ip_whitelist'] ?? '' ) );
 		$expires_at        = sanitize_text_field( wp_unslash( $_POST['expires_at'] ?? '' ) );
 
@@ -123,7 +123,11 @@ class GatewayAjaxController {
 		}
 
 		if ( ! empty( $expires_at ) ) {
-			$attrs['expires_at'] = gmdate( 'Y-m-d H:i:s', strtotime( $expires_at ) );
+			$ts = strtotime( $expires_at );
+			if ( false === $ts ) {
+				wp_send_json_error( [ 'message' => __( '过期时间格式无效', 'wpmind' ) ] );
+			}
+			$attrs['expires_at'] = gmdate( 'Y-m-d H:i:s', $ts );
 		}
 
 		$result = ApiKeyManager::create_api_key( $attrs );
@@ -209,16 +213,16 @@ class GatewayAjaxController {
 			$data['name'] = sanitize_text_field( wp_unslash( $_POST['name'] ) );
 		}
 		if ( isset( $_POST['rpm_limit'] ) ) {
-			$data['rpm_limit'] = max( 1, min( 10000, absint( $_POST['rpm_limit'] ) ) );
+			$data['rpm_limit'] = max( 1, min( 10000, absint( wp_unslash( $_POST['rpm_limit'] ) ) ) );
 		}
 		if ( isset( $_POST['tpm_limit'] ) ) {
-			$data['tpm_limit'] = max( 1000, min( 10000000, absint( $_POST['tpm_limit'] ) ) );
+			$data['tpm_limit'] = max( 1000, min( 10000000, absint( wp_unslash( $_POST['tpm_limit'] ) ) ) );
 		}
 		if ( isset( $_POST['concurrency_limit'] ) ) {
-			$data['concurrency_limit'] = max( 1, min( 100, absint( $_POST['concurrency_limit'] ) ) );
+			$data['concurrency_limit'] = max( 1, min( 100, absint( wp_unslash( $_POST['concurrency_limit'] ) ) ) );
 		}
 		if ( isset( $_POST['monthly_budget_usd'] ) ) {
-			$data['monthly_budget_usd'] = max( 0.0, (float) $_POST['monthly_budget_usd'] );
+			$data['monthly_budget_usd'] = max( 0.0, (float) wp_unslash( $_POST['monthly_budget_usd'] ) );
 		}
 		if ( isset( $_POST['ip_whitelist'] ) ) {
 			$raw = sanitize_text_field( wp_unslash( $_POST['ip_whitelist'] ) );
@@ -234,7 +238,15 @@ class GatewayAjaxController {
 		}
 		if ( isset( $_POST['expires_at'] ) ) {
 			$exp = sanitize_text_field( wp_unslash( $_POST['expires_at'] ) );
-			$data['expires_at'] = ! empty( $exp ) ? gmdate( 'Y-m-d H:i:s', strtotime( $exp ) ) : null;
+			if ( ! empty( $exp ) ) {
+				$ts = strtotime( $exp );
+				if ( false === $ts ) {
+					wp_send_json_error( [ 'message' => __( '过期时间格式无效', 'wpmind' ) ] );
+				}
+				$data['expires_at'] = gmdate( 'Y-m-d H:i:s', $ts );
+			} else {
+				$data['expires_at'] = null;
+			}
 		}
 
 		if ( empty( $data ) ) {

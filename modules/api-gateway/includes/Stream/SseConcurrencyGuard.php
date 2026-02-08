@@ -132,19 +132,27 @@ final class SseConcurrencyGuard {
 	 * @param int     $ttl  New TTL in seconds (default 120).
 	 */
 	public function heartbeat_slot( SseSlot $slot, int $ttl = 120 ): void {
-		$now = time();
-
-		$global_slots = $this->get_slots( self::GLOBAL_SLOTS_KEY );
-		if ( isset( $global_slots[ $slot->slot_key ] ) ) {
-			$global_slots[ $slot->slot_key ] = $now + $ttl;
-			set_transient( self::GLOBAL_SLOTS_KEY, $global_slots, $ttl + 60 );
+		if ( ! $this->acquire_lock( 'global' ) ) {
+			return;
 		}
 
-		$key_transient = self::KEY_SLOTS_PREFIX . $slot->key_id . '_slots';
-		$key_slots     = $this->get_slots( $key_transient );
-		if ( isset( $key_slots[ $slot->slot_key ] ) ) {
-			$key_slots[ $slot->slot_key ] = $now + $ttl;
-			set_transient( $key_transient, $key_slots, $ttl + 60 );
+		try {
+			$now = time();
+
+			$global_slots = $this->get_slots( self::GLOBAL_SLOTS_KEY );
+			if ( isset( $global_slots[ $slot->slot_key ] ) ) {
+				$global_slots[ $slot->slot_key ] = $now + $ttl;
+				set_transient( self::GLOBAL_SLOTS_KEY, $global_slots, $ttl + 60 );
+			}
+
+			$key_transient = self::KEY_SLOTS_PREFIX . $slot->key_id . '_slots';
+			$key_slots     = $this->get_slots( $key_transient );
+			if ( isset( $key_slots[ $slot->slot_key ] ) ) {
+				$key_slots[ $slot->slot_key ] = $now + $ttl;
+				set_transient( $key_transient, $key_slots, $ttl + 60 );
+			}
+		} finally {
+			$this->release_lock( 'global' );
 		}
 	}
 
@@ -154,23 +162,31 @@ final class SseConcurrencyGuard {
 	 * @param SseSlot $slot Slot to release.
 	 */
 	public function release_slot( SseSlot $slot ): void {
-		$global_slots = $this->get_slots( self::GLOBAL_SLOTS_KEY );
-		unset( $global_slots[ $slot->slot_key ] );
-
-		if ( empty( $global_slots ) ) {
-			delete_transient( self::GLOBAL_SLOTS_KEY );
-		} else {
-			set_transient( self::GLOBAL_SLOTS_KEY, $global_slots, 180 );
+		if ( ! $this->acquire_lock( 'global' ) ) {
+			return;
 		}
 
-		$key_transient = self::KEY_SLOTS_PREFIX . $slot->key_id . '_slots';
-		$key_slots     = $this->get_slots( $key_transient );
-		unset( $key_slots[ $slot->slot_key ] );
+		try {
+			$global_slots = $this->get_slots( self::GLOBAL_SLOTS_KEY );
+			unset( $global_slots[ $slot->slot_key ] );
 
-		if ( empty( $key_slots ) ) {
-			delete_transient( $key_transient );
-		} else {
-			set_transient( $key_transient, $key_slots, 180 );
+			if ( empty( $global_slots ) ) {
+				delete_transient( self::GLOBAL_SLOTS_KEY );
+			} else {
+				set_transient( self::GLOBAL_SLOTS_KEY, $global_slots, 180 );
+			}
+
+			$key_transient = self::KEY_SLOTS_PREFIX . $slot->key_id . '_slots';
+			$key_slots     = $this->get_slots( $key_transient );
+			unset( $key_slots[ $slot->slot_key ] );
+
+			if ( empty( $key_slots ) ) {
+				delete_transient( $key_transient );
+			} else {
+				set_transient( $key_transient, $key_slots, 180 );
+			}
+		} finally {
+			$this->release_lock( 'global' );
 		}
 	}
 
@@ -213,20 +229,20 @@ final class SseConcurrencyGuard {
 		$max_tries = 10;
 
 		while ( $attempts < $max_tries ) {
-			// set_transient returns false if the key already exists when
-			// using an external object cache. For the DB-based default,
-			// we use a get-then-set pattern.
-			$existing = get_transient( $lock_key );
-
-			if ( $existing === false ) {
-				set_transient( $lock_key, time(), self::LOCK_TIMEOUT );
-				return true;
-			}
-
-			// If the lock is stale (older than timeout), force acquire.
-			if ( is_numeric( $existing ) && ( time() - (int) $existing ) > self::LOCK_TIMEOUT ) {
-				set_transient( $lock_key, time(), self::LOCK_TIMEOUT );
-				return true;
+			if ( wp_using_ext_object_cache() ) {
+				if ( wp_cache_add( $lock_key, time(), 'wpmind_sse', self::LOCK_TIMEOUT ) ) {
+					return true;
+				}
+			} else {
+				global $wpdb;
+				$inserted = (bool) $wpdb->query( $wpdb->prepare(
+					"INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'no')",
+					'_transient_' . $lock_key,
+					time()
+				) );
+				if ( $inserted ) {
+					return true;
+				}
 			}
 
 			usleep( 50000 ); // 50ms.
@@ -242,6 +258,13 @@ final class SseConcurrencyGuard {
 	 * @param string $name Lock name.
 	 */
 	private function release_lock( string $name ): void {
-		delete_transient( self::LOCK_PREFIX . $name );
+		$lock_key = self::LOCK_PREFIX . $name;
+
+		if ( wp_using_ext_object_cache() ) {
+			wp_cache_delete( $lock_key, 'wpmind_sse' );
+			return;
+		}
+
+		delete_transient( $lock_key );
 	}
 }

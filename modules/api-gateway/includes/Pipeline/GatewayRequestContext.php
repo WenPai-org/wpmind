@@ -29,6 +29,7 @@ final class GatewayRequestContext {
 	private ?\WP_REST_Response $rest_response = null;
 	private ?\WP_Error $error = null;
 	private ?\Throwable $exception = null;
+	private ?string $client_ip = null;
 	private array $response_headers = [];
 	private int $retry_after_sec = 0;
 	private float $start_time;
@@ -102,7 +103,25 @@ final class GatewayRequestContext {
 	 * @return string|null
 	 */
 	public function key_id(): ?string {
-		return $this->auth_result->key_id ?? null;
+		return $this->auth_result?->key_id ?? null;
+	}
+
+	/**
+	 * Set the resolved client IP address.
+	 *
+	 * @param string $ip Client IP address.
+	 */
+	public function set_client_ip( string $ip ): void {
+		$this->client_ip = $ip;
+	}
+
+	/**
+	 * Get the resolved client IP address.
+	 *
+	 * @return string|null
+	 */
+	public function client_ip(): ?string {
+		return $this->client_ip;
 	}
 
 	/**

@@ -48,7 +48,7 @@ final class RouteMiddleware implements GatewayStageInterface {
 			default            => $context->set_error(
 				new \WP_Error(
 					'unsupported_operation',
-					sprintf( 'Unsupported operation: %s', $operation ),
+					sprintf( 'Unsupported operation: %s', sanitize_text_field( $operation ) ),
 					[ 'status' => 400 ]
 				)
 			),
@@ -160,7 +160,7 @@ final class RouteMiddleware implements GatewayStageInterface {
 		if ( $resolved === null ) {
 			$context->set_error( new \WP_Error(
 				'model_not_found',
-				sprintf( 'Model "%s" is not available.', $model_id ),
+				sprintf( 'Model "%s" is not available.', sanitize_text_field( (string) $model_id ) ),
 				[ 'status' => 404 ]
 			) );
 			return;

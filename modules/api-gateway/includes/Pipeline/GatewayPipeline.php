@@ -66,8 +66,18 @@ final class GatewayPipeline {
 		}
 
 		// Error and log stages always execute (finally semantics).
-		$this->error->process( $context );
-		$this->log->process( $context );
+		try {
+			$this->error->process( $context );
+		} catch ( \Throwable $e ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( '[WPMind GW] Error stage failed: ' . $e->getMessage() );
+		}
+		try {
+			$this->log->process( $context );
+		} catch ( \Throwable $e ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( '[WPMind GW] Log stage failed: ' . $e->getMessage() );
+		}
 
 		return $context->to_rest_response();
 	}

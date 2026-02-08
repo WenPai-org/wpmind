@@ -56,12 +56,12 @@ final class LogMiddleware implements GatewayStageInterface {
 		// Build detail JSON.
 		$detail = $this->build_detail( $context );
 
-		// Determine actor_user_id (null for anonymous).
+		// Determine actor_user_id (0 for anonymous).
 		$user_id       = get_current_user_id();
-		$actor_user_id = $user_id > 0 ? $user_id : null;
+		$actor_user_id = $user_id > 0 ? $user_id : 0;
 
 		// Privacy-preserving IP hash.
-		$ip_hash = $this->hash_client_ip();
+		$ip_hash = $this->hash_client_ip( $context );
 
 		// User-Agent, truncated to 255 chars.
 		$user_agent = $context->rest_request()->get_header( 'user-agent' );
@@ -69,7 +69,8 @@ final class LogMiddleware implements GatewayStageInterface {
 			$user_agent = mb_substr( $user_agent, 0, 255 );
 		}
 
-		$wpdb->insert(
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$inserted = $wpdb->insert(
 			$wpdb->prefix . 'wpmind_api_audit_log',
 			[
 				'event_type'    => $event_type,
@@ -92,6 +93,17 @@ final class LogMiddleware implements GatewayStageInterface {
 				'%s', // created_at
 			]
 		);
+
+		if ( $inserted === false ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log(
+				sprintf(
+					'[WPMind API Gateway] Failed to insert audit log for request %s: %s',
+					$context->request_id(),
+					$wpdb->last_error
+				)
+			);
+		}
 	}
 
 	/**
@@ -137,7 +149,7 @@ final class LogMiddleware implements GatewayStageInterface {
 
 		// Atomic upsert: INSERT ... ON DUPLICATE KEY UPDATE.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->query(
+		$query_result = $wpdb->query(
 			$wpdb->prepare(
 				"INSERT INTO {$table}
 					( key_id, window_month, request_count, input_tokens, output_tokens, total_tokens, total_cost_usd, updated_at )
@@ -158,6 +170,17 @@ final class LogMiddleware implements GatewayStageInterface {
 				$now
 			)
 		);
+
+		if ( $query_result === false ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log(
+				sprintf(
+					'[WPMind API Gateway] Failed to update key usage for %s: %s',
+					$key_id,
+					$wpdb->last_error
+				)
+			);
+		}
 	}
 
 	/**
@@ -210,38 +233,16 @@ final class LogMiddleware implements GatewayStageInterface {
 	}
 
 	/**
-	 * Generate a SHA-256 hash of the client IP for privacy.
+	 * Generate an HMAC-SHA256 hash of the client IP for privacy.
 	 *
+	 * Uses the IP resolved by AuthMiddleware via the context.
+	 *
+	 * @param GatewayRequestContext $context Request context.
 	 * @return string 64-character hex hash.
 	 */
-	private function hash_client_ip(): string {
-		$headers = [
-			'HTTP_X_FORWARDED_FOR',
-			'HTTP_X_REAL_IP',
-			'REMOTE_ADDR',
-		];
+	private function hash_client_ip( GatewayRequestContext $context ): string {
+		$ip = $context->client_ip() ?? '127.0.0.1';
 
-		$ip = '127.0.0.1';
-
-		foreach ( $headers as $header ) {
-			$value = sanitize_text_field( wp_unslash( $_SERVER[ $header ] ?? '' ) );
-
-			if ( $value === '' ) {
-				continue;
-			}
-
-			// X-Forwarded-For may contain multiple IPs; take the first.
-			if ( $header === 'HTTP_X_FORWARDED_FOR' ) {
-				$parts = explode( ',', $value );
-				$value = trim( $parts[0] );
-			}
-
-			if ( filter_var( $value, FILTER_VALIDATE_IP ) !== false ) {
-				$ip = $value;
-				break;
-			}
-		}
-
-		return hash( 'sha256', $ip );
+		return hash_hmac( 'sha256', $ip, wp_salt( 'auth' ) );
 	}
 }
