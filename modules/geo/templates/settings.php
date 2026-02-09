@@ -42,6 +42,8 @@ if ( ! is_array( $robots_ai_rules ) ) {
 $ai_summary_enabled    = $is_enabled( 'wpmind_ai_summary_enabled', '0' );
 $ai_summary_fallback   = get_option( 'wpmind_ai_summary_fallback', 'excerpt' );
 $entity_linker_enabled = $is_enabled( 'wpmind_entity_linker_enabled', '0' );
+$brand_entity_enabled  = $is_enabled( 'wpmind_brand_entity_enabled', '0' );
+$brand_org_type        = get_option( 'wpmind_brand_org_type', 'Organization' );
 
 // 检查官方插件是否安装
 $official_installed = class_exists( 'AI_Experiments\\Experiments\\Markdown_Feeds' );
@@ -123,6 +125,10 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
         <button type="button" class="wpmind-module-subtab" data-tab="crawlers">
             <span class="dashicons ri-robot-line"></span>
             <?php esc_html_e( '爬虫管理', 'wpmind' ); ?>
+        </button>
+        <button type="button" class="wpmind-module-subtab" data-tab="brand">
+            <span class="dashicons ri-building-line"></span>
+            <?php esc_html_e( '品牌实体', 'wpmind' ); ?>
         </button>
     </div>
 
@@ -596,6 +602,157 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                 </div><!-- /right -->
                 </div><!-- /grid -->
             </div><!-- /crawlers -->
+
+            <!-- ========== 品牌实体 Tab ========== -->
+            <div class="wpmind-module-tab-panel" data-panel="brand">
+                <div class="wpmind-geo-grid">
+                <div class="wpmind-geo-left">
+                <!-- 组织基础 -->
+                <div class="wpmind-geo-section">
+                    <h3 class="wpmind-geo-section-title">
+                        <span class="dashicons ri-building-line"></span>
+                        <?php esc_html_e( '组织基础', 'wpmind' ); ?>
+                        <span class="wpmind-geo-new-badge"><?php esc_html_e( 'NEW', 'wpmind' ); ?></span>
+                    </h3>
+                    <p class="wpmind-geo-section-desc"><?php esc_html_e( '定义品牌实体信息，增强 publisher Schema 并在首页输出 Organization JSON-LD。', 'wpmind' ); ?></p>
+                    <div class="wpmind-geo-options">
+                        <label class="wpmind-module-option">
+                            <input type="checkbox" name="wpmind_brand_entity_enabled" value="1" <?php checked( $brand_entity_enabled ); ?>>
+                            <span class="wpmind-module-option-content">
+                                <span class="wpmind-module-option-title"><?php esc_html_e( '启用品牌实体', 'wpmind' ); ?></span>
+                                <span class="wpmind-module-option-desc"><?php esc_html_e( '丰富文章 publisher Schema，并在首页输出独立 Organization JSON-LD', 'wpmind' ); ?></span>
+                            </span>
+                        </label>
+                    </div>
+                    <?php if ( $brand_entity_enabled ) : ?>
+                    <div class="wpmind-geo-select-group">
+                        <label class="wpmind-geo-select-label"><?php esc_html_e( '组织类型：', 'wpmind' ); ?></label>
+                        <select name="wpmind_brand_org_type" class="wpmind-geo-select">
+                            <option value="Organization" <?php selected( $brand_org_type, 'Organization' ); ?>><?php esc_html_e( 'Organization (通用)', 'wpmind' ); ?></option>
+                            <option value="Corporation" <?php selected( $brand_org_type, 'Corporation' ); ?>><?php esc_html_e( 'Corporation (公司)', 'wpmind' ); ?></option>
+                            <option value="LocalBusiness" <?php selected( $brand_org_type, 'LocalBusiness' ); ?>><?php esc_html_e( 'LocalBusiness (本地商户)', 'wpmind' ); ?></option>
+                            <option value="OnlineBusiness" <?php selected( $brand_org_type, 'OnlineBusiness' ); ?>><?php esc_html_e( 'OnlineBusiness (在线业务)', 'wpmind' ); ?></option>
+                            <option value="NewsMediaOrganization" <?php selected( $brand_org_type, 'NewsMediaOrganization' ); ?>><?php esc_html_e( 'NewsMediaOrganization (新闻媒体)', 'wpmind' ); ?></option>
+                        </select>
+                    </div>
+                    <div class="wpmind-geo-select-group" style="margin-top:12px;">
+                        <label class="wpmind-geo-select-label"><?php esc_html_e( '品牌名称：', 'wpmind' ); ?></label>
+                        <input type="text" name="wpmind_brand_name" value="<?php echo esc_attr( get_option( 'wpmind_brand_name', '' ) ); ?>"
+                               placeholder="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" class="regular-text">
+                        <p class="description"><?php esc_html_e( '留空则使用站点名称', 'wpmind' ); ?></p>
+                    </div>
+                    <div class="wpmind-geo-select-group" style="margin-top:12px;">
+                        <label class="wpmind-geo-select-label"><?php esc_html_e( '品牌描述：', 'wpmind' ); ?></label>
+                        <textarea name="wpmind_brand_description" rows="3" class="large-text"
+                                  placeholder="<?php esc_attr_e( '简要描述您的品牌/组织', 'wpmind' ); ?>"><?php echo esc_textarea( get_option( 'wpmind_brand_description', '' ) ); ?></textarea>
+                    </div>
+                    <div class="wpmind-geo-select-group" style="margin-top:12px;">
+                        <label class="wpmind-geo-select-label"><?php esc_html_e( '品牌 URL：', 'wpmind' ); ?></label>
+                        <input type="url" name="wpmind_brand_url" value="<?php echo esc_attr( get_option( 'wpmind_brand_url', '' ) ); ?>"
+                               placeholder="<?php echo esc_attr( home_url( '/' ) ); ?>" class="regular-text">
+                        <p class="description"><?php esc_html_e( '留空则使用站点首页地址', 'wpmind' ); ?></p>
+                    </div>
+                    <div class="wpmind-geo-select-group" style="margin-top:12px;">
+                        <label class="wpmind-geo-select-label"><?php esc_html_e( '创立日期：', 'wpmind' ); ?></label>
+                        <input type="text" name="wpmind_brand_founding_date" value="<?php echo esc_attr( get_option( 'wpmind_brand_founding_date', '' ) ); ?>"
+                               placeholder="<?php esc_attr_e( '例如：2020 或 2020-01-01', 'wpmind' ); ?>" class="regular-text" style="width:200px;">
+                    </div>
+                    <?php endif; ?>
+                </div>
+
+                <?php if ( $brand_entity_enabled ) : ?>
+                <!-- 社交档案 -->
+                <div class="wpmind-geo-section">
+                    <h3 class="wpmind-geo-section-title">
+                        <span class="dashicons ri-share-line"></span>
+                        <?php esc_html_e( '社交档案', 'wpmind' ); ?>
+                    </h3>
+                    <p class="wpmind-geo-section-desc"><?php esc_html_e( '社交平台主页 URL，将作为 Schema.org sameAs 输出。', 'wpmind' ); ?></p>
+                    <?php
+                    $social_fields = [
+                        'wpmind_brand_social_facebook'  => 'Facebook',
+                        'wpmind_brand_social_twitter'   => 'X (Twitter)',
+                        'wpmind_brand_social_linkedin'  => 'LinkedIn',
+                        'wpmind_brand_social_youtube'   => 'YouTube',
+                        'wpmind_brand_social_github'    => 'GitHub',
+                        'wpmind_brand_social_weibo'     => __( '微博', 'wpmind' ),
+                        'wpmind_brand_social_zhihu'     => __( '知乎', 'wpmind' ),
+                        'wpmind_brand_social_wechat'    => __( '微信公众号', 'wpmind' ),
+                    ];
+                    foreach ( $social_fields as $field_name => $label ) :
+                    ?>
+                    <div class="wpmind-geo-select-group" style="margin-top:8px;">
+                        <label class="wpmind-geo-select-label"><?php echo esc_html( $label ); ?>:</label>
+                        <input type="url" name="<?php echo esc_attr( $field_name ); ?>"
+                               value="<?php echo esc_attr( get_option( $field_name, '' ) ); ?>"
+                               placeholder="https://" class="regular-text">
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+
+                <!-- 联系方式 -->
+                <div class="wpmind-geo-section">
+                    <h3 class="wpmind-geo-section-title">
+                        <span class="dashicons ri-mail-line"></span>
+                        <?php esc_html_e( '联系方式', 'wpmind' ); ?>
+                    </h3>
+                    <p class="wpmind-geo-section-desc"><?php esc_html_e( '可选的联系信息，将作为 Schema.org contactPoint 输出。', 'wpmind' ); ?></p>
+                    <div class="wpmind-geo-select-group" style="margin-top:8px;">
+                        <label class="wpmind-geo-select-label"><?php esc_html_e( '联系邮箱：', 'wpmind' ); ?></label>
+                        <input type="email" name="wpmind_brand_contact_email"
+                               value="<?php echo esc_attr( get_option( 'wpmind_brand_contact_email', '' ) ); ?>"
+                               placeholder="hello@example.com" class="regular-text">
+                    </div>
+                    <div class="wpmind-geo-select-group" style="margin-top:8px;">
+                        <label class="wpmind-geo-select-label"><?php esc_html_e( '联系电话：', 'wpmind' ); ?></label>
+                        <input type="tel" name="wpmind_brand_contact_phone"
+                               value="<?php echo esc_attr( get_option( 'wpmind_brand_contact_phone', '' ) ); ?>"
+                               placeholder="+86-xxx-xxxx-xxxx" class="regular-text" style="width:200px;">
+                    </div>
+                </div>
+
+                <!-- Knowledge Graph -->
+                <div class="wpmind-geo-section">
+                    <h3 class="wpmind-geo-section-title">
+                        <span class="dashicons ri-global-line"></span>
+                        <?php esc_html_e( 'Knowledge Graph', 'wpmind' ); ?>
+                    </h3>
+                    <p class="wpmind-geo-section-desc"><?php esc_html_e( '关联品牌的 Wikidata/Wikipedia 页面，强化知识图谱信号。', 'wpmind' ); ?></p>
+                    <div class="wpmind-geo-select-group" style="margin-top:8px;">
+                        <label class="wpmind-geo-select-label"><?php esc_html_e( 'Wikidata URL：', 'wpmind' ); ?></label>
+                        <input type="url" name="wpmind_brand_wikidata_url"
+                               value="<?php echo esc_attr( get_option( 'wpmind_brand_wikidata_url', '' ) ); ?>"
+                               placeholder="https://www.wikidata.org/wiki/Q..." class="regular-text">
+                    </div>
+                    <div class="wpmind-geo-select-group" style="margin-top:8px;">
+                        <label class="wpmind-geo-select-label"><?php esc_html_e( 'Wikipedia URL：', 'wpmind' ); ?></label>
+                        <input type="url" name="wpmind_brand_wikipedia_url"
+                               value="<?php echo esc_attr( get_option( 'wpmind_brand_wikipedia_url', '' ) ); ?>"
+                               placeholder="https://en.wikipedia.org/wiki/..." class="regular-text">
+                    </div>
+                </div>
+                <?php endif; ?>
+                </div><!-- /left -->
+                <div class="wpmind-geo-right">
+                    <div class="wpmind-geo-section wpmind-geo-info">
+                        <h3 class="wpmind-geo-section-title">
+                            <span class="dashicons ri-lightbulb-line"></span>
+                            <?php esc_html_e( '品牌实体与 AI 搜索', 'wpmind' ); ?>
+                        </h3>
+                        <div class="wpmind-geo-info-content">
+                            <p><?php esc_html_e( '品牌实体是 GEO 的基础层。AI 搜索引擎必须先"理解"品牌身份，才能信任并推荐其内容。完整的 Organization Schema 和社交档案 sameAs 是建立品牌知识图谱的关键信号。', 'wpmind' ); ?></p>
+                            <ul>
+                                <li><?php esc_html_e( 'Organization JSON-LD 在首页输出，是知识图谱的主要信号源', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( 'sameAs 关联社交档案，帮助 AI 验证品牌真实性', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( 'Wikidata/Wikipedia 链接强化实体消歧', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( '文章 publisher 自动增强，无需逐篇配置', 'wpmind' ); ?></li>
+                            </ul>
+                            <p><a href="<?php echo esc_url( $learn_more_url ); ?>" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
+                        </div>
+                    </div>
+                </div><!-- /right -->
+                </div><!-- /grid -->
+            </div><!-- /brand -->
 
             <!-- 保存按钮 -->
             <div class="wpmind-module-actions">

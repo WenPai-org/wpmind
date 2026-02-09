@@ -30,6 +30,7 @@ require_once __DIR__ . '/includes/AiSitemapGenerator.php';
 require_once __DIR__ . '/includes/RobotsTxtManager.php';
 require_once __DIR__ . '/includes/AiSummaryManager.php';
 require_once __DIR__ . '/includes/EntityLinker.php';
+require_once __DIR__ . '/includes/BrandEntity.php';
 
 /**
  * Class GeoModule
@@ -189,6 +190,11 @@ class GeoModule implements ModuleInterface {
 		if ( $is_enabled( 'wpmind_entity_linker_enabled', '0' ) ) {
 			$this->components['entity_linker'] = new EntityLinker();
 		}
+
+		// Brand Entity.
+		if ( $is_enabled( 'wpmind_brand_entity_enabled', '0' ) ) {
+			$this->components['brand_entity'] = new BrandEntity();
+		}
 	}
 
 	/**
@@ -267,6 +273,7 @@ class GeoModule implements ModuleInterface {
 			'wpmind_robots_ai_enabled'       => $to_bool( 'wpmind_robots_ai_enabled' ),
 			'wpmind_ai_summary_enabled'      => $to_bool( 'wpmind_ai_summary_enabled' ),
 			'wpmind_entity_linker_enabled'   => $to_bool( 'wpmind_entity_linker_enabled' ),
+			'wpmind_brand_entity_enabled'    => $to_bool( 'wpmind_brand_entity_enabled' ),
 		);
 
 		foreach ( $options as $key => $value ) {
@@ -312,6 +319,56 @@ class GeoModule implements ModuleInterface {
 				true
 			) ? sanitize_key( $settings['wpmind_ai_summary_fallback'] ) : 'excerpt';
 			update_option( 'wpmind_ai_summary_fallback', $fallback, false );
+		}
+
+		// Save brand entity sub-settings only when enabled.
+		if ( $options['wpmind_brand_entity_enabled'] === '1' ) {
+			$brand_text_fields = [
+				'wpmind_brand_name',
+				'wpmind_brand_description',
+				'wpmind_brand_founding_date',
+			];
+			foreach ( $brand_text_fields as $field ) {
+				$val = isset( $settings[ $field ] ) ? sanitize_text_field( wp_unslash( $settings[ $field ] ) ) : '';
+				update_option( $field, $val, false );
+			}
+
+			$brand_url_fields = [
+				'wpmind_brand_url',
+				'wpmind_brand_social_facebook',
+				'wpmind_brand_social_twitter',
+				'wpmind_brand_social_linkedin',
+				'wpmind_brand_social_youtube',
+				'wpmind_brand_social_github',
+				'wpmind_brand_social_weibo',
+				'wpmind_brand_social_zhihu',
+				'wpmind_brand_social_wechat',
+				'wpmind_brand_wikidata_url',
+				'wpmind_brand_wikipedia_url',
+			];
+			foreach ( $brand_url_fields as $field ) {
+				$val = isset( $settings[ $field ] ) ? esc_url_raw( wp_unslash( $settings[ $field ] ) ) : '';
+				update_option( $field, $val, false );
+			}
+
+			// Contact email (URL-like but use esc_url_raw for mailto compatibility).
+			$email = isset( $settings['wpmind_brand_contact_email'] )
+				? sanitize_email( wp_unslash( $settings['wpmind_brand_contact_email'] ) ) : '';
+			update_option( 'wpmind_brand_contact_email', $email, false );
+
+			// Phone (not URL).
+			$phone = isset( $settings['wpmind_brand_contact_phone'] )
+				? sanitize_text_field( wp_unslash( $settings['wpmind_brand_contact_phone'] ) ) : '';
+			update_option( 'wpmind_brand_contact_phone', $phone, false );
+
+			// Org type (whitelist).
+			$allowed_types = [ 'Organization', 'Corporation', 'LocalBusiness', 'OnlineBusiness', 'NewsMediaOrganization' ];
+			$org_type      = isset( $settings['wpmind_brand_org_type'] )
+				? sanitize_text_field( $settings['wpmind_brand_org_type'] ) : 'Organization';
+			if ( ! in_array( $org_type, $allowed_types, true ) ) {
+				$org_type = 'Organization';
+			}
+			update_option( 'wpmind_brand_org_type', $org_type, false );
 		}
 
 		// Flush rewrite rules if markdown feed or AI sitemap setting changed.
