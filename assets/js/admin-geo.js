@@ -83,6 +83,26 @@
 				wpmind_schema_mode: $( 'select[name="wpmind_schema_mode"]' ).val() || 'auto',
 				wpmind_entity_linker_enabled: $( 'input[name="wpmind_entity_linker_enabled"]' ).is( ':checked' ) ? 1 : 0,
 
+				// Brand entity tab.
+				wpmind_brand_entity_enabled: $( 'input[name="wpmind_brand_entity_enabled"]' ).is( ':checked' ) ? 1 : 0,
+				wpmind_brand_org_type: $( 'select[name="wpmind_brand_org_type"]' ).val() || 'Organization',
+				wpmind_brand_name: $( 'input[name="wpmind_brand_name"]' ).val() || '',
+				wpmind_brand_description: $( 'textarea[name="wpmind_brand_description"]' ).val() || '',
+				wpmind_brand_url: $( 'input[name="wpmind_brand_url"]' ).val() || '',
+				wpmind_brand_founding_date: $( 'input[name="wpmind_brand_founding_date"]' ).val() || '',
+				wpmind_brand_social_facebook: $( 'input[name="wpmind_brand_social_facebook"]' ).val() || '',
+				wpmind_brand_social_twitter: $( 'input[name="wpmind_brand_social_twitter"]' ).val() || '',
+				wpmind_brand_social_linkedin: $( 'input[name="wpmind_brand_social_linkedin"]' ).val() || '',
+				wpmind_brand_social_youtube: $( 'input[name="wpmind_brand_social_youtube"]' ).val() || '',
+				wpmind_brand_social_github: $( 'input[name="wpmind_brand_social_github"]' ).val() || '',
+				wpmind_brand_social_weibo: $( 'input[name="wpmind_brand_social_weibo"]' ).val() || '',
+				wpmind_brand_social_zhihu: $( 'input[name="wpmind_brand_social_zhihu"]' ).val() || '',
+				wpmind_brand_social_wechat: $( 'input[name="wpmind_brand_social_wechat"]' ).val() || '',
+				wpmind_brand_wikidata_url: $( 'input[name="wpmind_brand_wikidata_url"]' ).val() || '',
+				wpmind_brand_wikipedia_url: $( 'input[name="wpmind_brand_wikipedia_url"]' ).val() || '',
+				wpmind_brand_contact_email: $( 'input[name="wpmind_brand_contact_email"]' ).val() || '',
+				wpmind_brand_contact_phone: $( 'input[name="wpmind_brand_contact_phone"]' ).val() || '',
+
 				// Control tab.
 				wpmind_ai_indexing_enabled: $( 'input[name="wpmind_ai_indexing_enabled"]' ).is( ':checked' ) ? 1 : 0,
 				wpmind_ai_default_declaration: $( 'select[name="wpmind_ai_default_declaration"]' ).val() || 'original',
