@@ -1,6 +1,48 @@
 # WPMind 更新日志
 
+## [3.11.1] - 2026-02-09
+
+### CSS 架构重构
+
+统一模块设置页 CSS 架构，消除跨模块样式耦合。
+
+#### 变更
+- **新建** `assets/css/components/module-layout.css` — 共享模块布局组件（header/badge/stats/subtabs/options/actions）
+- **统一命名**: `wpmind-geo-*`/`wpmind-mi-*` 共享类 → `wpmind-module-*`
+- **JS 作用域化**: GEO/MI/AM 三个模块的 jQuery 选择器限定到各自 panel 容器，防止子标签切换互相干扰
+- **模块 CSS 瘦身**: 各模块 CSS 仅保留模块专属样式，共享部分统一引用 module-layout.css
+
+#### 影响范围
+- 20 个文件变更（6 CSS + 3 JS + 1 PHP + 10 模板）
+- 420 行新增，499 行删除（净减 79 行）
+
+---
+
 ## [3.11.0] - 2026-02-09
+
+### Media Intelligence 模块
+
+AI 驱动的图片元数据自动生成，复用多模态 Vision API。
+
+#### 核心功能
+- **Alt Text 生成**: 上传图片时自动生成无障碍描述
+- **图片标题**: 自动生成语义化标题
+- **图片描述**: 自动生成详细描述文本
+- **批量处理**: 对已有媒体库图片批量生成元数据
+- **安全检测**: NSFW 内容识别（可选）
+
+#### 技术实现
+- **触发方式**: `add_attachment` hook（上传时）+ 手动批量触发
+- **执行模式**: WP-Cron 异步处理，批量模式支持进度追踪
+- **API 策略**: `wpmind_vision()` 调用多模态 Provider（Qwen-VL/GPT-4o/Gemini）
+- **Failover**: Vision API 故障时自动切换到支持视觉的备用 Provider
+- **语言支持**: 根据站点 locale 自动选择生成语言
+
+#### 设置页
+- 子标签页布局：功能开关 + 批量处理
+- 独立开关（alt text/标题/描述/安全检测）
+- 生成语言选择
+- 批量处理进度条和结果统计
 
 ### Auto-Meta 模块
 
