@@ -16,6 +16,7 @@ namespace WPMind\API;
 
 use WP_Error;
 use WPMind\API\Services\ChatService;
+use WPMind\API\Services\VisionHelper;
 use WPMind\API\Services\TextProcessingService;
 use WPMind\API\Services\StructuredOutputService;
 use WPMind\API\Services\EmbeddingService;
@@ -318,6 +319,36 @@ class PublicAPI {
 	 */
 	public function generate_image(string $prompt, array $options = []) {
 		return $this->image_service->generate_image($prompt, $options);
+	}
+
+	/**
+	 * AI 图像理解（Vision）
+	 *
+	 * @since 4.3.0
+	 * @param string $image_url 图片 URL 或 base64 data URI
+	 * @param string $prompt    提示词
+	 * @param array  $options   选项
+	 * @return array|WP_Error
+	 */
+	public function vision( string $image_url, string $prompt = '', array $options = [] ) {
+		$defaults = [
+			'system'      => '',
+			'max_tokens'  => 300,
+			'temperature' => 0.3,
+			'provider'    => 'auto',
+			'language'    => get_locale() === 'zh_CN' ? 'zh' : 'en',
+		];
+		$options = wp_parse_args( $options, $defaults );
+
+		if ( 'auto' === $options['provider'] ) {
+			$options['provider'] = VisionHelper::get_vision_provider();
+			$options['model']    = VisionHelper::get_vision_model( $options['provider'] );
+		}
+
+		$messages = VisionHelper::build_vision_messages( $image_url, $prompt, $options['system'] );
+		unset( $options['system'] );
+
+		return $this->chat( $messages, $options );
 	}
 
 	/**
