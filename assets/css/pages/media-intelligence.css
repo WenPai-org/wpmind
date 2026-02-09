@@ -53,11 +53,11 @@
 }
 
 /* Tab panels */
-.wpmind-mi-tab-panel {
+.wpmind-media-panel .wpmind-mi-tab-panel {
 	display: none;
 }
 
-.wpmind-mi-tab-panel.active {
+.wpmind-media-panel .wpmind-mi-tab-panel.active {
 	display: block;
 }
 

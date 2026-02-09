@@ -33,8 +33,8 @@
 		bindEvents: function() {
 			var self = this;
 
-			// Sub-tab switching.
-			$( '.wpmind-mi-subtab' ).on( 'click', function() {
+			// Sub-tab switching (scoped to media panel).
+			$( '.wpmind-media-panel .wpmind-mi-subtab' ).on( 'click', function() {
 				self.switchTab( $( this ).data( 'tab' ) );
 			} );
 
@@ -50,11 +50,11 @@
 		},
 
 		switchTab: function( tab ) {
-			$( '.wpmind-mi-subtab' ).removeClass( 'active' );
-			$( '.wpmind-mi-subtab[data-tab="' + tab + '"]' ).addClass( 'active' );
+			$( '.wpmind-media-panel .wpmind-mi-subtab' ).removeClass( 'active' );
+			$( '.wpmind-media-panel .wpmind-mi-subtab[data-tab="' + tab + '"]' ).addClass( 'active' );
 
-			$( '.wpmind-mi-tab-panel' ).removeClass( 'active' );
-			$( '.wpmind-mi-tab-panel[data-panel="' + tab + '"]' ).addClass( 'active' );
+			$( '.wpmind-media-panel .wpmind-mi-tab-panel' ).removeClass( 'active' );
+			$( '.wpmind-media-panel .wpmind-mi-tab-panel[data-panel="' + tab + '"]' ).addClass( 'active' );
 
 			try {
 				sessionStorage.setItem( 'wpmind_mi_subtab', tab );
@@ -65,7 +65,7 @@
 			var tab = 'settings';
 			try {
 				var saved = sessionStorage.getItem( 'wpmind_mi_subtab' );
-				if ( saved && $( '.wpmind-mi-subtab[data-tab="' + saved + '"]' ).length ) {
+				if ( saved && $( '.wpmind-media-panel .wpmind-mi-subtab[data-tab="' + saved + '"]' ).length ) {
 					tab = saved;
 				}
 			} catch ( e ) {}
