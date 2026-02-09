@@ -1,5 +1,43 @@
 # WPMind 更新日志
 
+## [3.11.0] - 2026-02-09
+
+### Auto-Meta 模块
+
+发布时自动生成摘要、标签、分类、FAQ Schema、SEO 描述，与 GEO 模块协同提升 AI 搜索引擎可见性。
+
+#### 核心功能
+- **自动摘要**: 发布文章时生成 100-150 字摘要，仅在摘要为空时填充
+- **智能标签**: 自动提取 3-5 个关键词标签，仅在无标签时添加
+- **分类建议**: 从已有分类中匹配最佳分类，仅在只有默认分类时替换（默认关闭）
+- **FAQ Schema**: 生成 3 个常见问题及回答，通过 `wpmind_article_schema` filter 注入 GEO 模块
+- **SEO 描述**: 生成 120-160 字符 SEO 描述，存储在 post meta 中
+
+#### 技术实现
+- **触发方式**: `transition_post_status`（首次发布）+ `post_updated`（内容变更）
+- **执行模式**: WP-Cron 异步（延迟 30 秒），手动触发同步执行
+- **API 策略**: 单次 `wpmind_structured()` 调用生成全部 5 项元数据
+- **防护机制**: 并发锁、内容哈希去重、hook 临时移除防递归、功能预检跳过无效 AI 调用
+- **FAQ 注入**: 优先级 15（AiSummary:10 之后，EntityLinker:20 之前）
+
+#### 设置页
+- 子标签页布局：功能开关 + 手动生成
+- 5 个独立功能开关（摘要/标签/分类/FAQ/SEO 描述）
+- 支持的文章类型多选（默认 post + page）
+- 手动输入文章 ID 生成并预览结果
+
+#### 代码统计
+- 新增 7 个文件（5 PHP + 1 CSS + 1 JS），约 1,200 行
+- 修改 2 个文件（settings-page.php + wpmind.php）
+
+#### Codex 评审修复
+- **High**: 新增 `has_enabled_features()` 预检，所有开关关闭时跳过 AI 调用
+- **Medium**: `on_update` 允许 source 为空时重试（首次 API 失败后不再永久跳过）
+- **Medium**: `inject_faq_schema` 新增 FAQ 开关检查，关闭后不再输出 Schema
+- **Low**: 手动生成对非发布文章返回明确状态错误
+
+---
+
 ## [3.10.2] - 2026-02-08
 
 ### API Gateway 模块 (Phase 0-10)
