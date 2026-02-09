@@ -1,0 +1,84 @@
+/**
+ * WPMind Auto-Meta Module Styles
+ *
+ * Auto-Meta-specific UI components: post type checkboxes, manual form, result table.
+ *
+ * @package WPMind
+ * @since 3.11.0
+ */
+
+/* === Auto-Meta Module === */
+.wpmind-auto-meta-panel .wpmind-geo-badge {
+	margin-right: auto;
+}
+
+/* Post types row */
+.wpmind-am-post-types-row {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wpmind-space-2);
+	padding: var(--wpmind-space-3) 0;
+}
+
+.wpmind-am-post-types {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--wpmind-space-3);
+}
+
+.wpmind-am-type-label {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--wpmind-space-1);
+	font-size: var(--wpmind-text-sm);
+	cursor: pointer;
+}
+
+/* Manual generate form */
+.wpmind-am-manual-info {
+	color: var(--wpmind-gray-600);
+	margin: 0 0 var(--wpmind-space-3);
+}
+
+.wpmind-am-manual-form {
+	display: flex;
+	gap: var(--wpmind-space-2);
+	align-items: center;
+	margin-bottom: var(--wpmind-space-4);
+}
+
+.wpmind-am-manual-form input[type="number"] {
+	width: 120px;
+}
+
+/* Result table */
+.wpmind-am-result h4 {
+	margin: 0 0 var(--wpmind-space-2);
+	font-size: var(--wpmind-text-base);
+}
+
+.wpmind-am-result-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.wpmind-am-result-table th,
+.wpmind-am-result-table td {
+	padding: var(--wpmind-space-2) var(--wpmind-space-3);
+	border-bottom: 1px solid var(--wpmind-gray-200);
+	text-align: left;
+	font-size: var(--wpmind-text-sm);
+	vertical-align: top;
+}
+
+.wpmind-am-result-table th {
+	width: 100px;
+	color: var(--wpmind-gray-600);
+	font-weight: 500;
+	white-space: nowrap;
+}
+
+.wpmind-am-result-table td {
+	color: var(--wpmind-gray-800);
+	line-height: 1.5;
+}

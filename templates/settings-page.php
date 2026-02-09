@@ -54,6 +54,8 @@ defined("ABSPATH") || exit(); ?>
   $exact_cache_enabled = $exact_cache_module && $exact_cache_module["enabled"];
   $media_intelligence_module = $module_loader->get_module("media-intelligence");
   $media_intelligence_enabled = $media_intelligence_module && $media_intelligence_module["enabled"];
+  $auto_meta_module = $module_loader->get_module("auto-meta");
+  $auto_meta_enabled = $auto_meta_module && $auto_meta_module["enabled"];
   ?>
 		<!-- Tab 卡片 -->
 		<div class="wpmind-tabs-card">
@@ -99,6 +101,11 @@ defined("ABSPATH") || exit(); ?>
 				<?php if ($media_intelligence_enabled): ?>
 				<a href="#media-intelligence" class="wpmind-tab" data-tab="media-intelligence">
 					<?php esc_html_e("媒体智能", "wpmind"); ?>
+				</a>
+				<?php endif; ?>
+				<?php if ($auto_meta_enabled): ?>
+				<a href="#auto-meta" class="wpmind-tab" data-tab="auto-meta">
+					<?php esc_html_e("Auto-Meta", "wpmind"); ?>
 				</a>
 				<?php endif; ?>
 				<a href="#modules" class="wpmind-tab" data-tab="modules">
@@ -165,6 +172,16 @@ defined("ABSPATH") || exit(); ?>
     $mi_settings = WPMIND_PATH . "modules/media-intelligence/templates/settings.php";
     if (file_exists($mi_settings)) {
         include $mi_settings;
+    }
+    ?>
+			</div>
+			<?php endif; ?>
+			<?php if ($auto_meta_enabled): ?>
+			<div id="auto-meta" class="wpmind-tab-pane">
+				<?php
+    $auto_meta_settings = WPMIND_PATH . "modules/auto-meta/templates/settings.php";
+    if (file_exists($auto_meta_settings)) {
+        include $auto_meta_settings;
     }
     ?>
 			</div>
