@@ -23,20 +23,20 @@ $month_gen = (int) ( $stats[ $month_key ] ?? 0 );
 
 <div class="wpmind-media-panel">
 	<!-- Header -->
-	<div class="wpmind-geo-header">
-		<h2 class="wpmind-geo-title">
+	<div class="wpmind-module-header">
+		<h2 class="wpmind-module-title">
 			<span class="dashicons ri-image-ai-line"></span>
 			<?php esc_html_e( '媒体智能', 'wpmind' ); ?>
 		</h2>
-		<span class="wpmind-geo-badge">v1.0</span>
+		<span class="wpmind-module-badge">v1.0</span>
 	</div>
 
-	<p class="wpmind-geo-desc">
+	<p class="wpmind-module-desc">
 		<?php esc_html_e( 'AI 驱动的图片 Alt Text、标题、描述自动生成，提升 SEO 和无障碍访问。', 'wpmind' ); ?>
 	</p>
 
 	<!-- Stats Cards -->
-	<div class="wpmind-geo-stats">
+	<div class="wpmind-module-stats">
 		<div class="wpmind-stat-card">
 			<div class="wpmind-stat-icon">
 				<span class="dashicons ri-image-line"></span>
@@ -77,48 +77,48 @@ $month_gen = (int) ( $stats[ $month_key ] ?? 0 );
 	</div>
 
 	<!-- Sub-tab Navigation -->
-	<div class="wpmind-mi-subtabs">
-		<button type="button" class="wpmind-mi-subtab active" data-tab="settings">
+	<div class="wpmind-module-subtabs">
+		<button type="button" class="wpmind-module-subtab active" data-tab="settings">
 			<span class="dashicons ri-settings-3-line"></span>
 			<?php esc_html_e( '基本设置', 'wpmind' ); ?>
 		</button>
-		<button type="button" class="wpmind-mi-subtab" data-tab="batch">
+		<button type="button" class="wpmind-module-subtab" data-tab="batch">
 			<span class="dashicons ri-stack-line"></span>
 			<?php esc_html_e( '批量处理', 'wpmind' ); ?>
 		</button>
-		<button type="button" class="wpmind-mi-subtab" data-tab="safety">
+		<button type="button" class="wpmind-module-subtab" data-tab="safety">
 			<span class="dashicons ri-shield-check-line"></span>
 			<?php esc_html_e( '内容安全', 'wpmind' ); ?>
 		</button>
 	</div>
 
 	<!-- ========== Tab: Basic Settings ========== -->
-	<div class="wpmind-mi-tab-panel active" data-panel="settings">
-		<div class="wpmind-geo-option">
+	<div class="wpmind-module-tab-panel active" data-panel="settings">
+		<div class="wpmind-module-option">
 			<label class="wpmind-toggle">
 				<input type="checkbox" name="wpmind_media_auto_alt" value="1"
 					<?php checked( $auto_alt, '1' ); ?>>
 				<span class="wpmind-toggle-slider"></span>
 			</label>
-			<div class="wpmind-geo-option-text">
+			<div class="wpmind-module-option-text">
 				<strong><?php esc_html_e( '上传时自动生成 Alt Text', 'wpmind' ); ?></strong>
 				<p><?php esc_html_e( '新图片上传后自动通过 AI 生成描述性 alt text，已有 alt text 的图片不会被覆盖。', 'wpmind' ); ?></p>
 			</div>
 		</div>
 
-		<div class="wpmind-geo-option">
+		<div class="wpmind-module-option">
 			<label class="wpmind-toggle">
 				<input type="checkbox" name="wpmind_media_auto_title" value="1"
 					<?php checked( $auto_title, '1' ); ?>>
 				<span class="wpmind-toggle-slider"></span>
 			</label>
-			<div class="wpmind-geo-option-text">
+			<div class="wpmind-module-option-text">
 				<strong><?php esc_html_e( '自动生成标题和描述', 'wpmind' ); ?></strong>
 				<p><?php esc_html_e( '同时自动填充图片标题（post_title）和说明（caption）。', 'wpmind' ); ?></p>
 			</div>
 		</div>
 
-		<div class="wpmind-geo-option wpmind-media-language-row">
+		<div class="wpmind-module-option wpmind-media-language-row">
 			<label for="wpmind-media-language">
 				<strong><?php esc_html_e( '生成语言', 'wpmind' ); ?></strong>
 			</label>
@@ -135,7 +135,7 @@ $month_gen = (int) ( $stats[ $month_key ] ?? 0 );
 			</select>
 		</div>
 
-		<div class="wpmind-geo-actions">
+		<div class="wpmind-module-actions">
 			<button type="button" id="wpmind-save-media-settings" class="button button-primary">
 				<span class="dashicons ri-save-line"></span>
 				<?php esc_html_e( '保存设置', 'wpmind' ); ?>
@@ -144,7 +144,7 @@ $month_gen = (int) ( $stats[ $month_key ] ?? 0 );
 	</div>
 
 	<!-- ========== Tab: Batch Processing ========== -->
-	<div class="wpmind-mi-tab-panel" data-panel="batch">
+	<div class="wpmind-module-tab-panel" data-panel="batch">
 		<p class="wpmind-media-bulk-info">
 			<?php esc_html_e( '扫描媒体库中缺少 Alt Text 的图片，并批量通过 AI 生成。每次处理 5 张，避免超时。', 'wpmind' ); ?>
 		</p>
@@ -169,14 +169,14 @@ $month_gen = (int) ( $stats[ $month_key ] ?? 0 );
 	</div>
 
 	<!-- ========== Tab: Content Safety ========== -->
-	<div class="wpmind-mi-tab-panel" data-panel="safety">
-		<div class="wpmind-geo-option">
+	<div class="wpmind-module-tab-panel" data-panel="safety">
+		<div class="wpmind-module-option">
 			<label class="wpmind-toggle">
 				<input type="checkbox" name="wpmind_media_nsfw_enabled" value="1"
 					<?php checked( $nsfw_enabled, '1' ); ?>>
 				<span class="wpmind-toggle-slider"></span>
 			</label>
-			<div class="wpmind-geo-option-text">
+			<div class="wpmind-module-option-text">
 				<strong><?php esc_html_e( 'NSFW 内容检测', 'wpmind' ); ?></strong>
 				<p><?php esc_html_e( '上传时自动检测不当内容并标记，管理员可在媒体库中筛选已标记的图片。', 'wpmind' ); ?></p>
 			</div>
@@ -187,7 +187,7 @@ $month_gen = (int) ( $stats[ $month_key ] ?? 0 );
 			<p><?php esc_html_e( '启用后，每张新上传的图片会额外消耗一次 Vision API 调用进行安全检测。检测结果保存在图片元数据中，不会阻止上传。', 'wpmind' ); ?></p>
 		</div>
 
-		<div class="wpmind-geo-actions">
+		<div class="wpmind-module-actions">
 			<button type="button" id="wpmind-save-media-safety" class="button button-primary">
 				<span class="dashicons ri-save-line"></span>
 				<?php esc_html_e( '保存设置', 'wpmind' ); ?>

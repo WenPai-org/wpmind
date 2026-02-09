@@ -1,0 +1,245 @@
+/**
+ * WPMind Shared Module Layout Components
+ *
+ * Reusable UI components for all module settings pages:
+ * header, badge, stats, subtabs, options, actions.
+ *
+ * @package WPMind
+ * @since 3.12.0
+ */
+
+/* ========================================
+   Module Header
+   ======================================== */
+.wpmind-module-header {
+	display: flex;
+	align-items: center;
+	gap: var(--wpmind-space-3);
+	margin-bottom: var(--wpmind-space-2);
+}
+
+.wpmind-module-title {
+	display: flex;
+	align-items: center;
+	gap: var(--wpmind-space-2);
+	font-size: var(--wpmind-text-md);
+	font-weight: 600;
+	color: var(--wpmind-gray-900);
+	margin: 0;
+}
+
+.wpmind-module-title .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	color: var(--wpmind-primary);
+}
+
+.wpmind-module-badge {
+	display: inline-flex;
+	align-items: center;
+	padding: 2px 8px;
+	font-size: 11px;
+	font-weight: 500;
+	color: var(--wpmind-primary);
+	background: var(--wpmind-primary-light);
+	border-radius: 4px;
+}
+
+.wpmind-module-desc {
+	color: var(--wpmind-gray-600);
+	margin: 0 0 var(--wpmind-space-6);
+}
+
+/* ========================================
+   Stat Cards
+   ======================================== */
+.wpmind-module-stats {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: var(--wpmind-space-4);
+	margin-bottom: var(--wpmind-space-6);
+}
+
+.wpmind-stat-card {
+	display: flex;
+	align-items: center;
+	gap: var(--wpmind-space-3);
+	padding: var(--wpmind-space-3);
+	background: #fff;
+	border: 1px solid var(--wpmind-gray-200);
+	border-radius: 4px;
+}
+
+.wpmind-stat-icon {
+	width: 36px;
+	height: 36px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--wpmind-gray-100);
+	border-radius: 6px;
+	color: var(--wpmind-gray-600);
+}
+
+.wpmind-stat-icon .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+}
+
+.wpmind-stat-content {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.wpmind-stat-value {
+	font-size: 18px;
+	font-weight: 700;
+	color: var(--wpmind-gray-900);
+	line-height: 1.2;
+}
+
+.wpmind-stat-value small {
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--wpmind-gray-500);
+}
+
+.wpmind-stat-label {
+	font-size: 11px;
+	color: var(--wpmind-gray-500);
+}
+
+@media (max-width: 1200px) {
+	.wpmind-module-stats {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+/* ========================================
+   Sub-tab Navigation
+   ======================================== */
+.wpmind-module-subtabs {
+	display: flex;
+	gap: var(--wpmind-space-2);
+	margin-bottom: var(--wpmind-space-6);
+	border-bottom: 2px solid var(--wpmind-gray-200);
+	padding-bottom: 0;
+}
+
+.wpmind-module-subtab {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 10px 16px;
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--wpmind-gray-600);
+	background: none;
+	border: none;
+	border-bottom: 2px solid transparent;
+	margin-bottom: -2px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.wpmind-module-subtab:hover {
+	color: var(--wpmind-primary);
+}
+
+.wpmind-module-subtab.active {
+	color: var(--wpmind-primary);
+	border-bottom-color: var(--wpmind-primary);
+}
+
+.wpmind-module-subtab .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+/* Tab panels */
+.wpmind-module-tab-panel {
+	display: none;
+}
+
+.wpmind-module-tab-panel.active {
+	display: block;
+}
+
+/* ========================================
+   Options & Actions
+   ======================================== */
+.wpmind-module-options {
+	display: flex;
+	flex-direction: column;
+	gap: var(--wpmind-space-3);
+}
+
+.wpmind-module-option {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--wpmind-space-3);
+	padding: var(--wpmind-space-3);
+	background: white;
+	border: 1px solid var(--wpmind-gray-200);
+	border-radius: var(--wpmind-radius-md);
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.wpmind-module-option:hover {
+	border-color: var(--wpmind-primary);
+	background: var(--wpmind-primary-light);
+}
+
+.wpmind-module-option input[type="checkbox"] {
+	margin: 2px 0 0;
+	flex-shrink: 0;
+}
+
+.wpmind-module-option-content {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.wpmind-module-option-title {
+	font-weight: 500;
+	color: var(--wpmind-gray-800);
+}
+
+.wpmind-module-option-desc {
+	font-size: var(--wpmind-text-sm);
+	color: var(--wpmind-gray-500);
+}
+
+.wpmind-module-option-text strong {
+	display: block;
+	color: var(--wpmind-gray-800);
+	margin-bottom: 2px;
+}
+
+.wpmind-module-option-text p {
+	margin: 0;
+	font-size: var(--wpmind-text-sm);
+	color: var(--wpmind-gray-500);
+}
+
+.wpmind-module-actions {
+	margin-top: var(--wpmind-space-4);
+}
+
+.wpmind-module-actions .button {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--wpmind-space-2);
+}
+
+.wpmind-module-actions .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}

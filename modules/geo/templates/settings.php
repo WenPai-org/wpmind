@@ -56,20 +56,20 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
 ?>
 
 <div class="wpmind-geo-panel">
-    <div class="wpmind-geo-header">
-        <h2 class="wpmind-geo-title">
+    <div class="wpmind-module-header">
+        <h2 class="wpmind-module-title">
             <span class="dashicons ri-robot-2-line"></span>
             <?php esc_html_e( 'GEO 优化', 'wpmind' ); ?>
         </h2>
-        <span class="wpmind-geo-badge">v3.10</span>
+        <span class="wpmind-module-badge">v3.10</span>
     </div>
 
-    <p class="wpmind-geo-desc">
+    <p class="wpmind-module-desc">
         <?php esc_html_e( 'GEO (Generative Engine Optimization) 帮助 AI 搜索引擎更好地理解和引用您的内容。', 'wpmind' ); ?>
     </p>
 
     <!-- 状态概览 -->
-    <div class="wpmind-geo-stats">
+    <div class="wpmind-module-stats">
         <div class="wpmind-stat-card">
             <div class="wpmind-stat-icon"><span class="dashicons ri-robot-2-line"></span></div>
             <div class="wpmind-stat-content">
@@ -103,24 +103,24 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
     </div>
 
     <!-- 子导航 -->
-    <div class="wpmind-geo-subtabs">
-        <button type="button" class="wpmind-geo-subtab active" data-tab="basics">
+    <div class="wpmind-module-subtabs">
+        <button type="button" class="wpmind-module-subtab active" data-tab="basics">
             <span class="dashicons ri-settings-3-line"></span>
             <?php esc_html_e( '基础设置', 'wpmind' ); ?>
         </button>
-        <button type="button" class="wpmind-geo-subtab" data-tab="content">
+        <button type="button" class="wpmind-module-subtab" data-tab="content">
             <span class="dashicons ri-file-text-line"></span>
             <?php esc_html_e( '内容输出', 'wpmind' ); ?>
         </button>
-        <button type="button" class="wpmind-geo-subtab" data-tab="schema">
+        <button type="button" class="wpmind-module-subtab" data-tab="schema">
             <span class="dashicons ri-code-s-slash-line"></span>
             <?php esc_html_e( '结构化数据', 'wpmind' ); ?>
         </button>
-        <button type="button" class="wpmind-geo-subtab" data-tab="control">
+        <button type="button" class="wpmind-module-subtab" data-tab="control">
             <span class="dashicons ri-shield-check-line"></span>
             <?php esc_html_e( 'AI 索引', 'wpmind' ); ?>
         </button>
-        <button type="button" class="wpmind-geo-subtab" data-tab="crawlers">
+        <button type="button" class="wpmind-module-subtab" data-tab="crawlers">
             <span class="dashicons ri-robot-line"></span>
             <?php esc_html_e( '爬虫管理', 'wpmind' ); ?>
         </button>
@@ -129,7 +129,7 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
     <div class="wpmind-geo-content">
 
             <!-- ========== 基础设置 Tab ========== -->
-            <div class="wpmind-geo-tab-panel active" data-panel="basics">
+            <div class="wpmind-module-tab-panel active" data-panel="basics">
                 <div class="wpmind-geo-grid">
                     <div class="wpmind-geo-left">
                         <div class="wpmind-geo-section">
@@ -139,32 +139,32 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                             </h3>
                             <p class="wpmind-geo-section-desc"><?php esc_html_e( '优化内容结构，提高 AI 引用率。', 'wpmind' ); ?></p>
                             <div class="wpmind-geo-options">
-                                <label class="wpmind-geo-option">
+                                <label class="wpmind-module-option">
                                     <input type="checkbox" name="wpmind_geo_enabled" value="1" <?php checked( $geo_enabled ); ?>>
-                                    <span class="wpmind-geo-option-content">
-                                        <span class="wpmind-geo-option-title"><?php esc_html_e( '启用 GEO 增强', 'wpmind' ); ?></span>
-                                        <span class="wpmind-geo-option-desc"><?php esc_html_e( '总开关，控制所有 GEO 优化功能', 'wpmind' ); ?></span>
+                                    <span class="wpmind-module-option-content">
+                                        <span class="wpmind-module-option-title"><?php esc_html_e( '启用 GEO 增强', 'wpmind' ); ?></span>
+                                        <span class="wpmind-module-option-desc"><?php esc_html_e( '总开关，控制所有 GEO 优化功能', 'wpmind' ); ?></span>
                                     </span>
                                 </label>
-                                <label class="wpmind-geo-option">
+                                <label class="wpmind-module-option">
                                     <input type="checkbox" name="wpmind_chinese_optimize" value="1" <?php checked( $chinese_optimize ); ?>>
-                                    <span class="wpmind-geo-option-content">
-                                        <span class="wpmind-geo-option-title"><?php esc_html_e( '中文内容优化', 'wpmind' ); ?></span>
-                                        <span class="wpmind-geo-option-desc"><?php esc_html_e( '优化中英文混排、标点符号、段落结构', 'wpmind' ); ?></span>
+                                    <span class="wpmind-module-option-content">
+                                        <span class="wpmind-module-option-title"><?php esc_html_e( '中文内容优化', 'wpmind' ); ?></span>
+                                        <span class="wpmind-module-option-desc"><?php esc_html_e( '优化中英文混排、标点符号、段落结构', 'wpmind' ); ?></span>
                                     </span>
                                 </label>
-                                <label class="wpmind-geo-option">
+                                <label class="wpmind-module-option">
                                     <input type="checkbox" name="wpmind_geo_signals" value="1" <?php checked( $geo_signals ); ?>>
-                                    <span class="wpmind-geo-option-content">
-                                        <span class="wpmind-geo-option-title"><?php esc_html_e( 'GEO 信号注入', 'wpmind' ); ?></span>
-                                        <span class="wpmind-geo-option-desc"><?php esc_html_e( '添加作者信息、发布日期、引用格式等权威性信号', 'wpmind' ); ?></span>
+                                    <span class="wpmind-module-option-content">
+                                        <span class="wpmind-module-option-title"><?php esc_html_e( 'GEO 信号注入', 'wpmind' ); ?></span>
+                                        <span class="wpmind-module-option-desc"><?php esc_html_e( '添加作者信息、发布日期、引用格式等权威性信号', 'wpmind' ); ?></span>
                                     </span>
                                 </label>
-                                <label class="wpmind-geo-option">
+                                <label class="wpmind-module-option">
                                     <input type="checkbox" name="wpmind_crawler_tracking" value="1" <?php checked( $crawler_tracking ); ?>>
-                                    <span class="wpmind-geo-option-content">
-                                        <span class="wpmind-geo-option-title"><?php esc_html_e( 'AI 爬虫追踪', 'wpmind' ); ?></span>
-                                        <span class="wpmind-geo-option-desc"><?php esc_html_e( '记录 GPTBot、ClaudeBot 等 AI 爬虫的访问', 'wpmind' ); ?></span>
+                                    <span class="wpmind-module-option-content">
+                                        <span class="wpmind-module-option-title"><?php esc_html_e( 'AI 爬虫追踪', 'wpmind' ); ?></span>
+                                        <span class="wpmind-module-option-desc"><?php esc_html_e( '记录 GPTBot、ClaudeBot 等 AI 爬虫的访问', 'wpmind' ); ?></span>
                                     </span>
                                 </label>
                             </div>
@@ -225,7 +225,7 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                     </div><!-- /right -->
                 </div><!-- /grid -->
             </div><!-- /basics -->
-            <div class="wpmind-geo-tab-panel" data-panel="content">
+            <div class="wpmind-module-tab-panel" data-panel="content">
                 <div class="wpmind-geo-grid">
                 <div class="wpmind-geo-left">
                 <!-- Markdown Feed -->
@@ -242,12 +242,12 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                     </div>
                     <?php endif; ?>
                     <div class="wpmind-geo-options">
-                        <label class="wpmind-geo-option">
+                        <label class="wpmind-module-option">
                             <input type="checkbox" name="wpmind_standalone_markdown_feed" value="1"
                                    <?php checked( $standalone_feed ); ?> <?php disabled( $official_installed ); ?>>
-                            <span class="wpmind-geo-option-content">
-                                <span class="wpmind-geo-option-title"><?php esc_html_e( '启用独立 Markdown Feed', 'wpmind' ); ?></span>
-                                <span class="wpmind-geo-option-desc"><?php esc_html_e( '提供 /?feed=markdown 端点和 .md 后缀访问', 'wpmind' ); ?></span>
+                            <span class="wpmind-module-option-content">
+                                <span class="wpmind-module-option-title"><?php esc_html_e( '启用独立 Markdown Feed', 'wpmind' ); ?></span>
+                                <span class="wpmind-module-option-desc"><?php esc_html_e( '提供 /?feed=markdown 端点和 .md 后缀访问', 'wpmind' ); ?></span>
                             </span>
                         </label>
                     </div>
@@ -268,11 +268,11 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                     </h3>
                     <p class="wpmind-geo-section-desc"><?php esc_html_e( '为 AI 爬虫提供站点导航和内容索引。', 'wpmind' ); ?></p>
                     <div class="wpmind-geo-options">
-                        <label class="wpmind-geo-option">
+                        <label class="wpmind-module-option">
                             <input type="checkbox" name="wpmind_llms_txt_enabled" value="1" <?php checked( $llms_txt_enabled ); ?>>
-                            <span class="wpmind-geo-option-content">
-                                <span class="wpmind-geo-option-title"><?php esc_html_e( '启用 llms.txt', 'wpmind' ); ?></span>
-                                <span class="wpmind-geo-option-desc"><?php esc_html_e( '在 /llms.txt 提供站点内容导航', 'wpmind' ); ?></span>
+                            <span class="wpmind-module-option-content">
+                                <span class="wpmind-module-option-title"><?php esc_html_e( '启用 llms.txt', 'wpmind' ); ?></span>
+                                <span class="wpmind-module-option-desc"><?php esc_html_e( '在 /llms.txt 提供站点内容导航', 'wpmind' ); ?></span>
                             </span>
                         </label>
                     </div>
@@ -292,11 +292,11 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                     </h3>
                     <p class="wpmind-geo-section-desc"><?php esc_html_e( '为 AI 爬虫提供专属 XML Sitemap，包含内容声明和摘要等元数据。', 'wpmind' ); ?></p>
                     <div class="wpmind-geo-options">
-                        <label class="wpmind-geo-option">
+                        <label class="wpmind-module-option">
                             <input type="checkbox" name="wpmind_ai_sitemap_enabled" value="1" <?php checked( $ai_sitemap_enabled ); ?>>
-                            <span class="wpmind-geo-option-content">
-                                <span class="wpmind-geo-option-title"><?php esc_html_e( '启用 AI Sitemap', 'wpmind' ); ?></span>
-                                <span class="wpmind-geo-option-desc"><?php esc_html_e( '在 /ai-sitemap.xml 提供 AI 专属站点地图', 'wpmind' ); ?></span>
+                            <span class="wpmind-module-option-content">
+                                <span class="wpmind-module-option-title"><?php esc_html_e( '启用 AI Sitemap', 'wpmind' ); ?></span>
+                                <span class="wpmind-module-option-desc"><?php esc_html_e( '在 /ai-sitemap.xml 提供 AI 专属站点地图', 'wpmind' ); ?></span>
                             </span>
                         </label>
                     </div>
@@ -323,11 +323,11 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                     </h3>
                     <p class="wpmind-geo-section-desc"><?php esc_html_e( '控制 AI 如何描述您的文章，而非让 AI 自行猜测。', 'wpmind' ); ?></p>
                     <div class="wpmind-geo-options">
-                        <label class="wpmind-geo-option">
+                        <label class="wpmind-module-option">
                             <input type="checkbox" name="wpmind_ai_summary_enabled" value="1" <?php checked( $ai_summary_enabled ); ?>>
-                            <span class="wpmind-geo-option-content">
-                                <span class="wpmind-geo-option-title"><?php esc_html_e( '启用 AI 摘要', 'wpmind' ); ?></span>
-                                <span class="wpmind-geo-option-desc"><?php esc_html_e( '在编辑器中添加 AI 摘要字段，输出为 meta 标签和 Schema.org abstract', 'wpmind' ); ?></span>
+                            <span class="wpmind-module-option-content">
+                                <span class="wpmind-module-option-title"><?php esc_html_e( '启用 AI 摘要', 'wpmind' ); ?></span>
+                                <span class="wpmind-module-option-desc"><?php esc_html_e( '在编辑器中添加 AI 摘要字段，输出为 meta 标签和 Schema.org abstract', 'wpmind' ); ?></span>
                             </span>
                         </label>
                     </div>
@@ -368,7 +368,7 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
             </div><!-- /content -->
 
             <!-- ========== 结构化数据 Tab ========== -->
-            <div class="wpmind-geo-tab-panel" data-panel="schema">
+            <div class="wpmind-module-tab-panel" data-panel="schema">
                 <div class="wpmind-geo-grid">
                 <div class="wpmind-geo-left">
                 <!-- Schema.org -->
@@ -379,11 +379,11 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                     </h3>
                     <p class="wpmind-geo-section-desc"><?php esc_html_e( '为内容添加结构化数据，帮助 AI 理解语义。', 'wpmind' ); ?></p>
                     <div class="wpmind-geo-options">
-                        <label class="wpmind-geo-option">
+                        <label class="wpmind-module-option">
                             <input type="checkbox" name="wpmind_schema_enabled" value="1" <?php checked( $schema_enabled ); ?>>
-                            <span class="wpmind-geo-option-content">
-                                <span class="wpmind-geo-option-title"><?php esc_html_e( '启用 Schema.org', 'wpmind' ); ?></span>
-                                <span class="wpmind-geo-option-desc"><?php esc_html_e( '自动为文章添加 Article 结构化数据', 'wpmind' ); ?></span>
+                            <span class="wpmind-module-option-content">
+                                <span class="wpmind-module-option-title"><?php esc_html_e( '启用 Schema.org', 'wpmind' ); ?></span>
+                                <span class="wpmind-module-option-desc"><?php esc_html_e( '自动为文章添加 Article 结构化数据', 'wpmind' ); ?></span>
                             </span>
                         </label>
                     </div>
@@ -408,11 +408,11 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                     </h3>
                     <p class="wpmind-geo-section-desc"><?php esc_html_e( '将文章关联到 Wikidata/Wikipedia 实体，帮助 AI 消除歧义并建立权威性。', 'wpmind' ); ?></p>
                     <div class="wpmind-geo-options">
-                        <label class="wpmind-geo-option">
+                        <label class="wpmind-module-option">
                             <input type="checkbox" name="wpmind_entity_linker_enabled" value="1" <?php checked( $entity_linker_enabled ); ?>>
-                            <span class="wpmind-geo-option-content">
-                                <span class="wpmind-geo-option-title"><?php esc_html_e( '启用实体关联', 'wpmind' ); ?></span>
-                                <span class="wpmind-geo-option-desc"><?php esc_html_e( '在编辑器中添加实体关联字段，输出为 Schema.org about.sameAs', 'wpmind' ); ?></span>
+                            <span class="wpmind-module-option-content">
+                                <span class="wpmind-module-option-title"><?php esc_html_e( '启用实体关联', 'wpmind' ); ?></span>
+                                <span class="wpmind-module-option-desc"><?php esc_html_e( '在编辑器中添加实体关联字段，输出为 Schema.org about.sameAs', 'wpmind' ); ?></span>
                             </span>
                         </label>
                     </div>
@@ -446,7 +446,7 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
             </div><!-- /schema -->
 
             <!-- ========== AI 控制 Tab ========== -->
-            <div class="wpmind-geo-tab-panel" data-panel="control">
+            <div class="wpmind-module-tab-panel" data-panel="control">
                 <div class="wpmind-geo-grid">
                 <div class="wpmind-geo-left">
                 <!-- AI 索引指令 -->
@@ -457,11 +457,11 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                     </h3>
                     <p class="wpmind-geo-section-desc"><?php esc_html_e( '控制 AI 爬虫对内容的索引和训练权限。', 'wpmind' ); ?></p>
                     <div class="wpmind-geo-options">
-                        <label class="wpmind-geo-option">
+                        <label class="wpmind-module-option">
                             <input type="checkbox" name="wpmind_ai_indexing_enabled" value="1" <?php checked( $ai_indexing ); ?>>
-                            <span class="wpmind-geo-option-content">
-                                <span class="wpmind-geo-option-title"><?php esc_html_e( '启用 AI 索引指令', 'wpmind' ); ?></span>
-                                <span class="wpmind-geo-option-desc"><?php esc_html_e( '输出 noai/nollm meta 标签和 X-Robots-Tag HTTP 头', 'wpmind' ); ?></span>
+                            <span class="wpmind-module-option-content">
+                                <span class="wpmind-module-option-title"><?php esc_html_e( '启用 AI 索引指令', 'wpmind' ); ?></span>
+                                <span class="wpmind-module-option-desc"><?php esc_html_e( '输出 noai/nollm meta 标签和 X-Robots-Tag HTTP 头', 'wpmind' ); ?></span>
                             </span>
                         </label>
                     </div>
@@ -517,7 +517,7 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
             </div><!-- /control -->
 
             <!-- ========== 爬虫管理 Tab ========== -->
-            <div class="wpmind-geo-tab-panel" data-panel="crawlers">
+            <div class="wpmind-module-tab-panel" data-panel="crawlers">
                 <div class="wpmind-geo-grid">
                 <div class="wpmind-geo-left">
                 <!-- robots.txt AI 管理 -->
@@ -529,11 +529,11 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                     </h3>
                     <p class="wpmind-geo-section-desc"><?php esc_html_e( '通过 robots.txt 控制 AI 爬虫的访问权限，不修改物理文件。', 'wpmind' ); ?></p>
                     <div class="wpmind-geo-options">
-                        <label class="wpmind-geo-option">
+                        <label class="wpmind-module-option">
                             <input type="checkbox" name="wpmind_robots_ai_enabled" value="1" <?php checked( $robots_ai_enabled ); ?>>
-                            <span class="wpmind-geo-option-content">
-                                <span class="wpmind-geo-option-title"><?php esc_html_e( '启用 robots.txt AI 管理', 'wpmind' ); ?></span>
-                                <span class="wpmind-geo-option-desc"><?php esc_html_e( '在 robots.txt 中注入 AI 爬虫的 Allow/Disallow 规则', 'wpmind' ); ?></span>
+                            <span class="wpmind-module-option-content">
+                                <span class="wpmind-module-option-title"><?php esc_html_e( '启用 robots.txt AI 管理', 'wpmind' ); ?></span>
+                                <span class="wpmind-module-option-desc"><?php esc_html_e( '在 robots.txt 中注入 AI 爬虫的 Allow/Disallow 规则', 'wpmind' ); ?></span>
                             </span>
                         </label>
                     </div>
@@ -598,7 +598,7 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
             </div><!-- /crawlers -->
 
             <!-- 保存按钮 -->
-            <div class="wpmind-geo-actions">
+            <div class="wpmind-module-actions">
                 <button type="button" class="button button-primary wpmind-save-geo" id="wpmind-save-geo">
                     <span class="dashicons ri-save-line"></span>
                     <?php esc_html_e( '保存设置', 'wpmind' ); ?>

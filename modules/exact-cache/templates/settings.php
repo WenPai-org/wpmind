@@ -25,12 +25,12 @@ $savings = \WPMind\Modules\ExactCache\CostEstimator::get_estimated_savings();
 
 <div class="wpmind-cache-panel">
 	<!-- Header -->
-	<div class="wpmind-geo-header">
-		<h2 class="wpmind-geo-title">
+	<div class="wpmind-module-header">
+		<h2 class="wpmind-module-title">
 			<span class="dashicons ri-database-2-line"></span>
 			<?php esc_html_e( '精确缓存', 'wpmind' ); ?>
 		</h2>
-		<span class="wpmind-geo-badge">v1.0</span>
+		<span class="wpmind-module-badge">v1.0</span>
 		<button type="button" id="wpmind-flush-cache" class="button button-small" title="<?php esc_attr_e( '清空缓存', 'wpmind' ); ?>">
 			<span class="dashicons ri-delete-bin-line"></span>
 			<?php esc_html_e( '清空缓存', 'wpmind' ); ?>
@@ -41,12 +41,12 @@ $savings = \WPMind\Modules\ExactCache\CostEstimator::get_estimated_savings();
 		</button>
 	</div>
 
-	<p class="wpmind-geo-desc">
+	<p class="wpmind-module-desc">
 		<?php esc_html_e( 'AI 请求精确缓存 - 相同请求直接返回缓存结果，降低 API 成本、加速响应。', 'wpmind' ); ?>
 	</p>
 
 	<!-- Stats Cards -->
-	<div class="wpmind-geo-stats">
+	<div class="wpmind-module-stats">
 		<div class="wpmind-stat-card">
 			<div class="wpmind-stat-icon"><span class="dashicons ri-percent-line"></span></div>
 			<div class="wpmind-stat-content">

@@ -2,97 +2,15 @@
  * WPMind Auto-Meta Module Styles
  *
  * Auto-Meta-specific UI components: post type checkboxes, manual form, result table.
+ * Shared components (header, stats, subtabs, options) in components/module-layout.css.
  *
  * @package WPMind
  * @since 3.11.0
  */
 
-/* === Auto-Meta Module === */
-.wpmind-auto-meta-panel .wpmind-geo-badge {
+/* Badge alignment */
+.wpmind-auto-meta-panel .wpmind-module-badge {
 	margin-right: auto;
-}
-
-/* Sub-tab navigation (self-contained, no dependency on media-intelligence.css) */
-.wpmind-am-subtabs {
-	display: flex;
-	gap: var(--wpmind-space-2);
-	border-bottom: 1px solid var(--wpmind-gray-200);
-	margin-bottom: var(--wpmind-space-5);
-	padding-bottom: 0;
-}
-
-.wpmind-am-subtabs .wpmind-mi-subtab {
-	display: inline-flex;
-	align-items: center;
-	gap: var(--wpmind-space-1);
-	padding: var(--wpmind-space-2) var(--wpmind-space-3);
-	background: none;
-	border: none;
-	border-bottom: 2px solid transparent;
-	color: var(--wpmind-gray-600);
-	font-size: var(--wpmind-text-sm);
-	font-weight: 500;
-	cursor: pointer;
-	transition: color 0.2s, border-color 0.2s;
-	margin-bottom: -1px;
-}
-
-.wpmind-am-subtabs .wpmind-mi-subtab:hover {
-	color: var(--wpmind-primary);
-}
-
-.wpmind-am-subtabs .wpmind-mi-subtab.active {
-	color: var(--wpmind-primary);
-	border-bottom-color: var(--wpmind-primary);
-}
-
-.wpmind-am-subtabs .wpmind-mi-subtab .dashicons {
-	font-size: 16px;
-	width: 16px;
-	height: 16px;
-}
-
-/* Tab panels */
-.wpmind-auto-meta-panel .wpmind-mi-tab-panel {
-	display: none;
-}
-
-.wpmind-auto-meta-panel .wpmind-mi-tab-panel.active {
-	display: block;
-}
-
-/* Shared option/actions styles (self-contained, no dependency on geo.css) */
-.wpmind-auto-meta-panel .wpmind-geo-option {
-	display: flex;
-	align-items: flex-start;
-	gap: var(--wpmind-space-3);
-	padding: var(--wpmind-space-3);
-	background: white;
-	border: 1px solid var(--wpmind-gray-200);
-	border-radius: var(--wpmind-radius-md);
-	cursor: pointer;
-	transition: all 0.2s ease;
-}
-
-.wpmind-auto-meta-panel .wpmind-geo-option:hover {
-	border-color: var(--wpmind-primary);
-	background: var(--wpmind-primary-light);
-}
-
-.wpmind-auto-meta-panel .wpmind-geo-actions {
-	margin-top: var(--wpmind-space-4);
-}
-
-.wpmind-auto-meta-panel .wpmind-geo-actions .button {
-	display: inline-flex;
-	align-items: center;
-	gap: var(--wpmind-space-2);
-}
-
-.wpmind-auto-meta-panel .wpmind-geo-actions .dashicons {
-	font-size: 16px;
-	width: 16px;
-	height: 16px;
 }
 
 /* Post types row */

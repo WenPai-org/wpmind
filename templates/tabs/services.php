@@ -18,14 +18,14 @@ $default_provider = get_option( 'wpmind_default_provider', '' );
 $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 ?>
 
-<div class="wpmind-geo-header">
-	<h2 class="wpmind-geo-title">
+<div class="wpmind-module-header">
+	<h2 class="wpmind-module-title">
 		<span class="dashicons ri-cloud-line"></span>
 		<?php esc_html_e( '服务配置', 'wpmind' ); ?>
 	</h2>
 </div>
 
-<p class="wpmind-geo-desc">
+<p class="wpmind-module-desc">
 	<?php esc_html_e( '配置 AI 服务端点和 API 密钥，支持 OpenAI、Anthropic、Google 及国内主流 AI 服务。', 'wpmind' ); ?>
 </p>
 

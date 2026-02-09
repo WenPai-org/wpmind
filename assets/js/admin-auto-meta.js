@@ -31,7 +31,7 @@
 			var self = this;
 
 			// Sub-tab switching (scoped to auto-meta panel).
-			$( '.wpmind-am-subtabs .wpmind-mi-subtab' ).on( 'click', function() {
+			$( '.wpmind-auto-meta-panel .wpmind-module-subtab' ).on( 'click', function() {
 				self.switchTab( $( this ).data( 'tab' ) );
 			} );
 
@@ -44,11 +44,11 @@
 		},
 
 		switchTab: function( tab ) {
-			$( '.wpmind-am-subtabs .wpmind-mi-subtab' ).removeClass( 'active' );
-			$( '.wpmind-am-subtabs .wpmind-mi-subtab[data-tab="' + tab + '"]' ).addClass( 'active' );
+			$( '.wpmind-auto-meta-panel .wpmind-module-subtab' ).removeClass( 'active' );
+			$( '.wpmind-auto-meta-panel .wpmind-module-subtab[data-tab="' + tab + '"]' ).addClass( 'active' );
 
-			$( '.wpmind-auto-meta-panel .wpmind-mi-tab-panel' ).removeClass( 'active' );
-			$( '.wpmind-auto-meta-panel .wpmind-mi-tab-panel[data-panel="' + tab + '"]' ).addClass( 'active' );
+			$( '.wpmind-auto-meta-panel .wpmind-module-tab-panel' ).removeClass( 'active' );
+			$( '.wpmind-auto-meta-panel .wpmind-module-tab-panel[data-panel="' + tab + '"]' ).addClass( 'active' );
 
 			try {
 				sessionStorage.setItem( 'wpmind_am_subtab', tab );
@@ -59,7 +59,7 @@
 			var tab = 'am-settings';
 			try {
 				var saved = sessionStorage.getItem( 'wpmind_am_subtab' );
-				if ( saved && $( '.wpmind-am-subtabs .wpmind-mi-subtab[data-tab="' + saved + '"]' ).length ) {
+				if ( saved && $( '.wpmind-auto-meta-panel .wpmind-module-subtab[data-tab="' + saved + '"]' ).length ) {
 					tab = saved;
 				}
 			} catch ( e ) {}

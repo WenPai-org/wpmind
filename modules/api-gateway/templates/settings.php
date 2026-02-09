@@ -28,15 +28,15 @@ $base_url = rest_url( 'mind/v1' );
 ?>
 
 <!-- Header -->
-<div class="wpmind-geo-header">
-	<h2 class="wpmind-geo-title">
+<div class="wpmind-module-header">
+	<h2 class="wpmind-module-title">
 		<span class="dashicons ri-server-line"></span>
 		<?php esc_html_e( 'API Gateway', 'wpmind' ); ?>
 	</h2>
-	<span class="wpmind-geo-badge"><?php echo $gateway_enabled ? 'ON' : 'OFF'; ?></span>
+	<span class="wpmind-module-badge"><?php echo $gateway_enabled ? 'ON' : 'OFF'; ?></span>
 </div>
 
-<p class="wpmind-geo-desc">
+<p class="wpmind-module-desc">
 	<?php esc_html_e( 'OpenAI 兼容的 API 网关，提供 Bearer 鉴权、速率限制、预算控制和 SSE 流式输出。', 'wpmind' ); ?>
 </p>
 
