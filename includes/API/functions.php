@@ -280,6 +280,48 @@ add_filter('wpmind_translate', function($default, $text, $from = 'auto', $to = '
 }, 10, 5);
 
 // ============================================
+// v4.3.0 Vision API
+// ============================================
+
+/**
+ * AI 图像理解（Vision）
+ *
+ * 利用多模态 chat 能力分析图片内容。
+ *
+ * @since 4.3.0
+ * @param string $image_url 图片 URL 或 base64 data URI
+ * @param string $prompt    提示词，描述需要对图片做什么
+ * @param array  $options {
+ *     可选参数
+ *     @type string $system      系统提示词
+ *     @type int    $max_tokens  最大 token 数，默认 300
+ *     @type float  $temperature 温度，默认 0.3
+ *     @type string $provider    服务商，默认 'auto'（自动选择支持 vision 的）
+ *     @type string $language    语言，默认根据 locale 自动判断
+ *     @type string $context     上下文标识
+ * }
+ * @return array|WP_Error
+ *
+ * @example
+ * $result = wpmind_vision(
+ *     'https://example.com/photo.jpg',
+ *     '为这张图片生成简洁的 alt text'
+ * );
+ * echo $result['content'];
+ */
+if ( ! function_exists( 'wpmind_vision' ) ) {
+	function wpmind_vision( string $image_url, string $prompt = '', array $options = [] ) {
+		if ( ! class_exists( 'WPMind\\API\\PublicAPI' ) ) {
+			return new WP_Error(
+				'wpmind_not_available',
+				__( 'WPMind 插件未激活', 'wpmind' )
+			);
+		}
+		return \WPMind\API\PublicAPI::instance()->vision( $image_url, $prompt, $options );
+	}
+}
+
+// ============================================
 // v2.6.0 增强 API 全局函数
 // ============================================
 

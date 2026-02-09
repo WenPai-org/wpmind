@@ -1,0 +1,21 @@
+{
+    "id": "media-intelligence",
+    "name": "Media Intelligence",
+    "description": "AI 媒体智能 - 自动生成 alt text、标题、描述，NSFW 检测",
+    "version": "1.0.0",
+    "author": "WPMind",
+    "icon": "ri-image-ai-line",
+    "class": "WPMind\\Modules\\MediaIntelligence\\MediaIntelligenceModule",
+    "can_disable": true,
+    "settings_tab": "media-intelligence",
+    "features": [
+        "图片 Alt Text 自动生成",
+        "图片标题/描述自动填充",
+        "批量处理已有图片",
+        "NSFW 内容检测"
+    ],
+    "requires": {
+        "php": "8.1",
+        "wordpress": "6.0"
+    }
+}

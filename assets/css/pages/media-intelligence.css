@@ -1,0 +1,85 @@
+/**
+ * WPMind Media Intelligence Module Styles
+ *
+ * Media Intelligence-specific UI components: bulk progress, language select.
+ *
+ * @package WPMind
+ * @since 4.3.0
+ */
+
+/* === Media Intelligence Module === */
+.wpmind-media-panel .wpmind-geo-badge {
+	margin-right: auto;
+}
+
+.wpmind-media-section {
+	margin-bottom: var(--wpmind-space-6);
+}
+
+.wpmind-media-section h3 {
+	display: flex;
+	align-items: center;
+	gap: var(--wpmind-space-2);
+	font-size: var(--wpmind-text-md);
+	font-weight: 600;
+	color: var(--wpmind-gray-900);
+	margin: 0 0 var(--wpmind-space-3);
+}
+
+.wpmind-media-section h3 .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	color: var(--wpmind-primary);
+}
+
+/* Language select row */
+.wpmind-media-language-row {
+	display: flex;
+	align-items: center;
+	gap: var(--wpmind-space-3);
+	padding: var(--wpmind-space-3) 0;
+}
+
+.wpmind-media-language-row select {
+	min-width: 160px;
+}
+
+/* Bulk processing */
+.wpmind-media-bulk-info {
+	color: var(--wpmind-gray-600);
+	margin: 0 0 var(--wpmind-space-3);
+}
+
+.wpmind-media-bulk-actions {
+	display: flex;
+	gap: var(--wpmind-space-2);
+	margin-bottom: var(--wpmind-space-4);
+}
+
+/* Progress bar */
+.wpmind-media-progress {
+	margin-top: var(--wpmind-space-3);
+}
+
+.wpmind-media-progress-bar {
+	height: 20px;
+	background: var(--wpmind-gray-100);
+	border-radius: 10px;
+	overflow: hidden;
+	border: 1px solid var(--wpmind-gray-200);
+}
+
+.wpmind-media-progress-fill {
+	height: 100%;
+	background: var(--wpmind-primary);
+	border-radius: 10px;
+	transition: width 0.3s ease;
+}
+
+.wpmind-media-progress-text {
+	display: inline-block;
+	margin-top: var(--wpmind-space-1);
+	font-size: var(--wpmind-text-sm);
+	color: var(--wpmind-gray-600);
+}
