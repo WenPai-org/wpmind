@@ -26,13 +26,20 @@
 
 		init: function() {
 			this.bindEvents();
+			this.restoreSubTab();
 			this.loadStats();
 		},
 
 		bindEvents: function() {
 			var self = this;
-			$( '#wpmind-save-media-settings' ).on( 'click', function() {
-				self.saveSettings();
+
+			// Sub-tab switching.
+			$( '.wpmind-mi-subtab' ).on( 'click', function() {
+				self.switchTab( $( this ).data( 'tab' ) );
+			} );
+
+			$( '#wpmind-save-media-settings, #wpmind-save-media-safety' ).on( 'click', function() {
+				self.saveSettings( $( this ) );
 			} );
 			$( '#wpmind-media-scan' ).on( 'click', function() {
 				self.scanImages();
@@ -40,6 +47,29 @@
 			$( '#wpmind-media-bulk-start' ).on( 'click', function() {
 				self.startBulkProcess();
 			} );
+		},
+
+		switchTab: function( tab ) {
+			$( '.wpmind-mi-subtab' ).removeClass( 'active' );
+			$( '.wpmind-mi-subtab[data-tab="' + tab + '"]' ).addClass( 'active' );
+
+			$( '.wpmind-mi-tab-panel' ).removeClass( 'active' );
+			$( '.wpmind-mi-tab-panel[data-panel="' + tab + '"]' ).addClass( 'active' );
+
+			try {
+				sessionStorage.setItem( 'wpmind_mi_subtab', tab );
+			} catch ( e ) {}
+		},
+
+		restoreSubTab: function() {
+			var tab = 'settings';
+			try {
+				var saved = sessionStorage.getItem( 'wpmind_mi_subtab' );
+				if ( saved && $( '.wpmind-mi-subtab[data-tab="' + saved + '"]' ).length ) {
+					tab = saved;
+				}
+			} catch ( e ) {}
+			this.switchTab( tab );
 		},
 
 		loadStats: function() {
@@ -59,8 +89,8 @@
 			} );
 		},
 
-		saveSettings: function() {
-			var $button = $( '#wpmind-save-media-settings' );
+		saveSettings: function( $button ) {
+			$button = $button || $( '#wpmind-save-media-settings' );
 			var originalText = $button.html();
 
 			$button.html( '<span class="dashicons ri-loader-4-line"></span> 保存中...' ).prop( 'disabled', true );

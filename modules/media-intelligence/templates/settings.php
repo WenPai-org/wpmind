@@ -2,6 +2,8 @@
 /**
  * Media Intelligence settings template.
  *
+ * Uses pill sub-navigation pattern (same as GEO module).
+ *
  * @package WPMind\Modules\MediaIntelligence
  * @since 1.0.0
  */
@@ -74,13 +76,24 @@ $month_gen = (int) ( $stats[ $month_key ] ?? 0 );
 		</div>
 	</div>
 
-	<!-- Settings Section -->
-	<div class="wpmind-media-section">
-		<h3>
+	<!-- Sub-tab Navigation -->
+	<div class="wpmind-mi-subtabs">
+		<button type="button" class="wpmind-mi-subtab active" data-tab="settings">
 			<span class="dashicons ri-settings-3-line"></span>
 			<?php esc_html_e( '基本设置', 'wpmind' ); ?>
-		</h3>
+		</button>
+		<button type="button" class="wpmind-mi-subtab" data-tab="batch">
+			<span class="dashicons ri-stack-line"></span>
+			<?php esc_html_e( '批量处理', 'wpmind' ); ?>
+		</button>
+		<button type="button" class="wpmind-mi-subtab" data-tab="safety">
+			<span class="dashicons ri-shield-check-line"></span>
+			<?php esc_html_e( '内容安全', 'wpmind' ); ?>
+		</button>
+	</div>
 
+	<!-- ========== Tab: Basic Settings ========== -->
+	<div class="wpmind-mi-tab-panel active" data-panel="settings">
 		<div class="wpmind-geo-option">
 			<label class="wpmind-toggle">
 				<input type="checkbox" name="wpmind_media_auto_alt" value="1"
@@ -102,18 +115,6 @@ $month_gen = (int) ( $stats[ $month_key ] ?? 0 );
 			<div class="wpmind-geo-option-text">
 				<strong><?php esc_html_e( '自动生成标题和描述', 'wpmind' ); ?></strong>
 				<p><?php esc_html_e( '同时自动填充图片标题（post_title）和说明（caption）。', 'wpmind' ); ?></p>
-			</div>
-		</div>
-
-		<div class="wpmind-geo-option">
-			<label class="wpmind-toggle">
-				<input type="checkbox" name="wpmind_media_nsfw_enabled" value="1"
-					<?php checked( $nsfw_enabled, '1' ); ?>>
-				<span class="wpmind-toggle-slider"></span>
-			</label>
-			<div class="wpmind-geo-option-text">
-				<strong><?php esc_html_e( 'NSFW 内容检测', 'wpmind' ); ?></strong>
-				<p><?php esc_html_e( '上传时自动检测不当内容并标记，管理员可在媒体库中筛选。', 'wpmind' ); ?></p>
 			</div>
 		</div>
 
@@ -142,14 +143,10 @@ $month_gen = (int) ( $stats[ $month_key ] ?? 0 );
 		</div>
 	</div>
 
-	<!-- Bulk Processing Section -->
-	<div class="wpmind-media-section">
-		<h3>
-			<span class="dashicons ri-stack-line"></span>
-			<?php esc_html_e( '批量处理', 'wpmind' ); ?>
-		</h3>
+	<!-- ========== Tab: Batch Processing ========== -->
+	<div class="wpmind-mi-tab-panel" data-panel="batch">
 		<p class="wpmind-media-bulk-info">
-			<?php esc_html_e( '扫描媒体库中缺少 Alt Text 的图片，并批量生成。', 'wpmind' ); ?>
+			<?php esc_html_e( '扫描媒体库中缺少 Alt Text 的图片，并批量通过 AI 生成。每次处理 5 张，避免超时。', 'wpmind' ); ?>
 		</p>
 
 		<div class="wpmind-media-bulk-actions">
@@ -168,6 +165,33 @@ $month_gen = (int) ( $stats[ $month_key ] ?? 0 );
 				<div class="wpmind-media-progress-fill" style="width:0%"></div>
 			</div>
 			<span class="wpmind-media-progress-text">0%</span>
+		</div>
+	</div>
+
+	<!-- ========== Tab: Content Safety ========== -->
+	<div class="wpmind-mi-tab-panel" data-panel="safety">
+		<div class="wpmind-geo-option">
+			<label class="wpmind-toggle">
+				<input type="checkbox" name="wpmind_media_nsfw_enabled" value="1"
+					<?php checked( $nsfw_enabled, '1' ); ?>>
+				<span class="wpmind-toggle-slider"></span>
+			</label>
+			<div class="wpmind-geo-option-text">
+				<strong><?php esc_html_e( 'NSFW 内容检测', 'wpmind' ); ?></strong>
+				<p><?php esc_html_e( '上传时自动检测不当内容并标记，管理员可在媒体库中筛选已标记的图片。', 'wpmind' ); ?></p>
+			</div>
+		</div>
+
+		<div class="wpmind-mi-safety-note">
+			<span class="dashicons ri-information-line"></span>
+			<p><?php esc_html_e( '启用后，每张新上传的图片会额外消耗一次 Vision API 调用进行安全检测。检测结果保存在图片元数据中，不会阻止上传。', 'wpmind' ); ?></p>
+		</div>
+
+		<div class="wpmind-geo-actions">
+			<button type="button" id="wpmind-save-media-safety" class="button button-primary">
+				<span class="dashicons ri-save-line"></span>
+				<?php esc_html_e( '保存设置', 'wpmind' ); ?>
+			</button>
 		</div>
 	</div>
 </div>

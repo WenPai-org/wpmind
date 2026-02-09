@@ -12,25 +12,78 @@
 	margin-right: auto;
 }
 
-.wpmind-media-section {
-	margin-bottom: var(--wpmind-space-6);
-}
-
-.wpmind-media-section h3 {
+/* Sub-tab navigation */
+.wpmind-mi-subtabs {
 	display: flex;
-	align-items: center;
 	gap: var(--wpmind-space-2);
-	font-size: var(--wpmind-text-md);
-	font-weight: 600;
-	color: var(--wpmind-gray-900);
-	margin: 0 0 var(--wpmind-space-3);
+	border-bottom: 1px solid var(--wpmind-gray-200);
+	margin-bottom: var(--wpmind-space-5);
+	padding-bottom: 0;
 }
 
-.wpmind-media-section h3 .dashicons {
-	font-size: 18px;
-	width: 18px;
-	height: 18px;
+.wpmind-mi-subtab {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--wpmind-space-1);
+	padding: var(--wpmind-space-2) var(--wpmind-space-3);
+	background: none;
+	border: none;
+	border-bottom: 2px solid transparent;
+	color: var(--wpmind-gray-600);
+	font-size: var(--wpmind-text-sm);
+	font-weight: 500;
+	cursor: pointer;
+	transition: color 0.2s, border-color 0.2s;
+	margin-bottom: -1px;
+}
+
+.wpmind-mi-subtab:hover {
 	color: var(--wpmind-primary);
+}
+
+.wpmind-mi-subtab.active {
+	color: var(--wpmind-primary);
+	border-bottom-color: var(--wpmind-primary);
+}
+
+.wpmind-mi-subtab .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+/* Tab panels */
+.wpmind-mi-tab-panel {
+	display: none;
+}
+
+.wpmind-mi-tab-panel.active {
+	display: block;
+}
+
+/* Safety note */
+.wpmind-mi-safety-note {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--wpmind-space-2);
+	padding: var(--wpmind-space-3);
+	background: var(--wpmind-gray-50);
+	border: 1px solid var(--wpmind-gray-200);
+	border-radius: var(--wpmind-radius-md);
+	margin-top: var(--wpmind-space-4);
+}
+
+.wpmind-mi-safety-note .dashicons {
+	color: var(--wpmind-primary);
+	flex-shrink: 0;
+	margin-top: 2px;
+}
+
+.wpmind-mi-safety-note p {
+	margin: 0;
+	font-size: var(--wpmind-text-sm);
+	color: var(--wpmind-gray-600);
+	line-height: 1.5;
 }
 
 /* Language select row */
