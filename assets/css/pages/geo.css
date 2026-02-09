@@ -1,0 +1,350 @@
+/**
+ * WPMind GEO Module Styles
+ *
+ * GEO-specific UI components: subtabs, sections, crawlers, options.
+ * Shared components (geo-header, stat-card, badge) remain in admin.css.
+ *
+ * @package WPMind
+ * @since 3.6.0
+ */
+
+/* Sub-tab navigation */
+.wpmind-geo-subtabs {
+    display: flex;
+    gap: var(--wpmind-space-2);
+    margin-bottom: var(--wpmind-space-6);
+    border-bottom: 2px solid var(--wpmind-gray-200);
+    padding-bottom: 0;
+}
+
+.wpmind-geo-subtab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--wpmind-gray-600);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.wpmind-geo-subtab:hover {
+    color: var(--wpmind-primary);
+}
+
+.wpmind-geo-subtab.active {
+    color: var(--wpmind-primary);
+    border-bottom-color: var(--wpmind-primary);
+}
+
+.wpmind-geo-subtab .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* Tab panels */
+.wpmind-geo-tab-panel {
+    display: none;
+}
+
+.wpmind-geo-tab-panel.active {
+    display: block;
+}
+
+/* Full-width grid when sidebar is hidden */
+.wpmind-geo-grid-full {
+    grid-template-columns: 1fr !important;
+}
+
+/* NEW badge */
+.wpmind-geo-new-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--wpmind-primary);
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+@media (max-width: 1200px) {
+    .wpmind-geo-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.wpmind-geo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--wpmind-space-6);
+}
+
+@media (max-width: 1200px) {
+    .wpmind-geo-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.wpmind-geo-section {
+    background: var(--wpmind-gray-50);
+    border: 1px solid var(--wpmind-gray-200);
+    border-radius: var(--wpmind-radius-lg);
+    padding: var(--wpmind-space-5);
+    margin-bottom: var(--wpmind-space-4);
+}
+
+.wpmind-geo-section-title {
+    display: flex;
+    align-items: center;
+    gap: var(--wpmind-space-2);
+    font-size: var(--wpmind-text-base);
+    font-weight: 600;
+    color: var(--wpmind-gray-800);
+    margin: 0 0 var(--wpmind-space-2);
+}
+
+.wpmind-geo-section-title .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--wpmind-primary);
+}
+
+.wpmind-geo-section-desc {
+    color: var(--wpmind-gray-600);
+    font-size: var(--wpmind-text-sm);
+    margin: 0 0 var(--wpmind-space-4);
+}
+
+.wpmind-geo-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wpmind-space-2);
+    padding: var(--wpmind-space-3);
+    border-radius: var(--wpmind-radius-md);
+    font-size: var(--wpmind-text-sm);
+    margin-bottom: var(--wpmind-space-4);
+}
+
+.wpmind-geo-notice-info {
+    background: var(--wpmind-info-light);
+    color: var(--wpmind-info);
+}
+
+.wpmind-geo-notice .dashicons {
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.wpmind-geo-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wpmind-space-3);
+}
+
+.wpmind-geo-select-group {
+    margin-top: var(--wpmind-space-4);
+    padding: var(--wpmind-space-3);
+    background: white;
+    border: 1px solid var(--wpmind-gray-200);
+    border-radius: var(--wpmind-radius-md);
+}
+.wpmind-geo-option {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--wpmind-space-3);
+    padding: var(--wpmind-space-3);
+    background: white;
+    border: 1px solid var(--wpmind-gray-200);
+    border-radius: var(--wpmind-radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.wpmind-geo-option:hover {
+    border-color: var(--wpmind-primary);
+    background: var(--wpmind-primary-light);
+}
+
+.wpmind-geo-option input[type="checkbox"] {
+    margin: 2px 0 0;
+    flex-shrink: 0;
+}
+
+.wpmind-geo-option-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.wpmind-geo-option-title {
+    font-weight: 500;
+    color: var(--wpmind-gray-800);
+}
+
+.wpmind-geo-option-desc {
+    font-size: var(--wpmind-text-sm);
+    color: var(--wpmind-gray-500);
+}
+
+.wpmind-geo-urls {
+    margin-top: var(--wpmind-space-4);
+    padding: var(--wpmind-space-3);
+    background: white;
+    border: 1px solid var(--wpmind-gray-200);
+    border-radius: var(--wpmind-radius-md);
+}
+
+.wpmind-geo-url-title {
+    font-size: var(--wpmind-text-sm);
+    font-weight: 500;
+    color: var(--wpmind-gray-700);
+    margin: 0 0 var(--wpmind-space-2);
+}
+
+.wpmind-geo-url {
+    display: block;
+    padding: var(--wpmind-space-2);
+    background: var(--wpmind-gray-100);
+    border-radius: var(--wpmind-radius-sm);
+    font-size: var(--wpmind-text-xs);
+    color: var(--wpmind-gray-700);
+    margin-bottom: var(--wpmind-space-2);
+    word-break: break-all;
+}
+
+.wpmind-geo-url:last-child {
+    margin-bottom: 0;
+}
+
+.wpmind-geo-actions {
+    margin-top: var(--wpmind-space-4);
+}
+
+.wpmind-geo-actions .button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--wpmind-space-2);
+}
+
+.wpmind-geo-actions .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* Crawler List */
+.wpmind-crawler-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wpmind-space-2);
+}
+
+.wpmind-crawler-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--wpmind-space-3);
+    background: white;
+    border: 1px solid var(--wpmind-gray-200);
+    border-radius: var(--wpmind-radius-md);
+}
+
+.wpmind-crawler-item.is-ai {
+    border-left: 3px solid var(--wpmind-primary);
+}
+
+.wpmind-crawler-info {
+    display: flex;
+    align-items: center;
+    gap: var(--wpmind-space-2);
+}
+
+.wpmind-crawler-name {
+    font-weight: 500;
+    color: var(--wpmind-gray-800);
+}
+
+.wpmind-crawler-company {
+    font-size: var(--wpmind-text-sm);
+    color: var(--wpmind-gray-500);
+}
+
+.wpmind-crawler-badge {
+    display: inline-flex;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    color: white;
+    background: var(--wpmind-primary);
+    border-radius: 3px;
+}
+
+.wpmind-crawler-stats {
+    display: flex;
+    align-items: baseline;
+    gap: var(--wpmind-space-1);
+}
+
+.wpmind-crawler-hits {
+    font-size: var(--wpmind-text-lg);
+    font-weight: 600;
+    color: var(--wpmind-gray-800);
+}
+
+.wpmind-crawler-label {
+    font-size: var(--wpmind-text-sm);
+    color: var(--wpmind-gray-500);
+}
+
+/* Empty State */
+.wpmind-geo-empty {
+    text-align: center;
+    padding: var(--wpmind-space-8) var(--wpmind-space-4);
+    color: var(--wpmind-gray-500);
+}
+
+.wpmind-geo-empty .dashicons {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: var(--wpmind-gray-300);
+    margin-bottom: var(--wpmind-space-3);
+}
+
+.wpmind-geo-empty p {
+    margin: 0;
+}
+
+.wpmind-geo-empty-hint {
+    font-size: var(--wpmind-text-sm);
+    margin-top: var(--wpmind-space-2) !important;
+}
+
+/* GEO Info */
+.wpmind-geo-info-content {
+    font-size: var(--wpmind-text-sm);
+    color: var(--wpmind-gray-600);
+}
+
+.wpmind-geo-info-content p {
+    margin: 0 0 var(--wpmind-space-3);
+}
+
+.wpmind-geo-info-content ul {
+    margin: 0;
+    padding-left: var(--wpmind-space-5);
+}
+
+.wpmind-geo-info-content li {
+    margin-bottom: var(--wpmind-space-1);
+}

@@ -1,0 +1,43 @@
+/**
+ * WPMind Exact Cache Module Styles
+ *
+ * Exact Cache-specific UI components: trend chart, cache panel badge.
+ *
+ * @package WPMind
+ * @since 3.6.0
+ */
+
+/* === Exact Cache Module === */
+.wpmind-cache-panel .wpmind-geo-badge {
+    margin-right: auto;
+}
+
+.wpmind-cache-trend-chart {
+    margin-bottom: var(--wpmind-space-6);
+}
+
+.wpmind-cache-trend-chart h3 {
+    display: flex;
+    align-items: center;
+    gap: var(--wpmind-space-2);
+    font-size: var(--wpmind-text-md);
+    font-weight: 600;
+    color: var(--wpmind-gray-900);
+    margin: 0 0 var(--wpmind-space-3);
+}
+
+.wpmind-cache-trend-chart h3 .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--wpmind-primary);
+}
+
+.wpmind-cache-trend-chart .wpmind-chart-wrapper {
+    position: relative;
+    height: 260px;
+    background: #fff;
+    border: 1px solid var(--wpmind-gray-200);
+    border-radius: 4px;
+    padding: var(--wpmind-space-3);
+}

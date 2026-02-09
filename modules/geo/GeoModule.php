@@ -123,6 +123,9 @@ class GeoModule implements ModuleInterface {
 		// Deferred rewrite flush (set by AJAX save, executed on next page load).
 		add_action( 'admin_init', array( $this, 'maybe_flush_rewrite_rules' ) );
 
+		// Admin assets (only on WPMind settings page).
+		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
+
 		/**
 		 * Fires when GEO module is initialized.
 		 *
@@ -186,6 +189,23 @@ class GeoModule implements ModuleInterface {
 		if ( $is_enabled( 'wpmind_entity_linker_enabled', '0' ) ) {
 			$this->components['entity_linker'] = new EntityLinker();
 		}
+	}
+
+	/**
+	 * Enqueue admin assets for the GEO tab.
+	 *
+	 * @param string $hook_suffix Current page hook suffix.
+	 */
+	public function enqueue_admin_assets( string $hook_suffix ): void {
+		if ( 'toplevel_page_wpmind' !== $hook_suffix ) {
+			return;
+		}
+		wp_enqueue_style(
+			'wpmind-geo',
+			WPMIND_PLUGIN_URL . 'assets/css/pages/geo.css',
+			[ 'wpmind-admin' ],
+			WPMIND_VERSION
+		);
 	}
 
 	/**
