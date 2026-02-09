@@ -348,6 +348,9 @@ class PublicAPI {
 		$messages = VisionHelper::build_vision_messages( $image_url, $prompt, $options['system'] );
 		unset( $options['system'] );
 
+		// Constrain failover chain to vision-capable providers only.
+		$options['failover_providers'] = VisionHelper::get_configured_vision_providers();
+
 		return $this->chat( $messages, $options );
 	}
 
