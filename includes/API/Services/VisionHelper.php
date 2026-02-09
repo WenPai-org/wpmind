@@ -143,4 +143,30 @@ class VisionHelper {
 	public static function get_vision_model( string $provider ): string {
 		return self::VISION_MODELS[ $provider ] ?? 'gpt-4o';
 	}
+
+	/**
+	 * Get all configured vision-capable providers (enabled + has API key).
+	 *
+	 * Used to constrain the failover chain so non-vision providers
+	 * are never tried with multimodal image messages.
+	 *
+	 * @return string[] Array of provider slugs.
+	 */
+	public static function get_configured_vision_providers(): array {
+		$endpoints = get_option( 'wpmind_custom_endpoints', [] );
+
+		if ( ! is_array( $endpoints ) ) {
+			return [];
+		}
+
+		$configured = [];
+		foreach ( self::VISION_PROVIDERS as $provider ) {
+			$ep = $endpoints[ $provider ] ?? [];
+			if ( ! empty( $ep['enabled'] ) && ! empty( $ep['api_key'] ) ) {
+				$configured[] = $provider;
+			}
+		}
+
+		return $configured;
+	}
 }

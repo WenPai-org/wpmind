@@ -31,16 +31,17 @@ class ChatService extends AbstractService {
 	 */
 	public function chat($messages, array $options = []) {
 		$defaults = [
-			'context'     => '',
-			'system'      => '',
-			'max_tokens'  => 1000,
-			'temperature' => 0.7,
-			'model'       => 'auto',
-			'provider'    => 'auto',
-			'json_mode'   => false,
-			'cache_ttl'   => 0,
-			'tools'       => [],
-			'tool_choice' => 'auto',
+			'context'            => '',
+			'system'             => '',
+			'max_tokens'         => 1000,
+			'temperature'        => 0.7,
+			'model'              => 'auto',
+			'provider'           => 'auto',
+			'json_mode'          => false,
+			'cache_ttl'          => 0,
+			'tools'              => [],
+			'tool_choice'        => 'auto',
+			'failover_providers' => [],
 		];
 		$options = wp_parse_args($options, $defaults);
 
@@ -71,6 +72,21 @@ class ChatService extends AbstractService {
 
 		$provider = $this->resolve_provider($options['provider'], $context);
 		$failover_chain = $this->get_failover_chain($provider);
+
+		// Filter failover chain to only supported providers (e.g. vision-capable).
+		if (!empty($options['failover_providers'])) {
+			$allowed = $options['failover_providers'];
+			$failover_chain = array_values(array_filter($failover_chain, function ($p) use ($allowed) {
+				return in_array($p, $allowed, true);
+			}));
+
+			if (empty($failover_chain)) {
+				return new WP_Error(
+					'wpmind_no_supported_provider',
+					__('没有可用的服务商支持此请求类型', 'wpmind')
+				);
+			}
+		}
 
 		if (!empty($failover_chain) && $failover_chain[0] !== $provider) {
 			do_action('wpmind_provider_failover', $provider, $failover_chain[0], $context);
