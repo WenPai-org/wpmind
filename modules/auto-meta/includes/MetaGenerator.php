@@ -84,7 +84,9 @@ final class MetaGenerator {
 		if ( $old_hash === $new_hash ) {
 			return;
 		}
-		if ( get_post_meta( $post_id, '_wpmind_auto_meta_source', true ) !== 'auto' ) {
+		// Only regenerate if metadata was auto-generated, or if initial generation failed (source empty).
+		$source = get_post_meta( $post_id, '_wpmind_auto_meta_source', true );
+		if ( $source !== 'auto' && $source !== '' ) {
 			return;
 		}
 		if ( wp_next_scheduled( 'wpmind_generate_auto_meta', [ $post_id ] ) ) {
@@ -102,6 +104,11 @@ final class MetaGenerator {
 	public function process_single( int $post_id ): void {
 		$post = get_post( $post_id );
 		if ( ! $post || $post->post_status !== 'publish' ) {
+			return;
+		}
+
+		// Preflight: skip AI call if no features are enabled.
+		if ( ! $this->has_enabled_features() ) {
 			return;
 		}
 
@@ -279,6 +286,10 @@ final class MetaGenerator {
 	 * @return array Modified schema.
 	 */
 	public function inject_faq_schema( array $schema, WP_Post $post ): array {
+		if ( get_option( 'wpmind_auto_meta_faq', '1' ) !== '1' ) {
+			return $schema;
+		}
+
 		$faq_json = get_post_meta( $post->ID, '_wpmind_faq_schema', true );
 		if ( empty( $faq_json ) ) {
 			return $schema;
@@ -309,6 +320,19 @@ final class MetaGenerator {
 		}
 
 		return $schema;
+	}
+
+	/**
+	 * Check if at least one auto-meta feature is enabled.
+	 *
+	 * @return bool True if any feature toggle is on.
+	 */
+	private function has_enabled_features(): bool {
+		return get_option( 'wpmind_auto_meta_excerpt', '1' ) === '1'
+			|| get_option( 'wpmind_auto_meta_tags', '1' ) === '1'
+			|| get_option( 'wpmind_auto_meta_category', '0' ) === '1'
+			|| get_option( 'wpmind_auto_meta_faq', '1' ) === '1'
+			|| get_option( 'wpmind_auto_meta_seo_desc', '1' ) === '1';
 	}
 
 	/**

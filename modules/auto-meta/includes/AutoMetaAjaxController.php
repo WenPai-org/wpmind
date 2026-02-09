@@ -105,6 +105,10 @@ final class AutoMetaAjaxController {
 			wp_send_json_error( [ 'message' => __( '文章不存在', 'wpmind' ) ] );
 		}
 
+		if ( $post->post_status !== 'publish' ) {
+			wp_send_json_error( [ 'message' => __( '仅支持已发布的文章，当前状态：', 'wpmind' ) . $post->post_status ] );
+		}
+
 		$generator = new MetaGenerator();
 		$generator->process_single( $post_id );
 
