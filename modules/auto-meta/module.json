@@ -1,0 +1,22 @@
+{
+    "id": "auto-meta",
+    "name": "Auto-Meta",
+    "description": "发布时自动生成摘要、标签、分类、FAQ Schema、SEO 描述",
+    "version": "1.0.0",
+    "author": "WPMind",
+    "icon": "ri-magic-line",
+    "class": "WPMind\\Modules\\AutoMeta\\AutoMetaModule",
+    "can_disable": true,
+    "settings_tab": "auto-meta",
+    "features": [
+        "自动摘要",
+        "智能标签",
+        "分类建议",
+        "FAQ Schema",
+        "SEO 描述"
+    ],
+    "requires": {
+        "php": "8.1",
+        "wordpress": "6.0"
+    }
+}
