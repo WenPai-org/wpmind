@@ -255,7 +255,9 @@
 .wpmind-tab-pane .wpmind-status-panel,
 .wpmind-tab-pane .wpmind-routing-panel,
 .wpmind-tab-pane .wpmind-budget-panel,
-.wpmind-tab-pane .wpmind-geo-panel {
+.wpmind-tab-pane .wpmind-geo-panel,
+.wpmind-tab-pane .wpmind-media-panel,
+.wpmind-tab-pane .wpmind-auto-meta-panel {
     border: none;
     box-shadow: none;
     padding: 0;
@@ -1464,57 +1466,4 @@ input.is-invalid {
     height: 16px;
 }
 
-/* ========================================
-   Shared Tab Components
-   (geo-header, stat-card, badge used by all tabs)
-   ======================================== */
-.wpmind-geo-panel {
-    /* padding handled by .wpmind-tab-pane */
-}
-
-.wpmind-geo-header {
-    display: flex;
-    align-items: center;
-    gap: var(--wpmind-space-3);
-    margin-bottom: var(--wpmind-space-2);
-}
-
-.wpmind-geo-title {
-    display: flex;
-    align-items: center;
-    gap: var(--wpmind-space-2);
-    font-size: var(--wpmind-text-md);
-    font-weight: 600;
-    color: var(--wpmind-gray-900);
-    margin: 0;
-}
-
-.wpmind-geo-title .dashicons {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    color: var(--wpmind-primary);
-}
-
-.wpmind-geo-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 2px 8px;
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--wpmind-primary);
-    background: var(--wpmind-primary-light);
-    border-radius: 4px;
-}
-
-.wpmind-geo-desc {
-    color: var(--wpmind-gray-600);
-    margin: 0 0 var(--wpmind-space-6);
-}
-
-.wpmind-geo-stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--wpmind-space-4);
-    margin-bottom: var(--wpmind-space-6);
-}
+/* Module shared components (header, badge, stats) moved to components/module-layout.css */

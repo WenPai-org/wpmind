@@ -1,64 +1,16 @@
 /**
  * WPMind Media Intelligence Module Styles
  *
- * Media Intelligence-specific UI components: bulk progress, language select.
+ * Media Intelligence-specific UI components: bulk progress, language select, safety note.
+ * Shared components (header, stats, subtabs, options) in components/module-layout.css.
  *
  * @package WPMind
  * @since 4.3.0
  */
 
-/* === Media Intelligence Module === */
-.wpmind-media-panel .wpmind-geo-badge {
+/* Badge alignment */
+.wpmind-media-panel .wpmind-module-badge {
 	margin-right: auto;
-}
-
-/* Sub-tab navigation */
-.wpmind-mi-subtabs {
-	display: flex;
-	gap: var(--wpmind-space-2);
-	border-bottom: 1px solid var(--wpmind-gray-200);
-	margin-bottom: var(--wpmind-space-5);
-	padding-bottom: 0;
-}
-
-.wpmind-mi-subtab {
-	display: inline-flex;
-	align-items: center;
-	gap: var(--wpmind-space-1);
-	padding: var(--wpmind-space-2) var(--wpmind-space-3);
-	background: none;
-	border: none;
-	border-bottom: 2px solid transparent;
-	color: var(--wpmind-gray-600);
-	font-size: var(--wpmind-text-sm);
-	font-weight: 500;
-	cursor: pointer;
-	transition: color 0.2s, border-color 0.2s;
-	margin-bottom: -1px;
-}
-
-.wpmind-mi-subtab:hover {
-	color: var(--wpmind-primary);
-}
-
-.wpmind-mi-subtab.active {
-	color: var(--wpmind-primary);
-	border-bottom-color: var(--wpmind-primary);
-}
-
-.wpmind-mi-subtab .dashicons {
-	font-size: 16px;
-	width: 16px;
-	height: 16px;
-}
-
-/* Tab panels */
-.wpmind-media-panel .wpmind-mi-tab-panel {
-	display: none;
-}
-
-.wpmind-media-panel .wpmind-mi-tab-panel.active {
-	display: block;
 }
 
 /* Safety note */

@@ -95,6 +95,13 @@ final class AdminAssets {
         );
 
         wp_enqueue_style(
+            'wpmind-module-layout',
+            WPMIND_PLUGIN_URL . 'assets/css/components/module-layout.css',
+            [ 'wpmind-admin' ],
+            WPMIND_VERSION
+        );
+
+        wp_enqueue_style(
             'wpmind-responsive',
             WPMIND_PLUGIN_URL . 'assets/css/responsive.css',
             [ 'wpmind-panels', 'wpmind-routing' ],

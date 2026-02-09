@@ -26,7 +26,7 @@
 			} );
 
 			// Sub-tab switching.
-			$( '.wpmind-geo-subtab' ).on( 'click', function() {
+			$( '.wpmind-geo-panel .wpmind-module-subtab' ).on( 'click', function() {
 				var tab = $( this ).data( 'tab' );
 				self.switchTab( tab );
 			} );
@@ -34,12 +34,12 @@
 
 		switchTab: function( tab ) {
 			// Update active button.
-			$( '.wpmind-geo-subtab' ).removeClass( 'active' );
-			$( '.wpmind-geo-subtab[data-tab="' + tab + '"]' ).addClass( 'active' );
+			$( '.wpmind-geo-panel .wpmind-module-subtab' ).removeClass( 'active' );
+			$( '.wpmind-geo-panel .wpmind-module-subtab[data-tab="' + tab + '"]' ).addClass( 'active' );
 
 			// Update active panel.
-			$( '.wpmind-geo-tab-panel' ).removeClass( 'active' );
-			$( '.wpmind-geo-tab-panel[data-panel="' + tab + '"]' ).addClass( 'active' );
+			$( '.wpmind-geo-panel .wpmind-module-tab-panel' ).removeClass( 'active' );
+			$( '.wpmind-geo-panel .wpmind-module-tab-panel[data-panel="' + tab + '"]' ).addClass( 'active' );
 
 			// Remember active tab.
 			try {
@@ -51,7 +51,7 @@
 			var tab = 'basics';
 			try {
 				var saved = sessionStorage.getItem( 'wpmind_geo_subtab' );
-				if ( saved && $( '.wpmind-geo-subtab[data-tab="' + saved + '"]' ).length ) {
+				if ( saved && $( '.wpmind-geo-panel .wpmind-module-subtab[data-tab="' + saved + '"]' ).length ) {
 					tab = saved;
 				}
 			} catch ( e ) {}

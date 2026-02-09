@@ -37,20 +37,20 @@ $ai_summary      = $crawler_tracker->get_ai_summary();
 ?>
 
 <div class="wpmind-geo-panel">
-    <div class="wpmind-geo-header">
-        <h2 class="wpmind-geo-title">
+    <div class="wpmind-module-header">
+        <h2 class="wpmind-module-title">
             <span class="dashicons ri-robot-2-line"></span>
             <?php esc_html_e( 'GEO 优化', 'wpmind' ); ?>
         </h2>
-        <span class="wpmind-geo-badge"><?php esc_html_e( '限时免费', 'wpmind' ); ?></span>
+        <span class="wpmind-module-badge"><?php esc_html_e( '限时免费', 'wpmind' ); ?></span>
     </div>
 
-    <p class="wpmind-geo-desc">
+    <p class="wpmind-module-desc">
         <?php esc_html_e( 'GEO (Generative Engine Optimization) 帮助 AI 搜索引擎更好地理解和引用您的内容。', 'wpmind' ); ?>
     </p>
 
     <!-- 状态概览 -->
-    <div class="wpmind-geo-stats">
+    <div class="wpmind-module-stats">
         <div class="wpmind-stat-card">
             <div class="wpmind-stat-icon">
                 <span class="dashicons ri-robot-2-line"></span>

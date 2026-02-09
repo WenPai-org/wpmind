@@ -69,56 +69,7 @@
 	}
 }
 
-.wpmind-stat-card {
-	display: flex;
-	align-items: center;
-	gap: var(--wpmind-space-3);
-	padding: var(--wpmind-space-3);
-	background: #fff;
-	border: 1px solid var(--wpmind-gray-200);
-	border-radius: 4px;
-}
-
-.wpmind-stat-icon {
-	width: 36px;
-	height: 36px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background: var(--wpmind-gray-100);
-	border-radius: 6px;
-	color: var(--wpmind-gray-600);
-}
-
-.wpmind-stat-icon .dashicons {
-	font-size: 18px;
-	width: 18px;
-	height: 18px;
-}
-
-.wpmind-stat-content {
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-}
-
-.wpmind-stat-value {
-	font-size: 18px;
-	font-weight: 700;
-	color: var(--wpmind-gray-900);
-	line-height: 1.2;
-}
-
-.wpmind-stat-value small {
-	font-size: 12px;
-	font-weight: 500;
-	color: var(--wpmind-gray-500);
-}
-
-.wpmind-stat-label {
-	font-size: 11px;
-	color: var(--wpmind-gray-500);
-}
+/* Stat cards moved to components/module-layout.css */
 
 /* Grid Layout */
 .wpmind-routing-grid {
