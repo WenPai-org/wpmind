@@ -625,37 +625,39 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                         </label>
                     </div>
                     <?php if ( $brand_entity_enabled ) : ?>
-                    <div class="wpmind-geo-select-group">
-                        <label class="wpmind-geo-select-label"><?php esc_html_e( '组织类型：', 'wpmind' ); ?></label>
-                        <select name="wpmind_brand_org_type" class="wpmind-geo-select">
-                            <option value="Organization" <?php selected( $brand_org_type, 'Organization' ); ?>><?php esc_html_e( 'Organization (通用)', 'wpmind' ); ?></option>
-                            <option value="Corporation" <?php selected( $brand_org_type, 'Corporation' ); ?>><?php esc_html_e( 'Corporation (公司)', 'wpmind' ); ?></option>
-                            <option value="LocalBusiness" <?php selected( $brand_org_type, 'LocalBusiness' ); ?>><?php esc_html_e( 'LocalBusiness (本地商户)', 'wpmind' ); ?></option>
-                            <option value="OnlineBusiness" <?php selected( $brand_org_type, 'OnlineBusiness' ); ?>><?php esc_html_e( 'OnlineBusiness (在线业务)', 'wpmind' ); ?></option>
-                            <option value="NewsMediaOrganization" <?php selected( $brand_org_type, 'NewsMediaOrganization' ); ?>><?php esc_html_e( 'NewsMediaOrganization (新闻媒体)', 'wpmind' ); ?></option>
-                        </select>
-                    </div>
-                    <div class="wpmind-geo-select-group" style="margin-top:12px;">
-                        <label class="wpmind-geo-select-label"><?php esc_html_e( '品牌名称：', 'wpmind' ); ?></label>
-                        <input type="text" name="wpmind_brand_name" value="<?php echo esc_attr( get_option( 'wpmind_brand_name', '' ) ); ?>"
-                               placeholder="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" class="regular-text">
-                        <p class="description"><?php esc_html_e( '留空则使用站点名称', 'wpmind' ); ?></p>
-                    </div>
-                    <div class="wpmind-geo-select-group" style="margin-top:12px;">
-                        <label class="wpmind-geo-select-label"><?php esc_html_e( '品牌描述：', 'wpmind' ); ?></label>
-                        <textarea name="wpmind_brand_description" rows="3" class="large-text"
-                                  placeholder="<?php esc_attr_e( '简要描述您的品牌/组织', 'wpmind' ); ?>"><?php echo esc_textarea( get_option( 'wpmind_brand_description', '' ) ); ?></textarea>
-                    </div>
-                    <div class="wpmind-geo-select-group" style="margin-top:12px;">
-                        <label class="wpmind-geo-select-label"><?php esc_html_e( '品牌 URL：', 'wpmind' ); ?></label>
-                        <input type="url" name="wpmind_brand_url" value="<?php echo esc_attr( get_option( 'wpmind_brand_url', '' ) ); ?>"
-                               placeholder="<?php echo esc_attr( home_url( '/' ) ); ?>" class="regular-text">
-                        <p class="description"><?php esc_html_e( '留空则使用站点首页地址', 'wpmind' ); ?></p>
-                    </div>
-                    <div class="wpmind-geo-select-group" style="margin-top:12px;">
-                        <label class="wpmind-geo-select-label"><?php esc_html_e( '创立日期：', 'wpmind' ); ?></label>
-                        <input type="text" name="wpmind_brand_founding_date" value="<?php echo esc_attr( get_option( 'wpmind_brand_founding_date', '' ) ); ?>"
-                               placeholder="<?php esc_attr_e( '例如：2020 或 2020-01-01', 'wpmind' ); ?>" class="regular-text" style="width:200px;">
+                    <div class="wpmind-geo-select-group wpmind-brand-fields">
+                        <div class="wpmind-brand-field">
+                            <label class="wpmind-brand-label"><?php esc_html_e( '组织类型', 'wpmind' ); ?></label>
+                            <select name="wpmind_brand_org_type" class="wpmind-geo-select">
+                                <option value="Organization" <?php selected( $brand_org_type, 'Organization' ); ?>><?php esc_html_e( 'Organization (通用)', 'wpmind' ); ?></option>
+                                <option value="Corporation" <?php selected( $brand_org_type, 'Corporation' ); ?>><?php esc_html_e( 'Corporation (公司)', 'wpmind' ); ?></option>
+                                <option value="LocalBusiness" <?php selected( $brand_org_type, 'LocalBusiness' ); ?>><?php esc_html_e( 'LocalBusiness (本地商户)', 'wpmind' ); ?></option>
+                                <option value="OnlineBusiness" <?php selected( $brand_org_type, 'OnlineBusiness' ); ?>><?php esc_html_e( 'OnlineBusiness (在线业务)', 'wpmind' ); ?></option>
+                                <option value="NewsMediaOrganization" <?php selected( $brand_org_type, 'NewsMediaOrganization' ); ?>><?php esc_html_e( 'NewsMediaOrganization (新闻媒体)', 'wpmind' ); ?></option>
+                            </select>
+                        </div>
+                        <div class="wpmind-brand-field">
+                            <label class="wpmind-brand-label"><?php esc_html_e( '品牌名称', 'wpmind' ); ?></label>
+                            <input type="text" name="wpmind_brand_name" value="<?php echo esc_attr( get_option( 'wpmind_brand_name', '' ) ); ?>"
+                                   placeholder="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
+                            <p class="description"><?php esc_html_e( '留空则使用站点名称', 'wpmind' ); ?></p>
+                        </div>
+                        <div class="wpmind-brand-field">
+                            <label class="wpmind-brand-label"><?php esc_html_e( '品牌描述', 'wpmind' ); ?></label>
+                            <textarea name="wpmind_brand_description" rows="3"
+                                      placeholder="<?php esc_attr_e( '简要描述您的品牌/组织', 'wpmind' ); ?>"><?php echo esc_textarea( get_option( 'wpmind_brand_description', '' ) ); ?></textarea>
+                        </div>
+                        <div class="wpmind-brand-field">
+                            <label class="wpmind-brand-label"><?php esc_html_e( '品牌 URL', 'wpmind' ); ?></label>
+                            <input type="url" name="wpmind_brand_url" value="<?php echo esc_attr( get_option( 'wpmind_brand_url', '' ) ); ?>"
+                                   placeholder="<?php echo esc_attr( home_url( '/' ) ); ?>">
+                            <p class="description"><?php esc_html_e( '留空则使用站点首页地址', 'wpmind' ); ?></p>
+                        </div>
+                        <div class="wpmind-brand-field">
+                            <label class="wpmind-brand-label"><?php esc_html_e( '创立日期', 'wpmind' ); ?></label>
+                            <input type="text" name="wpmind_brand_founding_date" value="<?php echo esc_attr( get_option( 'wpmind_brand_founding_date', '' ) ); ?>"
+                                   placeholder="<?php esc_attr_e( '例如：2020 或 2020-01-01', 'wpmind' ); ?>">
+                        </div>
                     </div>
                     <?php endif; ?>
                 </div>
@@ -668,6 +670,7 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                         <?php esc_html_e( '社交档案', 'wpmind' ); ?>
                     </h3>
                     <p class="wpmind-geo-section-desc"><?php esc_html_e( '社交平台主页 URL，将作为 Schema.org sameAs 输出。', 'wpmind' ); ?></p>
+                    <div class="wpmind-geo-select-group wpmind-brand-fields">
                     <?php
                     $social_fields = [
                         'wpmind_brand_social_facebook'  => 'Facebook',
@@ -681,13 +684,14 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                     ];
                     foreach ( $social_fields as $field_name => $label ) :
                     ?>
-                    <div class="wpmind-geo-select-group" style="margin-top:8px;">
-                        <label class="wpmind-geo-select-label"><?php echo esc_html( $label ); ?>:</label>
-                        <input type="url" name="<?php echo esc_attr( $field_name ); ?>"
-                               value="<?php echo esc_attr( get_option( $field_name, '' ) ); ?>"
-                               placeholder="https://" class="regular-text">
-                    </div>
+                        <div class="wpmind-brand-field">
+                            <label class="wpmind-brand-label"><?php echo esc_html( $label ); ?></label>
+                            <input type="url" name="<?php echo esc_attr( $field_name ); ?>"
+                                   value="<?php echo esc_attr( get_option( $field_name, '' ) ); ?>"
+                                   placeholder="https://">
+                        </div>
                     <?php endforeach; ?>
+                    </div>
                 </div>
 
                 <!-- 联系方式 -->
@@ -697,17 +701,19 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                         <?php esc_html_e( '联系方式', 'wpmind' ); ?>
                     </h3>
                     <p class="wpmind-geo-section-desc"><?php esc_html_e( '可选的联系信息，将作为 Schema.org contactPoint 输出。', 'wpmind' ); ?></p>
-                    <div class="wpmind-geo-select-group" style="margin-top:8px;">
-                        <label class="wpmind-geo-select-label"><?php esc_html_e( '联系邮箱：', 'wpmind' ); ?></label>
-                        <input type="email" name="wpmind_brand_contact_email"
-                               value="<?php echo esc_attr( get_option( 'wpmind_brand_contact_email', '' ) ); ?>"
-                               placeholder="hello@example.com" class="regular-text">
-                    </div>
-                    <div class="wpmind-geo-select-group" style="margin-top:8px;">
-                        <label class="wpmind-geo-select-label"><?php esc_html_e( '联系电话：', 'wpmind' ); ?></label>
-                        <input type="tel" name="wpmind_brand_contact_phone"
-                               value="<?php echo esc_attr( get_option( 'wpmind_brand_contact_phone', '' ) ); ?>"
-                               placeholder="+86-xxx-xxxx-xxxx" class="regular-text" style="width:200px;">
+                    <div class="wpmind-geo-select-group wpmind-brand-fields">
+                        <div class="wpmind-brand-field">
+                            <label class="wpmind-brand-label"><?php esc_html_e( '联系邮箱', 'wpmind' ); ?></label>
+                            <input type="email" name="wpmind_brand_contact_email"
+                                   value="<?php echo esc_attr( get_option( 'wpmind_brand_contact_email', '' ) ); ?>"
+                                   placeholder="hello@example.com">
+                        </div>
+                        <div class="wpmind-brand-field">
+                            <label class="wpmind-brand-label"><?php esc_html_e( '联系电话', 'wpmind' ); ?></label>
+                            <input type="tel" name="wpmind_brand_contact_phone"
+                                   value="<?php echo esc_attr( get_option( 'wpmind_brand_contact_phone', '' ) ); ?>"
+                                   placeholder="+86-xxx-xxxx-xxxx">
+                        </div>
                     </div>
                 </div>
 
@@ -718,17 +724,19 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                         <?php esc_html_e( 'Knowledge Graph', 'wpmind' ); ?>
                     </h3>
                     <p class="wpmind-geo-section-desc"><?php esc_html_e( '关联品牌的 Wikidata/Wikipedia 页面，强化知识图谱信号。', 'wpmind' ); ?></p>
-                    <div class="wpmind-geo-select-group" style="margin-top:8px;">
-                        <label class="wpmind-geo-select-label"><?php esc_html_e( 'Wikidata URL：', 'wpmind' ); ?></label>
-                        <input type="url" name="wpmind_brand_wikidata_url"
-                               value="<?php echo esc_attr( get_option( 'wpmind_brand_wikidata_url', '' ) ); ?>"
-                               placeholder="https://www.wikidata.org/wiki/Q..." class="regular-text">
-                    </div>
-                    <div class="wpmind-geo-select-group" style="margin-top:8px;">
-                        <label class="wpmind-geo-select-label"><?php esc_html_e( 'Wikipedia URL：', 'wpmind' ); ?></label>
-                        <input type="url" name="wpmind_brand_wikipedia_url"
-                               value="<?php echo esc_attr( get_option( 'wpmind_brand_wikipedia_url', '' ) ); ?>"
-                               placeholder="https://en.wikipedia.org/wiki/..." class="regular-text">
+                    <div class="wpmind-geo-select-group wpmind-brand-fields">
+                        <div class="wpmind-brand-field">
+                            <label class="wpmind-brand-label"><?php esc_html_e( 'Wikidata URL', 'wpmind' ); ?></label>
+                            <input type="url" name="wpmind_brand_wikidata_url"
+                                   value="<?php echo esc_attr( get_option( 'wpmind_brand_wikidata_url', '' ) ); ?>"
+                                   placeholder="https://www.wikidata.org/wiki/Q...">
+                        </div>
+                        <div class="wpmind-brand-field">
+                            <label class="wpmind-brand-label"><?php esc_html_e( 'Wikipedia URL', 'wpmind' ); ?></label>
+                            <input type="url" name="wpmind_brand_wikipedia_url"
+                                   value="<?php echo esc_attr( get_option( 'wpmind_brand_wikipedia_url', '' ) ); ?>"
+                                   placeholder="https://en.wikipedia.org/wiki/...">
+                        </div>
                     </div>
                 </div>
                 <?php endif; ?>

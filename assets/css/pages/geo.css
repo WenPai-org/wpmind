@@ -247,3 +247,39 @@
 .wpmind-geo-info-content li {
     margin-bottom: var(--wpmind-space-1);
 }
+
+/* Brand Entity Fields */
+.wpmind-brand-fields {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wpmind-space-4);
+}
+
+.wpmind-brand-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wpmind-space-1);
+}
+
+.wpmind-brand-label {
+    font-size: var(--wpmind-text-sm);
+    font-weight: 500;
+    color: var(--wpmind-gray-700);
+}
+
+.wpmind-brand-fields input[type="text"],
+.wpmind-brand-fields input[type="url"],
+.wpmind-brand-fields input[type="email"],
+.wpmind-brand-fields input[type="tel"],
+.wpmind-brand-fields textarea,
+.wpmind-brand-fields select {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.wpmind-brand-fields .description {
+    margin-top: var(--wpmind-space-1);
+    font-size: var(--wpmind-text-xs);
+    color: var(--wpmind-gray-500);
+}
