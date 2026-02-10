@@ -404,49 +404,49 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                     </div>
                     <?php endif; ?>
                 </div>
-
-                <!-- 实体关联 -->
-                <div class="wpmind-geo-section">
-                    <h3 class="wpmind-geo-section-title">
-                        <span class="dashicons ri-links-line"></span>
-                        <?php esc_html_e( '实体关联', 'wpmind' ); ?>
-                        <span class="wpmind-geo-new-badge"><?php esc_html_e( 'NEW', 'wpmind' ); ?></span>
-                    </h3>
-                    <p class="wpmind-geo-section-desc"><?php esc_html_e( '将文章关联到 Wikidata/Wikipedia 实体，帮助 AI 消除歧义并建立权威性。', 'wpmind' ); ?></p>
-                    <div class="wpmind-geo-options">
-                        <label class="wpmind-module-option">
-                            <input type="checkbox" name="wpmind_entity_linker_enabled" value="1" <?php checked( $entity_linker_enabled ); ?>>
-                            <span class="wpmind-module-option-content">
-                                <span class="wpmind-module-option-title"><?php esc_html_e( '启用实体关联', 'wpmind' ); ?></span>
-                                <span class="wpmind-module-option-desc"><?php esc_html_e( '在编辑器中添加实体关联字段，输出为 Schema.org about.sameAs', 'wpmind' ); ?></span>
-                            </span>
-                        </label>
-                    </div>
-                    <?php if ( $entity_linker_enabled ) : ?>
-                    <div class="wpmind-geo-notice wpmind-geo-notice-info" style="margin-top:12px;">
-                        <span class="dashicons ri-information-line"></span>
-                        <?php esc_html_e( '在编辑器侧边栏的「实体关联」面板中为每篇文章关联 Wikidata 实体。', 'wpmind' ); ?>
-                    </div>
-                    <?php endif; ?>
-                </div>
                 </div><!-- /left -->
                 <div class="wpmind-geo-right">
                     <div class="wpmind-geo-section wpmind-geo-info">
                         <h3 class="wpmind-geo-section-title">
                             <span class="dashicons ri-lightbulb-line"></span>
-                            <?php esc_html_e( '语义理解与实体消歧', 'wpmind' ); ?>
+                            <?php esc_html_e( 'Schema.org 与 AI 搜索', 'wpmind' ); ?>
                         </h3>
                         <div class="wpmind-geo-info-content">
-                            <p><?php esc_html_e( 'Schema.org 结构化数据是 AI 理解内容语义的关键。通过 JSON-LD 标记，AI 不仅知道页面有什么文字，还能理解文章类型、作者、主题等语义关系。', 'wpmind' ); ?></p>
+                            <p><?php esc_html_e( 'Schema.org JSON-LD 是 AI 理解页面语义的核心通道。与 HTML 不同，结构化数据直接告诉 AI "这是什么类型的内容、谁写的、什么时候发布的"。', 'wpmind' ); ?></p>
                             <ul>
-                                <li><?php esc_html_e( 'Article Schema 标记作者、日期、分类等元数据', 'wpmind' ); ?></li>
-                                <li><?php esc_html_e( '实体关联通过 Wikidata sameAs 消除语义歧义', 'wpmind' ); ?></li>
-                                <li><?php esc_html_e( '结构化数据是从"被爬取"到"被理解"的桥梁', 'wpmind' ); ?></li>
-                                <li><?php esc_html_e( 'Google 知识图谱大量基于 Wikidata 数据', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( 'Article/BlogPosting/NewsArticle 类型自动识别', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( 'headline, author, datePublished 等核心属性', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( 'publisher 由品牌实体自动增强', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( 'wordCount, articleSection, keywords 辅助 AI 分类', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( 'inLanguage 帮助多语言内容正确归类', 'wpmind' ); ?></li>
                             </ul>
-                            <p><a href="<?php echo esc_url( $learn_more_url ); ?>" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
                         </div>
                     </div>
+                    <?php if ( $schema_enabled ) : ?>
+                    <div class="wpmind-geo-section wpmind-geo-info">
+                        <h3 class="wpmind-geo-section-title">
+                            <span class="dashicons ri-code-s-slash-line"></span>
+                            <?php esc_html_e( '输出属性一览', 'wpmind' ); ?>
+                        </h3>
+                        <div class="wpmind-geo-info-content">
+                            <p><?php esc_html_e( '每篇文章自动输出以下 JSON-LD 属性：', 'wpmind' ); ?></p>
+                            <table class="widefat striped" style="font-size:12px;">
+                                <tbody>
+                                    <tr><td><code>@type</code></td><td><?php esc_html_e( '48h 内 NewsArticle，之后 BlogPosting，页面 Article', 'wpmind' ); ?></td></tr>
+                                    <tr><td><code>headline</code></td><td><?php esc_html_e( '文章标题', 'wpmind' ); ?></td></tr>
+                                    <tr><td><code>author</code></td><td><?php esc_html_e( 'Person: name + url', 'wpmind' ); ?></td></tr>
+                                    <tr><td><code>publisher</code></td><td><?php esc_html_e( 'Organization (品牌实体增强)', 'wpmind' ); ?></td></tr>
+                                    <tr><td><code>image</code></td><td><?php esc_html_e( '特色图片或正文首图', 'wpmind' ); ?></td></tr>
+                                    <tr><td><code>description</code></td><td><?php esc_html_e( '文章摘要', 'wpmind' ); ?></td></tr>
+                                    <tr><td><code>wordCount</code></td><td><?php esc_html_e( '字数统计', 'wpmind' ); ?></td></tr>
+                                    <tr><td><code>articleSection</code></td><td><?php esc_html_e( '所属分类', 'wpmind' ); ?></td></tr>
+                                    <tr><td><code>keywords</code></td><td><?php esc_html_e( '文章标签', 'wpmind' ); ?></td></tr>
+                                    <tr><td><code>inLanguage</code></td><td><?php esc_html_e( '内容语言', 'wpmind' ); ?></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <?php endif; ?>
                 </div><!-- /right -->
                 </div><!-- /grid -->
             </div><!-- /schema -->
@@ -739,21 +739,46 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                         </div>
                     </div>
                 </div>
+
+                <!-- 文章实体关联 -->
+                <div class="wpmind-geo-section">
+                    <h3 class="wpmind-geo-section-title">
+                        <span class="dashicons ri-links-line"></span>
+                        <?php esc_html_e( '文章实体关联', 'wpmind' ); ?>
+                    </h3>
+                    <p class="wpmind-geo-section-desc"><?php esc_html_e( '将每篇文章关联到 Wikidata/Wikipedia 实体，帮助 AI 消除歧义并建立权威性。', 'wpmind' ); ?></p>
+                    <div class="wpmind-geo-options">
+                        <label class="wpmind-module-option">
+                            <input type="checkbox" name="wpmind_entity_linker_enabled" value="1" <?php checked( $entity_linker_enabled ); ?>>
+                            <span class="wpmind-module-option-content">
+                                <span class="wpmind-module-option-title"><?php esc_html_e( '启用文章实体关联', 'wpmind' ); ?></span>
+                                <span class="wpmind-module-option-desc"><?php esc_html_e( '在编辑器中添加实体关联字段，输出为 Schema.org about.sameAs', 'wpmind' ); ?></span>
+                            </span>
+                        </label>
+                    </div>
+                    <?php if ( $entity_linker_enabled ) : ?>
+                    <div class="wpmind-geo-notice wpmind-geo-notice-info" style="margin-top:12px;">
+                        <span class="dashicons ri-information-line"></span>
+                        <?php esc_html_e( '在编辑器侧边栏的「实体关联」面板中为每篇文章关联 Wikidata 实体。', 'wpmind' ); ?>
+                    </div>
+                    <?php endif; ?>
+                </div>
                 <?php endif; ?>
                 </div><!-- /left -->
                 <div class="wpmind-geo-right">
                     <div class="wpmind-geo-section wpmind-geo-info">
                         <h3 class="wpmind-geo-section-title">
                             <span class="dashicons ri-lightbulb-line"></span>
-                            <?php esc_html_e( '品牌实体与 AI 搜索', 'wpmind' ); ?>
+                            <?php esc_html_e( '实体与 AI 搜索', 'wpmind' ); ?>
                         </h3>
                         <div class="wpmind-geo-info-content">
-                            <p><?php esc_html_e( '品牌实体是 GEO 的基础层。AI 搜索引擎必须先"理解"品牌身份，才能信任并推荐其内容。完整的 Organization Schema 和社交档案 sameAs 是建立品牌知识图谱的关键信号。', 'wpmind' ); ?></p>
+                            <p><?php esc_html_e( '品牌实体是 GEO 的基础层。AI 搜索引擎必须先"理解"品牌身份，才能信任并推荐其内容。', 'wpmind' ); ?></p>
                             <ul>
                                 <li><?php esc_html_e( 'Organization JSON-LD 在首页输出，是知识图谱的主要信号源', 'wpmind' ); ?></li>
                                 <li><?php esc_html_e( 'sameAs 关联社交档案，帮助 AI 验证品牌真实性', 'wpmind' ); ?></li>
                                 <li><?php esc_html_e( 'Wikidata/Wikipedia 链接强化实体消歧', 'wpmind' ); ?></li>
                                 <li><?php esc_html_e( '文章 publisher 自动增强，无需逐篇配置', 'wpmind' ); ?></li>
+                                <li><?php esc_html_e( '文章实体关联通过 about.sameAs 消除语义歧义', 'wpmind' ); ?></li>
                             </ul>
                             <p><a href="<?php echo esc_url( $learn_more_url ); ?>" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
                         </div>
