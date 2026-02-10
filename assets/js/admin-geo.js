@@ -30,6 +30,15 @@
 				var tab = $( this ).data( 'tab' );
 				self.switchTab( tab );
 			} );
+
+			// Schema preview tab switching.
+			$( '.wpmind-schema-preview-tabs' ).on( 'click', '.wpmind-schema-tab', function() {
+				var preview = $( this ).data( 'preview' );
+				$( '.wpmind-schema-tab' ).removeClass( 'active' );
+				$( this ).addClass( 'active' );
+				$( '.wpmind-schema-preview-panel' ).hide();
+				$( '.wpmind-schema-preview-panel[data-preview-panel="' + preview + '"]' ).show();
+			} );
 		},
 
 		switchTab: function( tab ) {
