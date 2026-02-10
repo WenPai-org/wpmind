@@ -26,6 +26,7 @@ class BrandEntity {
 	public function __construct() {
 		add_filter( 'wpmind_article_schema', [ $this, 'enrich_publisher' ], 5, 2 );
 		add_action( 'wp_head', [ $this, 'output_organization_schema' ], 2 );
+		add_action( 'wp_head', [ $this, 'output_website_schema' ], 2 );
 	}
 
 	/**
@@ -124,6 +125,47 @@ class BrandEntity {
 
 		$json = wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
 		echo "\n<!-- WPMind Brand Entity -->\n";
+		echo '<script type="application/ld+json">' . "\n" . $json . "\n</script>\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
+
+	/**
+	 * Output WebSite schema with SearchAction on the front page.
+	 */
+	public function output_website_schema(): void {
+		if ( ! is_front_page() ) {
+			return;
+		}
+
+		$name = get_option( 'wpmind_brand_name', '' );
+		if ( empty( $name ) ) {
+			$name = get_bloginfo( 'name' );
+		}
+
+		$schema = [
+			'@context' => 'https://schema.org',
+			'@type'    => 'WebSite',
+			'name'     => $name,
+			'url'      => home_url( '/' ),
+		];
+
+		$description = get_bloginfo( 'description' );
+		if ( ! empty( $description ) ) {
+			$schema['description'] = $description;
+		}
+
+		$schema['potentialAction'] = [
+			'@type'       => 'SearchAction',
+			'target'      => home_url( '/?s={search_term_string}' ),
+			'query-input' => 'required name=search_term_string',
+		];
+
+		$lang = get_locale();
+		if ( ! empty( $lang ) ) {
+			$schema['inLanguage'] = $lang;
+		}
+
+		$json = wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
+		echo "\n<!-- WPMind WebSite Schema -->\n";
 		echo '<script type="application/ld+json">' . "\n" . $json . "\n</script>\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 

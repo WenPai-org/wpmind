@@ -52,6 +52,9 @@ class SchemaGenerator {
 		$this->mode = get_option( 'wpmind_schema_mode', self::MODE_AUTO );
 
 		add_action( 'wp_head', array( $this, 'maybe_output_schema' ), 1 );
+
+		// Author social profile fields.
+		add_filter( 'user_contactmethods', [ $this, 'add_author_social_fields' ] );
 	}
 
 	/**
@@ -137,6 +140,16 @@ class SchemaGenerator {
 		echo '<script type="application/ld+json">' . "\n";
 		echo $json . "\n";
 		echo '</script>' . "\n";
+
+		// BreadcrumbList schema.
+		$breadcrumb = $this->generate_breadcrumb_schema( $post );
+		if ( ! empty( $breadcrumb ) ) {
+			$breadcrumb_json = wp_json_encode( $breadcrumb, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
+			echo "\n<!-- WPMind BreadcrumbList -->\n";
+			echo '<script type="application/ld+json">' . "\n";
+			echo $breadcrumb_json . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo '</script>' . "\n";
+		}
 	}
 
 	/**
@@ -226,6 +239,83 @@ class SchemaGenerator {
 	}
 
 	/**
+	 * Generate BreadcrumbList schema for a post.
+	 *
+	 * @param \WP_Post $post The post object.
+	 * @return array BreadcrumbList schema data.
+	 */
+	private function generate_breadcrumb_schema( \WP_Post $post ): array {
+		$items    = [];
+		$position = 1;
+
+		// Home.
+		$items[] = [
+			'@type'    => 'ListItem',
+			'position' => $position++,
+			'name'     => get_bloginfo( 'name' ),
+			'item'     => home_url( '/' ),
+		];
+
+		// Category (for posts).
+		if ( 'post' === get_post_type( $post ) ) {
+			$categories = get_the_category( $post->ID );
+			if ( ! empty( $categories ) ) {
+				$cat = $categories[0];
+				// Include parent categories.
+				$ancestors = get_ancestors( $cat->term_id, 'category' );
+				$ancestors = array_reverse( $ancestors );
+				foreach ( $ancestors as $ancestor_id ) {
+					$ancestor = get_term( $ancestor_id, 'category' );
+					if ( $ancestor && ! is_wp_error( $ancestor ) ) {
+						$items[] = [
+							'@type'    => 'ListItem',
+							'position' => $position++,
+							'name'     => $ancestor->name,
+							'item'     => get_term_link( $ancestor ),
+						];
+					}
+				}
+				$items[] = [
+					'@type'    => 'ListItem',
+					'position' => $position++,
+					'name'     => $cat->name,
+					'item'     => get_term_link( $cat ),
+				];
+			}
+		}
+
+		// Page hierarchy (for pages).
+		if ( 'page' === get_post_type( $post ) && $post->post_parent ) {
+			$ancestors = get_post_ancestors( $post );
+			$ancestors = array_reverse( $ancestors );
+			foreach ( $ancestors as $ancestor_id ) {
+				$ancestor = get_post( $ancestor_id );
+				if ( $ancestor ) {
+					$items[] = [
+						'@type'    => 'ListItem',
+						'position' => $position++,
+						'name'     => get_the_title( $ancestor ),
+						'item'     => get_permalink( $ancestor ),
+					];
+				}
+			}
+		}
+
+		// Current post/page (no item URL per Google spec).
+		$items[] = [
+			'@type'    => 'ListItem',
+			'position' => $position,
+			'name'     => get_the_title( $post ),
+		];
+
+		return [
+			'@context'        => 'https://schema.org',
+			'@type'           => 'BreadcrumbList',
+			'itemListElement' => $items,
+		];
+	}
+
+	/**
 	 * Get the most specific Article type.
 	 *
 	 * @param \WP_Post $post The post object.
@@ -280,6 +370,32 @@ class SchemaGenerator {
 		$author_url = get_author_posts_url( $author_id );
 		if ( ! empty( $author_url ) ) {
 			$schema['url'] = $author_url;
+		}
+
+		// Author sameAs (social profiles from user meta).
+		$same_as     = [];
+		$social_keys = [
+			'wpmind_social_twitter',
+			'wpmind_social_linkedin',
+			'wpmind_social_github',
+			'wpmind_social_weibo',
+			'wpmind_social_facebook',
+		];
+		foreach ( $social_keys as $key ) {
+			$val = get_user_meta( $author_id, $key, true );
+			if ( ! empty( $val ) && filter_var( $val, FILTER_VALIDATE_URL ) ) {
+				$same_as[] = $val;
+			}
+		}
+
+		// Also check WordPress built-in URL field.
+		$user_url = $author->user_url;
+		if ( ! empty( $user_url ) && $user_url !== $author_url ) {
+			$same_as[] = $user_url;
+		}
+
+		if ( ! empty( $same_as ) ) {
+			$schema['sameAs'] = $same_as;
 		}
 
 		return $schema;
@@ -353,5 +469,20 @@ class SchemaGenerator {
 		if ( in_array( $mode, array( self::MODE_AUTO, self::MODE_MERGE, self::MODE_FORCE ), true ) ) {
 			$this->mode = $mode;
 		}
+	}
+
+	/**
+	 * Add social profile fields to user profile page.
+	 *
+	 * @param array $methods Existing contact methods.
+	 * @return array Modified contact methods.
+	 */
+	public function add_author_social_fields( array $methods ): array {
+		$methods['wpmind_social_twitter']  = 'X (Twitter) URL';
+		$methods['wpmind_social_linkedin'] = 'LinkedIn URL';
+		$methods['wpmind_social_github']   = 'GitHub URL';
+		$methods['wpmind_social_weibo']    = __( '微博 URL', 'wpmind' );
+		$methods['wpmind_social_facebook'] = 'Facebook URL';
+		return $methods;
 	}
 }

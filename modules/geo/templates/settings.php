@@ -446,6 +446,46 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                             </table>
                         </div>
                     </div>
+                    <div class="wpmind-geo-section wpmind-geo-info">
+                        <h3 class="wpmind-geo-section-title">
+                            <span class="dashicons ri-eye-line"></span>
+                            <?php esc_html_e( 'JSON-LD 预览', 'wpmind' ); ?>
+                        </h3>
+                        <div class="wpmind-geo-info-content">
+                            <p><?php esc_html_e( '基于当前设置生成的示例输出：', 'wpmind' ); ?></p>
+                            <?php
+                            // Generate sample schema preview.
+                            $preview_brand_name = get_option( 'wpmind_brand_name', '' ) ?: get_bloginfo( 'name' );
+                            $preview_org_type   = get_option( 'wpmind_brand_org_type', 'Organization' );
+                            $preview_brand_url  = get_option( 'wpmind_brand_url', '' ) ?: home_url( '/' );
+                            $preview_schema = [
+                                '@context'        => 'https://schema.org',
+                                '@type'           => 'BlogPosting',
+                                'headline'        => __( '示例文章标题', 'wpmind' ),
+                                'author'          => [
+                                    '@type' => 'Person',
+                                    'name'  => wp_get_current_user()->display_name ?: 'Author',
+                                    'url'   => home_url( '/author/example/' ),
+                                ],
+                                'datePublished'   => wp_date( 'c' ),
+                                'publisher'       => [
+                                    '@type' => $preview_org_type,
+                                    'name'  => $preview_brand_name,
+                                    'url'   => $preview_brand_url,
+                                ],
+                                'description'     => __( '文章摘要内容...', 'wpmind' ),
+                                'mainEntityOfPage' => [
+                                    '@type' => 'WebPage',
+                                    '@id'   => home_url( '/example-post/' ),
+                                ],
+                                'inLanguage'      => get_locale(),
+                            ];
+                            $preview_json = wp_json_encode( $preview_schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
+                            ?>
+                            <pre style="background:var(--wpmind-gray-100);padding:12px;border-radius:6px;font-size:11px;line-height:1.5;overflow-x:auto;max-height:300px;white-space:pre-wrap;word-break:break-all;"><code><?php echo esc_html( $preview_json ); ?></code></pre>
+                            <p class="description" style="margin-top:8px;"><?php esc_html_e( '实际输出会包含文章的真实数据。品牌实体启用后 publisher 将自动增强。', 'wpmind' ); ?></p>
+                        </div>
+                    </div>
                     <?php endif; ?>
                 </div><!-- /right -->
                 </div><!-- /grid -->
