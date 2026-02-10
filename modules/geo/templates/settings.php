@@ -434,7 +434,7 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                                 <tbody>
                                     <tr><td><code>@type</code></td><td><?php esc_html_e( '48h 内 NewsArticle，之后 BlogPosting，页面 Article', 'wpmind' ); ?></td></tr>
                                     <tr><td><code>headline</code></td><td><?php esc_html_e( '文章标题', 'wpmind' ); ?></td></tr>
-                                    <tr><td><code>author</code></td><td><?php esc_html_e( 'Person: name + url', 'wpmind' ); ?></td></tr>
+                                    <tr><td><code>author</code></td><td><?php esc_html_e( 'Person: name + url + sameAs (社交档案)', 'wpmind' ); ?></td></tr>
                                     <tr><td><code>publisher</code></td><td><?php esc_html_e( 'Organization (品牌实体增强)', 'wpmind' ); ?></td></tr>
                                     <tr><td><code>image</code></td><td><?php esc_html_e( '特色图片或正文首图', 'wpmind' ); ?></td></tr>
                                     <tr><td><code>description</code></td><td><?php esc_html_e( '文章摘要', 'wpmind' ); ?></td></tr>
@@ -442,6 +442,10 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                                     <tr><td><code>articleSection</code></td><td><?php esc_html_e( '所属分类', 'wpmind' ); ?></td></tr>
                                     <tr><td><code>keywords</code></td><td><?php esc_html_e( '文章标签', 'wpmind' ); ?></td></tr>
                                     <tr><td><code>inLanguage</code></td><td><?php esc_html_e( '内容语言', 'wpmind' ); ?></td></tr>
+                                    <tr><td colspan="2" style="font-weight:600;padding-top:8px;"><?php esc_html_e( 'BreadcrumbList (每篇文章)', 'wpmind' ); ?></td></tr>
+                                    <tr><td><code>itemListElement</code></td><td><?php esc_html_e( '首页 > 分类层级 > 当前页', 'wpmind' ); ?></td></tr>
+                                    <tr><td colspan="2" style="font-weight:600;padding-top:8px;"><?php esc_html_e( 'WebSite (仅首页)', 'wpmind' ); ?></td></tr>
+                                    <tr><td><code>potentialAction</code></td><td><?php esc_html_e( 'SearchAction 站内搜索', 'wpmind' ); ?></td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -458,15 +462,16 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                             $preview_brand_name = get_option( 'wpmind_brand_name', '' ) ?: get_bloginfo( 'name' );
                             $preview_org_type   = get_option( 'wpmind_brand_org_type', 'Organization' );
                             $preview_brand_url  = get_option( 'wpmind_brand_url', '' ) ?: home_url( '/' );
+                            $preview_author = [
+                                '@type' => 'Person',
+                                'name'  => wp_get_current_user()->display_name ?: 'Author',
+                                'url'   => home_url( '/author/example/' ),
+                            ];
                             $preview_schema = [
                                 '@context'        => 'https://schema.org',
                                 '@type'           => 'BlogPosting',
                                 'headline'        => __( '示例文章标题', 'wpmind' ),
-                                'author'          => [
-                                    '@type' => 'Person',
-                                    'name'  => wp_get_current_user()->display_name ?: 'Author',
-                                    'url'   => home_url( '/author/example/' ),
-                                ],
+                                'author'          => $preview_author,
                                 'datePublished'   => wp_date( 'c' ),
                                 'publisher'       => [
                                     '@type' => $preview_org_type,
@@ -481,9 +486,72 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
                                 'inLanguage'      => get_locale(),
                             ];
                             $preview_json = wp_json_encode( $preview_schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
+
+                            // BreadcrumbList preview.
+                            $preview_breadcrumb = [
+                                '@context'        => 'https://schema.org',
+                                '@type'           => 'BreadcrumbList',
+                                'itemListElement' => [
+                                    [
+                                        '@type'    => 'ListItem',
+                                        'position' => 1,
+                                        'name'     => get_bloginfo( 'name' ),
+                                        'item'     => home_url( '/' ),
+                                    ],
+                                    [
+                                        '@type'    => 'ListItem',
+                                        'position' => 2,
+                                        'name'     => __( '示例分类', 'wpmind' ),
+                                        'item'     => home_url( '/category/example/' ),
+                                    ],
+                                    [
+                                        '@type'    => 'ListItem',
+                                        'position' => 3,
+                                        'name'     => __( '示例文章标题', 'wpmind' ),
+                                    ],
+                                ],
+                            ];
+                            $preview_breadcrumb_json = wp_json_encode( $preview_breadcrumb, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
+
+                            // WebSite preview.
+                            $preview_website = [
+                                '@context'        => 'https://schema.org',
+                                '@type'           => 'WebSite',
+                                'name'            => $preview_brand_name,
+                                'url'             => home_url( '/' ),
+                                'potentialAction' => [
+                                    '@type'       => 'SearchAction',
+                                    'target'      => home_url( '/?s={search_term_string}' ),
+                                    'query-input' => 'required name=search_term_string',
+                                ],
+                                'inLanguage'      => get_locale(),
+                            ];
+                            $site_desc = get_bloginfo( 'description' );
+                            if ( ! empty( $site_desc ) ) {
+                                $preview_website['description'] = $site_desc;
+                            }
+                            $preview_website_json = wp_json_encode( $preview_website, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
                             ?>
-                            <pre style="background:var(--wpmind-gray-100);padding:12px;border-radius:6px;font-size:11px;line-height:1.5;overflow-x:auto;max-height:300px;white-space:pre-wrap;word-break:break-all;"><code><?php echo esc_html( $preview_json ); ?></code></pre>
-                            <p class="description" style="margin-top:8px;"><?php esc_html_e( '实际输出会包含文章的真实数据。品牌实体启用后 publisher 将自动增强。', 'wpmind' ); ?></p>
+
+                            <!-- Schema type tabs -->
+                            <div class="wpmind-schema-preview-tabs" style="display:flex;gap:4px;margin-bottom:8px;">
+                                <button type="button" class="button button-small wpmind-schema-tab active" data-preview="article"><?php esc_html_e( 'Article', 'wpmind' ); ?></button>
+                                <button type="button" class="button button-small wpmind-schema-tab" data-preview="breadcrumb"><?php esc_html_e( 'Breadcrumb', 'wpmind' ); ?></button>
+                                <button type="button" class="button button-small wpmind-schema-tab" data-preview="website"><?php esc_html_e( 'WebSite', 'wpmind' ); ?></button>
+                            </div>
+
+                            <div class="wpmind-schema-preview-panel" data-preview-panel="article">
+                                <pre style="background:var(--wpmind-gray-100);padding:12px;border-radius:6px;font-size:11px;line-height:1.5;overflow-x:auto;max-height:300px;white-space:pre-wrap;word-break:break-all;"><code><?php echo esc_html( $preview_json ); ?></code></pre>
+                                <p class="description" style="margin-top:8px;"><?php esc_html_e( '每篇文章/页面自动输出。品牌实体启用后 publisher 将自动增强。', 'wpmind' ); ?></p>
+                            </div>
+                            <div class="wpmind-schema-preview-panel" data-preview-panel="breadcrumb" style="display:none;">
+                                <pre style="background:var(--wpmind-gray-100);padding:12px;border-radius:6px;font-size:11px;line-height:1.5;overflow-x:auto;max-height:300px;white-space:pre-wrap;word-break:break-all;"><code><?php echo esc_html( $preview_breadcrumb_json ); ?></code></pre>
+                                <p class="description" style="margin-top:8px;"><?php esc_html_e( '每篇文章/页面自动输出面包屑导航。支持分类层级和页面父子关系。', 'wpmind' ); ?></p>
+                            </div>
+                            <div class="wpmind-schema-preview-panel" data-preview-panel="website" style="display:none;">
+                                <pre style="background:var(--wpmind-gray-100);padding:12px;border-radius:6px;font-size:11px;line-height:1.5;overflow-x:auto;max-height:300px;white-space:pre-wrap;word-break:break-all;"><code><?php echo esc_html( $preview_website_json ); ?></code></pre>
+                                <p class="description" style="margin-top:8px;"><?php esc_html_e( '仅在首页输出。包含站内搜索 SearchAction，帮助搜索引擎展示站内搜索框。', 'wpmind' ); ?></p>
+                            </div>
                         </div>
                     </div>
                     <?php endif; ?>
