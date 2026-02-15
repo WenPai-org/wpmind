@@ -87,6 +87,7 @@ $cache_entries = (int) ($cache_stats["entries"] ?? 0);
 $cache_max_entries = (int) ($cache_stats["max_entries"] ?? 0);
 ?>
 
+<div class="wpmind-tab-pane-body">
 <div class="wpmind-overview">
 
 	<!-- Hero -->
@@ -554,4 +555,5 @@ $cache_max_entries = (int) ($cache_stats["max_entries"] ?? 0);
      WPMIND_VERSION,
  ); ?></p>
 
+</div>
 </div>

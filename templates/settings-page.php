@@ -36,83 +36,83 @@ defined("ABSPATH") || exit(); ?>
 		</span>
 	</h1>
 
+	<?php
+	// Get module loader instance for checking module status.
+	$module_loader = \WPMind\Core\ModuleLoader::instance();
+	$geo_module = $module_loader->get_module("geo");
+	$geo_enabled = $geo_module && $geo_module["enabled"];
+	$cost_control_module = $module_loader->get_module("cost-control");
+	$cost_control_enabled = $cost_control_module && $cost_control_module["enabled"];
+	$analytics_module = $module_loader->get_module("analytics");
+	$analytics_enabled = $analytics_module && $analytics_module["enabled"];
+	$api_gateway_module = $module_loader->get_module("api-gateway");
+	$api_gateway_enabled = $api_gateway_module && $api_gateway_module["enabled"];
+	$exact_cache_module = $module_loader->get_module("exact-cache");
+	$exact_cache_enabled = $exact_cache_module && $exact_cache_module["enabled"];
+	$media_intelligence_module = $module_loader->get_module("media-intelligence");
+	$media_intelligence_enabled = $media_intelligence_module && $media_intelligence_module["enabled"];
+	$auto_meta_module = $module_loader->get_module("auto-meta");
+	$auto_meta_enabled = $auto_meta_module && $auto_meta_module["enabled"];
+	?>
+
+	<!-- Tab 导航 -->
+	<nav class="wpmind-tab-list">
+		<a href="#overview" class="wpmind-tab wpmind-tab-active" data-tab="overview">
+			<?php esc_html_e("概览", "wpmind"); ?>
+		</a>
+		<a href="#services" class="wpmind-tab" data-tab="services">
+			<?php esc_html_e("文本服务", "wpmind"); ?>
+		</a>
+		<a href="#images" class="wpmind-tab" data-tab="images">
+			<?php esc_html_e("图像服务", "wpmind"); ?>
+		</a>
+		<a href="#routing" class="wpmind-tab" data-tab="routing">
+			<?php esc_html_e("智能路由", "wpmind"); ?>
+		</a>
+		<?php if ($analytics_enabled): ?>
+		<a href="#analytics" class="wpmind-tab" data-tab="analytics">
+			<?php esc_html_e("数据分析", "wpmind"); ?>
+		</a>
+		<?php endif; ?>
+		<?php if ($cost_control_enabled): ?>
+		<a href="#budget" class="wpmind-tab" data-tab="budget">
+			<?php esc_html_e("预算管理", "wpmind"); ?>
+		</a>
+		<?php endif; ?>
+		<?php if ($geo_enabled): ?>
+		<a href="#geo" class="wpmind-tab" data-tab="geo">
+			<?php esc_html_e("GEO 优化", "wpmind"); ?>
+		</a>
+		<?php endif; ?>
+		<?php if ($api_gateway_enabled): ?>
+		<a href="#api-gateway" class="wpmind-tab" data-tab="api-gateway">
+			<?php esc_html_e("API Gateway", "wpmind"); ?>
+		</a>
+		<?php endif; ?>
+		<?php if ($exact_cache_enabled): ?>
+		<a href="#exact-cache" class="wpmind-tab" data-tab="exact-cache">
+			<?php esc_html_e("精确缓存", "wpmind"); ?>
+		</a>
+		<?php endif; ?>
+		<?php if ($media_intelligence_enabled): ?>
+		<a href="#media-intelligence" class="wpmind-tab" data-tab="media-intelligence">
+			<?php esc_html_e("媒体智能", "wpmind"); ?>
+		</a>
+		<?php endif; ?>
+		<?php if ($auto_meta_enabled): ?>
+		<a href="#auto-meta" class="wpmind-tab" data-tab="auto-meta">
+			<?php esc_html_e("Auto-Meta", "wpmind"); ?>
+		</a>
+		<?php endif; ?>
+		<a href="#modules" class="wpmind-tab" data-tab="modules">
+			<?php esc_html_e("模块管理", "wpmind"); ?>
+		</a>
+	</nav>
+
 	<!-- 主内容区 -->
 	<div class="wpmind-content">
-		<?php
-  // Get module loader instance for checking module status.
-  $module_loader = \WPMind\Core\ModuleLoader::instance();
-  $geo_module = $module_loader->get_module("geo");
-  $geo_enabled = $geo_module && $geo_module["enabled"];
-  $cost_control_module = $module_loader->get_module("cost-control");
-  $cost_control_enabled =
-      $cost_control_module && $cost_control_module["enabled"];
-  $analytics_module = $module_loader->get_module("analytics");
-  $analytics_enabled = $analytics_module && $analytics_module["enabled"];
-  $api_gateway_module = $module_loader->get_module("api-gateway");
-  $api_gateway_enabled = $api_gateway_module && $api_gateway_module["enabled"];
-  $exact_cache_module = $module_loader->get_module("exact-cache");
-  $exact_cache_enabled = $exact_cache_module && $exact_cache_module["enabled"];
-  $media_intelligence_module = $module_loader->get_module("media-intelligence");
-  $media_intelligence_enabled = $media_intelligence_module && $media_intelligence_module["enabled"];
-  $auto_meta_module = $module_loader->get_module("auto-meta");
-  $auto_meta_enabled = $auto_meta_module && $auto_meta_module["enabled"];
-  ?>
 		<!-- Tab 卡片 -->
 		<div class="wpmind-tabs-card">
-			<!-- Tab 导航 -->
-			<nav class="wpmind-tab-list">
-				<a href="#overview" class="wpmind-tab wpmind-tab-active" data-tab="overview">
-					<?php esc_html_e("概览", "wpmind"); ?>
-				</a>
-				<a href="#services" class="wpmind-tab" data-tab="services">
-					<?php esc_html_e("文本服务", "wpmind"); ?>
-				</a>
-				<a href="#images" class="wpmind-tab" data-tab="images">
-					<?php esc_html_e("图像服务", "wpmind"); ?>
-				</a>
-				<a href="#routing" class="wpmind-tab" data-tab="routing">
-					<?php esc_html_e("智能路由", "wpmind"); ?>
-				</a>
-				<?php if ($analytics_enabled): ?>
-				<a href="#analytics" class="wpmind-tab" data-tab="analytics">
-					<?php esc_html_e("数据分析", "wpmind"); ?>
-				</a>
-				<?php endif; ?>
-				<?php if ($cost_control_enabled): ?>
-				<a href="#budget" class="wpmind-tab" data-tab="budget">
-					<?php esc_html_e("预算管理", "wpmind"); ?>
-				</a>
-				<?php endif; ?>
-				<?php if ($geo_enabled): ?>
-				<a href="#geo" class="wpmind-tab" data-tab="geo">
-					<?php esc_html_e("GEO 优化", "wpmind"); ?>
-				</a>
-				<?php endif; ?>
-				<?php if ($api_gateway_enabled): ?>
-				<a href="#api-gateway" class="wpmind-tab" data-tab="api-gateway">
-					<?php esc_html_e("API Gateway", "wpmind"); ?>
-				</a>
-				<?php endif; ?>
-				<?php if ($exact_cache_enabled): ?>
-				<a href="#exact-cache" class="wpmind-tab" data-tab="exact-cache">
-					<?php esc_html_e("精确缓存", "wpmind"); ?>
-				</a>
-				<?php endif; ?>
-				<?php if ($media_intelligence_enabled): ?>
-				<a href="#media-intelligence" class="wpmind-tab" data-tab="media-intelligence">
-					<?php esc_html_e("媒体智能", "wpmind"); ?>
-				</a>
-				<?php endif; ?>
-				<?php if ($auto_meta_enabled): ?>
-				<a href="#auto-meta" class="wpmind-tab" data-tab="auto-meta">
-					<?php esc_html_e("Auto-Meta", "wpmind"); ?>
-				</a>
-				<?php endif; ?>
-				<a href="#modules" class="wpmind-tab" data-tab="modules">
-					<?php esc_html_e("模块管理", "wpmind"); ?>
-				</a>
-			</nav>
-
 			<!-- Tab 内容 -->
 			<div id="overview" class="wpmind-tab-pane wpmind-tab-pane-active">
 				<?php include WPMIND_PLUGIN_DIR . "templates/tabs/overview.php"; ?>

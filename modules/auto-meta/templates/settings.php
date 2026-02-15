@@ -29,15 +29,17 @@ $month_gen = (int) ( $stats[ $month_key ] ?? 0 );
 $public_types = get_post_types( [ 'public' => true ], 'objects' );
 ?>
 
+<!-- Header -->
+<div class="wpmind-module-header">
+	<h2 class="wpmind-module-title">
+		<span class="dashicons ri-magic-line"></span>
+		<?php esc_html_e( 'Auto-Meta', 'wpmind' ); ?>
+	</h2>
+	<span class="wpmind-module-badge">v1.0</span>
+</div>
+
+<div class="wpmind-tab-pane-body">
 <div class="wpmind-auto-meta-panel">
-	<!-- Header -->
-	<div class="wpmind-module-header">
-		<h2 class="wpmind-module-title">
-			<span class="dashicons ri-magic-line"></span>
-			<?php esc_html_e( 'Auto-Meta', 'wpmind' ); ?>
-		</h2>
-		<span class="wpmind-module-badge">v1.0</span>
-	</div>
 
 	<p class="wpmind-module-desc">
 		<?php esc_html_e( 'AI 驱动的文章元数据自动生成：摘要、标签、分类、FAQ Schema、SEO 描述。', 'wpmind' ); ?>
@@ -209,4 +211,5 @@ $public_types = get_post_types( [ 'public' => true ], 'objects' );
 			</table>
 		</div>
 	</div>
+</div>
 </div>

@@ -164,8 +164,11 @@
 .wpmind-budget-header {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	gap: var(--wpmind-space-3);
-	margin-bottom: var(--wpmind-space-2);
+	padding: var(--wpmind-space-4) var(--wpmind-space-5);
+	border-bottom: 1px solid var(--wpmind-gray-200);
+	margin: 0;
 }
 
 .wpmind-budget-title {
@@ -188,6 +191,33 @@
 .wpmind-budget-desc {
 	color: var(--wpmind-gray-600);
 	margin: 0 0 var(--wpmind-space-6);
+}
+
+.wpmind-cost-control-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--wpmind-space-3);
+	padding: var(--wpmind-space-4) var(--wpmind-space-5);
+	border-bottom: 1px solid var(--wpmind-gray-200);
+	margin: 0;
+}
+
+.wpmind-cost-control-title {
+	display: flex;
+	align-items: center;
+	gap: var(--wpmind-space-2);
+	font-size: var(--wpmind-text-md);
+	font-weight: 600;
+	color: var(--wpmind-gray-900);
+	margin: 0;
+}
+
+.wpmind-cost-control-title .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	color: var(--wpmind-primary);
 }
 
 .wpmind-budget-status-badge {

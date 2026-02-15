@@ -48,14 +48,16 @@ $get_value = function( $array, $key, $default = 0 ) {
 };
 ?>
 
+<div class="wpmind-cost-control-header">
+    <h2 class="wpmind-cost-control-title">
+        <span class="dashicons ri-money-cny-circle-line"></span>
+        <?php esc_html_e( 'Cost Control', 'wpmind' ); ?>
+    </h2>
+    <span class="wpmind-cost-control-badge">v1.0</span>
+</div>
+
+<div class="wpmind-tab-pane-body">
 <div class="wpmind-cost-control-panel">
-    <div class="wpmind-cost-control-header">
-        <h2 class="wpmind-cost-control-title">
-            <span class="dashicons ri-money-cny-circle-line"></span>
-            <?php esc_html_e( 'Cost Control', 'wpmind' ); ?>
-        </h2>
-        <span class="wpmind-cost-control-badge">v1.0</span>
-    </div>
 
     <p class="wpmind-cost-control-desc">
         <?php esc_html_e( '监控 AI 服务费用，设置预算限额，接收告警通知。', 'wpmind' ); ?>
@@ -314,4 +316,5 @@ $get_value = function( $array, $key, $default = 0 ) {
             </div>
         </div>
     </div>
+</div>
 </div>

@@ -194,10 +194,11 @@
 .wpmind-tab-list {
     display: flex;
     align-items: center;
-    justify-content: center;
+    flex-wrap: wrap;
     gap: 0;
-    padding: 0;
-    box-shadow: var(--wpmind-shadow);
+    padding: 0 var(--wpmind-space-6);
+    background: #fff;
+    border-bottom: 1px solid var(--wpmind-gray-200);
 }
 
 .wpmind-tab {
@@ -237,15 +238,22 @@
 /* Tab 内容 */
 .wpmind-tab-pane {
     display: none;
-    padding: var(--wpmind-space-6);
+    padding: 0 var(--wpmind-space-6) var(--wpmind-space-6);
 }
 
 .wpmind-tab-pane-active {
     display: block;
 }
 
-.wpmind-tab-pane > :first-child {
-    margin-top: 0;
+/* Tab 页面 header 突破 tab-pane 左右 padding 贴边显示 */
+.wpmind-tab-pane .wpmind-module-header,
+.wpmind-tab-pane .wpmind-routing-header,
+.wpmind-tab-pane .wpmind-budget-header,
+.wpmind-tab-pane .wpmind-usage-header,
+.wpmind-tab-pane .wpmind-cost-control-header,
+.wpmind-tab-pane .wpmind-modules-header {
+    margin-left: calc(-1 * var(--wpmind-space-6));
+    margin-right: calc(-1 * var(--wpmind-space-6));
 }
 
 /* Tab 内面板样式重置 */
@@ -1061,8 +1069,11 @@ input.is-invalid {
 .wpmind-usage-header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: var(--wpmind-space-3);
-    margin-bottom: var(--wpmind-space-2);
+    padding: var(--wpmind-space-4) var(--wpmind-space-5);
+    border-bottom: 1px solid var(--wpmind-gray-200);
+    margin: 0;
 }
 
 .wpmind-usage-title {
