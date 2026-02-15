@@ -74,20 +74,6 @@ function register_wpmind_providers(): void {
     $registeredIds = $registry->getRegisteredProviderIds();
     debug_log( 'Registered provider IDs: ' . implode( ', ', $registeredIds ) );
 
-    // 调试：检查每个 WPMind Provider 的配置状态
-    foreach ( $endpoints as $key => $endpoint ) {
-        if ( ! empty( $endpoint['enabled'] ) && ! empty( $endpoint['api_key'] ) ) {
-            $providerClass = ProviderRegistrar::getProviderClass( $key );
-            if ( $providerClass && $registry->hasProvider( $providerClass ) ) {
-                try {
-                    $isConfigured = $registry->isProviderConfigured( $providerClass );
-                    debug_log( "Provider $key ($providerClass) isConfigured: " . ( $isConfigured ? 'true' : 'false' ) );
-                } catch ( \Exception $e ) {
-                    debug_log( "Provider $key check failed: " . $e->getMessage() );
-                }
-            }
-        }
-    }
 }
 
 // 在 init 钩子以优先级 5 注册 Provider
