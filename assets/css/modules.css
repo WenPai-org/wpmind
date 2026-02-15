@@ -4,12 +4,26 @@
 }
 
 .wpmind-modules-header {
-	margin-bottom: var(--wpmind-space-6);
+	padding: var(--wpmind-space-4) var(--wpmind-space-5);
+	border-bottom: 1px solid var(--wpmind-gray-200);
+	margin: 0;
 }
 
 .wpmind-modules-header h2 {
-	margin: 0 0 var(--wpmind-space-2);
+	display: flex;
+	align-items: center;
+	gap: var(--wpmind-space-2);
+	margin: 0;
 	font-size: var(--wpmind-text-md);
+	font-weight: 600;
+	color: var(--wpmind-gray-900);
+}
+
+.wpmind-modules-header h2 .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	color: var(--wpmind-primary);
 }
 
 .wpmind-modules-grid {
@@ -34,12 +48,13 @@
 	opacity: 0.7;
 }
 
-.wpmind-module-header {
+.wpmind-module-card .wpmind-module-header {
 	display: flex;
 	align-items: center;
 	padding: var(--wpmind-space-4);
 	border-bottom: 1px solid var(--wpmind-gray-100);
 	gap: var(--wpmind-space-3);
+	margin: 0;
 }
 
 .wpmind-module-icon {

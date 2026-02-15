@@ -57,14 +57,16 @@ $ai_summary_data = $crawler_tracker->get_ai_summary();
 $learn_more_url = 'https://wpcy.com/c/wpmind';
 ?>
 
+<div class="wpmind-module-header">
+    <h2 class="wpmind-module-title">
+        <span class="dashicons ri-robot-2-line"></span>
+        <?php esc_html_e( 'GEO 优化', 'wpmind' ); ?>
+    </h2>
+    <span class="wpmind-module-badge">v3.10</span>
+</div>
+
+<div class="wpmind-tab-pane-body">
 <div class="wpmind-geo-panel">
-    <div class="wpmind-module-header">
-        <h2 class="wpmind-module-title">
-            <span class="dashicons ri-robot-2-line"></span>
-            <?php esc_html_e( 'GEO 优化', 'wpmind' ); ?>
-        </h2>
-        <span class="wpmind-module-badge">v3.10</span>
-    </div>
 
     <p class="wpmind-module-desc">
         <?php esc_html_e( 'GEO (Generative Engine Optimization) 帮助 AI 搜索引擎更好地理解和引用您的内容。', 'wpmind' ); ?>
@@ -905,3 +907,4 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
 
     </div><!-- /wpmind-geo-content -->
 </div><!-- /wpmind-geo-panel -->
+</div><!-- /wpmind-tab-pane-body -->

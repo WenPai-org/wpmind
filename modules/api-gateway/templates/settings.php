@@ -36,6 +36,7 @@ $base_url = rest_url( 'mind/v1' );
 	<span class="wpmind-module-badge"><?php echo $gateway_enabled ? 'ON' : 'OFF'; ?></span>
 </div>
 
+<div class="wpmind-tab-pane-body">
 <p class="wpmind-module-desc">
 	<?php esc_html_e( 'OpenAI 兼容的 API 网关，提供 Bearer 鉴权、速率限制、预算控制和 SSE 流式输出。', 'wpmind' ); ?>
 </p>
@@ -341,6 +342,7 @@ $base_url = rest_url( 'mind/v1' );
 			<button type="button" class="wpmind-gw-btn wpmind-gw-btn-sm wpmind-gw-btn-secondary" id="log-next" disabled><?php esc_html_e( '下一页', 'wpmind' ); ?></button>
 		</div>
 	</div>
+</div>
 </div>
 
 <script>

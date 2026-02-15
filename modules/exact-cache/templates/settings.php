@@ -23,23 +23,25 @@ $entries       = (int) ( $cache_stats['entries'] ?? 0 );
 $savings = \WPMind\Modules\ExactCache\CostEstimator::get_estimated_savings();
 ?>
 
+<!-- Header -->
+<div class="wpmind-module-header">
+	<h2 class="wpmind-module-title">
+		<span class="dashicons ri-database-2-line"></span>
+		<?php esc_html_e( '精确缓存', 'wpmind' ); ?>
+	</h2>
+	<span class="wpmind-module-badge">v1.0</span>
+	<button type="button" id="wpmind-flush-cache" class="button button-small" title="<?php esc_attr_e( '清空缓存', 'wpmind' ); ?>">
+		<span class="dashicons ri-delete-bin-line"></span>
+		<?php esc_html_e( '清空缓存', 'wpmind' ); ?>
+	</button>
+	<button type="button" id="wpmind-reset-cache-stats" class="button button-small" title="<?php esc_attr_e( '重置统计', 'wpmind' ); ?>">
+		<span class="dashicons ri-restart-line"></span>
+		<?php esc_html_e( '重置统计', 'wpmind' ); ?>
+	</button>
+</div>
+
+<div class="wpmind-tab-pane-body">
 <div class="wpmind-cache-panel">
-	<!-- Header -->
-	<div class="wpmind-module-header">
-		<h2 class="wpmind-module-title">
-			<span class="dashicons ri-database-2-line"></span>
-			<?php esc_html_e( '精确缓存', 'wpmind' ); ?>
-		</h2>
-		<span class="wpmind-module-badge">v1.0</span>
-		<button type="button" id="wpmind-flush-cache" class="button button-small" title="<?php esc_attr_e( '清空缓存', 'wpmind' ); ?>">
-			<span class="dashicons ri-delete-bin-line"></span>
-			<?php esc_html_e( '清空缓存', 'wpmind' ); ?>
-		</button>
-		<button type="button" id="wpmind-reset-cache-stats" class="button button-small" title="<?php esc_attr_e( '重置统计', 'wpmind' ); ?>">
-			<span class="dashicons ri-restart-line"></span>
-			<?php esc_html_e( '重置统计', 'wpmind' ); ?>
-		</button>
-	</div>
 
 	<p class="wpmind-module-desc">
 		<?php esc_html_e( 'AI 请求精确缓存 - 相同请求直接返回缓存结果，降低 API 成本、加速响应。', 'wpmind' ); ?>
@@ -141,4 +143,5 @@ $savings = \WPMind\Modules\ExactCache\CostEstimator::get_estimated_savings();
 		</button>
 	</p>
 
+</div>
 </div>

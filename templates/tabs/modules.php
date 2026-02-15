@@ -14,13 +14,14 @@ $module_loader = ModuleLoader::instance();
 $modules       = $module_loader->get_modules();
 ?>
 
+<div class="wpmind-modules-header">
+	<h2><span class="dashicons ri-puzzle-line"></span> <?php esc_html_e( '模块管理', 'wpmind' ); ?></h2>
+</div>
+<div class="wpmind-tab-pane-body">
 <div class="wpmind-modules-container">
-	<div class="wpmind-modules-header">
-		<h2><span class="dashicons ri-puzzle-line"></span> <?php esc_html_e( '模块管理', 'wpmind' ); ?></h2>
-		<p class="description">
-			<?php esc_html_e( '启用或禁用 WPMind 功能模块。禁用不需要的模块可以提升性能。', 'wpmind' ); ?>
-		</p>
-	</div>
+	<p class="description">
+		<?php esc_html_e( '启用或禁用 WPMind 功能模块。禁用不需要的模块可以提升性能。', 'wpmind' ); ?>
+	</p>
 
 	<div class="wpmind-modules-grid">
 		<?php foreach ( $modules as $module_id => $module ) : ?>
@@ -81,4 +82,5 @@ $modules       = $module_loader->get_modules();
 		</div>
 		<?php endif; ?>
 	</div>
+</div>
 </div>

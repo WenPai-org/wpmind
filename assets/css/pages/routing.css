@@ -11,7 +11,9 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: var(--wpmind-space-3);
-	margin-bottom: var(--wpmind-space-2);
+	padding: var(--wpmind-space-4) var(--wpmind-space-5);
+	border-bottom: 1px solid var(--wpmind-gray-200);
+	margin: 0;
 }
 
 .wpmind-routing-desc {

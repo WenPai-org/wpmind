@@ -21,15 +21,17 @@ $total_gen = (int) ( $stats['generated'] ?? 0 );
 $month_gen = (int) ( $stats[ $month_key ] ?? 0 );
 ?>
 
+<!-- Header -->
+<div class="wpmind-module-header">
+	<h2 class="wpmind-module-title">
+		<span class="dashicons ri-image-ai-line"></span>
+		<?php esc_html_e( '媒体智能', 'wpmind' ); ?>
+	</h2>
+	<span class="wpmind-module-badge">v1.0</span>
+</div>
+
+<div class="wpmind-tab-pane-body">
 <div class="wpmind-media-panel">
-	<!-- Header -->
-	<div class="wpmind-module-header">
-		<h2 class="wpmind-module-title">
-			<span class="dashicons ri-image-ai-line"></span>
-			<?php esc_html_e( '媒体智能', 'wpmind' ); ?>
-		</h2>
-		<span class="wpmind-module-badge">v1.0</span>
-	</div>
 
 	<p class="wpmind-module-desc">
 		<?php esc_html_e( 'AI 驱动的图片 Alt Text、标题、描述自动生成，提升 SEO 和无障碍访问。', 'wpmind' ); ?>
@@ -194,4 +196,5 @@ $month_gen = (int) ( $stats[ $month_key ] ?? 0 );
 			</button>
 		</div>
 	</div>
+</div>
 </div>
