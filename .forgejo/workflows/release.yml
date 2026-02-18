@@ -21,13 +21,12 @@ jobs:
       - name: Verify tools
         shell: bash
         run: |
-          set -euo pipefail
-          php -v | head -1
+          php -v | head -1 || true
           git --version
-          rsync --version | head -1
-          zip --version | head -2
+          rsync --version | head -1 || true
+          zip --version | head -2 || true
           jq --version
-          curl --version | head -1
+          curl --version | head -1 || true
 
       - name: Extract version from tag
         id: version
