@@ -26,3 +26,10 @@ node_modules/
 *.tmp
 *.swp
 *~
+
+# AI & internal docs (sensitive)
+CLAUDE.md
+.agent/
+docs/
+WPMIND-ROADMAP.md
+**/DEPLOYMENT.md
