@@ -12,6 +12,7 @@
  * Domain Path: /languages
  * Requires at least: 6.4
  * Requires PHP: 8.1
+ * Update URI: https://updates.wenpai.net
  *
  * @package WPMind
  */
@@ -37,6 +38,9 @@ if ( ! defined( 'WPMIND_PLUGIN_DIR' ) ) {
 }
 if ( ! defined( 'WPMIND_PLUGIN_URL' ) ) {
     define( 'WPMIND_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+}
+if ( ! defined( 'WPMIND_PLUGIN_BASENAME' ) ) {
+    define( 'WPMIND_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 }
 // Alias for module compatibility.
 if ( ! defined( 'WPMIND_PATH' ) ) {
@@ -735,6 +739,10 @@ spl_autoload_register( function ( string $class ): void {
         require $file;
     }
 } );
+
+// 加载 WenPai 更新器（跨插件共享组件，不走 PSR-4）
+require_once WPMIND_PLUGIN_DIR . 'includes/class-wenpai-updater.php';
+new \WenPai_Updater( WPMIND_PLUGIN_BASENAME, WPMIND_VERSION );
 
 // 加载 Provider 注册模块
 require_once WPMIND_PLUGIN_DIR . 'includes/Providers/register.php';
