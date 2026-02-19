@@ -1,6 +1,7 @@
 # 文派统一插件发布 CI Workflow
 # 触发：push tag v*
 # 运行环境：forgejo-ci-php:latest (Alpine + php-cli + git + rsync + zip + node)
+# 基于 ci-workflows/wp-release.yml 2026-02-18 版本
 name: Release Plugin
 
 on:
@@ -17,6 +18,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Verify tools
         shell: bash
@@ -73,6 +76,58 @@ jobs:
           fi
           echo "Version consistency check passed: $VERSION"
 
+      - name: Generate Changelog
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF#refs/tags/}"
+
+          PREV_TAG=$(git tag --sort=-version:refname | grep -E '^v' | grep -v "^${TAG}$" | head -1)
+
+          if [ -n "$PREV_TAG" ]; then
+            echo "Changelog: ${PREV_TAG}..${TAG}"
+            COMMITS=$(git log "${PREV_TAG}..${TAG}" --no-merges --pretty=format:"%s (%h)" 2>/dev/null || true)
+          else
+            echo "Changelog: first release, using all commits"
+            COMMITS=$(git log --no-merges --pretty=format:"%s (%h)" 2>/dev/null || true)
+          fi
+
+          if [ -z "$COMMITS" ]; then
+            : > /tmp/changelog.md
+            echo "No commits found for changelog"
+            exit 0
+          fi
+
+          FEAT="" FIX="" OTHER=""
+          while IFS= read -r line; do
+            case "$line" in
+              feat:*|feat\(*) FEAT="${FEAT}\n- ${line}" ;;
+              fix:*|fix\(*)   FIX="${FIX}\n- ${line}" ;;
+              *)              OTHER="${OTHER}\n- ${line}" ;;
+            esac
+          done <<< "$COMMITS"
+
+          CHANGELOG=""
+          HAS_CATEGORIES=false
+          if [ -n "$FEAT" ]; then
+            CHANGELOG="${CHANGELOG}#### New Features${FEAT}\n\n"
+            HAS_CATEGORIES=true
+          fi
+          if [ -n "$FIX" ]; then
+            CHANGELOG="${CHANGELOG}#### Bug Fixes${FIX}\n\n"
+            HAS_CATEGORIES=true
+          fi
+          if [ -n "$OTHER" ]; then
+            if [ "$HAS_CATEGORIES" = true ]; then
+              CHANGELOG="${CHANGELOG}#### Other Changes${OTHER}\n\n"
+            else
+              CHANGELOG="${OTHER#\\n}\n\n"
+            fi
+          fi
+
+          printf '%b' "$CHANGELOG" > /tmp/changelog.md
+          echo "Changelog generated ($(echo "$COMMITS" | wc -l) commits)"
+
       - name: PHP Lint
         shell: bash
         run: |
@@ -118,6 +173,7 @@ jobs:
             --exclude="vendor" \
             --exclude="tests" \
             --exclude="docs" \
+            --exclude="lib" \
             --exclude="phpunit.xml*" \
             --exclude="phpcs.xml*" \
             --exclude="phpstan.neon*" \
@@ -176,7 +232,23 @@ jobs:
           SHA256="${{ steps.checksum.outputs.sha256 }}"
           API_URL="${GITHUB_SERVER_URL%/}/api/v1/repos/${GITHUB_REPOSITORY}"
           AUTH_HEADER="Authorization: token ${AUTH_TOKEN}"
-          printf -v RELEASE_NOTES '## %s %s\n\n### Checksums\n\n| File | SHA-256 |\n|------|---------|\n| %s | %s |\n' "$SLUG" "$TAG" "$ZIP_NAME" "$SHA256"
+
+          {
+            echo "## ${SLUG} ${TAG}"
+            echo ""
+            CHANGELOG_FILE="/tmp/changelog.md"
+            if [ -f "$CHANGELOG_FILE" ] && [ -s "$CHANGELOG_FILE" ]; then
+              echo "### What's Changed"
+              echo ""
+              cat "$CHANGELOG_FILE"
+            fi
+            echo "### Checksums"
+            echo ""
+            echo "| File | SHA-256 |"
+            echo "|------|---------|"
+            echo "| ${ZIP_NAME} | ${SHA256} |"
+          } > /tmp/release-notes.md
+          RELEASE_NOTES=$(cat /tmp/release-notes.md)
 
           echo ">>> Resolving release ${TAG}"
           STATUS=$(curl -sS -o /tmp/release.json -w "%{http_code}" \
