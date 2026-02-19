@@ -107,6 +107,9 @@ defined("ABSPATH") || exit(); ?>
 		<a href="#modules" class="wpmind-tab" data-tab="modules">
 			<?php esc_html_e("模块管理", "wpmind"); ?>
 		</a>
+		<a href="#license" class="wpmind-tab" data-tab="license">
+			<?php esc_html_e("授权", "wpmind"); ?>
+		</a>
 	</nav>
 
 	<!-- 主内容区 -->
@@ -188,6 +191,9 @@ defined("ABSPATH") || exit(); ?>
 			<?php endif; ?>
 			<div id="modules" class="wpmind-tab-pane">
 				<?php include WPMIND_PLUGIN_DIR . "templates/tabs/modules.php"; ?>
+			</div>
+			<div id="license" class="wpmind-tab-pane">
+				<?php include WPMIND_PLUGIN_DIR . "templates/tabs/license.php"; ?>
 			</div>
 		</div>
 	</div>

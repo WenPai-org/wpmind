@@ -744,5 +744,22 @@ spl_autoload_register( function ( string $class ): void {
 require_once WPMIND_PLUGIN_DIR . 'includes/class-wenpai-updater.php';
 new \WenPai_Updater( WPMIND_PLUGIN_BASENAME, WPMIND_VERSION );
 
+// 加载 WenPai 授权客户端
+require_once WPMIND_PLUGIN_DIR . 'includes/class-wenpai-license.php';
+
+/**
+ * 获取 WPMind 授权实例。
+ *
+ * @since 4.0.0
+ * @return \WenPai_License
+ */
+function wpmind_license(): \WenPai_License {
+	static $instance = null;
+	if ( null === $instance ) {
+		$instance = new \WenPai_License( 'wpmind' );
+	}
+	return $instance;
+}
+
 // 加载 Provider 注册模块
 require_once WPMIND_PLUGIN_DIR . 'includes/Providers/register.php';
