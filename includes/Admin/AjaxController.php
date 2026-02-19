@@ -68,6 +68,7 @@ final class AjaxController {
         add_action( 'wp_ajax_wpmind_route_request', [ $this, 'ajax_route_request' ] );
         add_action( 'wp_ajax_wpmind_set_provider_priority', [ $this, 'ajax_set_provider_priority' ] );
         // GEO settings are handled by GeoModule.
+        add_action( 'wp_ajax_wpmind_license', [ $this, 'ajax_license' ] );
     }
 
     /**
@@ -609,5 +610,42 @@ final class AjaxController {
             'success' => false,
             'message' => '连接失败 (HTTP ' . $status_code . ')',
         ];
+    }
+
+    /**
+     * AJAX 授权操作（激活/停用）。
+     *
+     * @since 4.0.0
+     */
+    public function ajax_license(): void {
+        check_ajax_referer( 'wpmind_license_action' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( [ 'message' => '权限不足' ] );
+        }
+
+        $action = sanitize_text_field( $_POST['license_action'] ?? '' );
+        $key    = sanitize_text_field( $_POST['license_key'] ?? '' );
+
+        $license = \WPMind\wpmind_license();
+
+        if ( $action === 'activate' ) {
+            if ( $key === '' ) {
+                wp_send_json_error( [ 'message' => '请输入 License Key' ] );
+            }
+            $license->set_key( $key );
+            $result = $license->activate();
+            if ( $result ) {
+                wp_send_json_success( [ 'message' => '授权激活成功' ] );
+            } else {
+                wp_send_json_error( [ 'message' => '激活失败，请检查 License Key 是否正确' ] );
+            }
+        } elseif ( $action === 'deactivate' ) {
+            $license->deactivate();
+            $license->set_key( '' );
+            wp_send_json_success( [ 'message' => '授权已停用' ] );
+        } else {
+            wp_send_json_error( [ 'message' => '未知操作' ] );
+        }
     }
 }
