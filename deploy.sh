@@ -19,6 +19,11 @@ if [ ! -d "$TARGET_DIR" ]; then
     exit 1
 fi
 
+# 生成 .pot 翻译模板
+echo "🌐 生成 .pot 翻译模板..."
+mkdir -p "$SOURCE_DIR/languages"
+wp i18n make-pot "$SOURCE_DIR" "$SOURCE_DIR/languages/wpmind.pot" --domain=wpmind --skip-audit --quiet
+
 # 同步文件 (排除 .git 目录)
 echo "📦 同步文件..."
 sudo rsync -av --delete \
