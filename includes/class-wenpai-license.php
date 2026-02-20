@@ -63,6 +63,8 @@ class WenPai_License {
 
 		if ( $api_url !== '' ) {
 			$this->api_url = rtrim( $api_url, '/' );
+		} elseif ( defined( 'WENPAI_LICENSE_URL' ) ) {
+			$this->api_url = rtrim( WENPAI_LICENSE_URL, '/' );
 		}
 	}
 
