@@ -51,10 +51,10 @@ final class AdminAssets {
             return;
         }
 
-        // Remixicon 图标库
+        // Remixicon 图标库（本地打包）
         wp_enqueue_style(
             'remixicon',
-            'https://cdn.jsdelivr.net/npm/remixicon@4.9.1/fonts/remixicon.min.css',
+            WPMIND_PLUGIN_URL . 'assets/vendor/remixicon/remixicon.css',
             [],
             '4.9.1'
         );
