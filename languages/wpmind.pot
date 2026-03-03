@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-19T23:15:05+08:00\n"
+"POT-Creation-Date: 2026-02-22T06:57:17+08:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: wpmind\n"
@@ -90,18 +90,18 @@ msgstr ""
 msgid "文档"
 msgstr ""
 
-#: includes/Admin/AjaxController.php:84
-#: includes/Admin/AjaxController.php:201
-#: includes/Admin/AjaxController.php:246
-#: includes/Admin/AjaxController.php:267
-#: includes/Admin/AjaxController.php:291
-#: includes/Admin/AjaxController.php:316
-#: includes/Admin/AjaxController.php:384
-#: includes/Admin/AjaxController.php:408
-#: includes/Admin/AjaxController.php:432
-#: includes/Admin/AjaxController.php:450
-#: includes/Admin/AjaxController.php:481
-#: includes/Admin/AjaxController.php:519
+#: includes/Admin/AjaxController.php:85
+#: includes/Admin/AjaxController.php:202
+#: includes/Admin/AjaxController.php:247
+#: includes/Admin/AjaxController.php:268
+#: includes/Admin/AjaxController.php:292
+#: includes/Admin/AjaxController.php:317
+#: includes/Admin/AjaxController.php:385
+#: includes/Admin/AjaxController.php:409
+#: includes/Admin/AjaxController.php:433
+#: includes/Admin/AjaxController.php:451
+#: includes/Admin/AjaxController.php:482
+#: includes/Admin/AjaxController.php:520
 #: includes/Core/ModuleLoader.php:420
 #: modules/analytics/AnalyticsModule.php:154
 #: modules/api-gateway/includes/Admin/GatewayAjaxController.php:44
@@ -117,83 +117,83 @@ msgstr ""
 msgid "权限不足"
 msgstr ""
 
-#: includes/Admin/AjaxController.php:92
-#: includes/Admin/AjaxController.php:207
+#: includes/Admin/AjaxController.php:93
+#: includes/Admin/AjaxController.php:208
 msgid "缺少服务标识"
 msgstr ""
 
-#: includes/Admin/AjaxController.php:99
+#: includes/Admin/AjaxController.php:100
 msgid "服务不存在"
 msgstr ""
 
-#: includes/Admin/AjaxController.php:110
-#: includes/Admin/AjaxController.php:220
+#: includes/Admin/AjaxController.php:111
+#: includes/Admin/AjaxController.php:221
 msgid "请先配置 API Key"
 msgstr ""
 
-#: includes/Admin/AjaxController.php:161
-#: includes/Admin/AjaxController.php:228
+#: includes/Admin/AjaxController.php:162
+#: includes/Admin/AjaxController.php:229
 msgid "连接成功"
 msgstr ""
 
-#: includes/Admin/AjaxController.php:214
+#: includes/Admin/AjaxController.php:215
 msgid "服务未配置"
 msgstr ""
 
-#: includes/Admin/AjaxController.php:232
+#: includes/Admin/AjaxController.php:233
 msgid "连接失败"
 msgstr ""
 
-#: includes/Admin/AjaxController.php:275
+#: includes/Admin/AjaxController.php:276
 msgid "所有熔断器已重置"
 msgstr ""
 
-#: includes/Admin/AjaxController.php:278
+#: includes/Admin/AjaxController.php:279
 msgid "熔断器已重置"
 msgstr ""
 
-#: includes/Admin/AjaxController.php:322
-#: includes/Admin/AjaxController.php:390
+#: includes/Admin/AjaxController.php:323
+#: includes/Admin/AjaxController.php:391
 msgid "Cost Control 模块未启用"
 msgstr ""
 
-#: includes/Admin/AjaxController.php:330
+#: includes/Admin/AjaxController.php:331
 #: modules/cost-control/CostControlModule.php:199
 msgid "无效的数据格式"
 msgstr ""
 
-#: includes/Admin/AjaxController.php:369
+#: includes/Admin/AjaxController.php:370
 msgid "预算设置已保存"
 msgstr ""
 
-#: includes/Admin/AjaxController.php:371
-#: includes/Admin/AjaxController.php:506
+#: includes/Admin/AjaxController.php:372
+#: includes/Admin/AjaxController.php:507
 #: modules/api-gateway/templates/settings.php:380
 #: modules/cost-control/CostControlModule.php:240
 msgid "保存失败"
 msgstr ""
 
-#: includes/Admin/AjaxController.php:414
+#: includes/Admin/AjaxController.php:415
 msgid "Analytics 模块未启用"
 msgstr ""
 
-#: includes/Admin/AjaxController.php:456
+#: includes/Admin/AjaxController.php:457
 msgid "请选择路由策略"
 msgstr ""
 
-#: includes/Admin/AjaxController.php:464
+#: includes/Admin/AjaxController.php:465
 msgid "路由策略已更新"
 msgstr ""
 
-#: includes/Admin/AjaxController.php:468
+#: includes/Admin/AjaxController.php:469
 msgid "无效的路由策略"
 msgstr ""
 
-#: includes/Admin/AjaxController.php:491
+#: includes/Admin/AjaxController.php:492
 msgid "已清除手动优先级设置"
 msgstr ""
 
-#: includes/Admin/AjaxController.php:494
+#: includes/Admin/AjaxController.php:495
 msgid "Provider 优先级已更新"
 msgstr ""
 
@@ -2719,6 +2719,10 @@ msgstr ""
 msgid "模块管理"
 msgstr ""
 
+#: templates/settings-page.php:111
+msgid "授权"
+msgstr ""
+
 #: templates/tabs/budget.php:33
 msgid "设置 AI 服务的费用限额和告警规则，控制成本支出。"
 msgstr ""
@@ -2826,6 +2830,54 @@ msgstr ""
 #: templates/tabs/images.php:252
 #: templates/tabs/services.php:205
 msgid "支持的模型"
+msgstr ""
+
+#: templates/tabs/license.php:19
+msgid "授权管理"
+msgstr ""
+
+#: templates/tabs/license.php:21
+msgid "输入您的授权密钥以解锁 Pro/Enterprise 功能。"
+msgstr ""
+
+#: templates/tabs/license.php:26
+msgid "当前状态"
+msgstr ""
+
+#. translators: %s: plan name
+#: templates/tabs/license.php:32
+#, php-format
+msgid "已激活 — %s"
+msgstr ""
+
+#. translators: %s: expiration date
+#: templates/tabs/license.php:42
+#, php-format
+msgid "到期时间: %s"
+msgstr ""
+
+#: templates/tabs/license.php:50
+msgid "免费版"
+msgstr ""
+
+#: templates/tabs/license.php:59
+msgid "License Key"
+msgstr ""
+
+#: templates/tabs/license.php:68
+msgid "在 wenpai.net 购买后获取授权密钥。"
+msgstr ""
+
+#: templates/tabs/license.php:78
+msgid "停用授权"
+msgstr ""
+
+#: templates/tabs/license.php:82
+msgid "激活授权"
+msgstr ""
+
+#: templates/tabs/license.php:127
+msgid "请求失败"
 msgstr ""
 
 #: templates/tabs/modules.php:23
