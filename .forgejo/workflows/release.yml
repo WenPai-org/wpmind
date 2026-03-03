@@ -170,7 +170,7 @@ jobs:
             --exclude=".agent" \
             --exclude=".vscode" \
             --exclude="node_modules" \
-            --exclude="vendor" \
+            --exclude="/vendor" \
             --exclude="tests" \
             --exclude="docs" \
             --exclude="lib" \

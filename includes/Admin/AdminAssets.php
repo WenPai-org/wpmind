@@ -108,25 +108,13 @@ final class AdminAssets {
             WPMIND_VERSION
         );
 
-        // Chart.js 图表库（本地优先，CDN 兜底）
+        // Chart.js 图表库（本地打包，无外部 CDN 依赖）
         wp_register_script(
             'chartjs',
             WPMIND_PLUGIN_URL . 'assets/js/vendor/chartjs/chart.umd.min.js',
             [],
             '4.5.0',
             true
-        );
-        $chartjs_cdn = 'https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js';
-        wp_add_inline_script(
-            'chartjs',
-            "if (typeof Chart === 'undefined' && !document.querySelector('script[data-wpmind-fallback=\"chartjs-cdn\"]')) {" .
-            "var wpmindChartJsCdn = document.createElement('script');" .
-            "wpmindChartJsCdn.src = '{$chartjs_cdn}';" .
-            "wpmindChartJsCdn.defer = true;" .
-            "wpmindChartJsCdn.setAttribute('data-wpmind-fallback', 'chartjs-cdn');" .
-            "document.head.appendChild(wpmindChartJsCdn);" .
-            "}",
-            'after'
         );
 
         wp_enqueue_script(
