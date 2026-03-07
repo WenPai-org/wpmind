@@ -280,7 +280,7 @@ $cache_max_entries = (int) ($cache_stats["max_entries"] ?? 0);
       ); ?>" style="color: <?php echo esc_attr($color); ?>"></span>
 						<span class="wpmind-overview-module-name"><?php
       echo esc_html($m["name"]);
-      echo $badge;
+      echo wp_kses_post($badge);
 
          // phpcs:ignore
          ?></span>

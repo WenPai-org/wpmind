@@ -50,6 +50,7 @@ final class AutoMetaAjaxController {
 	public function ajax_save_settings(): void {
 		$this->verify_request( true );
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified in verify_request() above.
 		$raw = wp_unslash( $_POST );
 
 		$to_bool = function ( string $key ) use ( $raw ): string {
@@ -95,6 +96,7 @@ final class AutoMetaAjaxController {
 	public function ajax_manual_generate(): void {
 		$this->verify_request( true );
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified in verify_request() above.
 		$post_id = (int) ( $_POST['post_id'] ?? 0 );
 		if ( $post_id <= 0 ) {
 			wp_send_json_error( [ 'message' => __( '无效的文章 ID', 'wpmind' ) ] );

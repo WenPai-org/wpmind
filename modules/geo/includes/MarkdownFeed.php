@@ -182,6 +182,7 @@ class MarkdownFeed {
 		$site_name = get_bloginfo( 'name' );
 		$site_url  = home_url();
 
+		// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- Markdown feed served as text/markdown; HTML escaping would corrupt output.
 		echo "# {$site_name} - Markdown Feed\n\n";
 		echo "来源: {$site_url}\n";
 		echo "生成时间: " . gmdate( 'Y-m-d H:i:s' ) . " UTC\n\n";
@@ -192,6 +193,7 @@ class MarkdownFeed {
 			echo $this->post_to_markdown( $post );
 			echo "\n\n---\n\n";
 		}
+		// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -201,6 +203,7 @@ class MarkdownFeed {
 	 */
 	private function render_singular( \WP_Post $post ): void {
 		header( 'Content-Type: text/markdown; charset=utf-8' );
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markdown feed served as text/markdown; HTML escaping would corrupt output.
 		echo $this->post_to_markdown( $post );
 	}
 

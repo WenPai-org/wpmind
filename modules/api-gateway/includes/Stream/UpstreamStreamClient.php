@@ -55,7 +55,7 @@ final class UpstreamStreamClient {
 		$callback = function ( string $delta, array $raw_json ) use ( $on_chunk, $token, &$tokens_used, &$cancelled ): void {
 			if ( $token->is_cancelled() ) {
 				$cancelled = true;
-				throw new \RuntimeException( 'Stream cancelled: ' . $token->get_reason() );
+				throw new \RuntimeException( 'Stream cancelled: ' . esc_html( $token->get_reason() ) );
 			}
 
 			// Estimate tokens from chunk text (rough: 1 token per 3 chars for mixed CJK/Latin).

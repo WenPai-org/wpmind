@@ -116,6 +116,7 @@ class LlmsTxtGenerator {
 			$this->set_cache( $content );
 		}
 
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Plain-text llms.txt feed; escaping would corrupt the content.
 		echo $content;
 	}
 

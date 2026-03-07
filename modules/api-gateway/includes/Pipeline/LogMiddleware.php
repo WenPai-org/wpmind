@@ -151,7 +151,7 @@ final class LogMiddleware implements GatewayStageInterface {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$query_result = $wpdb->query(
 			$wpdb->prepare(
-				"INSERT INTO {$table}
+				"INSERT INTO %i
 					( key_id, window_month, request_count, input_tokens, output_tokens, total_tokens, total_cost_usd, updated_at )
 				VALUES ( %s, %s, 1, %d, %d, %d, %f, %s )
 				ON DUPLICATE KEY UPDATE
@@ -161,6 +161,7 @@ final class LogMiddleware implements GatewayStageInterface {
 					total_tokens   = total_tokens   + VALUES(total_tokens),
 					total_cost_usd = total_cost_usd + VALUES(total_cost_usd),
 					updated_at     = VALUES(updated_at)",
+				$table,
 				$key_id,
 				$window_month,
 				$input_tokens,

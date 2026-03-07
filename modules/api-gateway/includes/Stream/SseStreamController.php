@@ -213,6 +213,7 @@ final class SseStreamController {
 	 */
 	private function send_sse_event( string $data ): void {
 		$data = str_replace( [ "\r\n", "\r", "\n" ], '', $data );
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Raw SSE stream; data is JSON-encoded upstream and must not be HTML-escaped.
 		echo 'data: ' . $data . "\n\n";
 
 		if ( ob_get_level() ) {

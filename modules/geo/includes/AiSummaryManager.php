@@ -152,7 +152,7 @@ class AiSummaryManager {
 				printf(
 					/* translators: %d: character count */
 					esc_html__( '建议 50-160 字符。当前：%d 字符', 'wpmind' ),
-					mb_strlen( $summary )
+					(int) mb_strlen( $summary )
 				);
 				?>
 			</p>

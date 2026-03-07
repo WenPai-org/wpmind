@@ -82,6 +82,7 @@ class AuditLogRepository {
 		$sql    = "SELECT * FROM %i {$where_sql} ORDER BY created_at DESC LIMIT %d OFFSET %d";
 		$params = array_merge( [ self::table() ], $filter_values, [ $per_page, $offset ] );
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $sql built from build_where_clause() contains only hardcoded columns and %s placeholders.
 		$results = $wpdb->get_results(
 			$wpdb->prepare( $sql, ...$params ),
 			ARRAY_A
@@ -104,6 +105,7 @@ class AuditLogRepository {
 		$sql    = "SELECT COUNT(*) FROM %i {$where_sql}";
 		$params = array_merge( [ self::table() ], $filter_values );
 
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- $sql built from build_where_clause() contains only hardcoded columns and %s placeholders.
 		return (int) $wpdb->get_var( $wpdb->prepare( $sql, ...$params ) );
 	}
 }

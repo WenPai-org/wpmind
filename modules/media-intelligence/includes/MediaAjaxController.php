@@ -52,6 +52,7 @@ final class MediaAjaxController {
 	public function ajax_save_settings(): void {
 		$this->verify_request( true );
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified in verify_request() above.
 		$raw = wp_unslash( $_POST );
 
 		$to_bool = function ( string $key ) use ( $raw ): string {
@@ -127,6 +128,7 @@ final class MediaAjaxController {
 		$batch_size = 5;
 
 		// Get batch of image IDs missing alt text, excluding previously failed ones.
+		// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.LikeWildcardsInQuery -- fixed pattern match, not user-supplied wildcards.
 		$ids = $wpdb->get_col( $wpdb->prepare(
 			"SELECT p.ID FROM {$wpdb->posts} p
 			 WHERE p.post_type = 'attachment'
@@ -205,6 +207,7 @@ final class MediaAjaxController {
 			wp_send_json_error( [ 'message' => 'Vision API not available' ] );
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified in verify_request() above.
 		$attachment_id = (int) ( $_POST['attachment_id'] ?? 0 );
 		if ( $attachment_id <= 0 || ! wp_attachment_is_image( $attachment_id ) ) {
 			wp_send_json_error( [ 'message' => 'Invalid attachment' ] );

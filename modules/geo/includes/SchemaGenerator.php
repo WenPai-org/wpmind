@@ -138,6 +138,7 @@ class SchemaGenerator {
 
 		echo "\n<!-- WPMind Schema.org -->\n";
 		echo '<script type="application/ld+json">' . "\n";
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON-LD schema must be output raw; data is generated internally via wp_json_encode.
 		echo $json . "\n";
 		echo '</script>' . "\n";
 

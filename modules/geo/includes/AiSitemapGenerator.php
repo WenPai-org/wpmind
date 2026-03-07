@@ -87,6 +87,7 @@ class AiSitemapGenerator {
 			$this->set_cache( $content );
 		}
 
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- XML sitemap output; escaping would produce invalid XML.
 		echo $content;
 	}
 

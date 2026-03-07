@@ -67,8 +67,8 @@ abstract class AbstractOpenAiCompatibleProvider extends AbstractApiProvider
         throw new RuntimeException(
             sprintf(
                 'Unsupported model capabilities for %s: %s',
-                $providerMetadata->getName(),
-                implode(', ', $capabilities)
+                esc_html( $providerMetadata->getName() ),
+                esc_html( implode( ', ', $capabilities ) )
             )
         );
     }

@@ -53,6 +53,7 @@ final class CacheAjaxController {
 		$this->verify_request( true );
 
 		// Whitelist fields + boundary validation + wp_unslash.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified in verify_request() above.
 		$raw         = wp_unslash( $_POST );
 		$enabled     = in_array( $raw['enabled'] ?? '', [ '1', '0' ], true ) ? $raw['enabled'] : '1';
 		$default_ttl = max( 0, min( 86400, (int) ( $raw['default_ttl'] ?? 900 ) ) );

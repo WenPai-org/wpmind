@@ -266,7 +266,7 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
             </span>
             <?php if ( $status['state'] === 'open' && $status['recovery_in'] ) : ?>
             <span class="wpmind-status-recovery">
-                <?php printf( esc_html__( '%d分钟后恢复', 'wpmind' ), ceil( $status['recovery_in'] / 60 ) ); ?>
+                <?php printf( esc_html__( '%d分钟后恢复', 'wpmind' ), (int) ceil( $status['recovery_in'] / 60 ) ); ?>
             </span>
             <?php endif; ?>
         </div>
