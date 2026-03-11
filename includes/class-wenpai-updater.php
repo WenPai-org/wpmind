@@ -31,7 +31,7 @@ class WenPai_Updater {
      *
      * @var string
      */
-    const VERSION = '1.1.0';
+    const VERSION = '1.2.0';
 
     /**
      * 云桥 API 地址。
@@ -182,7 +182,7 @@ class WenPai_Updater {
             $info->last_updated  = $response['last_updated'] ?? '';
             $info->icons         = $response['icons'] ?? [];
             $info->banners       = $response['banners'] ?? [];
-            $info->sections      = $response['sections'] ?? [];
+            $info->sections      = array_map( [ $this, 'markdown_to_html' ], $response['sections'] ?? [] );
             $info->external      = true;
 
             return $info;
@@ -262,5 +262,87 @@ class WenPai_Updater {
         }
 
         return $data;
+    }
+
+    /**
+     * 将 Markdown 文本转换为 HTML。
+     *
+     * 仅处理 API 返回的 changelog 中常见的 Markdown 子集：
+     * 标题、列表、加粗、斜体、行内代码、链接。
+     *
+     * @param string $text Markdown 文本。
+     * @return string HTML。
+     */
+    private function markdown_to_html( string $text ): string {
+        if ( empty( $text ) || str_starts_with( trim( $text ), '<' ) ) {
+            return $text;
+        }
+
+        // 去掉 CI 自动生成的冗余标题行（WordPress 弹窗已显示插件名和版本）
+        $text = preg_replace( '/^##\s+\S+\s+v[\d.]+\s*\n+/m', '', $text );
+        $text = preg_replace( '/^###?\s+What\'s Changed\s*\n+/mi', '', $text );
+
+        $lines  = explode( "\n", $text );
+        $html   = '';
+        $in_ul  = false;
+
+        foreach ( $lines as $line ) {
+            $trimmed = trim( $line );
+
+            if ( '' === $trimmed ) {
+                if ( $in_ul ) {
+                    $html .= "</ul>\n";
+                    $in_ul = false;
+                }
+                continue;
+            }
+
+            // 标题 h2-h4
+            if ( preg_match( '/^(#{2,4})\s+(.+)$/', $trimmed, $m ) ) {
+                if ( $in_ul ) {
+                    $html .= "</ul>\n";
+                    $in_ul = false;
+                }
+                $level = strlen( $m[1] );
+                $html .= sprintf( "<h%d>%s</h%d>\n", $level, esc_html( $m[2] ), $level );
+                continue;
+            }
+
+            // 无序列表
+            if ( preg_match( '/^[-*]\s+(.+)$/', $trimmed, $m ) ) {
+                if ( ! $in_ul ) {
+                    $html .= "<ul>\n";
+                    $in_ul = true;
+                }
+                $html .= '<li>' . $this->inline_markdown( $m[1] ) . "</li>\n";
+                continue;
+            }
+
+            // 普通段落
+            if ( $in_ul ) {
+                $html .= "</ul>\n";
+                $in_ul = false;
+            }
+            $html .= '<p>' . $this->inline_markdown( $trimmed ) . "</p>\n";
+        }
+
+        if ( $in_ul ) {
+            $html .= "</ul>\n";
+        }
+
+        return $html;
+    }
+
+    /**
+     * 处理行内 Markdown：加粗、斜体、行内代码、链接。
+     */
+    private function inline_markdown( string $text ): string {
+        $text = esc_html( $text );
+        $text = preg_replace( '/\*\*(.+?)\*\*/', '<strong>$1</strong>', $text );
+        $text = preg_replace( '/\*(.+?)\*/', '<em>$1</em>', $text );
+        $text = preg_replace( '/`(.+?)`/', '<code>$1</code>', $text );
+        $text = preg_replace( '/\[([^\]]+)\]\(([^)]+)\)/', '<a href="$2">$1</a>', $text );
+
+        return $text;
     }
 }
