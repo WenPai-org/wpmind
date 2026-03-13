@@ -66,4 +66,56 @@ class ProviderRegistrar
         $map = apply_filters('wpmind_provider_map', self::PROVIDER_MAP);
         return $map[$providerId] ?? null;
     }
+
+    /**
+     * 获取 WP 7.0 Connectors 注册所需的元数据
+     *
+     * @since 3.8.0
+     * @return array<string, array{name: string, description: string, credentials_url: string}>
+     */
+    public static function getConnectorMeta(): array
+    {
+        return apply_filters('wpmind_connector_meta', [
+            'deepseek'    => [
+                'name'            => 'DeepSeek',
+                'description'     => __('Text generation with DeepSeek models.', 'wpmind'),
+                'credentials_url' => 'https://platform.deepseek.com/api_keys',
+            ],
+            'qwen'        => [
+                'name'            => 'Qwen (通义千问)',
+                'description'     => __('Text generation with Alibaba Qwen models.', 'wpmind'),
+                'credentials_url' => 'https://dashscope.console.aliyun.com/apiKey',
+            ],
+            'zhipu'       => [
+                'name'            => 'Zhipu AI (智谱)',
+                'description'     => __('Text generation with Zhipu GLM models.', 'wpmind'),
+                'credentials_url' => 'https://open.bigmodel.cn/usercenter/apikeys',
+            ],
+            'moonshot'    => [
+                'name'            => 'Moonshot (月之暗面)',
+                'description'     => __('Text generation with Moonshot Kimi models.', 'wpmind'),
+                'credentials_url' => 'https://platform.moonshot.cn/console/api-keys',
+            ],
+            'doubao'      => [
+                'name'            => 'Doubao (豆包)',
+                'description'     => __('Text generation with ByteDance Doubao models.', 'wpmind'),
+                'credentials_url' => 'https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey',
+            ],
+            'siliconflow' => [
+                'name'            => 'SiliconFlow (硅基流动)',
+                'description'     => __('Text generation via SiliconFlow model hub.', 'wpmind'),
+                'credentials_url' => 'https://cloud.siliconflow.cn/account/ak',
+            ],
+            'baidu'       => [
+                'name'            => 'Baidu ERNIE (文心一言)',
+                'description'     => __('Text generation with Baidu ERNIE models.', 'wpmind'),
+                'credentials_url' => 'https://console.bce.baidu.com/qianfan/ais/console/applicationConsole/application',
+            ],
+            'minimax'     => [
+                'name'            => 'MiniMax',
+                'description'     => __('Text generation with MiniMax models.', 'wpmind'),
+                'credentials_url' => 'https://platform.minimaxi.com/user-center/basic-information/interface-key',
+            ],
+        ]);
+    }
 }
