@@ -97,13 +97,16 @@ abstract class AbstractOpenAiCompatibleProvider extends AbstractApiProvider
      */
     protected static function createProviderMetadata(): ProviderMetadata
     {
+        $meta = ProviderRegistrar::getConnectorMeta();
+        $description = $meta[ static::providerId() ]['description'] ?? null;
+
         return new ProviderMetadata(
             static::providerId(),
             static::providerName(),
             ProviderTypeEnum::cloud(),
             static::credentialsUrl(),
             RequestAuthenticationMethod::apiKey(),
-            null,
+            $description,
             static::logoPath()
         );
     }
