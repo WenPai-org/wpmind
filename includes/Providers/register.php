@@ -10,8 +10,6 @@ declare(strict_types=1);
 
 namespace WPMind\Providers;
 
-use WordPress\AI_Client\HTTP\WP_AI_Client_Discovery_Strategy;
-
 // 防止直接访问
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -48,16 +46,21 @@ function register_wpmind_providers(): void {
         return;
     }
 
-    // 检查 HTTP 发现策略类是否可用
-    if ( ! class_exists( 'WordPress\\AI_Client\\HTTP\\WP_AI_Client_Discovery_Strategy' ) ) {
-        debug_log( 'WP_AI_Client_Discovery_Strategy not found' );
+    // 检查 HTTP 发现策略是否可用（WP 7.0 核心 或 旧 AI 插件）
+    $has_core_strategy  = class_exists( 'WP_AI_Client_Discovery_Strategy' );
+    $has_plugin_strategy = class_exists( 'WordPress\\AI_Client\\HTTP\\WP_AI_Client_Discovery_Strategy' );
+
+    if ( ! $has_core_strategy && ! $has_plugin_strategy ) {
+        debug_log( 'WP_AI_Client_Discovery_Strategy not found (neither core nor plugin)' );
         return;
     }
 
     $registered = true;
 
-    // 先初始化 HTTP 客户端发现策略
-    WP_AI_Client_Discovery_Strategy::init();
+    // WP 7.0 核心已在 wp-settings.php 调用 init()，仅旧 AI 插件需要手动初始化
+    if ( ! $has_core_strategy && $has_plugin_strategy ) {
+        \WordPress\AI_Client\HTTP\WP_AI_Client_Discovery_Strategy::init();
+    }
 
     $plugin = \WPMind\wpmind();
     $endpoints = $plugin->get_custom_endpoints();
@@ -143,3 +146,66 @@ function pre_option_credentials( $pre_option ) {
 }
 
 add_filter( 'pre_option_wp_ai_client_provider_credentials', __NAMESPACE__ . '\\pre_option_credentials', 1 );
+
+/**
+ * 在 WP 7.0+ Connectors 系统中注册 WPMind 的国产 AI Providers
+ *
+ * @since 3.8.0
+ */
+function register_wpmind_connectors( \WP_Connector_Registry $registry ): void {
+    if ( ! function_exists( 'WPMind\\wpmind' ) ) {
+        return;
+    }
+
+    $plugin    = \WPMind\wpmind();
+    $endpoints = $plugin->get_custom_endpoints();
+    $meta      = ProviderRegistrar::getConnectorMeta();
+
+    foreach ( $meta as $provider_id => $connector_data ) {
+        // 仅注册已启用的 provider
+        if ( empty( $endpoints[ $provider_id ]['enabled'] ) ) {
+            continue;
+        }
+
+        // 跳过已被核心或其他插件注册的 connector
+        if ( $registry->is_registered( $provider_id ) ) {
+            debug_log( "Connector '{$provider_id}' already registered, skipping" );
+            continue;
+        }
+
+        $setting_name = 'connectors_ai_' . $provider_id . '_api_key';
+
+        // 解析 logo URL
+        $logo_path = WPMIND_PLUGIN_DIR . 'assets/images/providers/' . $provider_id . '.svg';
+        $logo_url  = file_exists( $logo_path )
+            ? WPMIND_PLUGIN_URL . 'assets/images/providers/' . $provider_id . '.svg'
+            : null;
+
+        $registry->register( $provider_id, [
+            'name'           => $connector_data['name'],
+            'description'    => $connector_data['description'],
+            'type'           => 'ai_provider',
+            'logo_url'       => $logo_url,
+            'authentication' => [
+                'method'          => 'api_key',
+                'credentials_url' => $connector_data['credentials_url'] ?? '',
+                'setting_name'    => $setting_name,
+            ],
+        ] );
+
+        // 将 WPMind 管理的 API key 同步到 connector 的 option
+        if ( ! empty( $endpoints[ $provider_id ]['api_key'] ) ) {
+            $existing = get_option( $setting_name, '' );
+            if ( '' === $existing ) {
+                update_option( $setting_name, $endpoints[ $provider_id ]['api_key'] );
+            }
+        }
+    }
+
+    debug_log( 'WPMind connectors registered for WP 7.0+' );
+}
+
+// WP 7.0+ Connectors API — _wp_connectors_init 在 init:15 触发
+if ( class_exists( 'WP_Connector_Registry' ) ) {
+    add_action( 'wp_connectors_init', __NAMESPACE__ . '\\register_wpmind_connectors' );
+}

@@ -16,6 +16,7 @@ use WordPress\AiClient\Providers\Contracts\ModelMetadataDirectoryInterface;
 use WordPress\AiClient\Providers\Contracts\ProviderAvailabilityInterface;
 use WordPress\AiClient\Providers\DTO\ProviderMetadata;
 use WordPress\AiClient\Providers\Enums\ProviderTypeEnum;
+use WordPress\AiClient\Providers\Http\Enums\RequestAuthenticationMethod;
 use WordPress\AiClient\Providers\Models\Contracts\ModelInterface;
 use WordPress\AiClient\Providers\Models\DTO\ModelMetadata;
 
@@ -67,8 +68,8 @@ abstract class AbstractOpenAiCompatibleProvider extends AbstractApiProvider
         throw new RuntimeException(
             sprintf(
                 'Unsupported model capabilities for %s: %s',
-                esc_html( $providerMetadata->getName() ),
-                esc_html( implode( ', ', $capabilities ) )
+                $providerMetadata->getName(),
+                implode(', ', $capabilities)
             )
         );
     }
@@ -81,6 +82,17 @@ abstract class AbstractOpenAiCompatibleProvider extends AbstractApiProvider
     abstract protected static function textGenerationModelClass(): string;
 
     /**
+     * 获取 Provider Logo 文件路径
+     *
+     * @return string|null
+     */
+    protected static function logoPath(): ?string
+    {
+        $path = WPMIND_PLUGIN_DIR . 'assets/images/providers/' . static::providerId() . '.svg';
+        return file_exists( $path ) ? $path : null;
+    }
+
+    /**
      * {@inheritDoc}
      */
     protected static function createProviderMetadata(): ProviderMetadata
@@ -89,7 +101,10 @@ abstract class AbstractOpenAiCompatibleProvider extends AbstractApiProvider
             static::providerId(),
             static::providerName(),
             ProviderTypeEnum::cloud(),
-            static::credentialsUrl()
+            static::credentialsUrl(),
+            RequestAuthenticationMethod::apiKey(),
+            null,
+            static::logoPath()
         );
     }
 
