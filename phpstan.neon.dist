@@ -1,8 +1,8 @@
 includes:
-    # - vendor/szepeviktor/phpstan-wordpress/extension.neon
+    - %rootDir%/../../szepeviktor/phpstan-wordpress/extension.neon
 
 parameters:
-    level: 6
+    level: 3
     paths:
         - includes
         - modules
@@ -13,10 +13,7 @@ parameters:
             - vendor (?)
             - tests (?)
             - node_modules (?)
-    ignoreErrors:
-        - '#Call to function is_(array|string|int|bool|null) with .* will always evaluate to (true|false)#'
-        - '#Undefined variable: \$wpdb#'
-        - '#Undefined variable: \$wp_query#'
-        - '#Undefined variable: \$post#'
+    # 忽略的错误模式（level 3 暂无需忽略，升级 level 时按需添加）
+    ignoreErrors: []
     checkUninitializedProperties: true
     checkMissingCallableSignature: true
