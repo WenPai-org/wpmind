@@ -12,10 +12,10 @@
 defined( 'ABSPATH' ) || exit;
 
 // 获取预算设置
-$budget_manager = \WPMind\Modules\CostControl\BudgetManager::instance();
+$budget_manager  = \WPMind\Modules\CostControl\BudgetManager::instance();
 $budget_settings = $budget_manager->get_settings();
-$budget_checker = \WPMind\Modules\CostControl\BudgetChecker::instance();
-$budget_summary = $budget_checker->get_summary();
+$budget_checker  = \WPMind\Modules\CostControl\BudgetChecker::instance();
+$budget_summary  = $budget_checker->get_summary();
 ?>
 
 <div class="wpmind-budget-panel">
@@ -56,8 +56,8 @@ $budget_summary = $budget_checker->get_summary();
 						<div class="wpmind-budget-input-group">
 							<span class="wpmind-budget-currency">$</span>
 							<input type="number" id="budget_daily_usd" name="daily_limit_usd"
-								   value="<?php echo esc_attr( $budget_settings['global']['daily_limit_usd'] ?? 0 ); ?>"
-								   min="0" step="0.01" class="small-text">
+									value="<?php echo esc_attr( $budget_settings['global']['daily_limit_usd'] ?? 0 ); ?>"
+									min="0" step="0.01" class="small-text">
 						</div>
 					</div>
 					<div class="wpmind-budget-field">
@@ -65,8 +65,8 @@ $budget_summary = $budget_checker->get_summary();
 						<div class="wpmind-budget-input-group">
 							<span class="wpmind-budget-currency">$</span>
 							<input type="number" id="budget_monthly_usd" name="monthly_limit_usd"
-								   value="<?php echo esc_attr( $budget_settings['global']['monthly_limit_usd'] ?? 0 ); ?>"
-								   min="0" step="0.01" class="small-text">
+									value="<?php echo esc_attr( $budget_settings['global']['monthly_limit_usd'] ?? 0 ); ?>"
+									min="0" step="0.01" class="small-text">
 						</div>
 					</div>
 					<div class="wpmind-budget-field">
@@ -74,8 +74,8 @@ $budget_summary = $budget_checker->get_summary();
 						<div class="wpmind-budget-input-group">
 							<span class="wpmind-budget-currency">¥</span>
 							<input type="number" id="budget_daily_cny" name="daily_limit_cny"
-								   value="<?php echo esc_attr( $budget_settings['global']['daily_limit_cny'] ?? 0 ); ?>"
-								   min="0" step="0.01" class="small-text">
+									value="<?php echo esc_attr( $budget_settings['global']['daily_limit_cny'] ?? 0 ); ?>"
+									min="0" step="0.01" class="small-text">
 						</div>
 					</div>
 					<div class="wpmind-budget-field">
@@ -83,8 +83,8 @@ $budget_summary = $budget_checker->get_summary();
 						<div class="wpmind-budget-input-group">
 							<span class="wpmind-budget-currency">¥</span>
 							<input type="number" id="budget_monthly_cny" name="monthly_limit_cny"
-								   value="<?php echo esc_attr( $budget_settings['global']['monthly_limit_cny'] ?? 0 ); ?>"
-								   min="0" step="0.01" class="small-text">
+									value="<?php echo esc_attr( $budget_settings['global']['monthly_limit_cny'] ?? 0 ); ?>"
+									min="0" step="0.01" class="small-text">
 						</div>
 					</div>
 				</div>
@@ -102,8 +102,8 @@ $budget_summary = $budget_checker->get_summary();
 						<label for="budget_alert_threshold"><?php esc_html_e( '告警阈值', 'wpmind' ); ?></label>
 						<div class="wpmind-budget-input-group">
 							<input type="number" id="budget_alert_threshold" name="alert_threshold"
-								   value="<?php echo esc_attr( $budget_settings['global']['alert_threshold'] ); ?>"
-								   min="1" max="100" step="1" class="small-text">
+									value="<?php echo esc_attr( $budget_settings['global']['alert_threshold'] ); ?>"
+									min="1" max="100" step="1" class="small-text">
 							<span class="wpmind-budget-suffix">%</span>
 						</div>
 						<p class="description"><?php esc_html_e( '当费用达到限额的此百分比时发送告警', 'wpmind' ); ?></p>
@@ -138,9 +138,9 @@ $budget_summary = $budget_checker->get_summary();
 					</label>
 					<div class="wpmind-budget-email-field" style="<?php echo $budget_settings['notifications']['email_alert'] ? '' : 'display:none;'; ?>">
 						<input type="email" name="email_address"
-							   value="<?php echo esc_attr( $budget_settings['notifications']['email_address'] ); ?>"
-							   placeholder="<?php esc_attr_e( '告警邮箱地址', 'wpmind' ); ?>"
-							   class="regular-text">
+								value="<?php echo esc_attr( $budget_settings['notifications']['email_address'] ); ?>"
+								placeholder="<?php esc_attr_e( '告警邮箱地址', 'wpmind' ); ?>"
+								class="regular-text">
 					</div>
 				</div>
 			</div>

@@ -194,9 +194,9 @@ class ApiGatewayModule implements ModuleInterface {
 	 * SSE streams exit() before pipeline finalization, so this
 	 * hook ensures audit logs and usage counters are still updated.
 	 *
-	 * @param string                              $request_id Request ID.
-	 * @param string                              $key_id     API key ID.
-	 * @param Stream\StreamResult                 $result     Stream result.
+	 * @param string              $request_id Request ID.
+	 * @param string              $key_id     API key ID.
+	 * @param Stream\StreamResult $result     Stream result.
 	 */
 	public function log_sse_completion( string $request_id, string $key_id, Stream\StreamResult $result ): void {
 		global $wpdb;
@@ -212,11 +212,13 @@ class ApiGatewayModule implements ModuleInterface {
 				'request_id'    => $request_id,
 				'ip_hash'       => hash( 'sha256', sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ?? '' ) ) ),
 				'user_agent'    => sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ?? '' ) ),
-				'detail_json'   => wp_json_encode( [
-					'tokens_used'   => $result->tokens_used,
-					'finish_reason' => $result->finish_reason,
-					'stream'        => true,
-				] ),
+				'detail_json'   => wp_json_encode(
+					[
+						'tokens_used'   => $result->tokens_used,
+						'finish_reason' => $result->finish_reason,
+						'stream'        => true,
+					]
+				),
 				'created_at'    => current_time( 'mysql', true ),
 			],
 			[ '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s' ]
@@ -228,23 +230,25 @@ class ApiGatewayModule implements ModuleInterface {
 		$now          = current_time( 'mysql', true );
 		$tokens       = $result->tokens_used;
 
-		$wpdb->query( $wpdb->prepare(
-			"INSERT INTO %i (key_id, window_month, request_count, input_tokens, output_tokens, total_tokens, total_cost_usd, updated_at)
+		$wpdb->query(
+			$wpdb->prepare(
+				'INSERT INTO %i (key_id, window_month, request_count, input_tokens, output_tokens, total_tokens, total_cost_usd, updated_at)
 			VALUES (%s, %s, 1, 0, %d, %d, 0, %s)
 			ON DUPLICATE KEY UPDATE
 				request_count = request_count + 1,
 				output_tokens = output_tokens + %d,
 				total_tokens = total_tokens + %d,
-				updated_at = %s",
-			$usage_table,
-			$key_id,
-			$window_month,
-			$tokens,
-			$tokens,
-			$now,
-			$tokens,
-			$tokens,
-			$now
-		) );
+				updated_at = %s',
+				$usage_table,
+				$key_id,
+				$window_month,
+				$tokens,
+				$tokens,
+				$now,
+				$tokens,
+				$tokens,
+				$now
+			)
+		);
 	}
 }

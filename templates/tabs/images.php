@@ -12,12 +12,12 @@
 defined( 'ABSPATH' ) || exit;
 
 // 获取已保存的配置
-$image_endpoints  = get_option( 'wpmind_image_endpoints', [] );
+$image_endpoints        = get_option( 'wpmind_image_endpoints', [] );
 $default_image_provider = get_option( 'wpmind_default_image_provider', '' );
 
 // 图像生成服务商定义（已通过 Gemini CLI 核实 2026-02-01）
 $available_providers = [
-	'openai_gpt_image' => [
+	'openai_gpt_image'    => [
 		'name'         => 'DALL-E 3 / GPT-Image',
 		'display_name' => 'openai-image',
 		'description'  => 'OpenAI 图像生成，综合最均衡、文字渲染极强',
@@ -31,21 +31,21 @@ $available_providers = [
 		'base_url'     => 'https://generativelanguage.googleapis.com/v1beta/',
 		'models'       => [ 'imagen-3.0-generate-001' ],
 	],
-	'tencent_hunyuan' => [
+	'tencent_hunyuan'     => [
 		'name'         => '混元图像',
 		'display_name' => 'hunyuan-image',
 		'description'  => '腾讯混元，中文理解 & 文字渲染顶级（需 SDK 签名）',
 		'base_url'     => 'https://hunyuan.tencentcloudapi.com/',
 		'models'       => [ 'hunyuan-image-v3' ],
 	],
-	'bytedance_doubao' => [
+	'bytedance_doubao'    => [
 		'name'         => 'Doubao Image / Seedream',
 		'display_name' => 'doubao-image',
 		'description'  => '火山引擎图像生成，性价比高、中文文化理解强',
 		'base_url'     => 'https://ark.cn-beijing.volces.com/api/v3/',
 		'models'       => [ 'doubao-image-v1', 'seedream-4.5' ],
 	],
-	'flux' => [
+	'flux'                => [
 		'name'         => 'Flux (Fal.ai)',
 		'display_name' => 'flux',
 		'description'  => 'Black Forest Labs 开源天花板，手部/文字/遵循最强',
@@ -53,7 +53,7 @@ $available_providers = [
 		'models'       => [ 'flux/dev', 'flux/schnell', 'flux-pro-1.1' ],
 	],
 
-	'qwen_image' => [
+	'qwen_image'          => [
 		'name'         => '通义万相',
 		'display_name' => 'wanx',
 		'description'  => '阿里云通义万相，真实感极强，几乎无AI味',
@@ -64,13 +64,31 @@ $available_providers = [
 
 // 图标映射（单色风格，与文本服务一致）
 $provider_icons = [
-	'openai_gpt_image'    => [ 'icon' => 'ri-openai-line', 'color' => '#50575e' ],
-	'google_gemini_image' => [ 'icon' => 'ri-gemini-line', 'color' => '#50575e' ],
-	'tencent_hunyuan'     => [ 'icon' => 'ri-cloud-line', 'color' => '#50575e' ],
-	'bytedance_doubao'    => [ 'icon' => 'ri-fire-line', 'color' => '#50575e' ],
-	'flux'                => [ 'icon' => 'ri-sparkling-2-line', 'color' => '#50575e' ],
+	'openai_gpt_image'    => [
+		'icon'  => 'ri-openai-line',
+		'color' => '#50575e',
+	],
+	'google_gemini_image' => [
+		'icon'  => 'ri-gemini-line',
+		'color' => '#50575e',
+	],
+	'tencent_hunyuan'     => [
+		'icon'  => 'ri-cloud-line',
+		'color' => '#50575e',
+	],
+	'bytedance_doubao'    => [
+		'icon'  => 'ri-fire-line',
+		'color' => '#50575e',
+	],
+	'flux'                => [
+		'icon'  => 'ri-sparkling-2-line',
+		'color' => '#50575e',
+	],
 
-	'qwen_image'          => [ 'icon' => 'ri-rainbow-line', 'color' => '#50575e' ],
+	'qwen_image'          => [
+		'icon'  => 'ri-rainbow-line',
+		'color' => '#50575e',
+	],
 ];
 
 /**
@@ -134,13 +152,14 @@ function wpmind_image_has_api_key( $key, $endpoints ) {
 	</p>
 
 	<div class="wpmind-endpoints-grid">
-		<?php foreach ( $available_providers as $key => $provider ) :
+		<?php
+		foreach ( $available_providers as $key => $provider ) :
 			$saved_config = $image_endpoints[ $key ] ?? [];
 			$is_enabled   = ! empty( $saved_config['enabled'] );
 			$has_api_key  = wpmind_image_has_api_key( $key, $image_endpoints );
 			$icon_class   = $provider_icons[ $key ]['icon'] ?? 'ri-image-line';
 			$icon_color   = $provider_icons[ $key ]['color'] ?? '#6b7280';
-		?>
+			?>
 		<div class="wpmind-endpoint-card<?php echo ( $is_enabled && $has_api_key ) ? '' : ' is-collapsed'; ?>" id="image-endpoint-<?php echo esc_attr( $key ); ?>">
 			<div class="wpmind-endpoint-header">
 				<button type="button" class="wpmind-endpoint-toggle" aria-expanded="<?php echo ( $is_enabled && $has_api_key ) ? 'true' : 'false'; ?>">
@@ -165,9 +184,9 @@ function wpmind_image_has_api_key( $key, $endpoints ) {
 					<td>
 						<label class="wpmind-toggle">
 							<input type="checkbox"
-								   name="wpmind_image_endpoints[<?php echo esc_attr( $key ); ?>][enabled]"
-								   value="1"
-								   <?php checked( $is_enabled ); ?>>
+									name="wpmind_image_endpoints[<?php echo esc_attr( $key ); ?>][enabled]"
+									value="1"
+									<?php checked( $is_enabled ); ?>>
 							<span class="wpmind-toggle-slider"></span>
 							<span class="wpmind-toggle-label">
 								<?php esc_html_e( '启用此服务', 'wpmind' ); ?>
@@ -185,12 +204,12 @@ function wpmind_image_has_api_key( $key, $endpoints ) {
 					<td>
 						<div class="wpmind-api-key-field">
 							<input type="password"
-								   id="image_api_key_<?php echo esc_attr( $key ); ?>"
-								   name="wpmind_image_endpoints[<?php echo esc_attr( $key ); ?>][api_key]"
-								   value=""
-								   class="regular-text"
-								   autocomplete="new-password"
-								   placeholder="<?php echo $has_api_key ? '••••••••••••••••' : esc_attr__( '请输入 API Key', 'wpmind' ); ?>">
+									id="image_api_key_<?php echo esc_attr( $key ); ?>"
+									name="wpmind_image_endpoints[<?php echo esc_attr( $key ); ?>][api_key]"
+									value=""
+									class="regular-text"
+									autocomplete="new-password"
+									placeholder="<?php echo $has_api_key ? '••••••••••••••••' : esc_attr__( '请输入 API Key', 'wpmind' ); ?>">
 							<button type="button"
 									class="button wpmind-toggle-key"
 									data-target="image_api_key_<?php echo esc_attr( $key ); ?>"
@@ -201,9 +220,9 @@ function wpmind_image_has_api_key( $key, $endpoints ) {
 						<?php if ( $has_api_key ) : ?>
 						<label class="wpmind-clear-key">
 							<input type="checkbox"
-								   name="wpmind_image_endpoints[<?php echo esc_attr( $key ); ?>][clear_api_key]"
-								   value="1"
-								   class="wpmind-clear-checkbox">
+									name="wpmind_image_endpoints[<?php echo esc_attr( $key ); ?>][clear_api_key]"
+									value="1"
+									class="wpmind-clear-checkbox">
 							<?php esc_html_e( '清除 API Key', 'wpmind' ); ?>
 						</label>
 						<?php endif; ?>
@@ -241,11 +260,11 @@ function wpmind_image_has_api_key( $key, $endpoints ) {
 					</th>
 					<td>
 						<input type="url"
-							   id="image_base_url_<?php echo esc_attr( $key ); ?>"
-							   name="wpmind_image_endpoints[<?php echo esc_attr( $key ); ?>][custom_base_url]"
-							   value="<?php echo esc_attr( $saved_config['custom_base_url'] ?? '' ); ?>"
-							   class="regular-text"
-							   placeholder="<?php echo esc_attr( $provider['base_url'] ); ?>">
+								id="image_base_url_<?php echo esc_attr( $key ); ?>"
+								name="wpmind_image_endpoints[<?php echo esc_attr( $key ); ?>][custom_base_url]"
+								value="<?php echo esc_attr( $saved_config['custom_base_url'] ?? '' ); ?>"
+								class="regular-text"
+								placeholder="<?php echo esc_attr( $provider['base_url'] ); ?>">
 					</td>
 				</tr>
 				<tr>

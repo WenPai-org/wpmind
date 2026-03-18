@@ -17,13 +17,12 @@ use WPMind\Providers\AbstractOpenAiCompatibleTextGenerationModel;
  *
  * @since 1.4.0
  */
-class BaiduTextGenerationModel extends AbstractOpenAiCompatibleTextGenerationModel
-{
-    /**
-     * {@inheritDoc}
-     */
-    protected static function providerClass(): string
-    {
-        return BaiduProvider::class;
-    }
+class BaiduTextGenerationModel extends AbstractOpenAiCompatibleTextGenerationModel {
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected static function providerClass(): string {
+		return BaiduProvider::class;
+	}
 }

@@ -111,8 +111,8 @@ class MarkdownFeed {
 			$post_id = url_to_postid( home_url( $clean_uri ) );
 
 			if ( $post_id ) {
-				$query_vars['p']                = $post_id;
-				$query_vars['wpmind_markdown']  = 1;
+				$query_vars['p']               = $post_id;
+				$query_vars['wpmind_markdown'] = 1;
 				// Clear other query vars that might conflict.
 				unset( $query_vars['error'], $query_vars['name'], $query_vars['category_name'] );
 			}
@@ -185,7 +185,7 @@ class MarkdownFeed {
 		// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- Markdown feed served as text/markdown; HTML escaping would corrupt output.
 		echo "# {$site_name} - Markdown Feed\n\n";
 		echo "来源: {$site_url}\n";
-		echo "生成时间: " . gmdate( 'Y-m-d H:i:s' ) . " UTC\n\n";
+		echo '生成时间: ' . gmdate( 'Y-m-d H:i:s' ) . " UTC\n\n";
 		echo "---\n\n";
 
 		// Render each post.

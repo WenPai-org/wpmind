@@ -147,31 +147,37 @@ final class RouteMiddleware implements GatewayStageInterface {
 		$model_id = $context->rest_request()->get_param( 'model_id' );
 
 		if ( $model_id === null || $model_id === '' ) {
-			$context->set_error( new \WP_Error(
-				'model_not_found',
-				'Model ID is required.',
-				[ 'status' => 400 ]
-			) );
+			$context->set_error(
+				new \WP_Error(
+					'model_not_found',
+					'Model ID is required.',
+					[ 'status' => 400 ]
+				)
+			);
 			return;
 		}
 
 		$resolved = ModelMapper::resolve( (string) $model_id );
 
 		if ( $resolved === null ) {
-			$context->set_error( new \WP_Error(
-				'model_not_found',
-				sprintf( 'Model "%s" is not available.', sanitize_text_field( (string) $model_id ) ),
-				[ 'status' => 404 ]
-			) );
+			$context->set_error(
+				new \WP_Error(
+					'model_not_found',
+					sprintf( 'Model "%s" is not available.', sanitize_text_field( (string) $model_id ) ),
+					[ 'status' => 404 ]
+				)
+			);
 			return;
 		}
 
-		$context->set_internal_result( [
-			'id'       => (string) $model_id,
-			'object'   => 'model',
-			'created'  => 0,
-			'owned_by' => 'wpmind',
-		] );
+		$context->set_internal_result(
+			[
+				'id'       => (string) $model_id,
+				'object'   => 'model',
+				'created'  => 0,
+				'owned_by' => 'wpmind',
+			]
+		);
 	}
 
 	/**
@@ -182,18 +188,20 @@ final class RouteMiddleware implements GatewayStageInterface {
 	 * @param GatewayRequestContext $context Pipeline context.
 	 */
 	private function handle_status( GatewayRequestContext $context ): void {
-		$context->set_internal_result( [
-			'status'         => 'ok',
-			'version'        => '1.0.0',
-			'endpoints'      => [
-				'/mind/v1/chat/completions',
-				'/mind/v1/embeddings',
-				'/mind/v1/responses',
-				'/mind/v1/models',
-				'/mind/v1/models/{model_id}',
-				'/mind/v1/status',
-			],
-			'schema_version' => SchemaManager::get_schema_version(),
-		] );
+		$context->set_internal_result(
+			[
+				'status'         => 'ok',
+				'version'        => '1.0.0',
+				'endpoints'      => [
+					'/mind/v1/chat/completions',
+					'/mind/v1/embeddings',
+					'/mind/v1/responses',
+					'/mind/v1/models',
+					'/mind/v1/models/{model_id}',
+					'/mind/v1/status',
+				],
+				'schema_version' => SchemaManager::get_schema_version(),
+			]
+		);
 	}
 }

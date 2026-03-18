@@ -29,11 +29,11 @@ abstract class AbstractService {
 	 * @param string $context  上下文
 	 * @return string
 	 */
-	protected function resolve_provider(string $provider, string $context = ''): string {
-		if ($provider === 'auto') {
-			$provider = get_option('wpmind_default_provider', 'openai');
+	protected function resolve_provider( string $provider, string $context = '' ): string {
+		if ( $provider === 'auto' ) {
+			$provider = get_option( 'wpmind_default_provider', 'openai' );
 		}
-		return apply_filters('wpmind_select_provider', $provider, $context);
+		return apply_filters( 'wpmind_select_provider', $provider, $context );
 	}
 
 	/**
@@ -42,13 +42,13 @@ abstract class AbstractService {
 	 * @param string $provider 首选 provider
 	 * @return array
 	 */
-	protected function get_failover_chain(string $provider): array {
-		if (!class_exists('\\WPMind\\Failover\\FailoverManager')) {
-			return [$provider];
+	protected function get_failover_chain( string $provider ): array {
+		if ( ! class_exists( '\\WPMind\\Failover\\FailoverManager' ) ) {
+			return [ $provider ];
 		}
 
 		$failover = \WPMind\Failover\FailoverManager::instance();
-		return $failover->get_failover_chain($provider);
+		return $failover->get_failover_chain( $provider );
 	}
 
 	/**
@@ -57,7 +57,7 @@ abstract class AbstractService {
 	 * @return array
 	 */
 	protected function get_endpoints(): array {
-		if (!class_exists('\\WPMind\\WPMind')) {
+		if ( ! class_exists( '\\WPMind\\WPMind' ) ) {
 			return [];
 		}
 		return \WPMind\WPMind::instance()->get_custom_endpoints();
@@ -70,9 +70,9 @@ abstract class AbstractService {
 	 * @param bool   $success    是否成功
 	 * @param int    $latency_ms 延迟毫秒
 	 */
-	protected function record_result(string $provider, bool $success, int $latency_ms = 0): void {
-		if (class_exists('\\WPMind\\Failover\\FailoverManager')) {
-			\WPMind\Failover\FailoverManager::instance()->record_result($provider, $success, $latency_ms);
+	protected function record_result( string $provider, bool $success, int $latency_ms = 0 ): void {
+		if ( class_exists( '\\WPMind\\Failover\\FailoverManager' ) ) {
+			\WPMind\Failover\FailoverManager::instance()->record_result( $provider, $success, $latency_ms );
 		}
 	}
 
@@ -96,56 +96,65 @@ abstract class AbstractService {
 		callable $execute_fn,
 		array $supported_providers = []
 	) {
-		$failover_chain = $this->get_failover_chain($provider);
+		$failover_chain = $this->get_failover_chain( $provider );
 
 		// 过滤出支持的 provider
-		if (!empty($supported_providers)) {
-			$failover_chain = array_values(array_filter($failover_chain, function ($p) use ($supported_providers) {
-				return in_array($p, $supported_providers, true);
-			}));
+		if ( ! empty( $supported_providers ) ) {
+			$failover_chain = array_values(
+				array_filter(
+					$failover_chain,
+					function ( $p ) use ( $supported_providers ) {
+						return in_array( $p, $supported_providers, true );
+					}
+				)
+			);
 
-			if (empty($failover_chain)) {
+			if ( empty( $failover_chain ) ) {
 				return new WP_Error(
 					"wpmind_{$type}_not_supported",
-					sprintf(__('没有可用的 %s 服务商', 'wpmind'), $type)
+					sprintf( __( '没有可用的 %s 服务商', 'wpmind' ), $type )
 				);
 			}
 		}
 
-		$endpoints = $this->get_endpoints();
+		$endpoints  = $this->get_endpoints();
 		$last_error = null;
 
-		foreach ($failover_chain as $try_provider) {
-			if (!isset($endpoints[$try_provider])) {
-				$last_error = new WP_Error('wpmind_provider_not_found',
-					sprintf(__('服务商 %s 未配置', 'wpmind'), $try_provider));
+		foreach ( $failover_chain as $try_provider ) {
+			if ( ! isset( $endpoints[ $try_provider ] ) ) {
+				$last_error = new WP_Error(
+					'wpmind_provider_not_found',
+					sprintf( __( '服务商 %s 未配置', 'wpmind' ), $try_provider )
+				);
 				continue;
 			}
 
-			$endpoint = $endpoints[$try_provider];
-			$api_key = $endpoint['api_key'] ?? '';
+			$endpoint = $endpoints[ $try_provider ];
+			$api_key  = $endpoint['api_key'] ?? '';
 
-			if (empty($api_key)) {
-				$last_error = new WP_Error('wpmind_api_key_missing',
-					sprintf(__('服务商 %s 未配置 API Key', 'wpmind'), $try_provider));
+			if ( empty( $api_key ) ) {
+				$last_error = new WP_Error(
+					'wpmind_api_key_missing',
+					sprintf( __( '服务商 %s 未配置 API Key', 'wpmind' ), $try_provider )
+				);
 				continue;
 			}
 
-			$result = $execute_fn($try_provider, $endpoint);
+			$result = $execute_fn( $try_provider, $endpoint );
 
-			if (!is_wp_error($result)) {
+			if ( ! is_wp_error( $result ) ) {
 				return $result;
 			}
 
 			$last_error = $result;
 		}
 
-		if ($last_error) {
-			do_action('wpmind_error', $last_error, $type, []);
+		if ( $last_error ) {
+			do_action( 'wpmind_error', $last_error, $type, [] );
 			return $last_error;
 		}
 
-		return new WP_Error("wpmind_{$type}_failed", sprintf(__('%s 请求失败', 'wpmind'), $type));
+		return new WP_Error( "wpmind_{$type}_failed", sprintf( __( '%s 请求失败', 'wpmind' ), $type ) );
 	}
 
 	/**
@@ -154,15 +163,15 @@ abstract class AbstractService {
 	 * @param string $provider 服务商
 	 * @return string
 	 */
-	protected function get_current_model(string $provider): string {
-		if (!class_exists('\\WPMind\\WPMind')) {
+	protected function get_current_model( string $provider ): string {
+		if ( ! class_exists( '\\WPMind\\WPMind' ) ) {
 			return 'default';
 		}
 
 		$endpoints = $this->get_endpoints();
 
-		if (isset($endpoints[$provider]['models']) && is_array($endpoints[$provider]['models'])) {
-			return $endpoints[$provider]['models'][0] ?? 'default';
+		if ( isset( $endpoints[ $provider ]['models'] ) && is_array( $endpoints[ $provider ]['models'] ) ) {
+			return $endpoints[ $provider ]['models'][0] ?? 'default';
 		}
 
 		return 'default';
@@ -174,8 +183,8 @@ abstract class AbstractService {
 	 * @return string
 	 */
 	protected function get_default_model(): string {
-		$provider = get_option('wpmind_default_provider', 'openai');
-		return $this->get_current_model($provider);
+		$provider = get_option( 'wpmind_default_provider', 'openai' );
+		return $this->get_current_model( $provider );
 	}
 
 	/**
@@ -187,14 +196,14 @@ abstract class AbstractService {
 	 * @param string $model    模型
 	 * @return string
 	 */
-	protected function generate_cache_key(string $type, array $args, string $provider = '', string $model = ''): string {
-		if (class_exists('\WPMind\Cache\ExactCache')) {
-			$key = \WPMind\Cache\ExactCache::instance()->build_key($type, $args, $provider, $model);
+	protected function generate_cache_key( string $type, array $args, string $provider = '', string $model = '' ): string {
+		if ( class_exists( '\WPMind\Cache\ExactCache' ) ) {
+			$key = \WPMind\Cache\ExactCache::instance()->build_key( $type, $args, $provider, $model );
 		} else {
-			$key = 'wpmind_' . $type . '_' . $provider . '_' . $model . '_' . md5(serialize($args));
+			$key = 'wpmind_' . $type . '_' . $provider . '_' . $model . '_' . md5( serialize( $args ) );
 		}
 
-		return apply_filters('wpmind_cache_key', $key, $type, $args);
+		return apply_filters( 'wpmind_cache_key', $key, $type, $args );
 	}
 
 	/**
@@ -204,27 +213,42 @@ abstract class AbstractService {
 	 * @param int    $cache_ttl TTL 秒数
 	 * @return array{hit:bool,value:mixed}
 	 */
-	protected function get_cached_value(string $cache_key, int $cache_ttl): array {
-		$effective_ttl = $this->get_effective_cache_ttl($cache_ttl);
-		if ($effective_ttl <= 0) {
-			return ['hit' => false, 'value' => null];
+	protected function get_cached_value( string $cache_key, int $cache_ttl ): array {
+		$effective_ttl = $this->get_effective_cache_ttl( $cache_ttl );
+		if ( $effective_ttl <= 0 ) {
+			return [
+				'hit'   => false,
+				'value' => null,
+			];
 		}
 
-		if (class_exists('\WPMind\Cache\ExactCache')) {
-			$cached = \WPMind\Cache\ExactCache::instance()->get($cache_key);
-			if ($cached !== null) {
-				return ['hit' => true, 'value' => $cached];
+		if ( class_exists( '\WPMind\Cache\ExactCache' ) ) {
+			$cached = \WPMind\Cache\ExactCache::instance()->get( $cache_key );
+			if ( $cached !== null ) {
+				return [
+					'hit'   => true,
+					'value' => $cached,
+				];
 			}
 
-			return ['hit' => false, 'value' => null];
+			return [
+				'hit'   => false,
+				'value' => null,
+			];
 		}
 
-		$cached = get_transient($cache_key);
-		if ($cached !== false) {
-			return ['hit' => true, 'value' => $cached];
+		$cached = get_transient( $cache_key );
+		if ( $cached !== false ) {
+			return [
+				'hit'   => true,
+				'value' => $cached,
+			];
 		}
 
-		return ['hit' => false, 'value' => null];
+		return [
+			'hit'   => false,
+			'value' => null,
+		];
 	}
 
 	/**
@@ -236,18 +260,18 @@ abstract class AbstractService {
 	 * @param array  $meta 元数据
 	 * @return void
 	 */
-	protected function set_cached_value(string $cache_key, $value, int $cache_ttl, array $meta = []): void {
-		$effective_ttl = $this->get_effective_cache_ttl($cache_ttl);
-		if ($effective_ttl <= 0) {
+	protected function set_cached_value( string $cache_key, $value, int $cache_ttl, array $meta = [] ): void {
+		$effective_ttl = $this->get_effective_cache_ttl( $cache_ttl );
+		if ( $effective_ttl <= 0 ) {
 			return;
 		}
 
-		if (class_exists('\WPMind\Cache\ExactCache')) {
-			\WPMind\Cache\ExactCache::instance()->set($cache_key, $value, $effective_ttl, $meta);
+		if ( class_exists( '\WPMind\Cache\ExactCache' ) ) {
+			\WPMind\Cache\ExactCache::instance()->set( $cache_key, $value, $effective_ttl, $meta );
 			return;
 		}
 
-		set_transient($cache_key, $value, $effective_ttl);
+		set_transient( $cache_key, $value, $effective_ttl );
 	}
 
 	/**
@@ -264,21 +288,21 @@ abstract class AbstractService {
 	 * @param int $cache_ttl API 调用层传入 TTL
 	 * @return int
 	 */
-	private function get_effective_cache_ttl(int $cache_ttl): int {
-		if ($cache_ttl < 0) {
+	private function get_effective_cache_ttl( int $cache_ttl ): int {
+		if ( $cache_ttl < 0 ) {
 			return 0;
 		}
 
-		if ($cache_ttl > 0) {
+		if ( $cache_ttl > 0 ) {
 			return $cache_ttl;
 		}
 
-		if (!class_exists('\WPMind\Cache\ExactCache')) {
+		if ( ! class_exists( '\WPMind\Cache\ExactCache' ) ) {
 			return 0;
 		}
 
-		$auto_cache = (bool) apply_filters('wpmind_exact_cache_auto_cache', true);
-		if (!$auto_cache) {
+		$auto_cache = (bool) apply_filters( 'wpmind_exact_cache_auto_cache', true );
+		if ( ! $auto_cache ) {
 			return 0;
 		}
 

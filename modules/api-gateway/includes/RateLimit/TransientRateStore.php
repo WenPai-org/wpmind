@@ -103,11 +103,13 @@ final class TransientRateStore implements RateStoreInterface {
 
 		global $wpdb;
 
-		return (bool) $wpdb->query( $wpdb->prepare(
-			"INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'no')",
-			'_transient_' . $lock_key,
-			time()
-		) );
+		return (bool) $wpdb->query(
+			$wpdb->prepare(
+				"INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'no')",
+				'_transient_' . $lock_key,
+				time()
+			)
+		);
 	}
 
 	/**

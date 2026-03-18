@@ -17,13 +17,12 @@ use WPMind\Providers\AbstractOpenAiCompatibleTextGenerationModel;
  *
  * @since 1.3.0
  */
-class MoonshotTextGenerationModel extends AbstractOpenAiCompatibleTextGenerationModel
-{
-    /**
-     * {@inheritDoc}
-     */
-    protected static function providerClass(): string
-    {
-        return MoonshotProvider::class;
-    }
+class MoonshotTextGenerationModel extends AbstractOpenAiCompatibleTextGenerationModel {
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected static function providerClass(): string {
+		return MoonshotProvider::class;
+	}
 }

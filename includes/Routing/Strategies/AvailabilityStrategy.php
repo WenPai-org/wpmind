@@ -15,76 +15,74 @@ namespace WPMind\Routing\Strategies;
 use WPMind\Routing\AbstractStrategy;
 use WPMind\Routing\RoutingContext;
 
-class AvailabilityStrategy extends AbstractStrategy
-{
-    public function get_name(): string
-    {
-        return 'availability';
-    }
+class AvailabilityStrategy extends AbstractStrategy {
 
-    public function get_display_name(): string
-    {
-        return '可用性优先';
-    }
+	public function get_name(): string {
+		return 'availability';
+	}
 
-    public function get_description(): string
-    {
-        return '选择健康分数最高的 Provider，适合对稳定性要求高的场景';
-    }
+	public function get_display_name(): string {
+		return '可用性优先';
+	}
 
-    /**
-     * 计算 Provider 的得分
-     *
-     * 直接使用健康分数
-     */
-    public function calculate_score(string $providerId, RoutingContext $context): float
-    {
-        $healthScore = $context->get_health_score($providerId);
-        $latency = $context->get_average_latency($providerId);
+	public function get_description(): string {
+		return '选择健康分数最高的 Provider，适合对稳定性要求高的场景';
+	}
 
-        // 延迟作为次要因素（延迟越低加分越多）
-        $latencyBonus = 0;
-        if ($latency > 0 && $latency < 5000) {
-            $latencyBonus = (5000 - $latency) / 5000 * 10; // 最多加 10 分
-        }
+	/**
+	 * 计算 Provider 的得分
+	 *
+	 * 直接使用健康分数
+	 */
+	public function calculate_score( string $providerId, RoutingContext $context ): float {
+		$healthScore = $context->get_health_score( $providerId );
+		$latency     = $context->get_average_latency( $providerId );
 
-        return min(100, $healthScore + $latencyBonus);
-    }
+		// 延迟作为次要因素（延迟越低加分越多）
+		$latencyBonus = 0;
+		if ( $latency > 0 && $latency < 5000 ) {
+			$latencyBonus = ( 5000 - $latency ) / 5000 * 10; // 最多加 10 分
+		}
 
-    /**
-     * 对 Provider 列表进行排序
-     *
-     * 按健康分数降序排列
-     */
-    public function rank_providers(RoutingContext $context, array $providers): array
-    {
-        $available = $this->filter_available($context, $providers);
+		return min( 100, $healthScore + $latencyBonus );
+	}
 
-        if (empty($available)) {
-            return [];
-        }
+	/**
+	 * 对 Provider 列表进行排序
+	 *
+	 * 按健康分数降序排列
+	 */
+	public function rank_providers( RoutingContext $context, array $providers ): array {
+		$available = $this->filter_available( $context, $providers );
 
-        // 计算每个 Provider 的健康分数和延迟
-        $providerData = [];
-        foreach ($available as $providerId) {
-            $providerData[$providerId] = [
-                'health' => $context->get_health_score($providerId),
-                'latency' => $context->get_average_latency($providerId),
-            ];
-        }
+		if ( empty( $available ) ) {
+			return [];
+		}
 
-        // 按健康分数降序排序
-        uasort($providerData, function ($a, $b) {
-            // 健康分数比较
-            $healthDiff = $b['health'] - $a['health'];
-            if ($healthDiff !== 0) {
-                return $healthDiff;
-            }
+		// 计算每个 Provider 的健康分数和延迟
+		$providerData = [];
+		foreach ( $available as $providerId ) {
+			$providerData[ $providerId ] = [
+				'health'  => $context->get_health_score( $providerId ),
+				'latency' => $context->get_average_latency( $providerId ),
+			];
+		}
 
-            // 健康分数相同时，延迟低的优先
-            return $a['latency'] - $b['latency'];
-        });
+		// 按健康分数降序排序
+		uasort(
+			$providerData,
+			function ( $a, $b ) {
+				// 健康分数比较
+				$healthDiff = $b['health'] - $a['health'];
+				if ( $healthDiff !== 0 ) {
+					return $healthDiff;
+				}
 
-        return array_keys($providerData);
-    }
+				// 健康分数相同时，延迟低的优先
+				return $a['latency'] - $b['latency'];
+			}
+		);
+
+		return array_keys( $providerData );
+	}
 }

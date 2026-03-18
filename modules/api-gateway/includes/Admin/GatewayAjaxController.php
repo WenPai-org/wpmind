@@ -44,13 +44,13 @@ class GatewayAjaxController {
 			wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
 		}
 
-		$enabled           = ! empty( $_POST['gateway_enabled'] );
-		$sse_global_limit  = absint( wp_unslash( $_POST['sse_global_limit'] ?? 20 ) );
-		$default_rpm       = absint( wp_unslash( $_POST['default_rpm'] ?? 60 ) );
-		$default_tpm       = absint( wp_unslash( $_POST['default_tpm'] ?? 100000 ) );
-		$max_body_bytes    = absint( wp_unslash( $_POST['max_body_bytes'] ?? 0 ) );
-		$max_tokens_cap    = absint( wp_unslash( $_POST['max_tokens_cap'] ?? 0 ) );
-		$log_prompts       = ! empty( $_POST['log_prompts'] );
+		$enabled          = ! empty( $_POST['gateway_enabled'] );
+		$sse_global_limit = absint( wp_unslash( $_POST['sse_global_limit'] ?? 20 ) );
+		$default_rpm      = absint( wp_unslash( $_POST['default_rpm'] ?? 60 ) );
+		$default_tpm      = absint( wp_unslash( $_POST['default_tpm'] ?? 100000 ) );
+		$max_body_bytes   = absint( wp_unslash( $_POST['max_body_bytes'] ?? 0 ) );
+		$max_tokens_cap   = absint( wp_unslash( $_POST['max_tokens_cap'] ?? 0 ) );
+		$log_prompts      = ! empty( $_POST['log_prompts'] );
 
 		// Clamp values to reasonable ranges.
 		$sse_global_limit = max( 1, min( 200, $sse_global_limit ) );
@@ -110,11 +110,11 @@ class GatewayAjaxController {
 		$monthly_budget    = max( 0.0, $monthly_budget );
 
 		$attrs = [
-			'name'              => $name,
-			'owner_user_id'     => get_current_user_id(),
-			'rpm_limit'         => $rpm_limit,
-			'tpm_limit'         => $tpm_limit,
-			'concurrency_limit' => $concurrency_limit,
+			'name'               => $name,
+			'owner_user_id'      => get_current_user_id(),
+			'rpm_limit'          => $rpm_limit,
+			'tpm_limit'          => $tpm_limit,
+			'concurrency_limit'  => $concurrency_limit,
 			'monthly_budget_usd' => $monthly_budget,
 		];
 
@@ -132,12 +132,14 @@ class GatewayAjaxController {
 
 		$result = ApiKeyManager::create_api_key( $attrs );
 
-		wp_send_json_success( [
-			'message'    => __( 'API Key 创建成功', 'wpmind' ),
-			'raw_key'    => $result['raw_key'],
-			'key_id'     => $result['key_id'],
-			'key_prefix' => $result['key_prefix'],
-		] );
+		wp_send_json_success(
+			[
+				'message'    => __( 'API Key 创建成功', 'wpmind' ),
+				'raw_key'    => $result['raw_key'],
+				'key_id'     => $result['key_id'],
+				'key_prefix' => $result['key_prefix'],
+			]
+		);
 	}
 
 	/**
@@ -292,12 +294,14 @@ class GatewayAjaxController {
 		$logs  = AuditLogRepository::list_logs( $filters, $page, $per_page );
 		$total = AuditLogRepository::count_logs( $filters );
 
-		wp_send_json_success( [
-			'logs'        => $logs,
-			'total'       => $total,
-			'page'        => $page,
-			'per_page'    => $per_page,
-			'total_pages' => (int) ceil( $total / $per_page ),
-		] );
+		wp_send_json_success(
+			[
+				'logs'        => $logs,
+				'total'       => $total,
+				'page'        => $page,
+				'per_page'    => $per_page,
+				'total_pages' => (int) ceil( $total / $per_page ),
+			]
+		);
 	}
 }

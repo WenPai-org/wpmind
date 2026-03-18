@@ -12,258 +12,252 @@ declare(strict_types=1);
 
 namespace WPMind\Failover;
 
-class FailoverManager
-{
-    private static ?FailoverManager $instance = null;
+class FailoverManager {
 
-    /** @var array<string, CircuitBreaker> */
-    private array $circuitBreakers = [];
+	private static ?FailoverManager $instance = null;
 
-    /** @var array Provider 配置 */
-    private array $providers = [];
+	/** @var array<string, CircuitBreaker> */
+	private array $circuitBreakers = [];
 
-    /**
-     * 获取单例实例
-     */
-    public static function instance(): FailoverManager
-    {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
+	/** @var array Provider 配置 */
+	private array $providers = [];
 
-    private function __construct()
-    {
-        // 从 WPMind 获取已启用的 Provider
-        if (function_exists('WPMind\\wpmind')) {
-            $endpoints = \WPMind\wpmind()->get_custom_endpoints();
-            foreach ($endpoints as $id => $config) {
-                if (!empty($config['enabled']) && !empty($config['api_key'])) {
-                    $this->providers[$id] = $config;
-                    $this->circuitBreakers[$id] = new CircuitBreaker($id);
-                }
-            }
-        }
-    }
+	/**
+	 * 获取单例实例
+	 */
+	public static function instance(): FailoverManager {
+		if ( self::$instance === null ) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
 
-    /**
-     * 选择最佳可用 Provider
-     *
-     * 优先级：
-     * 1. 用户设置的首选 Provider（如果可用）
-     * 2. 健康分数最高的 Provider
-     *
-     * @param string|null $preferredProvider 首选 Provider ID
-     * @return string|null 选中的 Provider ID
-     */
-    public function select_provider(?string $preferredProvider = null): ?string
-    {
-        $available = $this->get_available_providers();
+	private function __construct() {
+		// 从 WPMind 获取已启用的 Provider
+		if ( function_exists( 'WPMind\\wpmind' ) ) {
+			$endpoints = \WPMind\wpmind()->get_custom_endpoints();
+			foreach ( $endpoints as $id => $config ) {
+				if ( ! empty( $config['enabled'] ) && ! empty( $config['api_key'] ) ) {
+					$this->providers[ $id ]       = $config;
+					$this->circuitBreakers[ $id ] = new CircuitBreaker( $id );
+				}
+			}
+		}
+	}
 
-        if (empty($available)) {
-            return null;
-        }
+	/**
+	 * 选择最佳可用 Provider
+	 *
+	 * 优先级：
+	 * 1. 用户设置的首选 Provider（如果可用）
+	 * 2. 健康分数最高的 Provider
+	 *
+	 * @param string|null $preferredProvider 首选 Provider ID
+	 * @return string|null 选中的 Provider ID
+	 */
+	public function select_provider( ?string $preferredProvider = null ): ?string {
+		$available = $this->get_available_providers();
 
-        // 优先使用用户首选
-        if ($preferredProvider && in_array($preferredProvider, $available, true)) {
-            return $preferredProvider;
-        }
+		if ( empty( $available ) ) {
+			return null;
+		}
 
-        // 按健康分数排序
-        usort($available, function ($a, $b) {
-            $scoreA = ProviderHealthTracker::get_health_score($a);
-            $scoreB = ProviderHealthTracker::get_health_score($b);
+		// 优先使用用户首选
+		if ( $preferredProvider && in_array( $preferredProvider, $available, true ) ) {
+			return $preferredProvider;
+		}
 
-            // 分数相同时，按延迟排序
-            if ($scoreA === $scoreB) {
-                $latencyA = ProviderHealthTracker::get_average_latency($a);
-                $latencyB = ProviderHealthTracker::get_average_latency($b);
-                return $latencyA - $latencyB;
-            }
+		// 按健康分数排序
+		usort(
+			$available,
+			function ( $a, $b ) {
+				$scoreA = ProviderHealthTracker::get_health_score( $a );
+				$scoreB = ProviderHealthTracker::get_health_score( $b );
 
-            return $scoreB - $scoreA;
-        });
+				// 分数相同时，按延迟排序
+				if ( $scoreA === $scoreB ) {
+					$latencyA = ProviderHealthTracker::get_average_latency( $a );
+					$latencyB = ProviderHealthTracker::get_average_latency( $b );
+					return $latencyA - $latencyB;
+				}
 
-        return $available[0];
-    }
+				return $scoreB - $scoreA;
+			}
+		);
 
-    /**
-     * 获取所有可用的 Provider
-     *
-     * @return array<string> 可用的 Provider ID 列表
-     */
-    public function get_available_providers(): array
-    {
-        $available = [];
+		return $available[0];
+	}
 
-        foreach ($this->circuitBreakers as $providerId => $breaker) {
-            if ($breaker->is_available()) {
-                $available[] = $providerId;
-            }
-        }
+	/**
+	 * 获取所有可用的 Provider
+	 *
+	 * @return array<string> 可用的 Provider ID 列表
+	 */
+	public function get_available_providers(): array {
+		$available = [];
 
-        return $available;
-    }
+		foreach ( $this->circuitBreakers as $providerId => $breaker ) {
+			if ( $breaker->is_available() ) {
+				$available[] = $providerId;
+			}
+		}
 
-    /**
-     * 获取故障转移链
-     *
-     * 返回按优先级排序的 Provider 列表，用于依次尝试
-     *
-     * @param string|null $preferredProvider 首选 Provider ID
-     * @return array<string> Provider ID 列表
-     */
-    public function get_failover_chain(?string $preferredProvider = null): array
-    {
-        $available = $this->get_available_providers();
+		return $available;
+	}
 
-        if (empty($available)) {
-            return [];
-        }
+	/**
+	 * 获取故障转移链
+	 *
+	 * 返回按优先级排序的 Provider 列表，用于依次尝试
+	 *
+	 * @param string|null $preferredProvider 首选 Provider ID
+	 * @return array<string> Provider ID 列表
+	 */
+	public function get_failover_chain( ?string $preferredProvider = null ): array {
+		$available = $this->get_available_providers();
 
-        // 检查是否有手动优先级设置
-        $manual_priority = [];
-        if (class_exists('\\WPMind\\Routing\\IntelligentRouter')) {
-            $router = \WPMind\Routing\IntelligentRouter::instance();
-            $manual_priority = $router->get_manual_priority();
-        }
+		if ( empty( $available ) ) {
+			return [];
+		}
 
-        if (!empty($manual_priority)) {
-            // 使用手动优先级排序
-            $sorted = [];
-            foreach ($manual_priority as $providerId) {
-                if (in_array($providerId, $available, true)) {
-                    $sorted[] = $providerId;
-                }
-            }
-            // 添加未在手动列表中的可用 Provider
-            foreach ($available as $providerId) {
-                if (!in_array($providerId, $sorted, true)) {
-                    $sorted[] = $providerId;
-                }
-            }
-            $available = $sorted;
-        } else {
-            // 按健康分数排序
-            usort($available, function ($a, $b) {
-                return ProviderHealthTracker::get_health_score($b) - ProviderHealthTracker::get_health_score($a);
-            });
-        }
+		// 检查是否有手动优先级设置
+		$manual_priority = [];
+		if ( class_exists( '\\WPMind\\Routing\\IntelligentRouter' ) ) {
+			$router          = \WPMind\Routing\IntelligentRouter::instance();
+			$manual_priority = $router->get_manual_priority();
+		}
 
-        // 首选 Provider 放在最前面
-        if ($preferredProvider && in_array($preferredProvider, $available, true)) {
-            $available = array_values(array_diff($available, [$preferredProvider]));
-            array_unshift($available, $preferredProvider);
-        }
+		if ( ! empty( $manual_priority ) ) {
+			// 使用手动优先级排序
+			$sorted = [];
+			foreach ( $manual_priority as $providerId ) {
+				if ( in_array( $providerId, $available, true ) ) {
+					$sorted[] = $providerId;
+				}
+			}
+			// 添加未在手动列表中的可用 Provider
+			foreach ( $available as $providerId ) {
+				if ( ! in_array( $providerId, $sorted, true ) ) {
+					$sorted[] = $providerId;
+				}
+			}
+			$available = $sorted;
+		} else {
+			// 按健康分数排序
+			usort(
+				$available,
+				function ( $a, $b ) {
+					return ProviderHealthTracker::get_health_score( $b ) - ProviderHealthTracker::get_health_score( $a );
+				}
+			);
+		}
 
-        return $available;
-    }
+		// 首选 Provider 放在最前面
+		if ( $preferredProvider && in_array( $preferredProvider, $available, true ) ) {
+			$available = array_values( array_diff( $available, [ $preferredProvider ] ) );
+			array_unshift( $available, $preferredProvider );
+		}
 
-    /**
-     * 记录请求结果
-     *
-     * @param string $providerId Provider ID
-     * @param bool   $success    是否成功
-     * @param int    $latencyMs  延迟（毫秒）
-     */
-    public function record_result(string $providerId, bool $success, int $latencyMs = 0): void
-    {
-        // 更新熔断器状态
-        if (isset($this->circuitBreakers[$providerId])) {
-            if ($success) {
-                $this->circuitBreakers[$providerId]->record_success();
-            } else {
-                $this->circuitBreakers[$providerId]->record_failure();
-            }
-        }
+		return $available;
+	}
 
-        // 记录健康追踪
-        ProviderHealthTracker::record($providerId, $success, $latencyMs);
-    }
+	/**
+	 * 记录请求结果
+	 *
+	 * @param string $providerId Provider ID
+	 * @param bool   $success    是否成功
+	 * @param int    $latencyMs  延迟（毫秒）
+	 */
+	public function record_result( string $providerId, bool $success, int $latencyMs = 0 ): void {
+		// 更新熔断器状态
+		if ( isset( $this->circuitBreakers[ $providerId ] ) ) {
+			if ( $success ) {
+				$this->circuitBreakers[ $providerId ]->record_success();
+			} else {
+				$this->circuitBreakers[ $providerId ]->record_failure();
+			}
+		}
 
-    /**
-     * 获取 Provider 状态摘要
-     *
-     * @return array Provider 状态信息
-     */
-    public function get_status_summary(): array
-    {
-        $summary = [];
+		// 记录健康追踪
+		ProviderHealthTracker::record( $providerId, $success, $latencyMs );
+	}
 
-        foreach ($this->circuitBreakers as $providerId => $breaker) {
-            $cbStatus = $breaker->get_status_details();
-            $healthStatus = ProviderHealthTracker::get_provider_status($providerId);
+	/**
+	 * 获取 Provider 状态摘要
+	 *
+	 * @return array Provider 状态信息
+	 */
+	public function get_status_summary(): array {
+		$summary = [];
 
-            $summary[$providerId] = [
-                'name'          => $this->providers[$providerId]['name'] ?? $providerId,
-                'display_name'  => $this->providers[$providerId]['display_name'] ?? $providerId,
-                'state'         => $cbStatus['state'],
-                'state_label'   => $cbStatus['state_label'],
-                'available'     => $breaker->is_available_read_only(),
-                'health_score'  => $healthStatus['health_score'],
-                'avg_latency'   => $healthStatus['avg_latency'],
-                'success_rate'  => $healthStatus['success_rate'],
-                'recovery_in'   => $cbStatus['recovery_in'],
-            ];
-        }
+		foreach ( $this->circuitBreakers as $providerId => $breaker ) {
+			$cbStatus     = $breaker->get_status_details();
+			$healthStatus = ProviderHealthTracker::get_provider_status( $providerId );
 
-        return $summary;
-    }
+			$summary[ $providerId ] = [
+				'name'         => $this->providers[ $providerId ]['name'] ?? $providerId,
+				'display_name' => $this->providers[ $providerId ]['display_name'] ?? $providerId,
+				'state'        => $cbStatus['state'],
+				'state_label'  => $cbStatus['state_label'],
+				'available'    => $breaker->is_available_read_only(),
+				'health_score' => $healthStatus['health_score'],
+				'avg_latency'  => $healthStatus['avg_latency'],
+				'success_rate' => $healthStatus['success_rate'],
+				'recovery_in'  => $cbStatus['recovery_in'],
+			];
+		}
 
-    /**
-     * 检查是否有可用的 Provider
-     *
-     * @return bool
-     */
-    public function has_available_provider(): bool
-    {
-        return !empty($this->get_available_providers());
-    }
+		return $summary;
+	}
 
-    /**
-     * 重置指定 Provider 的熔断器
-     *
-     * @param string $providerId Provider ID
-     */
-    public function reset_provider(string $providerId): void
-    {
-        if (isset($this->circuitBreakers[$providerId])) {
-            $this->circuitBreakers[$providerId]->reset();
-        }
-        ProviderHealthTracker::clear_provider($providerId);
-    }
+	/**
+	 * 检查是否有可用的 Provider
+	 *
+	 * @return bool
+	 */
+	public function has_available_provider(): bool {
+		return ! empty( $this->get_available_providers() );
+	}
 
-    /**
-     * 重置所有熔断器
-     */
-    public function reset_all(): void
-    {
-        foreach ($this->circuitBreakers as $breaker) {
-            $breaker->reset();
-        }
-        ProviderHealthTracker::clear_all();
-    }
+	/**
+	 * 重置指定 Provider 的熔断器
+	 *
+	 * @param string $providerId Provider ID
+	 */
+	public function reset_provider( string $providerId ): void {
+		if ( isset( $this->circuitBreakers[ $providerId ] ) ) {
+			$this->circuitBreakers[ $providerId ]->reset();
+		}
+		ProviderHealthTracker::clear_provider( $providerId );
+	}
 
-    /**
-     * 获取熔断器实例
-     *
-     * @param string $providerId Provider ID
-     * @return CircuitBreaker|null
-     */
-    public function get_circuit_breaker(string $providerId): ?CircuitBreaker
-    {
-        return $this->circuitBreakers[$providerId] ?? null;
-    }
+	/**
+	 * 重置所有熔断器
+	 */
+	public function reset_all(): void {
+		foreach ( $this->circuitBreakers as $breaker ) {
+			$breaker->reset();
+		}
+		ProviderHealthTracker::clear_all();
+	}
 
-    /**
-     * 刷新 Provider 列表
-     *
-     * 当 Provider 配置变更时调用
-     */
-    public function refresh(): void
-    {
-        self::$instance = null;
-        self::instance();
-    }
+	/**
+	 * 获取熔断器实例
+	 *
+	 * @param string $providerId Provider ID
+	 * @return CircuitBreaker|null
+	 */
+	public function get_circuit_breaker( string $providerId ): ?CircuitBreaker {
+		return $this->circuitBreakers[ $providerId ] ?? null;
+	}
+
+	/**
+	 * 刷新 Provider 列表
+	 *
+	 * 当 Provider 配置变更时调用
+	 */
+	public function refresh(): void {
+		self::$instance = null;
+		self::instance();
+	}
 }

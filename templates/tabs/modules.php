@@ -45,9 +45,9 @@ $modules       = $module_loader->get_modules();
 					<?php else : ?>
 					<label class="wpmind-switch">
 						<input type="checkbox"
-							   class="wpmind-module-switch"
-							   data-module-id="<?php echo esc_attr( $module_id ); ?>"
-							   <?php checked( $module['enabled'] ); ?>>
+								class="wpmind-module-switch"
+								data-module-id="<?php echo esc_attr( $module_id ); ?>"
+								<?php checked( $module['enabled'] ); ?>>
 						<span class="wpmind-switch-slider"></span>
 					</label>
 					<?php endif; ?>

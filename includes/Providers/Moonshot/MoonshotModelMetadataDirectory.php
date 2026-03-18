@@ -17,25 +17,23 @@ use WPMind\Providers\AbstractOpenAiCompatibleModelMetadataDirectory;
  *
  * @since 1.3.0
  */
-class MoonshotModelMetadataDirectory extends AbstractOpenAiCompatibleModelMetadataDirectory
-{
-    /**
-     * {@inheritDoc}
-     */
-    protected static function providerClass(): string
-    {
-        return MoonshotProvider::class;
-    }
+class MoonshotModelMetadataDirectory extends AbstractOpenAiCompatibleModelMetadataDirectory {
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function getStaticModels(): array
-    {
-        return [
-            'moonshot-v1-8k'   => 'Moonshot v1 8K',
-            'moonshot-v1-32k'  => 'Moonshot v1 32K',
-            'moonshot-v1-128k' => 'Moonshot v1 128K',
-        ];
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	protected static function providerClass(): string {
+		return MoonshotProvider::class;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function getStaticModels(): array {
+		return [
+			'moonshot-v1-8k'   => 'Moonshot v1 8K',
+			'moonshot-v1-32k'  => 'Moonshot v1 32K',
+			'moonshot-v1-128k' => 'Moonshot v1 128K',
+		];
+	}
 }

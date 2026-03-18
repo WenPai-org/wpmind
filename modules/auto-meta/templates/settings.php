@@ -10,13 +10,13 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$am_enabled     = get_option( 'wpmind_auto_meta_enabled', '1' );
-$auto_excerpt   = get_option( 'wpmind_auto_meta_excerpt', '1' );
-$auto_tags      = get_option( 'wpmind_auto_meta_tags', '1' );
-$auto_category  = get_option( 'wpmind_auto_meta_category', '0' );
-$auto_faq       = get_option( 'wpmind_auto_meta_faq', '1' );
-$auto_seo_desc  = get_option( 'wpmind_auto_meta_seo_desc', '1' );
-$post_types     = get_option( 'wpmind_auto_meta_post_types', [ 'post', 'page' ] );
+$am_enabled    = get_option( 'wpmind_auto_meta_enabled', '1' );
+$auto_excerpt  = get_option( 'wpmind_auto_meta_excerpt', '1' );
+$auto_tags     = get_option( 'wpmind_auto_meta_tags', '1' );
+$auto_category = get_option( 'wpmind_auto_meta_category', '0' );
+$auto_faq      = get_option( 'wpmind_auto_meta_faq', '1' );
+$auto_seo_desc = get_option( 'wpmind_auto_meta_seo_desc', '1' );
+$post_types    = get_option( 'wpmind_auto_meta_post_types', [ 'post', 'page' ] );
 if ( ! is_array( $post_types ) ) {
 	$post_types = [ 'post', 'page' ];
 }

@@ -17,25 +17,23 @@ use WPMind\Providers\AbstractOpenAiCompatibleModelMetadataDirectory;
  *
  * @since 1.3.0
  */
-class DeepSeekModelMetadataDirectory extends AbstractOpenAiCompatibleModelMetadataDirectory
-{
-    /**
-     * {@inheritDoc}
-     */
-    protected static function providerClass(): string
-    {
-        return DeepSeekProvider::class;
-    }
+class DeepSeekModelMetadataDirectory extends AbstractOpenAiCompatibleModelMetadataDirectory {
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function getStaticModels(): array
-    {
-        return [
-            'deepseek-chat'     => 'DeepSeek Chat',
-            'deepseek-coder'    => 'DeepSeek Coder',
-            'deepseek-reasoner' => 'DeepSeek Reasoner (R1)',
-        ];
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	protected static function providerClass(): string {
+		return DeepSeekProvider::class;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function getStaticModels(): array {
+		return [
+			'deepseek-chat'     => 'DeepSeek Chat',
+			'deepseek-coder'    => 'DeepSeek Coder',
+			'deepseek-reasoner' => 'DeepSeek Reasoner (R1)',
+		];
+	}
 }

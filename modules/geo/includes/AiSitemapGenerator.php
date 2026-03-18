@@ -100,13 +100,15 @@ class AiSitemapGenerator {
 		$max_entries = (int) get_option( 'wpmind_ai_sitemap_max_entries', 500 );
 		$ai_indexing = $this->get_ai_indexing_manager();
 
-		$posts = get_posts( [
-			'numberposts' => $max_entries,
-			'post_status' => 'publish',
-			'post_type'   => $this->get_included_post_types(),
-			'orderby'     => 'modified',
-			'order'       => 'DESC',
-		] );
+		$posts = get_posts(
+			[
+				'numberposts' => $max_entries,
+				'post_status' => 'publish',
+				'post_type'   => $this->get_included_post_types(),
+				'orderby'     => 'modified',
+				'order'       => 'DESC',
+			]
+		);
 
 		$xml  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 		$xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"' . "\n";
@@ -130,7 +132,7 @@ class AiSitemapGenerator {
 	/**
 	 * Build a single <url> entry.
 	 *
-	 * @param \WP_Post                $post        Post object.
+	 * @param \WP_Post               $post        Post object.
 	 * @param AiIndexingManager|null $ai_indexing AI indexing manager.
 	 * @return string XML fragment.
 	 */
@@ -146,7 +148,7 @@ class AiSitemapGenerator {
 		$declaration = $ai_indexing
 			? $ai_indexing->get_declaration( $post->ID )
 			: get_option( 'wpmind_ai_default_declaration', 'original' );
-		$xml .= "\t\t<ai:declaration>" . esc_xml( $declaration ) . "</ai:declaration>\n";
+		$xml        .= "\t\t<ai:declaration>" . esc_xml( $declaration ) . "</ai:declaration>\n";
 
 		// AI summary (excerpt, max 200 chars).
 		$summary = $this->get_summary( $post );

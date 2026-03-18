@@ -17,27 +17,25 @@ use WPMind\Providers\AbstractOpenAiCompatibleModelMetadataDirectory;
  *
  * @since 1.3.0
  */
-class QwenModelMetadataDirectory extends AbstractOpenAiCompatibleModelMetadataDirectory
-{
-    /**
-     * {@inheritDoc}
-     */
-    protected static function providerClass(): string
-    {
-        return QwenProvider::class;
-    }
+class QwenModelMetadataDirectory extends AbstractOpenAiCompatibleModelMetadataDirectory {
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function getStaticModels(): array
-    {
-        return [
-            'qwen-turbo'       => 'Qwen Turbo',
-            'qwen-plus'        => 'Qwen Plus',
-            'qwen-max'         => 'Qwen Max',
-            'qwen-max-latest'  => 'Qwen Max (Latest)',
-            'qwen-long'        => 'Qwen Long',
-        ];
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	protected static function providerClass(): string {
+		return QwenProvider::class;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function getStaticModels(): array {
+		return [
+			'qwen-turbo'      => 'Qwen Turbo',
+			'qwen-plus'       => 'Qwen Plus',
+			'qwen-max'        => 'Qwen Max',
+			'qwen-max-latest' => 'Qwen Max (Latest)',
+			'qwen-long'       => 'Qwen Long',
+		];
+	}
 }

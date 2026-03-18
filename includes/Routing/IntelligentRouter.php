@@ -18,346 +18,327 @@ use WPMind\Routing\Strategies\CostStrategy;
 use WPMind\Routing\Strategies\LatencyStrategy;
 use WPMind\Routing\Strategies\LoadBalancedStrategy;
 
-class IntelligentRouter
-{
-    private static ?IntelligentRouter $instance = null;
+class IntelligentRouter {
 
-    /** @var array<string, RoutingStrategyInterface> 已注册的策略 */
-    private array $strategies = [];
+	private static ?IntelligentRouter $instance = null;
 
-    /** @var string 当前激活的策略名称 */
-    private string $activeStrategy = 'balanced';
+	/** @var array<string, RoutingStrategyInterface> 已注册的策略 */
+	private array $strategies = [];
 
-    /** @var array Provider 配置 */
-    private array $providers = [];
+	/** @var string 当前激活的策略名称 */
+	private string $activeStrategy = 'balanced';
 
-    /**
-     * 获取单例实例
-     */
-    public static function instance(): IntelligentRouter
-    {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
+	/** @var array Provider 配置 */
+	private array $providers = [];
 
-    private function __construct()
-    {
-        $this->register_default_strategies();
-        $this->load_providers();
-        $this->load_settings();
-    }
+	/**
+	 * 获取单例实例
+	 */
+	public static function instance(): IntelligentRouter {
+		if ( self::$instance === null ) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
 
-    /**
-     * 注册默认策略
-     */
-    private function register_default_strategies(): void
-    {
-        // 复合策略（推荐）
-        $this->register_strategy(CompositeStrategy::create_balanced());      // 平衡策略
-        $this->register_strategy(CompositeStrategy::create_performance());   // 性能优先
-        $this->register_strategy(CompositeStrategy::create_economic());      // 经济策略
+	private function __construct() {
+		$this->register_default_strategies();
+		$this->load_providers();
+		$this->load_settings();
+	}
 
-        // 基础策略
-        $this->register_strategy(new LoadBalancedStrategy());               // 负载均衡
+	/**
+	 * 注册默认策略
+	 */
+	private function register_default_strategies(): void {
+		// 复合策略（推荐）
+		$this->register_strategy( CompositeStrategy::create_balanced() );      // 平衡策略
+		$this->register_strategy( CompositeStrategy::create_performance() );   // 性能优先
+		$this->register_strategy( CompositeStrategy::create_economic() );      // 经济策略
 
-        /**
-         * 允许第三方注册自定义路由策略
-         *
-         * @since 3.7.0
-         * @param IntelligentRouter $router 路由器实例
-         */
-        do_action('wpmind_register_routing_strategies', $this);
-    }
+		// 基础策略
+		$this->register_strategy( new LoadBalancedStrategy() );               // 负载均衡
 
-    /**
-     * 加载 Provider 配置
-     */
-    private function load_providers(): void
-    {
-        if (function_exists('WPMind\\wpmind')) {
-            $endpoints = \WPMind\wpmind()->get_custom_endpoints();
-            foreach ($endpoints as $id => $config) {
-                if (!empty($config['enabled']) && !empty($config['api_key'])) {
-                    $this->providers[$id] = $config;
-                }
-            }
-        }
-    }
+		/**
+		 * 允许第三方注册自定义路由策略
+		 *
+		 * @since 3.7.0
+		 * @param IntelligentRouter $router 路由器实例
+		 */
+		do_action( 'wpmind_register_routing_strategies', $this );
+	}
 
-    /**
-     * 加载路由设置
-     */
-    private function load_settings(): void
-    {
-        $settings = get_option('wpmind_routing_settings', array());
-        $strategy = $settings['strategy'] ?? 'balanced';
-        
-        // 验证策略是否存在，否则回退到默认
-        if ( ! isset( $this->strategies[ $strategy ] ) ) {
-            $strategy = 'balanced';
-            // 自动修复无效配置
-            if ( isset( $settings['strategy'] ) ) {
-                $settings['strategy'] = 'balanced';
-                update_option('wpmind_routing_settings', $settings);
-            }
-        }
-        
-        $this->activeStrategy = $strategy;
-    }
+	/**
+	 * 加载 Provider 配置
+	 */
+	private function load_providers(): void {
+		if ( function_exists( 'WPMind\\wpmind' ) ) {
+			$endpoints = \WPMind\wpmind()->get_custom_endpoints();
+			foreach ( $endpoints as $id => $config ) {
+				if ( ! empty( $config['enabled'] ) && ! empty( $config['api_key'] ) ) {
+					$this->providers[ $id ] = $config;
+				}
+			}
+		}
+	}
 
-    /**
-     * 注册路由策略
-     *
-     * @param RoutingStrategyInterface $strategy 策略实例
-     */
-    public function register_strategy(RoutingStrategyInterface $strategy): void
-    {
-        $this->strategies[$strategy->get_name()] = $strategy;
-    }
+	/**
+	 * 加载路由设置
+	 */
+	private function load_settings(): void {
+		$settings = get_option( 'wpmind_routing_settings', array() );
+		$strategy = $settings['strategy'] ?? 'balanced';
 
-    /**
-     * 获取所有已注册的策略
-     *
-     * @return array<string, array{name: string, display_name: string, description: string}>
-     */
-    public function get_available_strategies(): array
-    {
-        $result = [];
-        foreach ($this->strategies as $name => $strategy) {
-            $result[$name] = [
-                'name' => $strategy->get_name(),
-                'display_name' => $strategy->get_display_name(),
-                'description' => $strategy->get_description(),
-            ];
-        }
-        return $result;
-    }
+		// 验证策略是否存在，否则回退到默认
+		if ( ! isset( $this->strategies[ $strategy ] ) ) {
+			$strategy = 'balanced';
+			// 自动修复无效配置
+			if ( isset( $settings['strategy'] ) ) {
+				$settings['strategy'] = 'balanced';
+				update_option( 'wpmind_routing_settings', $settings );
+			}
+		}
 
-    /**
-     * 设置当前策略
-     *
-     * @param string $strategyName 策略名称
-     * @return bool 是否设置成功
-     */
-    public function set_strategy(string $strategyName): bool
-    {
-        if (!isset($this->strategies[$strategyName])) {
-            return false;
-        }
+		$this->activeStrategy = $strategy;
+	}
 
-        $this->activeStrategy = $strategyName;
+	/**
+	 * 注册路由策略
+	 *
+	 * @param RoutingStrategyInterface $strategy 策略实例
+	 */
+	public function register_strategy( RoutingStrategyInterface $strategy ): void {
+		$this->strategies[ $strategy->get_name() ] = $strategy;
+	}
 
-        // 保存设置
-        $settings = get_option('wpmind_routing_settings', []);
-        $settings['strategy'] = $strategyName;
-        update_option('wpmind_routing_settings', $settings);
+	/**
+	 * 获取所有已注册的策略
+	 *
+	 * @return array<string, array{name: string, display_name: string, description: string}>
+	 */
+	public function get_available_strategies(): array {
+		$result = [];
+		foreach ( $this->strategies as $name => $strategy ) {
+			$result[ $name ] = [
+				'name'         => $strategy->get_name(),
+				'display_name' => $strategy->get_display_name(),
+				'description'  => $strategy->get_description(),
+			];
+		}
+		return $result;
+	}
 
-        return true;
-    }
+	/**
+	 * 设置当前策略
+	 *
+	 * @param string $strategyName 策略名称
+	 * @return bool 是否设置成功
+	 */
+	public function set_strategy( string $strategyName ): bool {
+		if ( ! isset( $this->strategies[ $strategyName ] ) ) {
+			return false;
+		}
 
-    /**
-     * 获取当前策略名称
-     */
-    public function get_current_strategy(): string
-    {
-        return $this->activeStrategy;
-    }
+		$this->activeStrategy = $strategyName;
 
-    /**
-     * 获取当前策略实例
-     */
-    public function get_strategy(?string $name = null): ?RoutingStrategyInterface
-    {
-        $name = $name ?? $this->activeStrategy;
-        
-        // 如果请求的策略不存在，尝试回退到 'balanced'
-        if ( ! isset( $this->strategies[ $name ] ) && $name !== 'balanced' ) {
-            // 如果 balanced 也不存在，返回第一个可用策略
-            if ( isset( $this->strategies['balanced'] ) ) {
-                $name = 'balanced';
-            } else {
-                $name = array_key_first( $this->strategies );
-            }
-        }
-        
-        return $this->strategies[ $name ] ?? null;
-    }
+		// 保存设置
+		$settings             = get_option( 'wpmind_routing_settings', [] );
+		$settings['strategy'] = $strategyName;
+		update_option( 'wpmind_routing_settings', $settings );
 
-    /**
-     * 路由请求到最佳 Provider
-     *
-     * @param RoutingContext|null $context 路由上下文
-     * @return string|null 选中的 Provider ID
-     */
-    public function route(?RoutingContext $context = null): ?string
-    {
-        $context = $context ?? RoutingContext::create();
-        $strategy = $this->get_strategy();
+		return true;
+	}
 
-        if ($strategy === null) {
-            // 无策略时，返回第一个可用的 Provider
-            return array_key_first($this->providers);
-        }
+	/**
+	 * 获取当前策略名称
+	 */
+	public function get_current_strategy(): string {
+		return $this->activeStrategy;
+	}
 
-        // 如果有首选 Provider 且可用，优先使用
-        $preferred = $context->get_preferred_provider();
-        if ($preferred !== null && isset($this->providers[$preferred])) {
-            if (!$context->is_excluded($preferred)) {
-                return $preferred;
-            }
-        }
+	/**
+	 * 获取当前策略实例
+	 */
+	public function get_strategy( ?string $name = null ): ?RoutingStrategyInterface {
+		$name = $name ?? $this->activeStrategy;
 
-        return $strategy->select_provider($context, $this->providers);
-    }
+		// 如果请求的策略不存在，尝试回退到 'balanced'
+		if ( ! isset( $this->strategies[ $name ] ) && $name !== 'balanced' ) {
+			// 如果 balanced 也不存在，返回第一个可用策略
+			if ( isset( $this->strategies['balanced'] ) ) {
+				$name = 'balanced';
+			} else {
+				$name = array_key_first( $this->strategies );
+			}
+		}
 
-    /**
-     * 获取故障转移链
-     *
-     * 返回按策略排序的 Provider 列表
-     *
-     * @param RoutingContext|null $context 路由上下文
-     * @return array<string> Provider ID 列表
-     */
-    public function get_failover_chain(?RoutingContext $context = null): array
-    {
-        $context = $context ?? RoutingContext::create();
-        $strategy = $this->get_strategy();
+		return $this->strategies[ $name ] ?? null;
+	}
 
-        if ($strategy === null) {
-            return array_keys($this->providers);
-        }
+	/**
+	 * 路由请求到最佳 Provider
+	 *
+	 * @param RoutingContext|null $context 路由上下文
+	 * @return string|null 选中的 Provider ID
+	 */
+	public function route( ?RoutingContext $context = null ): ?string {
+		$context  = $context ?? RoutingContext::create();
+		$strategy = $this->get_strategy();
 
-        $ranked = $strategy->rank_providers($context, $this->providers);
+		if ( $strategy === null ) {
+			// 无策略时，返回第一个可用的 Provider
+			return array_key_first( $this->providers );
+		}
 
-        // 如果有首选 Provider，放在最前面
-        $preferred = $context->get_preferred_provider();
-        if ($preferred !== null && in_array($preferred, $ranked, true)) {
-            $ranked = array_values(array_diff($ranked, [$preferred]));
-            array_unshift($ranked, $preferred);
-        }
+		// 如果有首选 Provider 且可用，优先使用
+		$preferred = $context->get_preferred_provider();
+		if ( $preferred !== null && isset( $this->providers[ $preferred ] ) ) {
+			if ( ! $context->is_excluded( $preferred ) ) {
+				return $preferred;
+			}
+		}
 
-        return $ranked;
-    }
+		return $strategy->select_provider( $context, $this->providers );
+	}
 
-    /**
-     * 获取所有 Provider 的路由得分
-     *
-     * @param RoutingContext|null $context 路由上下文
-     * @return array<string, array{score: float, rank: int}>
-     */
-    public function get_provider_scores(?RoutingContext $context = null): array
-    {
-        $context = $context ?? RoutingContext::create();
-        $strategy = $this->get_strategy();
+	/**
+	 * 获取故障转移链
+	 *
+	 * 返回按策略排序的 Provider 列表
+	 *
+	 * @param RoutingContext|null $context 路由上下文
+	 * @return array<string> Provider ID 列表
+	 */
+	public function get_failover_chain( ?RoutingContext $context = null ): array {
+		$context  = $context ?? RoutingContext::create();
+		$strategy = $this->get_strategy();
 
-        if ($strategy === null) {
-            return [];
-        }
+		if ( $strategy === null ) {
+			return array_keys( $this->providers );
+		}
 
-        $scores = [];
-        foreach ($this->providers as $providerId => $config) {
-            $scores[$providerId] = [
-                'score' => $strategy->calculate_score($providerId, $context),
-                'name' => $config['display_name'] ?? $providerId,
-            ];
-        }
+		$ranked = $strategy->rank_providers( $context, $this->providers );
 
-        // 按得分排序并添加排名
-        uasort($scores, fn($a, $b) => $b['score'] <=> $a['score']);
+		// 如果有首选 Provider，放在最前面
+		$preferred = $context->get_preferred_provider();
+		if ( $preferred !== null && in_array( $preferred, $ranked, true ) ) {
+			$ranked = array_values( array_diff( $ranked, [ $preferred ] ) );
+			array_unshift( $ranked, $preferred );
+		}
 
-        $rank = 1;
-        foreach ($scores as $providerId => &$data) {
-            $data['rank'] = $rank++;
-        }
+		return $ranked;
+	}
 
-        return $scores;
-    }
+	/**
+	 * 获取所有 Provider 的路由得分
+	 *
+	 * @param RoutingContext|null $context 路由上下文
+	 * @return array<string, array{score: float, rank: int}>
+	 */
+	public function get_provider_scores( ?RoutingContext $context = null ): array {
+		$context  = $context ?? RoutingContext::create();
+		$strategy = $this->get_strategy();
 
-    /**
-     * 获取路由状态摘要
-     *
-     * @return array 状态信息
-     */
-    public function get_status_summary(): array
-    {
-        $context = RoutingContext::create();
-        $strategy = $this->get_strategy();
+		if ( $strategy === null ) {
+			return [];
+		}
 
-        return [
-            'active_strategy' => [
-                'name' => $this->activeStrategy,
-                'display_name' => $strategy?->get_display_name() ?? '未知',
-                'description' => $strategy?->get_description() ?? '',
-            ],
-            'available_strategies' => $this->get_available_strategies(),
-            'provider_count' => count($this->providers),
-            'provider_scores' => $this->get_provider_scores($context),
-            'recommended' => $this->route($context),
-            'failover_chain' => $this->get_failover_chain($context),
-        ];
-    }
+		$scores = [];
+		foreach ( $this->providers as $providerId => $config ) {
+			$scores[ $providerId ] = [
+				'score' => $strategy->calculate_score( $providerId, $context ),
+				'name'  => $config['display_name'] ?? $providerId,
+			];
+		}
 
-    /**
-     * 刷新路由器状态
-     */
-    public function refresh(): void
-    {
-        self::$instance = null;
-        self::instance();
-    }
+		// 按得分排序并添加排名
+		uasort( $scores, fn( $a, $b ) => $b['score'] <=> $a['score'] );
 
-    /**
-     * 获取手动设置的 Provider 优先级
-     *
-     * @return array<string> Provider ID 列表，按优先级排序
-     */
-    public function get_manual_priority(): array
-    {
-        $settings = get_option('wpmind_routing_settings', []);
-        return $settings['provider_priority'] ?? [];
-    }
+		$rank = 1;
+		foreach ( $scores as $providerId => &$data ) {
+			$data['rank'] = $rank++;
+		}
 
-    /**
-     * 设置手动 Provider 优先级
-     *
-     * @param array<string> $priority Provider ID 列表，按优先级排序
-     * @return bool 是否设置成功
-     */
-    public function set_manual_priority(array $priority): bool
-    {
-        // 验证所有 Provider ID 都有效
-        $valid_providers = array_keys($this->providers);
-        $priority = array_filter($priority, fn($id) => in_array($id, $valid_providers, true));
+		return $scores;
+	}
 
-        $settings = get_option('wpmind_routing_settings', []);
-        $settings['provider_priority'] = array_values($priority);
+	/**
+	 * 获取路由状态摘要
+	 *
+	 * @return array 状态信息
+	 */
+	public function get_status_summary(): array {
+		$context  = RoutingContext::create();
+		$strategy = $this->get_strategy();
 
-        return update_option('wpmind_routing_settings', $settings);
-    }
+		return [
+			'active_strategy'      => [
+				'name'         => $this->activeStrategy,
+				'display_name' => $strategy?->get_display_name() ?? '未知',
+				'description'  => $strategy?->get_description() ?? '',
+			],
+			'available_strategies' => $this->get_available_strategies(),
+			'provider_count'       => count( $this->providers ),
+			'provider_scores'      => $this->get_provider_scores( $context ),
+			'recommended'          => $this->route( $context ),
+			'failover_chain'       => $this->get_failover_chain( $context ),
+		];
+	}
 
-    /**
-     * 清除手动优先级设置
-     *
-     * @return bool 是否清除成功
-     */
-    public function clear_manual_priority(): bool
-    {
-        $settings = get_option('wpmind_routing_settings', []);
-        unset($settings['provider_priority']);
+	/**
+	 * 刷新路由器状态
+	 */
+	public function refresh(): void {
+		self::$instance = null;
+		self::instance();
+	}
 
-        return update_option('wpmind_routing_settings', $settings);
-    }
+	/**
+	 * 获取手动设置的 Provider 优先级
+	 *
+	 * @return array<string> Provider ID 列表，按优先级排序
+	 */
+	public function get_manual_priority(): array {
+		$settings = get_option( 'wpmind_routing_settings', [] );
+		return $settings['provider_priority'] ?? [];
+	}
 
-    /**
-     * 检查是否启用了手动优先级
-     *
-     * @return bool
-     */
-    public function has_manual_priority(): bool
-    {
-        $priority = $this->get_manual_priority();
-        return !empty($priority);
-    }
+	/**
+	 * 设置手动 Provider 优先级
+	 *
+	 * @param array<string> $priority Provider ID 列表，按优先级排序
+	 * @return bool 是否设置成功
+	 */
+	public function set_manual_priority( array $priority ): bool {
+		// 验证所有 Provider ID 都有效
+		$valid_providers = array_keys( $this->providers );
+		$priority        = array_filter( $priority, fn( $id ) => in_array( $id, $valid_providers, true ) );
+
+		$settings                      = get_option( 'wpmind_routing_settings', [] );
+		$settings['provider_priority'] = array_values( $priority );
+
+		return update_option( 'wpmind_routing_settings', $settings );
+	}
+
+	/**
+	 * 清除手动优先级设置
+	 *
+	 * @return bool 是否清除成功
+	 */
+	public function clear_manual_priority(): bool {
+		$settings = get_option( 'wpmind_routing_settings', [] );
+		unset( $settings['provider_priority'] );
+
+		return update_option( 'wpmind_routing_settings', $settings );
+	}
+
+	/**
+	 * 检查是否启用了手动优先级
+	 *
+	 * @return bool
+	 */
+	public function has_manual_priority(): bool {
+		$priority = $this->get_manual_priority();
+		return ! empty( $priority );
+	}
 }

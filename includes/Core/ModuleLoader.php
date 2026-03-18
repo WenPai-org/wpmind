@@ -270,9 +270,9 @@ class ModuleLoader {
 	/**
 	 * Recursively resolve a module's dependencies.
 	 *
-	 * @param string   $module_id Module ID.
-	 * @param array    $ordered   Ordered output list (by reference).
-	 * @param array    $resolved  Already resolved modules (by reference).
+	 * @param string $module_id Module ID.
+	 * @param array  $ordered   Ordered output list (by reference).
+	 * @param array  $resolved  Already resolved modules (by reference).
 	 */
 	private function resolve_module_deps( string $module_id, array &$ordered, array &$resolved ): void {
 		if ( isset( $resolved[ $module_id ] ) ) {

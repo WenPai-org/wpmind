@@ -15,141 +15,132 @@ namespace WPMind\Routing\Strategies;
 use WPMind\Routing\AbstractStrategy;
 use WPMind\Routing\RoutingContext;
 
-class LoadBalancedStrategy extends AbstractStrategy
-{
-    /** @var string 负载均衡算法 */
-    private string $algorithm;
+class LoadBalancedStrategy extends AbstractStrategy {
 
-    /** @var array<string, int> Provider 权重配置 */
-    private array $weights;
+	/** @var string 负载均衡算法 */
+	private string $algorithm;
 
-    /**
-     * @param string $algorithm 算法: round_robin, weighted, random
-     * @param array<string, int> $weights Provider 权重
-     */
-    public function __construct(string $algorithm = 'weighted', array $weights = [])
-    {
-        $this->algorithm = $algorithm;
-        $this->weights = $weights;
-    }
+	/** @var array<string, int> Provider 权重配置 */
+	private array $weights;
 
-    public function get_name(): string
-    {
-        return 'load_balanced';
-    }
+	/**
+	 * @param string             $algorithm 算法: round_robin, weighted, random
+	 * @param array<string, int> $weights Provider 权重
+	 */
+	public function __construct( string $algorithm = 'weighted', array $weights = [] ) {
+		$this->algorithm = $algorithm;
+		$this->weights   = $weights;
+	}
 
-    public function get_display_name(): string
-    {
-        return '负载均衡';
-    }
+	public function get_name(): string {
+		return 'load_balanced';
+	}
 
-    public function get_description(): string
-    {
-        return '在多个 Provider 之间分散请求，避免单点过载';
-    }
+	public function get_display_name(): string {
+		return '负载均衡';
+	}
 
-    /**
-     * 选择 Provider
-     *
-     * 根据算法选择下一个 Provider
-     */
-    public function select_provider(RoutingContext $context, array $providers): ?string
-    {
-        $available = $this->filter_available($context, $providers);
+	public function get_description(): string {
+		return '在多个 Provider 之间分散请求，避免单点过载';
+	}
 
-        if (empty($available)) {
-            return null;
-        }
+	/**
+	 * 选择 Provider
+	 *
+	 * 根据算法选择下一个 Provider
+	 */
+	public function select_provider( RoutingContext $context, array $providers ): ?string {
+		$available = $this->filter_available( $context, $providers );
 
-        // 过滤掉健康分数太低的 Provider
-        $healthy = array_filter(
-            $available,
-            fn($id) => $context->get_health_score($id) >= 50
-        );
+		if ( empty( $available ) ) {
+			return null;
+		}
 
-        // 如果没有健康的 Provider，使用所有可用的
-        if (empty($healthy)) {
-            $healthy = $available;
-        }
+		// 过滤掉健康分数太低的 Provider
+		$healthy = array_filter(
+			$available,
+			fn( $id ) => $context->get_health_score( $id ) >= 50
+		);
 
-        return match ($this->algorithm) {
-            'round_robin' => $this->round_robin($healthy),
-            'random' => $this->random($healthy),
-            default => $this->weighted($healthy, $context),
-        };
-    }
+		// 如果没有健康的 Provider，使用所有可用的
+		if ( empty( $healthy ) ) {
+			$healthy = $available;
+		}
 
-    /**
-     * 计算 Provider 的得分
-     *
-     * 综合考虑权重、健康分数和使用量
-     */
-    public function calculate_score(string $providerId, RoutingContext $context): float
-    {
-        $healthScore = $context->get_health_score($providerId);
-        $weight = $this->weights[$providerId] ?? 1;
+		return match ( $this->algorithm ) {
+			'round_robin' => $this->round_robin( $healthy ),
+			'random' => $this->random( $healthy ),
+			default => $this->weighted( $healthy, $context ),
+		};
+	}
 
-        // 获取使用统计
-        $usageStats = $context->get_provider_usage_stats($providerId);
-        $requestCount = $usageStats['request_count'] ?? 0;
+	/**
+	 * 计算 Provider 的得分
+	 *
+	 * 综合考虑权重、健康分数和使用量
+	 */
+	public function calculate_score( string $providerId, RoutingContext $context ): float {
+		$healthScore = $context->get_health_score( $providerId );
+		$weight      = $this->weights[ $providerId ] ?? 1;
 
-        // 使用量越少，得分越高（鼓励分散）
-        $usageScore = max(0, 100 - ($requestCount / 10));
+		// 获取使用统计
+		$usageStats   = $context->get_provider_usage_stats( $providerId );
+		$requestCount = $usageStats['request_count'] ?? 0;
 
-        // 综合得分
-        return ($healthScore * 0.4) + ($usageScore * 0.3) + ($weight * 10 * 0.3);
-    }
+		// 使用量越少，得分越高（鼓励分散）
+		$usageScore = max( 0, 100 - ( $requestCount / 10 ) );
 
-    /**
-     * 轮询算法
-     */
-    private function round_robin(array $providers): string
-    {
-        $providers = array_values($providers);
-        $index = (int) get_transient('wpmind_round_robin_index') ?: 0;
-        $selected = $providers[$index % count($providers)];
-        set_transient('wpmind_round_robin_index', $index + 1, 3600);
-        return $selected;
-    }
+		// 综合得分
+		return ( $healthScore * 0.4 ) + ( $usageScore * 0.3 ) + ( $weight * 10 * 0.3 );
+	}
 
-    /**
-     * 随机算法
-     */
-    private function random(array $providers): string
-    {
-        $providers = array_values($providers);
-        return $providers[array_rand($providers)];
-    }
+	/**
+	 * 轮询算法
+	 */
+	private function round_robin( array $providers ): string {
+		$providers = array_values( $providers );
+		$index     = (int) get_transient( 'wpmind_round_robin_index' ) ?: 0;
+		$selected  = $providers[ $index % count( $providers ) ];
+		set_transient( 'wpmind_round_robin_index', $index + 1, 3600 );
+		return $selected;
+	}
 
-    /**
-     * 加权算法
-     */
-    private function weighted(array $providers, RoutingContext $context): string
-    {
-        $weightedProviders = [];
+	/**
+	 * 随机算法
+	 */
+	private function random( array $providers ): string {
+		$providers = array_values( $providers );
+		return $providers[ array_rand( $providers ) ];
+	}
 
-        foreach ($providers as $providerId) {
-            $weight = $this->weights[$providerId] ?? 1;
-            $healthScore = $context->get_health_score($providerId);
+	/**
+	 * 加权算法
+	 */
+	private function weighted( array $providers, RoutingContext $context ): string {
+		$weightedProviders = [];
 
-            // 健康分数作为权重修正因子
-            $effectiveWeight = $weight * ($healthScore / 100);
-            $weightedProviders[$providerId] = max(1, (int) $effectiveWeight);
-        }
+		foreach ( $providers as $providerId ) {
+			$weight      = $this->weights[ $providerId ] ?? 1;
+			$healthScore = $context->get_health_score( $providerId );
 
-        // 加权随机选择
-        $totalWeight = array_sum($weightedProviders);
-        $random = mt_rand(1, $totalWeight);
+			// 健康分数作为权重修正因子
+			$effectiveWeight                  = $weight * ( $healthScore / 100 );
+			$weightedProviders[ $providerId ] = max( 1, (int) $effectiveWeight );
+		}
 
-        $cumulative = 0;
-        foreach ($weightedProviders as $providerId => $weight) {
-            $cumulative += $weight;
-            if ($random <= $cumulative) {
-                return $providerId;
-            }
-        }
+		// 加权随机选择
+		$totalWeight = array_sum( $weightedProviders );
+		$random      = mt_rand( 1, $totalWeight );
 
-        // 兜底返回第一个
-        return array_key_first($weightedProviders);
-    }
+		$cumulative = 0;
+		foreach ( $weightedProviders as $providerId => $weight ) {
+			$cumulative += $weight;
+			if ( $random <= $cumulative ) {
+				return $providerId;
+			}
+		}
+
+		// 兜底返回第一个
+		return array_key_first( $weightedProviders );
+	}
 }

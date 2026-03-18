@@ -13,12 +13,12 @@ $default_ttl   = (int) get_option( 'wpmind_exact_cache_default_ttl', 900 );
 $max_entries   = (int) get_option( 'wpmind_exact_cache_max_entries', 500 );
 $scope_mode    = get_option( 'wpmind_exact_cache_scope_mode', 'role' );
 
-$cache_stats   = \WPMind\Cache\ExactCache::instance()->get_stats();
-$hits          = (int) ( $cache_stats['hits'] ?? 0 );
-$misses        = (int) ( $cache_stats['misses'] ?? 0 );
-$total_req     = $hits + $misses;
-$hit_rate      = $total_req > 0 ? round( $hits / $total_req * 100, 1 ) : 0;
-$entries       = (int) ( $cache_stats['entries'] ?? 0 );
+$cache_stats = \WPMind\Cache\ExactCache::instance()->get_stats();
+$hits        = (int) ( $cache_stats['hits'] ?? 0 );
+$misses      = (int) ( $cache_stats['misses'] ?? 0 );
+$total_req   = $hits + $misses;
+$hit_rate    = $total_req > 0 ? round( $hits / $total_req * 100, 1 ) : 0;
+$entries     = (int) ( $cache_stats['entries'] ?? 0 );
 
 $savings = \WPMind\Modules\ExactCache\CostEstimator::get_estimated_savings();
 ?>

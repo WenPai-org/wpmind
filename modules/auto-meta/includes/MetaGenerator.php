@@ -157,7 +157,12 @@ final class MetaGenerator {
 	 * @return array|WP_Error Structured result or error.
 	 */
 	private function generate_all_meta( WP_Post $post, string $content ): array|WP_Error {
-		$categories = get_categories( [ 'hide_empty' => false, 'fields' => 'names' ] );
+		$categories = get_categories(
+			[
+				'hide_empty' => false,
+				'fields'     => 'names',
+			]
+		);
 		$cat_list   = implode( '、', array_slice( $categories, 0, 30 ) );
 
 		$locale = get_locale();
@@ -201,11 +206,15 @@ final class MetaGenerator {
 		/** @var string $prompt */
 		$prompt = apply_filters( 'wpmind_auto_meta_prompt', $prompt, $post );
 
-		return wpmind_structured( $prompt, $schema, [
-			'context'     => 'auto_meta',
-			'max_tokens'  => 800,
-			'temperature' => 0.3,
-		] );
+		return wpmind_structured(
+			$prompt,
+			$schema,
+			[
+				'context'     => 'auto_meta',
+				'max_tokens'  => 800,
+				'temperature' => 0.3,
+			]
+		);
 	}
 
 	/**
@@ -224,10 +233,12 @@ final class MetaGenerator {
 			&& ! empty( $data['excerpt'] )
 		) {
 			remove_action( 'post_updated', [ $this, 'on_update' ], 20 );
-			wp_update_post( [
-				'ID'           => $post_id,
-				'post_excerpt' => sanitize_text_field( $data['excerpt'] ),
-			] );
+			wp_update_post(
+				[
+					'ID'           => $post_id,
+					'post_excerpt' => sanitize_text_field( $data['excerpt'] ),
+				]
+			);
 			add_action( 'post_updated', [ $this, 'on_update' ], 20, 3 );
 		}
 
@@ -358,8 +369,8 @@ final class MetaGenerator {
 		if ( ! is_array( $stats ) ) {
 			$stats = [];
 		}
-		$stats[ $key ]     = ( $stats[ $key ] ?? 0 ) + 1;
-		$month_key         = 'month_' . gmdate( 'Y_m' );
+		$stats[ $key ]       = ( $stats[ $key ] ?? 0 ) + 1;
+		$month_key           = 'month_' . gmdate( 'Y_m' );
 		$stats[ $month_key ] = ( $stats[ $month_key ] ?? 0 ) + 1;
 		update_option( 'wpmind_auto_meta_stats', $stats, false );
 	}

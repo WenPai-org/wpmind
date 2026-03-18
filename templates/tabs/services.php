@@ -45,13 +45,13 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 			</th>
 			<td>
 				<input type="number"
-					   id="wpmind_request_timeout"
-					   name="wpmind_request_timeout"
-					   value="<?php echo esc_attr( $request_timeout ); ?>"
-					   min="10"
-					   max="300"
-					   step="1"
-					   class="small-text">
+						id="wpmind_request_timeout"
+						name="wpmind_request_timeout"
+						value="<?php echo esc_attr( $request_timeout ); ?>"
+						min="10"
+						max="300"
+						step="1"
+						class="small-text">
 				<span class="description">
 					<?php esc_html_e( '秒 (建议 60-120)', 'wpmind' ); ?>
 				</span>
@@ -85,11 +85,12 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 	</h2>
 
 	<div class="wpmind-endpoints-grid">
-		<?php foreach ( $endpoints as $key => $endpoint ) :
+		<?php
+		foreach ( $endpoints as $key => $endpoint ) :
 			$has_api_key = $wpmind_instance->has_api_key( $key );
 			$icon_class  = \WPMind\Modules\CostControl\UsageTracker::get_provider_icon( $key );
 			$icon_color  = \WPMind\Modules\CostControl\UsageTracker::get_provider_color( $key );
-		?>
+			?>
 		<div class="wpmind-endpoint-card<?php echo ( ! empty( $endpoint['enabled'] ) && $has_api_key ) ? '' : ' is-collapsed'; ?>" id="endpoint-<?php echo esc_attr( $key ); ?>">
 			<div class="wpmind-endpoint-header">
 				<button type="button" class="wpmind-endpoint-toggle" aria-expanded="<?php echo ( ! empty( $endpoint['enabled'] ) && $has_api_key ) ? 'true' : 'false'; ?>">
@@ -114,9 +115,9 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 					<td>
 						<label class="wpmind-toggle">
 							<input type="checkbox"
-								   name="wpmind_custom_endpoints[<?php echo esc_attr( $key ); ?>][enabled]"
-								   value="1"
-								   <?php checked( ! empty( $endpoint['enabled'] ) ); ?>>
+									name="wpmind_custom_endpoints[<?php echo esc_attr( $key ); ?>][enabled]"
+									value="1"
+									<?php checked( ! empty( $endpoint['enabled'] ) ); ?>>
 							<span class="wpmind-toggle-slider"></span>
 							<span class="wpmind-toggle-label">
 								<?php esc_html_e( '启用此服务', 'wpmind' ); ?>
@@ -133,12 +134,12 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 					<td>
 						<div class="wpmind-api-key-field">
 							<input type="password"
-								   id="api_key_<?php echo esc_attr( $key ); ?>"
-								   name="wpmind_custom_endpoints[<?php echo esc_attr( $key ); ?>][api_key]"
-								   value=""
-								   class="regular-text"
-								   autocomplete="new-password"
-								   placeholder="<?php echo $has_api_key ? '••••••••••••••••' : esc_attr__( '请输入 API Key', 'wpmind' ); ?>">
+									id="api_key_<?php echo esc_attr( $key ); ?>"
+									name="wpmind_custom_endpoints[<?php echo esc_attr( $key ); ?>][api_key]"
+									value=""
+									class="regular-text"
+									autocomplete="new-password"
+									placeholder="<?php echo $has_api_key ? '••••••••••••••••' : esc_attr__( '请输入 API Key', 'wpmind' ); ?>">
 							<button type="button"
 									class="button wpmind-toggle-key"
 									data-target="api_key_<?php echo esc_attr( $key ); ?>"
@@ -149,9 +150,9 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 						<?php if ( $has_api_key ) : ?>
 						<label class="wpmind-clear-key">
 							<input type="checkbox"
-								   name="wpmind_custom_endpoints[<?php echo esc_attr( $key ); ?>][clear_api_key]"
-								   value="1"
-								   class="wpmind-clear-checkbox">
+									name="wpmind_custom_endpoints[<?php echo esc_attr( $key ); ?>][clear_api_key]"
+									value="1"
+									class="wpmind-clear-checkbox">
 							<?php esc_html_e( '清除 API Key', 'wpmind' ); ?>
 						</label>
 						<?php endif; ?>
@@ -194,11 +195,11 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 					</th>
 					<td>
 						<input type="url"
-							   id="custom_base_url_<?php echo esc_attr( $key ); ?>"
-							   name="wpmind_custom_endpoints[<?php echo esc_attr( $key ); ?>][custom_base_url]"
-							   value="<?php echo esc_attr( $endpoint['custom_base_url'] ?? '' ); ?>"
-							   class="regular-text"
-							   placeholder="<?php echo esc_attr( $endpoint['base_url'] ); ?>">
+								id="custom_base_url_<?php echo esc_attr( $key ); ?>"
+								name="wpmind_custom_endpoints[<?php echo esc_attr( $key ); ?>][custom_base_url]"
+								value="<?php echo esc_attr( $endpoint['custom_base_url'] ?? '' ); ?>"
+								class="regular-text"
+								placeholder="<?php echo esc_attr( $endpoint['base_url'] ); ?>">
 					</td>
 				</tr>
 				<tr>

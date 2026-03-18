@@ -122,20 +122,20 @@ class ChineseOptimizer {
 	 */
 	private function normalize_chinese_punctuation( string $text ): string {
 		$replacements = array(
-			'，' => ', ',
-			'。' => '. ',
-			'！' => '! ',
-			'？' => '? ',
-			'：' => ': ',
-			'；' => '; ',
-			'"'  => '"',
-			'"'  => '"',
+			'，'            => ', ',
+			'。'            => '. ',
+			'！'            => '! ',
+			'？'            => '? ',
+			'：'            => ': ',
+			'；'            => '; ',
+			'"'            => '"',
+			'"'            => '"',
 			"\xe2\x80\x98" => "'", // Left single quotation mark (')
 			"\xe2\x80\x99" => "'", // Right single quotation mark (')
-			'（' => '(',
-			'）' => ')',
-			'【' => '[',
-			'】' => ']',
+			'（'            => '(',
+			'）'            => ')',
+			'【'            => '[',
+			'】'            => ']',
 		);
 
 		return str_replace(

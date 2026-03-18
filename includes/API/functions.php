@@ -9,8 +9,8 @@
 
 declare(strict_types=1);
 
-if (!defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /**
@@ -18,19 +18,19 @@ if (!defined('ABSPATH')) {
  *
  * @since 2.5.0
  * @return bool
- * 
+ *
  * @example
  * if (wpmind_is_available()) {
  *     $result = wpmind_chat('Hello');
  * }
  */
-if (!function_exists('wpmind_is_available')) {
-    function wpmind_is_available(): bool {
-        if (!class_exists('WPMind\\API\\PublicAPI')) {
-            return false;
-        }
-        return \WPMind\API\PublicAPI::instance()->is_available();
-    }
+if ( ! function_exists( 'wpmind_is_available' ) ) {
+	function wpmind_is_available(): bool {
+		if ( ! class_exists( 'WPMind\\API\\PublicAPI' ) ) {
+			return false;
+		}
+		return \WPMind\API\PublicAPI::instance()->is_available();
+	}
 }
 
 /**
@@ -43,23 +43,27 @@ if (!function_exists('wpmind_is_available')) {
  *     @type string $model     当前模型
  *     @type array  $usage     用量统计
  * }
- * 
+ *
  * @example
  * $status = wpmind_get_status();
  * echo $status['usage']['today'];
  */
-if (!function_exists('wpmind_get_status')) {
-    function wpmind_get_status(): array {
-        if (!class_exists('WPMind\\API\\PublicAPI')) {
-            return [
-                'available' => false,
-                'provider'  => '',
-                'model'     => '',
-                'usage'     => ['today' => 0, 'month' => 0, 'limit' => 0],
-            ];
-        }
-        return \WPMind\API\PublicAPI::instance()->get_status();
-    }
+if ( ! function_exists( 'wpmind_get_status' ) ) {
+	function wpmind_get_status(): array {
+		if ( ! class_exists( 'WPMind\\API\\PublicAPI' ) ) {
+			return [
+				'available' => false,
+				'provider'  => '',
+				'model'     => '',
+				'usage'     => [
+					'today' => 0,
+					'month' => 0,
+					'limit' => 0,
+				],
+			];
+		}
+		return \WPMind\API\PublicAPI::instance()->get_status();
+	}
 }
 
 
@@ -69,22 +73,22 @@ if (!function_exists('wpmind_get_status')) {
  * @since 4.0.0
  * @return array
  */
-if (!function_exists('wpmind_get_cache_stats')) {
-    function wpmind_get_cache_stats(): array {
-        if (!class_exists('WPMind\API\PublicAPI')) {
-            return [
-                'enabled'     => false,
-                'hits'        => 0,
-                'misses'      => 0,
-                'writes'      => 0,
-                'hit_rate'    => 0,
-                'entries'     => 0,
-                'max_entries' => 0,
-            ];
-        }
+if ( ! function_exists( 'wpmind_get_cache_stats' ) ) {
+	function wpmind_get_cache_stats(): array {
+		if ( ! class_exists( 'WPMind\API\PublicAPI' ) ) {
+			return [
+				'enabled'     => false,
+				'hits'        => 0,
+				'misses'      => 0,
+				'writes'      => 0,
+				'hit_rate'    => 0,
+				'entries'     => 0,
+				'max_entries' => 0,
+			];
+		}
 
-        return \WPMind\API\PublicAPI::instance()->get_exact_cache_stats();
-    }
+		return \WPMind\API\PublicAPI::instance()->get_exact_cache_stats();
+	}
 }
 
 /**
@@ -110,11 +114,11 @@ if (!function_exists('wpmind_get_cache_stats')) {
  *     @type string $model    使用的模型
  *     @type array  $usage    Token 用量
  * }
- * 
+ *
  * @example 简单模式
  * $result = wpmind_chat('写一首关于春天的诗');
  * echo $result['content'];
- * 
+ *
  * @example 多轮对话
  * $result = wpmind_chat([
  *     ['role' => 'system', 'content' => '你是一个 SEO 专家'],
@@ -123,16 +127,16 @@ if (!function_exists('wpmind_get_cache_stats')) {
  *     'context' => 'seo_generation',
  * ]);
  */
-if (!function_exists('wpmind_chat')) {
-    function wpmind_chat($messages, array $options = []) {
-        if (!class_exists('WPMind\\API\\PublicAPI')) {
-            return new WP_Error(
-                'wpmind_not_available',
-                __('WPMind 插件未激活', 'wpmind')
-            );
-        }
-        return \WPMind\API\PublicAPI::instance()->chat($messages, $options);
-    }
+if ( ! function_exists( 'wpmind_chat' ) ) {
+	function wpmind_chat( $messages, array $options = [] ) {
+		if ( ! class_exists( 'WPMind\\API\\PublicAPI' ) ) {
+			return new WP_Error(
+				'wpmind_not_available',
+				__( 'WPMind 插件未激活', 'wpmind' )
+			);
+		}
+		return \WPMind\API\PublicAPI::instance()->chat( $messages, $options );
+	}
 }
 
 /**
@@ -150,27 +154,27 @@ if (!function_exists('wpmind_chat')) {
  *     @type int    $cache_ttl 缓存秒数，默认 86400（1天）
  * }
  * @return string|WP_Error 翻译结果或错误
- * 
+ *
  * @example 普通翻译
  * $english = wpmind_translate('你好世界', 'zh', 'en');
  * // 返回: "Hello World"
- * 
+ *
  * @example Slug 格式
  * $slug = wpmind_translate('WordPress 性能优化', 'zh', 'en', [
  *     'format' => 'slug',
  * ]);
  * // 返回: "wordpress-performance-optimization"
  */
-if (!function_exists('wpmind_translate')) {
-    function wpmind_translate(string $text, string $from = 'auto', string $to = 'en', array $options = []) {
-        if (!class_exists('WPMind\\API\\PublicAPI')) {
-            return new WP_Error(
-                'wpmind_not_available',
-                __('WPMind 插件未激活', 'wpmind')
-            );
-        }
-        return \WPMind\API\PublicAPI::instance()->translate($text, $from, $to, $options);
-    }
+if ( ! function_exists( 'wpmind_translate' ) ) {
+	function wpmind_translate( string $text, string $from = 'auto', string $to = 'en', array $options = [] ) {
+		if ( ! class_exists( 'WPMind\\API\\PublicAPI' ) ) {
+			return new WP_Error(
+				'wpmind_not_available',
+				__( 'WPMind 插件未激活', 'wpmind' )
+			);
+		}
+		return \WPMind\API\PublicAPI::instance()->translate( $text, $from, $to, $options );
+	}
 }
 
 /**
@@ -187,34 +191,37 @@ if (!function_exists('wpmind_translate')) {
  *     @type int    $cache_ttl 缓存时间（秒），默认 604800（7天）
  * }
  * @return string|WP_Error 成功返回拼音字符串，失败返回 WP_Error
- * 
+ *
  * @example
  * $pinyin = wpmind_pinyin('你好世界');
  * // 返回: "nihao-shijie"
- * 
- * @example 
+ *
+ * @example
  * $pinyin = wpmind_pinyin('WordPress性能优化指南');
  * // 返回: "WordPress-xingneng-youhua-zhinan"
  */
-if (!function_exists('wpmind_pinyin')) {
-    function wpmind_pinyin(string $text, array $options = []) {
-        if (!class_exists('WPMind\\API\\PublicAPI')) {
-            return new WP_Error(
-                'wpmind_not_available',
-                __('WPMind 插件未激活', 'wpmind')
-            );
-        }
-        
-        // 设置 format 为 pinyin
-        $options = wp_parse_args($options, [
-            'context'   => 'pinyin_conversion',
-            'format'    => 'pinyin',
-            'cache_ttl' => 604800, // 7 天
-        ]);
-        
-        // 调用 translate 方法，但 format=pinyin 会触发拼音转换逻辑
-        return \WPMind\API\PublicAPI::instance()->translate($text, 'zh', 'zh', $options);
-    }
+if ( ! function_exists( 'wpmind_pinyin' ) ) {
+	function wpmind_pinyin( string $text, array $options = [] ) {
+		if ( ! class_exists( 'WPMind\\API\\PublicAPI' ) ) {
+			return new WP_Error(
+				'wpmind_not_available',
+				__( 'WPMind 插件未激活', 'wpmind' )
+			);
+		}
+
+		// 设置 format 为 pinyin
+		$options = wp_parse_args(
+			$options,
+			[
+				'context'   => 'pinyin_conversion',
+				'format'    => 'pinyin',
+				'cache_ttl' => 604800, // 7 天
+			]
+		);
+
+		// 调用 translate 方法，但 format=pinyin 会触发拼音转换逻辑
+		return \WPMind\API\PublicAPI::instance()->translate( $text, 'zh', 'zh', $options );
+	}
 }
 
 /**
@@ -237,23 +244,23 @@ if (!function_exists('wpmind_pinyin')) {
  *     @type string $provider       使用的服务商
  *     @type string $revised_prompt 修改后的提示词（部分服务商）
  * }
- * 
+ *
  * @example
  * $image = wpmind_generate_image('一只可爱的熊猫在竹林中', [
  *     'size' => '1024x1024',
  * ]);
  * echo '<img src="' . $image['url'] . '">';
  */
-if (!function_exists('wpmind_generate_image')) {
-    function wpmind_generate_image(string $prompt, array $options = []) {
-        if (!class_exists('WPMind\\API\\PublicAPI')) {
-            return new WP_Error(
-                'wpmind_not_available',
-                __('WPMind 插件未激活', 'wpmind')
-            );
-        }
-        return \WPMind\API\PublicAPI::instance()->generate_image($prompt, $options);
-    }
+if ( ! function_exists( 'wpmind_generate_image' ) ) {
+	function wpmind_generate_image( string $prompt, array $options = [] ) {
+		if ( ! class_exists( 'WPMind\\API\\PublicAPI' ) ) {
+			return new WP_Error(
+				'wpmind_not_available',
+				__( 'WPMind 插件未激活', 'wpmind' )
+			);
+		}
+		return \WPMind\API\PublicAPI::instance()->generate_image( $prompt, $options );
+	}
 }
 
 /**
@@ -261,23 +268,36 @@ if (!function_exists('wpmind_generate_image')) {
  *
  * 为不存在 WPMind 时提供 fallback
  */
-add_filter('wpmind_is_available', function($available) {
-    return wpmind_is_available();
-});
+add_filter(
+	'wpmind_is_available',
+	function ( $available ) {
+		return wpmind_is_available();
+	}
+);
 
-add_filter('wpmind_chat', function($default, $messages, $options = []) {
-    if (wpmind_is_available()) {
-        return wpmind_chat($messages, $options);
-    }
-    return $default;
-}, 10, 3);
+add_filter(
+	'wpmind_chat',
+	function ( $default, $messages, $options = [] ) {
+		if ( wpmind_is_available() ) {
+			return wpmind_chat( $messages, $options );
+		}
+		return $default;
+	},
+	10,
+	3
+);
 
-add_filter('wpmind_translate', function($default, $text, $from = 'auto', $to = 'en', $options = []) {
-    if (wpmind_is_available()) {
-        return wpmind_translate($text, $from, $to, $options);
-    }
-    return $default;
-}, 10, 5);
+add_filter(
+	'wpmind_translate',
+	function ( $default, $text, $from = 'auto', $to = 'en', $options = [] ) {
+		if ( wpmind_is_available() ) {
+			return wpmind_translate( $text, $from, $to, $options );
+		}
+		return $default;
+	},
+	10,
+	5
+);
 
 // ============================================
 // v4.3.0 Vision API
@@ -340,13 +360,13 @@ if ( ! function_exists( 'wpmind_vision' ) ) {
  *     flush();
  * });
  */
-if (!function_exists('wpmind_stream')) {
-    function wpmind_stream($messages, callable $callback, array $options = []) {
-        if (!class_exists('WPMind\\API\\PublicAPI')) {
-            return new WP_Error('wpmind_not_available', __('WPMind 插件未激活', 'wpmind'));
-        }
-        return \WPMind\API\PublicAPI::instance()->stream($messages, $callback, $options);
-    }
+if ( ! function_exists( 'wpmind_stream' ) ) {
+	function wpmind_stream( $messages, callable $callback, array $options = [] ) {
+		if ( ! class_exists( 'WPMind\\API\\PublicAPI' ) ) {
+			return new WP_Error( 'wpmind_not_available', __( 'WPMind 插件未激活', 'wpmind' ) );
+		}
+		return \WPMind\API\PublicAPI::instance()->stream( $messages, $callback, $options );
+	}
 }
 
 /**
@@ -370,13 +390,13 @@ if (!function_exists('wpmind_stream')) {
  * ]);
  * // 返回: ['data' => ['title' => '...', 'date' => '...', 'summary' => '...'], ...]
  */
-if (!function_exists('wpmind_structured')) {
-    function wpmind_structured($messages, array $schema, array $options = []) {
-        if (!class_exists('WPMind\\API\\PublicAPI')) {
-            return new WP_Error('wpmind_not_available', __('WPMind 插件未激活', 'wpmind'));
-        }
-        return \WPMind\API\PublicAPI::instance()->structured($messages, $schema, $options);
-    }
+if ( ! function_exists( 'wpmind_structured' ) ) {
+	function wpmind_structured( $messages, array $schema, array $options = [] ) {
+		if ( ! class_exists( 'WPMind\\API\\PublicAPI' ) ) {
+			return new WP_Error( 'wpmind_not_available', __( 'WPMind 插件未激活', 'wpmind' ) );
+		}
+		return \WPMind\API\PublicAPI::instance()->structured( $messages, $schema, $options );
+	}
 }
 
 /**
@@ -393,13 +413,13 @@ if (!function_exists('wpmind_structured')) {
  * $result = wpmind_batch($titles, '将这个标题翻译成英文：{{item}}');
  * // 返回: ['results' => [...], 'total_items' => 3, ...]
  */
-if (!function_exists('wpmind_batch')) {
-    function wpmind_batch(array $items, string $prompt_template, array $options = []) {
-        if (!class_exists('WPMind\\API\\PublicAPI')) {
-            return new WP_Error('wpmind_not_available', __('WPMind 插件未激活', 'wpmind'));
-        }
-        return \WPMind\API\PublicAPI::instance()->batch($items, $prompt_template, $options);
-    }
+if ( ! function_exists( 'wpmind_batch' ) ) {
+	function wpmind_batch( array $items, string $prompt_template, array $options = [] ) {
+		if ( ! class_exists( 'WPMind\\API\\PublicAPI' ) ) {
+			return new WP_Error( 'wpmind_not_available', __( 'WPMind 插件未激活', 'wpmind' ) );
+		}
+		return \WPMind\API\PublicAPI::instance()->batch( $items, $prompt_template, $options );
+	}
 }
 
 /**
@@ -414,13 +434,13 @@ if (!function_exists('wpmind_batch')) {
  * $result = wpmind_embed('WordPress 是一个开源 CMS');
  * // 返回: ['embeddings' => [[0.123, 0.456, ...]], 'dimensions' => 1536, ...]
  */
-if (!function_exists('wpmind_embed')) {
-    function wpmind_embed($texts, array $options = []) {
-        if (!class_exists('WPMind\\API\\PublicAPI')) {
-            return new WP_Error('wpmind_not_available', __('WPMind 插件未激活', 'wpmind'));
-        }
-        return \WPMind\API\PublicAPI::instance()->embed($texts, $options);
-    }
+if ( ! function_exists( 'wpmind_embed' ) ) {
+	function wpmind_embed( $texts, array $options = [] ) {
+		if ( ! class_exists( 'WPMind\\API\\PublicAPI' ) ) {
+			return new WP_Error( 'wpmind_not_available', __( 'WPMind 插件未激活', 'wpmind' ) );
+		}
+		return \WPMind\API\PublicAPI::instance()->embed( $texts, $options );
+	}
 }
 
 /**
@@ -434,15 +454,15 @@ if (!function_exists('wpmind_embed')) {
  * $tokens = wpmind_count_tokens('这是一段中文文本');
  * // 返回: 约 8
  */
-if (!function_exists('wpmind_count_tokens')) {
-    function wpmind_count_tokens($content): int {
-        if (!class_exists('WPMind\\API\\PublicAPI')) {
-            // 简易估算
-            $text = is_array($content) ? json_encode($content) : $content;
-            return max(1, (int)(mb_strlen($text) / 3));
-        }
-        return \WPMind\API\PublicAPI::instance()->count_tokens($content);
-    }
+if ( ! function_exists( 'wpmind_count_tokens' ) ) {
+	function wpmind_count_tokens( $content ): int {
+		if ( ! class_exists( 'WPMind\\API\\PublicAPI' ) ) {
+			// 简易估算
+			$text = is_array( $content ) ? json_encode( $content ) : $content;
+			return max( 1, (int) ( mb_strlen( $text ) / 3 ) );
+		}
+		return \WPMind\API\PublicAPI::instance()->count_tokens( $content );
+	}
 }
 
 // ============================================
@@ -463,13 +483,13 @@ if (!function_exists('wpmind_count_tokens')) {
  *     'max_length' => 100,
  * ]);
  */
-if (!function_exists('wpmind_summarize')) {
-    function wpmind_summarize(string $text, array $options = []) {
-        if (!class_exists('WPMind\\API\\PublicAPI')) {
-            return new WP_Error('wpmind_not_available', __('WPMind 插件未激活', 'wpmind'));
-        }
-        return \WPMind\API\PublicAPI::instance()->summarize($text, $options);
-    }
+if ( ! function_exists( 'wpmind_summarize' ) ) {
+	function wpmind_summarize( string $text, array $options = [] ) {
+		if ( ! class_exists( 'WPMind\\API\\PublicAPI' ) ) {
+			return new WP_Error( 'wpmind_not_available', __( 'WPMind 插件未激活', 'wpmind' ) );
+		}
+		return \WPMind\API\PublicAPI::instance()->summarize( $text, $options );
+	}
 }
 
 /**
@@ -486,13 +506,13 @@ if (!function_exists('wpmind_summarize')) {
  *     // 内容不安全
  * }
  */
-if (!function_exists('wpmind_moderate')) {
-    function wpmind_moderate(string $content, array $options = []) {
-        if (!class_exists('WPMind\\API\\PublicAPI')) {
-            return new WP_Error('wpmind_not_available', __('WPMind 插件未激活', 'wpmind'));
-        }
-        return \WPMind\API\PublicAPI::instance()->moderate($content, $options);
-    }
+if ( ! function_exists( 'wpmind_moderate' ) ) {
+	function wpmind_moderate( string $content, array $options = [] ) {
+		if ( ! class_exists( 'WPMind\\API\\PublicAPI' ) ) {
+			return new WP_Error( 'wpmind_not_available', __( 'WPMind 插件未激活', 'wpmind' ) );
+		}
+		return \WPMind\API\PublicAPI::instance()->moderate( $content, $options );
+	}
 }
 
 /**
@@ -507,13 +527,13 @@ if (!function_exists('wpmind_moderate')) {
  * $result = wpmind_transcribe('/path/to/audio.mp3');
  * echo $result['text'];
  */
-if (!function_exists('wpmind_transcribe')) {
-    function wpmind_transcribe(string $audio_file, array $options = []) {
-        if (!class_exists('WPMind\\API\\PublicAPI')) {
-            return new WP_Error('wpmind_not_available', __('WPMind 插件未激活', 'wpmind'));
-        }
-        return \WPMind\API\PublicAPI::instance()->transcribe($audio_file, $options);
-    }
+if ( ! function_exists( 'wpmind_transcribe' ) ) {
+	function wpmind_transcribe( string $audio_file, array $options = [] ) {
+		if ( ! class_exists( 'WPMind\\API\\PublicAPI' ) ) {
+			return new WP_Error( 'wpmind_not_available', __( 'WPMind 插件未激活', 'wpmind' ) );
+		}
+		return \WPMind\API\PublicAPI::instance()->transcribe( $audio_file, $options );
+	}
 }
 
 /**
@@ -530,11 +550,11 @@ if (!function_exists('wpmind_transcribe')) {
  * ]);
  * echo $result['url']; // 音频 URL
  */
-if (!function_exists('wpmind_speech')) {
-    function wpmind_speech(string $text, array $options = []) {
-        if (!class_exists('WPMind\\API\\PublicAPI')) {
-            return new WP_Error('wpmind_not_available', __('WPMind 插件未激活', 'wpmind'));
-        }
-        return \WPMind\API\PublicAPI::instance()->speech($text, $options);
-    }
+if ( ! function_exists( 'wpmind_speech' ) ) {
+	function wpmind_speech( string $text, array $options = [] ) {
+		if ( ! class_exists( 'WPMind\\API\\PublicAPI' ) ) {
+			return new WP_Error( 'wpmind_not_available', __( 'WPMind 插件未激活', 'wpmind' ) );
+		}
+		return \WPMind\API\PublicAPI::instance()->speech( $text, $options );
+	}
 }

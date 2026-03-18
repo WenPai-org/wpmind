@@ -17,27 +17,25 @@ use WPMind\Providers\AbstractOpenAiCompatibleModelMetadataDirectory;
  *
  * @since 1.3.0
  */
-class DoubaoModelMetadataDirectory extends AbstractOpenAiCompatibleModelMetadataDirectory
-{
-    /**
-     * {@inheritDoc}
-     */
-    protected static function providerClass(): string
-    {
-        return DoubaoProvider::class;
-    }
+class DoubaoModelMetadataDirectory extends AbstractOpenAiCompatibleModelMetadataDirectory {
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function getStaticModels(): array
-    {
-        return [
-            'doubao-pro-4k'   => '豆包 Pro 4K',
-            'doubao-pro-32k'  => '豆包 Pro 32K',
-            'doubao-pro-128k' => '豆包 Pro 128K',
-            'doubao-lite-4k'  => '豆包 Lite 4K',
-            'doubao-lite-32k' => '豆包 Lite 32K',
-        ];
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	protected static function providerClass(): string {
+		return DoubaoProvider::class;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected function getStaticModels(): array {
+		return [
+			'doubao-pro-4k'   => '豆包 Pro 4K',
+			'doubao-pro-32k'  => '豆包 Pro 32K',
+			'doubao-pro-128k' => '豆包 Pro 128K',
+			'doubao-lite-4k'  => '豆包 Lite 4K',
+			'doubao-lite-32k' => '豆包 Lite 32K',
+		];
+	}
 }

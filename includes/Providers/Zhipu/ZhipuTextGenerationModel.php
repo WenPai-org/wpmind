@@ -17,13 +17,12 @@ use WPMind\Providers\AbstractOpenAiCompatibleTextGenerationModel;
  *
  * @since 1.3.0
  */
-class ZhipuTextGenerationModel extends AbstractOpenAiCompatibleTextGenerationModel
-{
-    /**
-     * {@inheritDoc}
-     */
-    protected static function providerClass(): string
-    {
-        return ZhipuProvider::class;
-    }
+class ZhipuTextGenerationModel extends AbstractOpenAiCompatibleTextGenerationModel {
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected static function providerClass(): string {
+		return ZhipuProvider::class;
+	}
 }

@@ -228,12 +228,12 @@ class LlmsTxtGenerator {
 		);
 
 		if ( ! empty( $categories ) ) {
-			$output .= "## " . __( 'Categories', 'wpmind' ) . "\n\n";
+			$output .= '## ' . __( 'Categories', 'wpmind' ) . "\n\n";
 
 			foreach ( $categories as $category ) {
-				$url   = get_category_link( $category->term_id );
-				$name  = esc_html( $category->name );
-				$desc  = ! empty( $category->description )
+				$url  = get_category_link( $category->term_id );
+				$name = esc_html( $category->name );
+				$desc = ! empty( $category->description )
 					? esc_html( $category->description )
 					: sprintf( __( '%d posts', 'wpmind' ), $category->count );
 
@@ -253,7 +253,7 @@ class LlmsTxtGenerator {
 		);
 
 		if ( ! empty( $recent_posts ) ) {
-			$output .= "## " . __( 'Recent Posts', 'wpmind' ) . "\n\n";
+			$output .= '## ' . __( 'Recent Posts', 'wpmind' ) . "\n\n";
 
 			foreach ( $recent_posts as $post ) {
 				$url     = get_permalink( $post );
@@ -276,7 +276,7 @@ class LlmsTxtGenerator {
 		);
 
 		if ( ! empty( $pages ) ) {
-			$output .= "## " . __( 'Pages', 'wpmind' ) . "\n\n";
+			$output .= '## ' . __( 'Pages', 'wpmind' ) . "\n\n";
 
 			foreach ( $pages as $page ) {
 				$url   = get_permalink( $page );

@@ -72,14 +72,18 @@ class AltTextGenerator {
 
 		$lang = $this->get_language_label();
 
-		$result = wpmind_vision( $image_url, sprintf(
-			'为这张图片生成简洁的 alt text（%s），直接输出文本，不要引号或前缀。',
-			$lang
-		), [
-			'max_tokens'  => 100,
-			'temperature' => 0.3,
-			'context'     => 'media_alt_text',
-		] );
+		$result = wpmind_vision(
+			$image_url,
+			sprintf(
+				'为这张图片生成简洁的 alt text（%s），直接输出文本，不要引号或前缀。',
+				$lang
+			),
+			[
+				'max_tokens'  => 100,
+				'temperature' => 0.3,
+				'context'     => 'media_alt_text',
+			]
+		);
 
 		if ( is_wp_error( $result ) ) {
 			do_action( 'wpmind_media_error', 'alt_text', $attachment_id, $result );
@@ -110,12 +114,16 @@ class AltTextGenerator {
 	 * @param string $image_url     Image URL.
 	 */
 	private function generate_title_and_caption( int $attachment_id, string $image_url ): void {
-		$result = wpmind_vision( $image_url, '为这张图片生成：1) 简短标题（10字以内）2) 一句话描述。JSON格式：{"title":"...","caption":"..."}', [
-			'max_tokens'  => 200,
-			'temperature' => 0.3,
-			'json_mode'   => true,
-			'context'     => 'media_title_caption',
-		] );
+		$result = wpmind_vision(
+			$image_url,
+			'为这张图片生成：1) 简短标题（10字以内）2) 一句话描述。JSON格式：{"title":"...","caption":"..."}',
+			[
+				'max_tokens'  => 200,
+				'temperature' => 0.3,
+				'json_mode'   => true,
+				'context'     => 'media_title_caption',
+			]
+		);
 
 		if ( is_wp_error( $result ) ) {
 			return;
@@ -151,7 +159,7 @@ class AltTextGenerator {
 			return $form_fields;
 		}
 
-		$nonce = wp_create_nonce( 'wpmind_ajax' );
+		$nonce                            = wp_create_nonce( 'wpmind_ajax' );
 		$form_fields['wpmind_regenerate'] = [
 			'label' => __( 'AI Alt Text', 'wpmind' ),
 			'input' => 'html',
@@ -213,8 +221,8 @@ class AltTextGenerator {
 		if ( ! is_array( $stats ) ) {
 			$stats = [];
 		}
-		$stats[ $key ] = ( $stats[ $key ] ?? 0 ) + 1;
-		$month_key     = 'month_' . gmdate( 'Y_m' );
+		$stats[ $key ]       = ( $stats[ $key ] ?? 0 ) + 1;
+		$month_key           = 'month_' . gmdate( 'Y_m' );
 		$stats[ $month_key ] = ( $stats[ $month_key ] ?? 0 ) + 1;
 		update_option( 'wpmind_media_stats', $stats, false );
 	}

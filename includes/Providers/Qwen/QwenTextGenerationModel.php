@@ -17,13 +17,12 @@ use WPMind\Providers\AbstractOpenAiCompatibleTextGenerationModel;
  *
  * @since 1.3.0
  */
-class QwenTextGenerationModel extends AbstractOpenAiCompatibleTextGenerationModel
-{
-    /**
-     * {@inheritDoc}
-     */
-    protected static function providerClass(): string
-    {
-        return QwenProvider::class;
-    }
+class QwenTextGenerationModel extends AbstractOpenAiCompatibleTextGenerationModel {
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected static function providerClass(): string {
+		return QwenProvider::class;
+	}
 }

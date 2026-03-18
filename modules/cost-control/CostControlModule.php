@@ -193,14 +193,14 @@ class CostControlModule implements ModuleInterface {
 
 		// Parse JSON data.
 		$json_input = isset( $_POST['settings'] ) ? wp_unslash( $_POST['settings'] ) : '';
-		$input = json_decode( $json_input, true );
+		$input      = json_decode( $json_input, true );
 
 		if ( ! is_array( $input ) ) {
 			wp_send_json_error( array( 'message' => __( '无效的数据格式', 'wpmind' ) ) );
 		}
 
 		// Build settings array.
-		$settings = array();
+		$settings            = array();
 		$settings['enabled'] = ! empty( $input['enabled'] );
 
 		$settings['global'] = array(
@@ -223,7 +223,7 @@ class CostControlModule implements ModuleInterface {
 		$settings['providers'] = array();
 		if ( ! empty( $input['providers'] ) && is_array( $input['providers'] ) ) {
 			foreach ( $input['providers'] as $provider => $limits ) {
-				$provider = sanitize_key( $provider );
+				$provider                           = sanitize_key( $provider );
 				$settings['providers'][ $provider ] = array(
 					'daily_limit'   => (float) ( $limits['daily_limit'] ?? 0 ),
 					'monthly_limit' => (float) ( $limits['monthly_limit'] ?? 0 ),
@@ -232,7 +232,7 @@ class CostControlModule implements ModuleInterface {
 		}
 
 		$manager = BudgetManager::instance();
-		$result = $manager->save_settings( $settings );
+		$result  = $manager->save_settings( $settings );
 
 		if ( $result ) {
 			wp_send_json_success( array( 'message' => __( '设置已保存', 'wpmind' ) ) );
@@ -258,12 +258,14 @@ class CostControlModule implements ModuleInterface {
 		$today = UsageTracker::get_today_stats();
 		$month = UsageTracker::get_month_stats();
 
-		wp_send_json_success( array(
-			'budget'  => $summary,
-			'stats'   => $stats,
-			'today'   => $today,
-			'month'   => $month,
-		) );
+		wp_send_json_success(
+			array(
+				'budget' => $summary,
+				'stats'  => $stats,
+				'today'  => $today,
+				'month'  => $month,
+			)
+		);
 	}
 
 	/**

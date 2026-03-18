@@ -104,11 +104,13 @@ final class MediaAjaxController {
 			   )"
 		);
 
-		wp_send_json_success( [
-			'total_images' => $total_images,
-			'missing_alt'  => $missing_alt,
-			'has_alt'      => $total_images - $missing_alt,
-		] );
+		wp_send_json_success(
+			[
+				'total_images' => $total_images,
+				'missing_alt'  => $missing_alt,
+				'has_alt'      => $total_images - $missing_alt,
+			]
+		);
 	}
 
 	/**
@@ -129,8 +131,9 @@ final class MediaAjaxController {
 
 		// Get batch of image IDs missing alt text, excluding previously failed ones.
 		// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.LikeWildcardsInQuery -- fixed pattern match, not user-supplied wildcards.
-		$ids = $wpdb->get_col( $wpdb->prepare(
-			"SELECT p.ID FROM {$wpdb->posts} p
+		$ids = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT p.ID FROM {$wpdb->posts} p
 			 WHERE p.post_type = 'attachment'
 			   AND p.post_mime_type LIKE 'image/%%'
 			   AND NOT EXISTS (
@@ -146,14 +149,17 @@ final class MediaAjaxController {
 			   )
 			 ORDER BY p.ID ASC
 			 LIMIT %d",
-			$batch_size
-		) );
+				$batch_size
+			)
+		);
 
 		if ( empty( $ids ) ) {
-			wp_send_json_success( [
-				'processed' => 0,
-				'done'      => true,
-			] );
+			wp_send_json_success(
+				[
+					'processed' => 0,
+					'done'      => true,
+				]
+			);
 		}
 
 		$generator = new AltTextGenerator();
@@ -167,19 +173,21 @@ final class MediaAjaxController {
 			// Check if alt text was actually set.
 			$alt = get_post_meta( $int_id, '_wp_attachment_image_alt', true );
 			if ( ! empty( $alt ) ) {
-				$processed++;
+				++$processed;
 			} else {
-				$errors++;
+				++$errors;
 				// Mark as failed to prevent infinite re-processing.
 				update_post_meta( $int_id, '_wpmind_alt_failed', '1' );
 			}
 		}
 
-		wp_send_json_success( [
-			'processed' => $processed,
-			'errors'    => $errors,
-			'done'      => count( $ids ) < $batch_size,
-		] );
+		wp_send_json_success(
+			[
+				'processed' => $processed,
+				'errors'    => $errors,
+				'done'      => count( $ids ) < $batch_size,
+			]
+		);
 	}
 
 	/**
@@ -191,10 +199,12 @@ final class MediaAjaxController {
 		$stats     = get_option( 'wpmind_media_stats', [] );
 		$month_key = 'month_' . gmdate( 'Y_m' );
 
-		wp_send_json_success( [
-			'total_generated' => (int) ( $stats['generated'] ?? 0 ),
-			'month_generated' => (int) ( $stats[ $month_key ] ?? 0 ),
-		] );
+		wp_send_json_success(
+			[
+				'total_generated' => (int) ( $stats['generated'] ?? 0 ),
+				'month_generated' => (int) ( $stats[ $month_key ] ?? 0 ),
+			]
+		);
 	}
 
 	/**
@@ -226,10 +236,12 @@ final class MediaAjaxController {
 
 		$post = get_post( $attachment_id );
 
-		wp_send_json_success( [
-			'alt_text' => $new_alt,
-			'title'    => $post->post_title ?? '',
-			'caption'  => $post->post_excerpt ?? '',
-		] );
+		wp_send_json_success(
+			[
+				'alt_text' => $new_alt,
+				'title'    => $post->post_title ?? '',
+				'caption'  => $post->post_excerpt ?? '',
+			]
+		);
 	}
 }

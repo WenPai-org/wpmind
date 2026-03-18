@@ -9,21 +9,21 @@
  */
 
 // 防止直接访问
-defined("ABSPATH") || exit(); ?>
+defined( 'ABSPATH' ) || exit(); ?>
 
 <div class="wrap wpmind-wrap">
 	<!-- 标题栏 -->
 	<h1 class="wpmind-title">
 		<span class="wpmind-title-left">
 			<img src="<?php echo esc_url( WPMIND_PLUGIN_URL . 'assets/images/wpmind-logo.webp' ); ?>" alt="WPMind" class="wpmind-logo">
-			<?php esc_html_e("文派心思", "wpmind"); ?>
-			<span class="wpmind-version">v<?php echo esc_html(WPMIND_VERSION); ?></span>
+			<?php esc_html_e( '文派心思', 'wpmind' ); ?>
+			<span class="wpmind-version">v<?php echo esc_html( WPMIND_VERSION ); ?></span>
 		</span>
 
 		<span class="wpmind-title-right">
 			<a href="https://wpcy.com/mind/" target="_blank" class="wpmind-title-link">
 				<span class="dashicons ri-book-2-line"></span>
-				<?php esc_html_e("文档", "wpmind"); ?>
+				<?php esc_html_e( '文档', 'wpmind' ); ?>
 			</a>
 			<a href="https://github.com/WenPai-org/wpmind" target="_blank" class="wpmind-title-link">
 
@@ -756,88 +756,88 @@ defined("ABSPATH") || exit(); ?>
 
 
 				<span class="dashicons ri-github-line"></span>
-				<?php esc_html_e("GitHub", "wpmind"); ?>
+				<?php esc_html_e( 'GitHub', 'wpmind' ); ?>
 			</a>
 			<a href="https://wpcy.com/c/wpmind" target="_blank" class="wpmind-title-link">
 				<span class="dashicons ri-discuss-line"></span>
-				<?php esc_html_e("支持", "wpmind"); ?>
+				<?php esc_html_e( '支持', 'wpmind' ); ?>
 			</a>
 		</span>
 	</h1>
 
 	<?php
 	// Get module loader instance for checking module status.
-	$module_loader = \WPMind\Core\ModuleLoader::instance();
-	$geo_module = $module_loader->get_module("geo");
-	$geo_enabled = $geo_module && $geo_module["enabled"];
-	$cost_control_module = $module_loader->get_module("cost-control");
-	$cost_control_enabled = $cost_control_module && $cost_control_module["enabled"];
-	$analytics_module = $module_loader->get_module("analytics");
-	$analytics_enabled = $analytics_module && $analytics_module["enabled"];
-	$api_gateway_module = $module_loader->get_module("api-gateway");
-	$api_gateway_enabled = $api_gateway_module && $api_gateway_module["enabled"];
-	$exact_cache_module = $module_loader->get_module("exact-cache");
-	$exact_cache_enabled = $exact_cache_module && $exact_cache_module["enabled"];
-	$media_intelligence_module = $module_loader->get_module("media-intelligence");
-	$media_intelligence_enabled = $media_intelligence_module && $media_intelligence_module["enabled"];
-	$auto_meta_module = $module_loader->get_module("auto-meta");
-	$auto_meta_enabled = $auto_meta_module && $auto_meta_module["enabled"];
+	$module_loader              = \WPMind\Core\ModuleLoader::instance();
+	$geo_module                 = $module_loader->get_module( 'geo' );
+	$geo_enabled                = $geo_module && $geo_module['enabled'];
+	$cost_control_module        = $module_loader->get_module( 'cost-control' );
+	$cost_control_enabled       = $cost_control_module && $cost_control_module['enabled'];
+	$analytics_module           = $module_loader->get_module( 'analytics' );
+	$analytics_enabled          = $analytics_module && $analytics_module['enabled'];
+	$api_gateway_module         = $module_loader->get_module( 'api-gateway' );
+	$api_gateway_enabled        = $api_gateway_module && $api_gateway_module['enabled'];
+	$exact_cache_module         = $module_loader->get_module( 'exact-cache' );
+	$exact_cache_enabled        = $exact_cache_module && $exact_cache_module['enabled'];
+	$media_intelligence_module  = $module_loader->get_module( 'media-intelligence' );
+	$media_intelligence_enabled = $media_intelligence_module && $media_intelligence_module['enabled'];
+	$auto_meta_module           = $module_loader->get_module( 'auto-meta' );
+	$auto_meta_enabled          = $auto_meta_module && $auto_meta_module['enabled'];
 	?>
 
 	<!-- Tab 导航 -->
 	<nav class="wpmind-tab-list">
 		<a href="#overview" class="wpmind-tab wpmind-tab-active" data-tab="overview">
-			<?php esc_html_e("概览", "wpmind"); ?>
+			<?php esc_html_e( '概览', 'wpmind' ); ?>
 		</a>
 		<a href="#services" class="wpmind-tab" data-tab="services">
-			<?php esc_html_e("文本服务", "wpmind"); ?>
+			<?php esc_html_e( '文本服务', 'wpmind' ); ?>
 		</a>
 		<a href="#images" class="wpmind-tab" data-tab="images">
-			<?php esc_html_e("图像服务", "wpmind"); ?>
+			<?php esc_html_e( '图像服务', 'wpmind' ); ?>
 		</a>
 		<a href="#routing" class="wpmind-tab" data-tab="routing">
-			<?php esc_html_e("智能路由", "wpmind"); ?>
+			<?php esc_html_e( '智能路由', 'wpmind' ); ?>
 		</a>
-		<?php if ($analytics_enabled): ?>
+		<?php if ( $analytics_enabled ) : ?>
 		<a href="#analytics" class="wpmind-tab" data-tab="analytics">
-			<?php esc_html_e("数据分析", "wpmind"); ?>
+			<?php esc_html_e( '数据分析', 'wpmind' ); ?>
 		</a>
 		<?php endif; ?>
-		<?php if ($cost_control_enabled): ?>
+		<?php if ( $cost_control_enabled ) : ?>
 		<a href="#budget" class="wpmind-tab" data-tab="budget">
-			<?php esc_html_e("预算管理", "wpmind"); ?>
+			<?php esc_html_e( '预算管理', 'wpmind' ); ?>
 		</a>
 		<?php endif; ?>
-		<?php if ($geo_enabled): ?>
+		<?php if ( $geo_enabled ) : ?>
 		<a href="#geo" class="wpmind-tab" data-tab="geo">
-			<?php esc_html_e("GEO 优化", "wpmind"); ?>
+			<?php esc_html_e( 'GEO 优化', 'wpmind' ); ?>
 		</a>
 		<?php endif; ?>
-		<?php if ($api_gateway_enabled): ?>
+		<?php if ( $api_gateway_enabled ) : ?>
 		<a href="#api-gateway" class="wpmind-tab" data-tab="api-gateway">
-			<?php esc_html_e("API Gateway", "wpmind"); ?>
+			<?php esc_html_e( 'API Gateway', 'wpmind' ); ?>
 		</a>
 		<?php endif; ?>
-		<?php if ($exact_cache_enabled): ?>
+		<?php if ( $exact_cache_enabled ) : ?>
 		<a href="#exact-cache" class="wpmind-tab" data-tab="exact-cache">
-			<?php esc_html_e("精确缓存", "wpmind"); ?>
+			<?php esc_html_e( '精确缓存', 'wpmind' ); ?>
 		</a>
 		<?php endif; ?>
-		<?php if ($media_intelligence_enabled): ?>
+		<?php if ( $media_intelligence_enabled ) : ?>
 		<a href="#media-intelligence" class="wpmind-tab" data-tab="media-intelligence">
-			<?php esc_html_e("媒体智能", "wpmind"); ?>
+			<?php esc_html_e( '媒体智能', 'wpmind' ); ?>
 		</a>
 		<?php endif; ?>
-		<?php if ($auto_meta_enabled): ?>
+		<?php if ( $auto_meta_enabled ) : ?>
 		<a href="#auto-meta" class="wpmind-tab" data-tab="auto-meta">
-			<?php esc_html_e("Auto-Meta", "wpmind"); ?>
+			<?php esc_html_e( 'Auto-Meta', 'wpmind' ); ?>
 		</a>
 		<?php endif; ?>
 		<a href="#modules" class="wpmind-tab" data-tab="modules">
-			<?php esc_html_e("模块管理", "wpmind"); ?>
+			<?php esc_html_e( '模块管理', 'wpmind' ); ?>
 		</a>
 		<a href="#license" class="wpmind-tab" data-tab="license">
-			<?php esc_html_e("授权", "wpmind"); ?>
+			<?php esc_html_e( '授权', 'wpmind' ); ?>
 		</a>
 	</nav>
 
@@ -847,82 +847,82 @@ defined("ABSPATH") || exit(); ?>
 		<div class="wpmind-tabs-card">
 			<!-- Tab 内容 -->
 			<div id="overview" class="wpmind-tab-pane wpmind-tab-pane-active">
-				<?php include WPMIND_PLUGIN_DIR . "templates/tabs/overview.php"; ?>
+				<?php require WPMIND_PLUGIN_DIR . 'templates/tabs/overview.php'; ?>
 			</div>
 			<div id="services" class="wpmind-tab-pane">
-				<?php include WPMIND_PLUGIN_DIR . "templates/tabs/services.php"; ?>
+				<?php require WPMIND_PLUGIN_DIR . 'templates/tabs/services.php'; ?>
 			</div>
 			<div id="images" class="wpmind-tab-pane">
-				<?php include WPMIND_PLUGIN_DIR . "templates/tabs/images.php"; ?>
+				<?php require WPMIND_PLUGIN_DIR . 'templates/tabs/images.php'; ?>
 			</div>
 			<div id="routing" class="wpmind-tab-pane">
-				<?php include WPMIND_PLUGIN_DIR . "templates/tabs/routing.php"; ?>
+				<?php require WPMIND_PLUGIN_DIR . 'templates/tabs/routing.php'; ?>
 			</div>
-			<?php if ($analytics_enabled): ?>
+			<?php if ( $analytics_enabled ) : ?>
 			<div id="analytics" class="wpmind-tab-pane">
-				<?php include WPMIND_PLUGIN_DIR . "templates/tabs/dashboard.php"; ?>
+				<?php include WPMIND_PLUGIN_DIR . 'templates/tabs/dashboard.php'; ?>
 			</div>
 			<?php endif; ?>
-			<?php if ($cost_control_enabled): ?>
+			<?php if ( $cost_control_enabled ) : ?>
 			<div id="budget" class="wpmind-tab-pane">
-				<?php include WPMIND_PLUGIN_DIR . "templates/tabs/budget.php"; ?>
+				<?php include WPMIND_PLUGIN_DIR . 'templates/tabs/budget.php'; ?>
 			</div>
 			<?php endif; ?>
-			<?php if ($geo_enabled): ?>
+			<?php if ( $geo_enabled ) : ?>
 			<div id="geo" class="wpmind-tab-pane">
 				<?php
-    $geo_settings = WPMIND_PATH . "modules/geo/templates/settings.php";
-    if (file_exists($geo_settings)) {
-        include $geo_settings;
-    }
-    ?>
+				$geo_settings = WPMIND_PATH . 'modules/geo/templates/settings.php';
+				if ( file_exists( $geo_settings ) ) {
+					include $geo_settings;
+				}
+				?>
 			</div>
 			<?php endif; ?>
-			<?php if ($api_gateway_enabled): ?>
+			<?php if ( $api_gateway_enabled ) : ?>
 			<div id="api-gateway" class="wpmind-tab-pane">
 				<?php
-    $api_gateway_settings = WPMIND_PATH . "modules/api-gateway/templates/settings.php";
-    if (file_exists($api_gateway_settings)) {
-        include $api_gateway_settings;
-    }
-    ?>
+				$api_gateway_settings = WPMIND_PATH . 'modules/api-gateway/templates/settings.php';
+				if ( file_exists( $api_gateway_settings ) ) {
+					include $api_gateway_settings;
+				}
+				?>
 			</div>
 			<?php endif; ?>
-			<?php if ($exact_cache_enabled): ?>
+			<?php if ( $exact_cache_enabled ) : ?>
 			<div id="exact-cache" class="wpmind-tab-pane">
 				<?php
-    $exact_cache_settings = WPMIND_PATH . "modules/exact-cache/templates/settings.php";
-    if (file_exists($exact_cache_settings)) {
-        include $exact_cache_settings;
-    }
-    ?>
+				$exact_cache_settings = WPMIND_PATH . 'modules/exact-cache/templates/settings.php';
+				if ( file_exists( $exact_cache_settings ) ) {
+					include $exact_cache_settings;
+				}
+				?>
 			</div>
 			<?php endif; ?>
-			<?php if ($media_intelligence_enabled): ?>
+			<?php if ( $media_intelligence_enabled ) : ?>
 			<div id="media-intelligence" class="wpmind-tab-pane">
 				<?php
-    $mi_settings = WPMIND_PATH . "modules/media-intelligence/templates/settings.php";
-    if (file_exists($mi_settings)) {
-        include $mi_settings;
-    }
-    ?>
+				$mi_settings = WPMIND_PATH . 'modules/media-intelligence/templates/settings.php';
+				if ( file_exists( $mi_settings ) ) {
+					include $mi_settings;
+				}
+				?>
 			</div>
 			<?php endif; ?>
-			<?php if ($auto_meta_enabled): ?>
+			<?php if ( $auto_meta_enabled ) : ?>
 			<div id="auto-meta" class="wpmind-tab-pane">
 				<?php
-    $auto_meta_settings = WPMIND_PATH . "modules/auto-meta/templates/settings.php";
-    if (file_exists($auto_meta_settings)) {
-        include $auto_meta_settings;
-    }
-    ?>
+				$auto_meta_settings = WPMIND_PATH . 'modules/auto-meta/templates/settings.php';
+				if ( file_exists( $auto_meta_settings ) ) {
+					include $auto_meta_settings;
+				}
+				?>
 			</div>
 			<?php endif; ?>
 			<div id="modules" class="wpmind-tab-pane">
-				<?php include WPMIND_PLUGIN_DIR . "templates/tabs/modules.php"; ?>
+				<?php require WPMIND_PLUGIN_DIR . 'templates/tabs/modules.php'; ?>
 			</div>
 			<div id="license" class="wpmind-tab-pane">
-				<?php include WPMIND_PLUGIN_DIR . "templates/tabs/license.php"; ?>
+				<?php require WPMIND_PLUGIN_DIR . 'templates/tabs/license.php'; ?>
 			</div>
 		</div>
 	</div>

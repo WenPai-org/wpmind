@@ -23,15 +23,15 @@ final class GatewayRequestContext {
 	private string $operation;
 	private string $request_id;
 	private \WP_REST_Request $rest_request;
-	private ?object $auth_result = null;
-	private ?array $internal_payload = null;
-	private mixed $internal_result = null;
+	private ?object $auth_result              = null;
+	private ?array $internal_payload          = null;
+	private mixed $internal_result            = null;
 	private ?\WP_REST_Response $rest_response = null;
-	private ?\WP_Error $error = null;
-	private ?\Throwable $exception = null;
-	private ?string $client_ip = null;
-	private array $response_headers = [];
-	private int $retry_after_sec = 0;
+	private ?\WP_Error $error                 = null;
+	private ?\Throwable $exception            = null;
+	private ?string $client_ip                = null;
+	private array $response_headers           = [];
+	private int $retry_after_sec              = 0;
 	private float $start_time;
 
 	private function __construct() {}
@@ -44,15 +44,15 @@ final class GatewayRequestContext {
 	 * @return self
 	 */
 	public static function from_rest_request( string $operation, \WP_REST_Request $request ): self {
-		$ctx = new self();
+		$ctx               = new self();
 		$ctx->operation    = $operation;
 		$ctx->rest_request = $request;
 		$ctx->start_time   = microtime( true );
 
 		// Generate UUID v4.
-		$data    = random_bytes( 16 );
-		$data[6] = chr( ord( $data[6] ) & 0x0f | 0x40 );
-		$data[8] = chr( ord( $data[8] ) & 0x3f | 0x80 );
+		$data            = random_bytes( 16 );
+		$data[6]         = chr( ord( $data[6] ) & 0x0f | 0x40 );
+		$data[8]         = chr( ord( $data[8] ) & 0x3f | 0x80 );
 		$ctx->request_id = vsprintf(
 			'%s%s-%s-%s-%s-%s%s%s',
 			str_split( bin2hex( $data ), 4 )

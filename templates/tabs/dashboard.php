@@ -15,11 +15,11 @@ defined( 'ABSPATH' ) || exit;
 $failover_manager = \WPMind\Failover\FailoverManager::instance();
 $provider_status  = $failover_manager->get_status_summary();
 
-$usage_stats = \WPMind\Modules\CostControl\UsageTracker::get_stats();
-$today_stats = \WPMind\Modules\CostControl\UsageTracker::get_today_stats();
-$week_stats  = \WPMind\Modules\CostControl\UsageTracker::get_week_stats();
-$month_stats = \WPMind\Modules\CostControl\UsageTracker::get_month_stats();
-$last_updated = $usage_stats['last_updated'] ?? 0;
+$usage_stats    = \WPMind\Modules\CostControl\UsageTracker::get_stats();
+$today_stats    = \WPMind\Modules\CostControl\UsageTracker::get_today_stats();
+$week_stats     = \WPMind\Modules\CostControl\UsageTracker::get_week_stats();
+$month_stats    = \WPMind\Modules\CostControl\UsageTracker::get_month_stats();
+$last_updated   = $usage_stats['last_updated'] ?? 0;
 $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
 ?>
 
@@ -135,7 +135,7 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
 			</div>
 			<div class="wpmind-usage-card-body">
 				<div class="wpmind-usage-stat">
-					<span class="wpmind-usage-value" id="total-tokens"><?php echo esc_html( \WPMind\Modules\CostControl\UsageTracker::format_tokens( ($usage_stats['total']['input_tokens'] ?? 0) + ($usage_stats['total']['output_tokens'] ?? 0) ) ); ?></span>
+					<span class="wpmind-usage-value" id="total-tokens"><?php echo esc_html( \WPMind\Modules\CostControl\UsageTracker::format_tokens( ( $usage_stats['total']['input_tokens'] ?? 0 ) + ( $usage_stats['total']['output_tokens'] ?? 0 ) ) ); ?></span>
 					<span class="wpmind-usage-label"><?php esc_html_e( 'Tokens', 'wpmind' ); ?></span>
 				</div>
 				<div class="wpmind-usage-stat">
@@ -151,18 +151,19 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
 	</div>
 
 	<!-- 各渠道用量统计 -->
-	<?php if ( ! empty( $usage_stats['providers'] ) ) : ?>
+		<?php if ( ! empty( $usage_stats['providers'] ) ) : ?>
 	<h3 class="wpmind-usage-section-title">
 		<span class="dashicons ri-server-line"></span>
-		<?php esc_html_e( '各渠道用量', 'wpmind' ); ?>
+			<?php esc_html_e( '各渠道用量', 'wpmind' ); ?>
 	</h3>
 	<div class="wpmind-provider-usage-grid">
-		<?php foreach ( $usage_stats['providers'] as $provider_id => $provider_stats ) :
-			$currency = \WPMind\Modules\CostControl\UsageTracker::get_currency( $provider_id );
-			$display_name = \WPMind\Modules\CostControl\UsageTracker::get_provider_display_name( $provider_id );
-			$icon_class = \WPMind\Modules\CostControl\UsageTracker::get_provider_icon( $provider_id );
-			$icon_color = \WPMind\Modules\CostControl\UsageTracker::get_provider_color( $provider_id );
-		?>
+			<?php
+			foreach ( $usage_stats['providers'] as $provider_id => $provider_stats ) :
+				$currency     = \WPMind\Modules\CostControl\UsageTracker::get_currency( $provider_id );
+				$display_name = \WPMind\Modules\CostControl\UsageTracker::get_provider_display_name( $provider_id );
+				$icon_class   = \WPMind\Modules\CostControl\UsageTracker::get_provider_icon( $provider_id );
+				$icon_color   = \WPMind\Modules\CostControl\UsageTracker::get_provider_color( $provider_id );
+				?>
 		<div class="wpmind-provider-usage-item">
 			<div class="wpmind-provider-usage-header">
 				<i class="<?php echo esc_attr( $icon_class ); ?> wpmind-provider-usage-icon" style="color: <?php echo esc_attr( $icon_color ); ?>;"></i>
@@ -184,7 +185,7 @@ $has_usage_data = ( $usage_stats['total']['requests'] ?? 0 ) > 0;
 				</div>
 			</div>
 		</div>
-		<?php endforeach; ?>
+			<?php endforeach; ?>
 	</div>
 	<?php endif; ?>
 

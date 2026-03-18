@@ -88,10 +88,13 @@ final class ExactCacheModule implements ModuleInterface {
 		add_filter( 'wpmind_settings_tabs', [ $this, 'register_settings_tab' ] );
 
 		// 2. Hook scope_mode option into ExactCache core filter.
-		//    When module is disabled this filter won't fire, core falls back to default 'role'.
-		add_filter( 'wpmind_exact_cache_scope_mode', function (): string {
-			return get_option( 'wpmind_exact_cache_scope_mode', 'role' );
-		} );
+		// When module is disabled this filter won't fire, core falls back to default 'role'.
+		add_filter(
+			'wpmind_exact_cache_scope_mode',
+			function (): string {
+				return get_option( 'wpmind_exact_cache_scope_mode', 'role' );
+			}
+		);
 
 		// 3. Register AJAX handlers.
 		$ajax = new CacheAjaxController();

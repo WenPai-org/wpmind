@@ -235,11 +235,13 @@ final class SseConcurrencyGuard {
 				}
 			} else {
 				global $wpdb;
-				$inserted = (bool) $wpdb->query( $wpdb->prepare(
-					"INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'no')",
-					'_transient_' . $lock_key,
-					time()
-				) );
+				$inserted = (bool) $wpdb->query(
+					$wpdb->prepare(
+						"INSERT IGNORE INTO {$wpdb->options} (option_name, option_value, autoload) VALUES (%s, %s, 'no')",
+						'_transient_' . $lock_key,
+						time()
+					)
+				);
 				if ( $inserted ) {
 					return true;
 				}

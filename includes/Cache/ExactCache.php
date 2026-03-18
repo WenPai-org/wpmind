@@ -20,12 +20,12 @@ namespace WPMind\Cache;
  */
 final class ExactCache {
 
-	private const OPTION_ENABLED = 'wpmind_exact_cache_enabled';
-	private const OPTION_DEFAULT_TTL = 'wpmind_exact_cache_default_ttl';
-	private const OPTION_MAX_ENTRIES = 'wpmind_exact_cache_max_entries';
-	private const OPTION_INDEX = 'wpmind_exact_cache_index';
-	private const OPTION_STATS = 'wpmind_exact_cache_stats';
-	private const KEY_PREFIX = 'wpmind_ec_';
+	private const OPTION_ENABLED      = 'wpmind_exact_cache_enabled';
+	private const OPTION_DEFAULT_TTL  = 'wpmind_exact_cache_default_ttl';
+	private const OPTION_MAX_ENTRIES  = 'wpmind_exact_cache_max_entries';
+	private const OPTION_INDEX        = 'wpmind_exact_cache_index';
+	private const OPTION_STATS        = 'wpmind_exact_cache_stats';
+	private const KEY_PREFIX          = 'wpmind_ec_';
 	private const DEFAULT_MAX_ENTRIES = 500;
 
 	private static ?ExactCache $instance = null;
@@ -64,7 +64,7 @@ final class ExactCache {
 	 * @return ExactCache
 	 */
 	public static function instance(): ExactCache {
-		if (null === self::$instance) {
+		if ( null === self::$instance ) {
 			self::$instance = new self();
 		}
 
@@ -82,11 +82,11 @@ final class ExactCache {
 	 * @return bool
 	 */
 	public function is_enabled(): bool {
-		$raw_value = get_option(self::OPTION_ENABLED, '1');
-		$disabled_values = [false, 0, '0', 'false', 'no', 'off'];
-		$enabled = !in_array($raw_value, $disabled_values, true);
+		$raw_value       = get_option( self::OPTION_ENABLED, '1' );
+		$disabled_values = [ false, 0, '0', 'false', 'no', 'off' ];
+		$enabled         = ! in_array( $raw_value, $disabled_values, true );
 
-		return (bool) apply_filters('wpmind_exact_cache_enabled', $enabled);
+		return (bool) apply_filters( 'wpmind_exact_cache_enabled', $enabled );
 	}
 
 	/**
@@ -95,12 +95,12 @@ final class ExactCache {
 	 * @return int
 	 */
 	public function get_max_entries(): int {
-		$max_entries = (int) get_option(self::OPTION_MAX_ENTRIES, self::DEFAULT_MAX_ENTRIES);
-		if ($max_entries <= 0) {
+		$max_entries = (int) get_option( self::OPTION_MAX_ENTRIES, self::DEFAULT_MAX_ENTRIES );
+		if ( $max_entries <= 0 ) {
 			$max_entries = self::DEFAULT_MAX_ENTRIES;
 		}
 
-		return (int) apply_filters('wpmind_exact_cache_max_entries', $max_entries);
+		return (int) apply_filters( 'wpmind_exact_cache_max_entries', $max_entries );
 	}
 
 	/**
@@ -109,10 +109,10 @@ final class ExactCache {
 	 * @return int
 	 */
 	public function get_default_ttl(): int {
-		$default_ttl = (int) get_option(self::OPTION_DEFAULT_TTL, 900);
-		$default_ttl = max(0, min(86400, $default_ttl));
+		$default_ttl = (int) get_option( self::OPTION_DEFAULT_TTL, 900 );
+		$default_ttl = max( 0, min( 86400, $default_ttl ) );
 
-		return (int) apply_filters('wpmind_exact_cache_default_ttl', $default_ttl);
+		return (int) apply_filters( 'wpmind_exact_cache_default_ttl', $default_ttl );
 	}
 
 	/**
@@ -124,24 +124,24 @@ final class ExactCache {
 	 * @param string $model 模型
 	 * @return string
 	 */
-	public function build_key(string $type, array $args, string $provider = '', string $model = ''): string {
+	public function build_key( string $type, array $args, string $provider = '', string $model = '' ): string {
 		$key_data = [
 			'v'        => 1,
 			'type'     => $type,
 			'provider' => $provider !== '' ? $provider : 'auto',
 			'model'    => $model !== '' ? $model : 'auto',
 			'scope'    => $this->build_scope(),
-			'args'     => $this->normalize_for_hash($args),
+			'args'     => $this->normalize_for_hash( $args ),
 		];
 
-		$json = wp_json_encode($key_data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-		if (!is_string($json) || $json === '') {
-			$json = serialize($key_data);
+		$json = wp_json_encode( $key_data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		if ( ! is_string( $json ) || $json === '' ) {
+			$json = serialize( $key_data );
 		}
 
-		$key = self::KEY_PREFIX . substr(hash('sha256', $json), 0, 40);
+		$key = self::KEY_PREFIX . substr( hash( 'sha256', $json ), 0, 40 );
 
-		return (string) apply_filters('wpmind_exact_cache_key', $key, $key_data);
+		return (string) apply_filters( 'wpmind_exact_cache_key', $key, $key_data );
 	}
 
 	/**
@@ -150,24 +150,24 @@ final class ExactCache {
 	 * @param string $cache_key 缓存键
 	 * @return mixed|null
 	 */
-	public function get(string $cache_key) {
-		if (!$this->is_enabled()) {
+	public function get( string $cache_key ) {
+		if ( ! $this->is_enabled() ) {
 			return null;
 		}
 
-		$cached = get_transient($cache_key);
-		if ($cached === false || !is_array($cached) || !array_key_exists('payload', $cached)) {
-			$this->buffer_stat('misses', $cache_key);
-			if ($this->index_has($cache_key)) {
-				$this->remove_from_index($cache_key);
+		$cached = get_transient( $cache_key );
+		if ( $cached === false || ! is_array( $cached ) || ! array_key_exists( 'payload', $cached ) ) {
+			$this->buffer_stat( 'misses', $cache_key );
+			if ( $this->index_has( $cache_key ) ) {
+				$this->remove_from_index( $cache_key );
 			}
-			do_action('wpmind_exact_cache_miss', $cache_key);
+			do_action( 'wpmind_exact_cache_miss', $cache_key );
 
 			return null;
 		}
 
-		$this->buffer_stat('hits', $cache_key);
-		do_action('wpmind_exact_cache_hit', $cache_key, $cached['meta'] ?? []);
+		$this->buffer_stat( 'hits', $cache_key );
+		do_action( 'wpmind_exact_cache_hit', $cache_key, $cached['meta'] ?? [] );
 
 		return $cached['payload'];
 	}
@@ -181,8 +181,8 @@ final class ExactCache {
 	 * @param array  $meta 元数据
 	 * @return bool
 	 */
-	public function set(string $cache_key, $value, int $ttl, array $meta = []): bool {
-		if (!$this->is_enabled() || $ttl <= 0) {
+	public function set( string $cache_key, $value, int $ttl, array $meta = [] ): bool {
+		if ( ! $this->is_enabled() || $ttl <= 0 ) {
 			return false;
 		}
 
@@ -193,15 +193,15 @@ final class ExactCache {
 			'expires_in' => $ttl,
 		];
 
-		$saved = set_transient($cache_key, $stored_payload, $ttl);
-		if (!$saved) {
+		$saved = set_transient( $cache_key, $stored_payload, $ttl );
+		if ( ! $saved ) {
 			return false;
 		}
 
-		$this->touch_index($cache_key);
+		$this->touch_index( $cache_key );
 		$this->enforce_max_entries();
-		$this->buffer_stat('writes', $cache_key);
-		do_action('wpmind_exact_cache_store', $cache_key, $meta, $ttl);
+		$this->buffer_stat( 'writes', $cache_key );
+		do_action( 'wpmind_exact_cache_store', $cache_key, $meta, $ttl );
 
 		return true;
 	}
@@ -212,9 +212,9 @@ final class ExactCache {
 	 * @param string $cache_key 缓存键
 	 * @return void
 	 */
-	public function delete(string $cache_key): void {
-		delete_transient($cache_key);
-		$this->remove_from_index($cache_key);
+	public function delete( string $cache_key ): void {
+		delete_transient( $cache_key );
+		$this->remove_from_index( $cache_key );
 	}
 
 	/**
@@ -225,16 +225,16 @@ final class ExactCache {
 	public function flush(): void {
 		$index = $this->load_index();
 
-		foreach (array_keys($index) as $cache_key) {
-			delete_transient($cache_key);
+		foreach ( array_keys( $index ) as $cache_key ) {
+			delete_transient( $cache_key );
 		}
 
 		$this->pending_index = [];
-		$this->index_dirty = false;
+		$this->index_dirty   = false;
 		$this->pending_stats = [];
 
-		delete_option(self::OPTION_INDEX);
-		update_option(self::OPTION_STATS, $this->get_default_stats(), false);
+		delete_option( self::OPTION_INDEX );
+		update_option( self::OPTION_STATS, $this->get_default_stats(), false );
 	}
 
 	/**
@@ -243,24 +243,24 @@ final class ExactCache {
 	 * @return array
 	 */
 	public function get_stats(): array {
-		$stats = get_option(self::OPTION_STATS, []);
-		$stats = wp_parse_args(is_array($stats) ? $stats : [], $this->get_default_stats());
+		$stats = get_option( self::OPTION_STATS, [] );
+		$stats = wp_parse_args( is_array( $stats ) ? $stats : [], $this->get_default_stats() );
 
 		// 合并尚未写入的内存增量
-		foreach (['hits', 'misses', 'writes'] as $metric) {
-			if (isset($this->pending_stats[$metric])) {
-				$stats[$metric] = (int) $stats[$metric] + (int) $this->pending_stats[$metric];
+		foreach ( [ 'hits', 'misses', 'writes' ] as $metric ) {
+			if ( isset( $this->pending_stats[ $metric ] ) ) {
+				$stats[ $metric ] = (int) $stats[ $metric ] + (int) $this->pending_stats[ $metric ];
 			}
 		}
 
 		$total_requests = (int) $stats['hits'] + (int) $stats['misses'];
-		$hit_rate = $total_requests > 0
-			? round(((int) $stats['hits'] / $total_requests) * 100, 2)
+		$hit_rate       = $total_requests > 0
+			? round( ( (int) $stats['hits'] / $total_requests ) * 100, 2 )
 			: 0.0;
 
-		$stats['enabled'] = $this->is_enabled();
-		$stats['hit_rate'] = $hit_rate;
-		$stats['entries'] = count($this->load_index());
+		$stats['enabled']     = $this->is_enabled();
+		$stats['hit_rate']    = $hit_rate;
+		$stats['entries']     = count( $this->load_index() );
 		$stats['max_entries'] = $this->get_max_entries();
 
 		return $stats;
@@ -273,9 +273,9 @@ final class ExactCache {
 	 */
 	public function get_entries(): array {
 		$index = $this->load_index();
-		arsort($index, SORT_NUMERIC);
+		arsort( $index, SORT_NUMERIC );
 		$entries = [];
-		foreach ($index as $key => $timestamp) {
+		foreach ( $index as $key => $timestamp ) {
 			$entries[] = [
 				'key'         => $key,
 				'last_access' => (int) $timestamp,
@@ -291,26 +291,26 @@ final class ExactCache {
 	 */
 	private function build_scope(): array {
 		$scope = [
-			'blog_id' => function_exists('get_current_blog_id') ? (int) get_current_blog_id() : 0,
-			'locale'  => function_exists('get_locale') ? (string) get_locale() : '',
+			'blog_id' => function_exists( 'get_current_blog_id' ) ? (int) get_current_blog_id() : 0,
+			'locale'  => function_exists( 'get_locale' ) ? (string) get_locale() : '',
 		];
 
-		$scope_mode = (string) apply_filters('wpmind_exact_cache_scope_mode', 'role');
-		if ($scope_mode === 'user') {
+		$scope_mode = (string) apply_filters( 'wpmind_exact_cache_scope_mode', 'role' );
+		if ( $scope_mode === 'user' ) {
 			$scope['user_id'] = get_current_user_id();
 			return $scope;
 		}
 
-		if ($scope_mode === 'none') {
+		if ( $scope_mode === 'none' ) {
 			$scope['segment'] = 'global';
 			return $scope;
 		}
 
-		$user = function_exists('wp_get_current_user') ? wp_get_current_user() : null;
+		$user  = function_exists( 'wp_get_current_user' ) ? wp_get_current_user() : null;
 		$roles = [];
-		if ($user && !empty($user->roles) && is_array($user->roles)) {
-			$roles = array_values($user->roles);
-			sort($roles);
+		if ( $user && ! empty( $user->roles ) && is_array( $user->roles ) ) {
+			$roles = array_values( $user->roles );
+			sort( $roles );
 		}
 
 		$scope['roles'] = $roles;
@@ -324,21 +324,21 @@ final class ExactCache {
 	 * @param mixed $value 原始值
 	 * @return mixed
 	 */
-	private function normalize_for_hash($value) {
-		if (is_array($value)) {
-			if ($this->is_assoc_array($value)) {
-				ksort($value);
+	private function normalize_for_hash( $value ) {
+		if ( is_array( $value ) ) {
+			if ( $this->is_assoc_array( $value ) ) {
+				ksort( $value );
 			}
 
-			foreach ($value as $key => $child) {
-				$value[$key] = $this->normalize_for_hash($child);
+			foreach ( $value as $key => $child ) {
+				$value[ $key ] = $this->normalize_for_hash( $child );
 			}
 
 			return $value;
 		}
 
-		if (is_object($value)) {
-			return $this->normalize_for_hash(get_object_vars($value));
+		if ( is_object( $value ) ) {
+			return $this->normalize_for_hash( get_object_vars( $value ) );
 		}
 
 		return $value;
@@ -350,12 +350,12 @@ final class ExactCache {
 	 * @param array $array 数组
 	 * @return bool
 	 */
-	private function is_assoc_array(array $array): bool {
-		if ($array === []) {
+	private function is_assoc_array( array $array ): bool {
+		if ( $array === [] ) {
 			return false;
 		}
 
-		return array_keys($array) !== range(0, count($array) - 1);
+		return array_keys( $array ) !== range( 0, count( $array ) - 1 );
 	}
 
 	/**
@@ -364,9 +364,9 @@ final class ExactCache {
 	 * @return array<string,int>
 	 */
 	private function load_index(): array {
-		if ($this->pending_index === null) {
-			$index = get_option(self::OPTION_INDEX, []);
-			$this->pending_index = is_array($index) ? $index : [];
+		if ( $this->pending_index === null ) {
+			$index               = get_option( self::OPTION_INDEX, [] );
+			$this->pending_index = is_array( $index ) ? $index : [];
 		}
 
 		return $this->pending_index;
@@ -378,9 +378,9 @@ final class ExactCache {
 	 * @param string $cache_key 缓存键
 	 * @return bool
 	 */
-	private function index_has(string $cache_key): bool {
+	private function index_has( string $cache_key ): bool {
 		$index = $this->load_index();
-		return isset($index[$cache_key]);
+		return isset( $index[ $cache_key ] );
 	}
 
 	/**
@@ -389,10 +389,10 @@ final class ExactCache {
 	 * @param string $cache_key 缓存键
 	 * @return void
 	 */
-	private function touch_index(string $cache_key): void {
+	private function touch_index( string $cache_key ): void {
 		$this->load_index();
-		$this->pending_index[$cache_key] = time();
-		$this->index_dirty = true;
+		$this->pending_index[ $cache_key ] = time();
+		$this->index_dirty                 = true;
 		$this->register_shutdown();
 	}
 
@@ -402,13 +402,13 @@ final class ExactCache {
 	 * @param string $cache_key 缓存键
 	 * @return void
 	 */
-	private function remove_from_index(string $cache_key): void {
+	private function remove_from_index( string $cache_key ): void {
 		$this->load_index();
-		if (!isset($this->pending_index[$cache_key])) {
+		if ( ! isset( $this->pending_index[ $cache_key ] ) ) {
 			return;
 		}
 
-		unset($this->pending_index[$cache_key]);
+		unset( $this->pending_index[ $cache_key ] );
 		$this->index_dirty = true;
 		$this->register_shutdown();
 	}
@@ -419,25 +419,25 @@ final class ExactCache {
 	 * @return void
 	 */
 	private function enforce_max_entries(): void {
-		$max_entries = $this->get_max_entries();
-		$index = $this->load_index();
-		$current_count = count($index);
+		$max_entries   = $this->get_max_entries();
+		$index         = $this->load_index();
+		$current_count = count( $index );
 
-		if ($current_count <= $max_entries) {
+		if ( $current_count <= $max_entries ) {
 			return;
 		}
 
-		asort($index, SORT_NUMERIC);
+		asort( $index, SORT_NUMERIC );
 		$remove_count = $current_count - $max_entries;
-		$expired_keys = array_slice(array_keys($index), 0, $remove_count);
+		$expired_keys = array_slice( array_keys( $index ), 0, $remove_count );
 
-		foreach ($expired_keys as $cache_key) {
-			delete_transient($cache_key);
-			unset($index[$cache_key]);
+		foreach ( $expired_keys as $cache_key ) {
+			delete_transient( $cache_key );
+			unset( $index[ $cache_key ] );
 		}
 
 		$this->pending_index = $index;
-		$this->index_dirty = true;
+		$this->index_dirty   = true;
 		$this->register_shutdown();
 	}
 
@@ -448,11 +448,11 @@ final class ExactCache {
 	 * @param string|null $cache_key 缓存键
 	 * @return void
 	 */
-	private function buffer_stat(string $metric, ?string $cache_key = null): void {
-		if (!isset($this->pending_stats[$metric])) {
-			$this->pending_stats[$metric] = 0;
+	private function buffer_stat( string $metric, ?string $cache_key = null ): void {
+		if ( ! isset( $this->pending_stats[ $metric ] ) ) {
+			$this->pending_stats[ $metric ] = 0;
 		}
-		$this->pending_stats[$metric]++;
+		++$this->pending_stats[ $metric ];
 
 		$timestamp_fields = [
 			'hits'   => 'last_hit_at',
@@ -460,11 +460,11 @@ final class ExactCache {
 			'writes' => 'last_write_at',
 		];
 
-		if (isset($timestamp_fields[$metric])) {
-			$this->pending_stats[$timestamp_fields[$metric]] = time();
+		if ( isset( $timestamp_fields[ $metric ] ) ) {
+			$this->pending_stats[ $timestamp_fields[ $metric ] ] = time();
 		}
 
-		if ($cache_key !== null) {
+		if ( $cache_key !== null ) {
 			$this->pending_stats['last_key'] = $cache_key;
 		}
 
@@ -477,11 +477,11 @@ final class ExactCache {
 	 * @return void
 	 */
 	private function register_shutdown(): void {
-		if ($this->shutdown_registered) {
+		if ( $this->shutdown_registered ) {
 			return;
 		}
 
-		add_action('shutdown', [$this, 'flush_pending']);
+		add_action( 'shutdown', [ $this, 'flush_pending' ] );
 		$this->shutdown_registered = true;
 	}
 
@@ -494,29 +494,29 @@ final class ExactCache {
 	 */
 	public function flush_pending(): void {
 		// 写入统计增量
-		if (!empty($this->pending_stats)) {
-			$stats = get_option(self::OPTION_STATS, []);
-			$stats = wp_parse_args(is_array($stats) ? $stats : [], $this->get_default_stats());
+		if ( ! empty( $this->pending_stats ) ) {
+			$stats = get_option( self::OPTION_STATS, [] );
+			$stats = wp_parse_args( is_array( $stats ) ? $stats : [], $this->get_default_stats() );
 
-			foreach (['hits', 'misses', 'writes'] as $metric) {
-				if (isset($this->pending_stats[$metric])) {
-					$stats[$metric] = (int) $stats[$metric] + (int) $this->pending_stats[$metric];
+			foreach ( [ 'hits', 'misses', 'writes' ] as $metric ) {
+				if ( isset( $this->pending_stats[ $metric ] ) ) {
+					$stats[ $metric ] = (int) $stats[ $metric ] + (int) $this->pending_stats[ $metric ];
 				}
 			}
 
-			foreach (['last_hit_at', 'last_miss_at', 'last_write_at', 'last_key'] as $field) {
-				if (isset($this->pending_stats[$field])) {
-					$stats[$field] = $this->pending_stats[$field];
+			foreach ( [ 'last_hit_at', 'last_miss_at', 'last_write_at', 'last_key' ] as $field ) {
+				if ( isset( $this->pending_stats[ $field ] ) ) {
+					$stats[ $field ] = $this->pending_stats[ $field ];
 				}
 			}
 
-			update_option(self::OPTION_STATS, $stats, false);
+			update_option( self::OPTION_STATS, $stats, false );
 			$this->pending_stats = [];
 		}
 
 		// 写入索引变更
-		if ($this->index_dirty && $this->pending_index !== null) {
-			update_option(self::OPTION_INDEX, $this->pending_index, false);
+		if ( $this->index_dirty && $this->pending_index !== null ) {
+			update_option( self::OPTION_INDEX, $this->pending_index, false );
 			$this->index_dirty = false;
 		}
 	}

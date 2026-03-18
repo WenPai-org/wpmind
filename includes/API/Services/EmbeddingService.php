@@ -40,92 +40,106 @@ class EmbeddingService extends AbstractService {
 	 * @param array        $options 选项
 	 * @return array|WP_Error
 	 */
-	public function embed($texts, array $options = []) {
+	public function embed( $texts, array $options = [] ) {
 		$defaults = [
 			'context'  => 'embedding',
 			'model'    => 'auto',
 			'provider' => 'auto',
 		];
-		$options = wp_parse_args($options, $defaults);
+		$options  = wp_parse_args( $options, $defaults );
 
-		$context = $options['context'];
-		$input_texts = is_array($texts) ? $texts : [$texts];
+		$context     = $options['context'];
+		$input_texts = is_array( $texts ) ? $texts : [ $texts ];
 
 		$original_model = $options['model'];
-		$model_is_auto = ($original_model === 'auto');
+		$model_is_auto  = ( $original_model === 'auto' );
 
-		$provider = $this->resolve_provider($options['provider'], $context);
+		$provider = $this->resolve_provider( $options['provider'], $context );
 
-		do_action('wpmind_before_request', 'embed', compact('texts', 'options'), $context);
+		do_action( 'wpmind_before_request', 'embed', compact( 'texts', 'options' ), $context );
 
-		return $this->execute_with_failover('embed', $provider, $context, function (string $try_provider, array $endpoint) use ($input_texts, $model_is_auto, $original_model, $texts, $options) {
-			$embed_model = $model_is_auto
-				? (self::EMBED_MODELS[$try_provider] ?? 'text-embedding-3-small')
+		return $this->execute_with_failover(
+			'embed',
+			$provider,
+			$context,
+			function ( string $try_provider, array $endpoint ) use ( $input_texts, $model_is_auto, $original_model, $texts, $options ) {
+				$embed_model = $model_is_auto
+				? ( self::EMBED_MODELS[ $try_provider ] ?? 'text-embedding-3-small' )
 				: $original_model;
 
-			$base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
-			$api_url = trailingslashit($base_url) . 'embeddings';
-			$api_key = $endpoint['api_key'];
+				$base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
+				$api_url  = trailingslashit( $base_url ) . 'embeddings';
+				$api_key  = $endpoint['api_key'];
 
-			$start_time = microtime(true);
+				$start_time = microtime( true );
 
-			$response = wp_remote_post($api_url, [
-				'headers' => [
-					'Authorization' => 'Bearer ' . $api_key,
-					'Content-Type'  => 'application/json',
-				],
-				'body'    => wp_json_encode([
-					'model' => $embed_model,
-					'input' => $input_texts,
-				]),
-				'timeout' => 60,
-			]);
+				$response = wp_remote_post(
+					$api_url,
+					[
+						'headers' => [
+							'Authorization' => 'Bearer ' . $api_key,
+							'Content-Type'  => 'application/json',
+						],
+						'body'    => wp_json_encode(
+							[
+								'model' => $embed_model,
+								'input' => $input_texts,
+							]
+						),
+						'timeout' => 60,
+					]
+				);
 
-			$latency_ms = (int)((microtime(true) - $start_time) * 1000);
+				$latency_ms = (int) ( ( microtime( true ) - $start_time ) * 1000 );
 
-			if (is_wp_error($response)) {
-				$this->record_result($try_provider, false, $latency_ms);
-				return new WP_Error('wpmind_embed_failed',
-					sprintf(__('嵌入请求失败: %s', 'wpmind'), $response->get_error_message()));
+				if ( is_wp_error( $response ) ) {
+					$this->record_result( $try_provider, false, $latency_ms );
+					return new WP_Error(
+						'wpmind_embed_failed',
+						sprintf( __( '嵌入请求失败: %s', 'wpmind' ), $response->get_error_message() )
+					);
+				}
+
+				$status_code = wp_remote_retrieve_response_code( $response );
+				$body        = wp_remote_retrieve_body( $response );
+				$data        = json_decode( $body, true );
+
+				if ( $status_code !== 200 ) {
+					$this->record_result( $try_provider, false, $latency_ms );
+					$error_message = is_array( $data ) ? ( $data['error']['message'] ?? __( '未知错误', 'wpmind' ) ) : __( '未知错误', 'wpmind' );
+					return new WP_Error(
+						'wpmind_embed_error',
+						sprintf( __( '嵌入 API 错误 (%1$d): %2$s', 'wpmind' ), $status_code, $error_message )
+					);
+				}
+
+				if ( ! is_array( $data ) ) {
+					$this->record_result( $try_provider, false, $latency_ms );
+					return new WP_Error( 'wpmind_invalid_response', __( '嵌入 API 返回了无效的响应格式', 'wpmind' ) );
+				}
+
+				$this->record_result( $try_provider, true, $latency_ms );
+
+				$embeddings = [];
+				foreach ( $data['data'] ?? [] as $item ) {
+					$embeddings[] = $item['embedding'];
+				}
+
+				$usage = [
+					'prompt_tokens' => $data['usage']['prompt_tokens'] ?? 0,
+					'total_tokens'  => $data['usage']['total_tokens'] ?? 0,
+				];
+
+				do_action( 'wpmind_after_request', 'embed', $embeddings, compact( 'texts', 'options' ), $usage );
+
+				return [
+					'embeddings' => $embeddings,
+					'model'      => $embed_model,
+					'provider'   => $try_provider,
+					'usage'      => $usage,
+					'dimensions' => ! empty( $embeddings[0] ) ? count( $embeddings[0] ) : 0,
+				];
 			}
-
-			$status_code = wp_remote_retrieve_response_code($response);
-			$body = wp_remote_retrieve_body($response);
-			$data = json_decode($body, true);
-
-			if ($status_code !== 200) {
-				$this->record_result($try_provider, false, $latency_ms);
-				$error_message = is_array($data) ? ($data['error']['message'] ?? __('未知错误', 'wpmind')) : __('未知错误', 'wpmind');
-				return new WP_Error('wpmind_embed_error',
-					sprintf(__('嵌入 API 错误 (%d): %s', 'wpmind'), $status_code, $error_message));
-			}
-
-			if (!is_array($data)) {
-				$this->record_result($try_provider, false, $latency_ms);
-				return new WP_Error('wpmind_invalid_response', __('嵌入 API 返回了无效的响应格式', 'wpmind'));
-			}
-
-			$this->record_result($try_provider, true, $latency_ms);
-
-			$embeddings = [];
-			foreach ($data['data'] ?? [] as $item) {
-				$embeddings[] = $item['embedding'];
-			}
-
-			$usage = [
-				'prompt_tokens' => $data['usage']['prompt_tokens'] ?? 0,
-				'total_tokens'  => $data['usage']['total_tokens'] ?? 0,
-			];
-
-			do_action('wpmind_after_request', 'embed', $embeddings, compact('texts', 'options'), $usage);
-
-			return [
-				'embeddings' => $embeddings,
-				'model'      => $embed_model,
-				'provider'   => $try_provider,
-				'usage'      => $usage,
-				'dimensions' => !empty($embeddings[0]) ? count($embeddings[0]) : 0,
-			];
-		});
+		);
 	}
 }

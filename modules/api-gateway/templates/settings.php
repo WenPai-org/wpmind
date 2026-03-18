@@ -270,12 +270,12 @@ $base_url = rest_url( 'mind/v1' );
 		<h4><?php esc_html_e( 'curl 示例', 'wpmind' ); ?></h4>
 		<div class="wpmind-gw-code-block">
 			<pre>curl <?php echo esc_html( $base_url ); ?>/chat/completions \
-  -H "Authorization: Bearer sk_mind_YOUR_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-  "model": "deepseek-chat",
-  "messages": [{"role": "user", "content": "Hello"}],
-  "stream": true
+	-H "Authorization: Bearer sk_mind_YOUR_KEY" \
+	-H "Content-Type: application/json" \
+	-d '{
+	"model": "deepseek-chat",
+	"messages": [{"role": "user", "content": "Hello"}],
+	"stream": true
 }'</pre>
 			<button type="button" class="wpmind-gw-copy-btn" data-copy-pre="1"><?php esc_html_e( '复制', 'wpmind' ); ?></button>
 		</div>

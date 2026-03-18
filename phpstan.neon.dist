@@ -1,0 +1,22 @@
+includes:
+    # - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+    level: 6
+    paths:
+        - includes
+        - modules
+        - wpmind.php
+        - uninstall.php
+    excludePaths:
+        analyseAndScan:
+            - vendor (?)
+            - tests (?)
+            - node_modules (?)
+    ignoreErrors:
+        - '#Call to function is_(array|string|int|bool|null) with .* will always evaluate to (true|false)#'
+        - '#Undefined variable: \$wpdb#'
+        - '#Undefined variable: \$wp_query#'
+        - '#Undefined variable: \$post#'
+    checkUninitializedProperties: true
+    checkMissingCallableSignature: true

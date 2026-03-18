@@ -17,13 +17,12 @@ use WPMind\Providers\AbstractOpenAiCompatibleTextGenerationModel;
  *
  * @since 1.3.0
  */
-class DoubaoTextGenerationModel extends AbstractOpenAiCompatibleTextGenerationModel
-{
-    /**
-     * {@inheritDoc}
-     */
-    protected static function providerClass(): string
-    {
-        return DoubaoProvider::class;
-    }
+class DoubaoTextGenerationModel extends AbstractOpenAiCompatibleTextGenerationModel {
+
+	/**
+	 * {@inheritDoc}
+	 */
+	protected static function providerClass(): string {
+		return DoubaoProvider::class;
+	}
 }

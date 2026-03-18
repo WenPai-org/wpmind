@@ -26,24 +26,78 @@ final class ModelMapper {
 	 * @var array<string, array{provider: string, model: string}>
 	 */
 	private static array $default_map = [
-		'gpt-4o'                       => [ 'provider' => 'openai', 'model' => 'gpt-4o' ],
-		'gpt-4o-mini'                  => [ 'provider' => 'openai', 'model' => 'gpt-4o-mini' ],
-		'gpt-4-turbo'                  => [ 'provider' => 'openai', 'model' => 'gpt-4-turbo' ],
-		'gpt-3.5-turbo'                => [ 'provider' => 'openai', 'model' => 'gpt-3.5-turbo' ],
-		'claude-3-5-sonnet-20241022'   => [ 'provider' => 'anthropic', 'model' => 'claude-3-5-sonnet-20241022' ],
-		'claude-3-5-haiku-20241022'    => [ 'provider' => 'anthropic', 'model' => 'claude-3-5-haiku-20241022' ],
-		'claude-3-opus-20240229'       => [ 'provider' => 'anthropic', 'model' => 'claude-3-opus-20240229' ],
-		'gemini-2.0-flash-exp'         => [ 'provider' => 'google', 'model' => 'gemini-2.0-flash-exp' ],
-		'gemini-1.5-pro'               => [ 'provider' => 'google', 'model' => 'gemini-1.5-pro' ],
-		'deepseek-chat'                => [ 'provider' => 'deepseek', 'model' => 'deepseek-chat' ],
-		'deepseek-coder'               => [ 'provider' => 'deepseek', 'model' => 'deepseek-coder' ],
-		'deepseek-reasoner'            => [ 'provider' => 'deepseek', 'model' => 'deepseek-reasoner' ],
-		'qwen-turbo'                   => [ 'provider' => 'qwen', 'model' => 'qwen-turbo' ],
-		'qwen-plus'                    => [ 'provider' => 'qwen', 'model' => 'qwen-plus' ],
-		'qwen-max'                     => [ 'provider' => 'qwen', 'model' => 'qwen-max' ],
-		'moonshot-v1-8k'               => [ 'provider' => 'moonshot', 'model' => 'moonshot-v1-8k' ],
-		'glm-4'                        => [ 'provider' => 'zhipu', 'model' => 'glm-4' ],
-		'glm-4-flash'                  => [ 'provider' => 'zhipu', 'model' => 'glm-4-flash' ],
+		'gpt-4o'                     => [
+			'provider' => 'openai',
+			'model'    => 'gpt-4o',
+		],
+		'gpt-4o-mini'                => [
+			'provider' => 'openai',
+			'model'    => 'gpt-4o-mini',
+		],
+		'gpt-4-turbo'                => [
+			'provider' => 'openai',
+			'model'    => 'gpt-4-turbo',
+		],
+		'gpt-3.5-turbo'              => [
+			'provider' => 'openai',
+			'model'    => 'gpt-3.5-turbo',
+		],
+		'claude-3-5-sonnet-20241022' => [
+			'provider' => 'anthropic',
+			'model'    => 'claude-3-5-sonnet-20241022',
+		],
+		'claude-3-5-haiku-20241022'  => [
+			'provider' => 'anthropic',
+			'model'    => 'claude-3-5-haiku-20241022',
+		],
+		'claude-3-opus-20240229'     => [
+			'provider' => 'anthropic',
+			'model'    => 'claude-3-opus-20240229',
+		],
+		'gemini-2.0-flash-exp'       => [
+			'provider' => 'google',
+			'model'    => 'gemini-2.0-flash-exp',
+		],
+		'gemini-1.5-pro'             => [
+			'provider' => 'google',
+			'model'    => 'gemini-1.5-pro',
+		],
+		'deepseek-chat'              => [
+			'provider' => 'deepseek',
+			'model'    => 'deepseek-chat',
+		],
+		'deepseek-coder'             => [
+			'provider' => 'deepseek',
+			'model'    => 'deepseek-coder',
+		],
+		'deepseek-reasoner'          => [
+			'provider' => 'deepseek',
+			'model'    => 'deepseek-reasoner',
+		],
+		'qwen-turbo'                 => [
+			'provider' => 'qwen',
+			'model'    => 'qwen-turbo',
+		],
+		'qwen-plus'                  => [
+			'provider' => 'qwen',
+			'model'    => 'qwen-plus',
+		],
+		'qwen-max'                   => [
+			'provider' => 'qwen',
+			'model'    => 'qwen-max',
+		],
+		'moonshot-v1-8k'             => [
+			'provider' => 'moonshot',
+			'model'    => 'moonshot-v1-8k',
+		],
+		'glm-4'                      => [
+			'provider' => 'zhipu',
+			'model'    => 'glm-4',
+		],
+		'glm-4-flash'                => [
+			'provider' => 'zhipu',
+			'model'    => 'glm-4-flash',
+		],
 	];
 
 	/**
@@ -57,7 +111,10 @@ final class ModelMapper {
 	 */
 	public static function resolve( string $model ): ?array {
 		if ( $model === 'auto' ) {
-			return [ 'provider' => 'auto', 'model' => 'auto' ];
+			return [
+				'provider' => 'auto',
+				'model'    => 'auto',
+			];
 		}
 
 		$aliases = get_option( 'wpmind_gateway_model_aliases', [] );

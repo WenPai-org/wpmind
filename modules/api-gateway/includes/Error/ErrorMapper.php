@@ -28,72 +28,72 @@ final class ErrorMapper {
 	 * @var array<string, array{type: string, code: string, status: int}>
 	 */
 	private const MAP = [
-		'missing_auth_header'    => [
+		'missing_auth_header'      => [
 			'type'   => 'invalid_request_error',
 			'code'   => 'missing_auth_header',
 			'status' => 401,
 		],
-		'invalid_auth_header'    => [
+		'invalid_auth_header'      => [
 			'type'   => 'invalid_request_error',
 			'code'   => 'invalid_api_key',
 			'status' => 401,
 		],
-		'invalid_api_key_format' => [
+		'invalid_api_key_format'   => [
 			'type'   => 'invalid_request_error',
 			'code'   => 'invalid_api_key',
 			'status' => 401,
 		],
-		'api_key_not_found'      => [
+		'api_key_not_found'        => [
 			'type'   => 'invalid_request_error',
 			'code'   => 'invalid_api_key',
 			'status' => 401,
 		],
-		'api_key_invalid_secret' => [
+		'api_key_invalid_secret'   => [
 			'type'   => 'invalid_request_error',
 			'code'   => 'invalid_api_key',
 			'status' => 401,
 		],
-		'api_key_inactive'       => [
+		'api_key_inactive'         => [
 			'type'   => 'invalid_request_error',
 			'code'   => 'invalid_api_key',
 			'status' => 403,
 		],
-		'api_key_expired'        => [
+		'api_key_expired'          => [
 			'type'   => 'invalid_request_error',
 			'code'   => 'invalid_api_key',
 			'status' => 403,
 		],
-		'api_key_ip_denied'      => [
+		'api_key_ip_denied'        => [
 			'type'   => 'invalid_request_error',
 			'code'   => 'invalid_api_key',
 			'status' => 403,
 		],
-		'insufficient_quota'     => [
+		'insufficient_quota'       => [
 			'type'   => 'insufficient_quota',
 			'code'   => 'insufficient_quota',
 			'status' => 429,
 		],
-		'rate_limit_exceeded'    => [
+		'rate_limit_exceeded'      => [
 			'type'   => 'rate_limit_exceeded',
 			'code'   => 'rate_limit_exceeded',
 			'status' => 429,
 		],
-		'model_not_found'        => [
+		'model_not_found'          => [
 			'type'   => 'invalid_request_error',
 			'code'   => 'model_not_found',
 			'status' => 400,
 		],
-		'request_too_large'      => [
+		'request_too_large'        => [
 			'type'   => 'invalid_request_error',
 			'code'   => 'request_too_large',
 			'status' => 413,
 		],
-		'not_authenticated'      => [
+		'not_authenticated'        => [
 			'type'   => 'invalid_request_error',
 			'code'   => 'invalid_api_key',
 			'status' => 401,
 		],
-		'forbidden'              => [
+		'forbidden'                => [
 			'type'   => 'invalid_request_error',
 			'code'   => 'insufficient_permissions',
 			'status' => 403,
@@ -103,12 +103,12 @@ final class ErrorMapper {
 			'code'   => 'rate_limit_exceeded',
 			'status' => 429,
 		],
-		'sse_lock_timeout'       => [
+		'sse_lock_timeout'         => [
 			'type'   => 'server_error',
 			'code'   => 'server_error',
 			'status' => 503,
 		],
-		'unsupported_operation'  => [
+		'unsupported_operation'    => [
 			'type'   => 'invalid_request_error',
 			'code'   => 'unsupported_operation',
 			'status' => 400,

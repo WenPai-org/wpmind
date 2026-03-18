@@ -123,15 +123,17 @@ final class AutoMetaAjaxController {
 		$post = get_post( $post_id );
 		$faq  = get_post_meta( $post_id, '_wpmind_faq_schema', true );
 
-		wp_send_json_success( [
-			'message'         => __( '元数据生成成功', 'wpmind' ),
-			'excerpt'         => $post->post_excerpt,
-			'tags'            => wp_get_post_tags( $post_id, [ 'fields' => 'names' ] ),
-			'categories'      => wp_get_post_categories( $post_id, [ 'fields' => 'names' ] ),
-			'faq'             => $faq ? json_decode( $faq, true ) : [],
-			'seo_description' => get_post_meta( $post_id, '_wpmind_seo_description', true ),
-			'generated_at'    => get_post_meta( $post_id, '_wpmind_auto_meta_generated_at', true ),
-		] );
+		wp_send_json_success(
+			[
+				'message'         => __( '元数据生成成功', 'wpmind' ),
+				'excerpt'         => $post->post_excerpt,
+				'tags'            => wp_get_post_tags( $post_id, [ 'fields' => 'names' ] ),
+				'categories'      => wp_get_post_categories( $post_id, [ 'fields' => 'names' ] ),
+				'faq'             => $faq ? json_decode( $faq, true ) : [],
+				'seo_description' => get_post_meta( $post_id, '_wpmind_seo_description', true ),
+				'generated_at'    => get_post_meta( $post_id, '_wpmind_auto_meta_generated_at', true ),
+			]
+		);
 	}
 
 	/**
@@ -143,9 +145,11 @@ final class AutoMetaAjaxController {
 		$stats     = get_option( 'wpmind_auto_meta_stats', [] );
 		$month_key = 'month_' . gmdate( 'Y_m' );
 
-		wp_send_json_success( [
-			'total_generated' => (int) ( $stats['generated'] ?? 0 ),
-			'month_generated' => (int) ( $stats[ $month_key ] ?? 0 ),
-		] );
+		wp_send_json_success(
+			[
+				'total_generated' => (int) ( $stats['generated'] ?? 0 ),
+				'month_generated' => (int) ( $stats[ $month_key ] ?? 0 ),
+			]
+		);
 	}
 }

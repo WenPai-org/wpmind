@@ -118,8 +118,12 @@ final class RateLimiter {
 	 * @param string $rid Request ID.
 	 */
 	private function rollback_with_fallback( string $key, string $rid ): void {
-		try { $this->primary->rollback( $key, $rid ); } catch ( \Throwable $e ) { /* ignore */ }
-		try { $this->fallback->rollback( $key, $rid ); } catch ( \Throwable $e ) { /* ignore */ }
+		try {
+			$this->primary->rollback( $key, $rid ); } catch ( \Throwable $e ) {
+			/* ignore */ }
+			try {
+				$this->fallback->rollback( $key, $rid ); } catch ( \Throwable $e ) {
+						/* ignore */ }
 	}
 
 	/**

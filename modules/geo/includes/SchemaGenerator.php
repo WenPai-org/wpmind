@@ -218,7 +218,7 @@ class SchemaGenerator {
 		// Keywords (tags).
 		$tags = get_the_tags( $post->ID );
 		if ( ! empty( $tags ) ) {
-			$keywords = array_map(
+			$keywords           = array_map(
 				function ( $tag ) {
 					return $tag->name;
 				},

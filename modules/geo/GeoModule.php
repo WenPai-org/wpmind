@@ -140,7 +140,7 @@ class GeoModule implements ModuleInterface {
 	 */
 	private function init_components(): void {
 		// Helper function to check if option is enabled.
-		$is_enabled = function( $option, $default = '1' ) {
+		$is_enabled = function ( $option, $default = '1' ) {
 			$value = get_option( $option, $default );
 			return $value === '1' || $value === true || $value === 1;
 		};
@@ -255,25 +255,25 @@ class GeoModule implements ModuleInterface {
 		// Sanitize and save settings.
 		// Use string '1'/'0' instead of boolean for reliable storage.
 		// Compare by value (not isset) because JS always sends 0/1 for checkboxes.
-		$to_bool = function( $key ) use ( $settings ): string {
+		$to_bool = function ( $key ) use ( $settings ): string {
 			return ( (string) ( $settings[ $key ] ?? '0' ) ) === '1' ? '1' : '0';
 		};
 
 		$options = array(
-			'wpmind_geo_enabled'             => $to_bool( 'wpmind_geo_enabled' ),
+			'wpmind_geo_enabled'              => $to_bool( 'wpmind_geo_enabled' ),
 			'wpmind_standalone_markdown_feed' => $to_bool( 'wpmind_standalone_markdown_feed' ),
-			'wpmind_chinese_optimize'        => $to_bool( 'wpmind_chinese_optimize' ),
-			'wpmind_geo_signals'             => $to_bool( 'wpmind_geo_signals' ),
-			'wpmind_crawler_tracking'        => $to_bool( 'wpmind_crawler_tracking' ),
-			'wpmind_llms_txt_enabled'        => $to_bool( 'wpmind_llms_txt_enabled' ),
-			'wpmind_schema_enabled'          => $to_bool( 'wpmind_schema_enabled' ),
-			'wpmind_schema_mode'             => sanitize_key( $settings['wpmind_schema_mode'] ?? 'auto' ),
-			'wpmind_ai_indexing_enabled'     => $to_bool( 'wpmind_ai_indexing_enabled' ),
-			'wpmind_ai_sitemap_enabled'      => $to_bool( 'wpmind_ai_sitemap_enabled' ),
-			'wpmind_robots_ai_enabled'       => $to_bool( 'wpmind_robots_ai_enabled' ),
-			'wpmind_ai_summary_enabled'      => $to_bool( 'wpmind_ai_summary_enabled' ),
-			'wpmind_entity_linker_enabled'   => $to_bool( 'wpmind_entity_linker_enabled' ),
-			'wpmind_brand_entity_enabled'    => $to_bool( 'wpmind_brand_entity_enabled' ),
+			'wpmind_chinese_optimize'         => $to_bool( 'wpmind_chinese_optimize' ),
+			'wpmind_geo_signals'              => $to_bool( 'wpmind_geo_signals' ),
+			'wpmind_crawler_tracking'         => $to_bool( 'wpmind_crawler_tracking' ),
+			'wpmind_llms_txt_enabled'         => $to_bool( 'wpmind_llms_txt_enabled' ),
+			'wpmind_schema_enabled'           => $to_bool( 'wpmind_schema_enabled' ),
+			'wpmind_schema_mode'              => sanitize_key( $settings['wpmind_schema_mode'] ?? 'auto' ),
+			'wpmind_ai_indexing_enabled'      => $to_bool( 'wpmind_ai_indexing_enabled' ),
+			'wpmind_ai_sitemap_enabled'       => $to_bool( 'wpmind_ai_sitemap_enabled' ),
+			'wpmind_robots_ai_enabled'        => $to_bool( 'wpmind_robots_ai_enabled' ),
+			'wpmind_ai_summary_enabled'       => $to_bool( 'wpmind_ai_summary_enabled' ),
+			'wpmind_entity_linker_enabled'    => $to_bool( 'wpmind_entity_linker_enabled' ),
+			'wpmind_brand_entity_enabled'     => $to_bool( 'wpmind_brand_entity_enabled' ),
 		);
 
 		foreach ( $options as $key => $value ) {

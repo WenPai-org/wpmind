@@ -98,7 +98,7 @@ class ApiKeyRepository {
 
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				"SELECT * FROM %i WHERE key_id = %s LIMIT 1",
+				'SELECT * FROM %i WHERE key_id = %s LIMIT 1',
 				self::table(),
 				$key_id
 			),
@@ -189,7 +189,7 @@ class ApiKeyRepository {
 
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM %i ORDER BY created_at DESC LIMIT %d OFFSET %d",
+				'SELECT * FROM %i ORDER BY created_at DESC LIMIT %d OFFSET %d',
 				self::table(),
 				$per_page,
 				$offset
@@ -209,7 +209,7 @@ class ApiKeyRepository {
 		global $wpdb;
 
 		return (int) $wpdb->get_var(
-			$wpdb->prepare( "SELECT COUNT(*) FROM %i", self::table() )
+			$wpdb->prepare( 'SELECT COUNT(*) FROM %i', self::table() )
 		);
 	}
 
@@ -223,7 +223,7 @@ class ApiKeyRepository {
 
 		return (int) $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM %i WHERE status = %s",
+				'SELECT COUNT(*) FROM %i WHERE status = %s',
 				self::table(),
 				'active'
 			)
@@ -243,7 +243,7 @@ class ApiKeyRepository {
 
 		return (int) $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COALESCE(SUM(request_count), 0) FROM %i WHERE window_month = %s",
+				'SELECT COALESCE(SUM(request_count), 0) FROM %i WHERE window_month = %s',
 				$usage_table,
 				$window_month
 			)
@@ -338,13 +338,13 @@ class ApiKeyRepository {
 	public static function list_all_with_usage(): array {
 		global $wpdb;
 
-		$keys_table  = self::table();
-		$usage_table = $wpdb->prefix . 'wpmind_api_key_usage';
+		$keys_table   = self::table();
+		$usage_table  = $wpdb->prefix . 'wpmind_api_key_usage';
 		$window_month = gmdate( 'Y-m' );
 
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT k.id, k.key_id, k.key_prefix, k.name, k.owner_user_id,
+				'SELECT k.id, k.key_id, k.key_prefix, k.name, k.owner_user_id,
 						k.rpm_limit, k.tpm_limit, k.concurrency_limit,
 						k.monthly_budget_usd, k.ip_whitelist, k.status,
 						k.last_used_at, k.expires_at, k.revoked_at,
@@ -354,7 +354,7 @@ class ApiKeyRepository {
 						COALESCE(u.total_cost_usd, 0) AS usage_total_cost_usd
 				FROM %i AS k
 				LEFT JOIN %i AS u ON k.key_id = u.key_id AND u.window_month = %s
-				ORDER BY k.created_at DESC",
+				ORDER BY k.created_at DESC',
 				$keys_table,
 				$usage_table,
 				$window_month

@@ -63,19 +63,19 @@ class GeoSignalInjector {
 		$categories = wp_get_post_categories( $post->ID, array( 'fields' => 'names' ) );
 		$tags       = wp_get_post_tags( $post->ID, array( 'fields' => 'names' ) );
 
-		$signal = "---\n";
+		$signal  = "---\n";
 		$signal .= sprintf( "作者: %s\n", $this->escape_yaml_value( $author ) );
 		$signal .= sprintf( "发布日期: %s\n", $date );
 		$signal .= sprintf( "最后更新: %s\n", $modified );
 
 		if ( ! empty( $categories ) ) {
 			$escaped_cats = array_map( array( $this, 'escape_yaml_value' ), $categories );
-			$signal .= sprintf( "分类: %s\n", implode( ', ', $escaped_cats ) );
+			$signal      .= sprintf( "分类: %s\n", implode( ', ', $escaped_cats ) );
 		}
 
 		if ( ! empty( $tags ) ) {
 			$escaped_tags = array_map( array( $this, 'escape_yaml_value' ), $tags );
-			$signal .= sprintf( "标签: %s\n", implode( ', ', $escaped_tags ) );
+			$signal      .= sprintf( "标签: %s\n", implode( ', ', $escaped_tags ) );
 		}
 
 		$signal .= "---\n\n";
@@ -112,7 +112,7 @@ class GeoSignalInjector {
 		$site   = get_bloginfo( 'name' );
 		$date   = get_the_date( 'Y-m-d', $post );
 
-		$citation = "\n\n---\n\n";
+		$citation  = "\n\n---\n\n";
 		$citation .= "## 引用本文\n\n";
 
 		// APA style citation.

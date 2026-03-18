@@ -86,15 +86,19 @@ final class CacheAjaxController {
 		$this->verify_request( true );
 
 		// Reset core stats.
-		update_option( 'wpmind_exact_cache_stats', [
-			'hits'          => 0,
-			'misses'        => 0,
-			'writes'        => 0,
-			'last_hit_at'   => 0,
-			'last_miss_at'  => 0,
-			'last_write_at' => 0,
-			'last_key'      => '',
-		], false );
+		update_option(
+			'wpmind_exact_cache_stats',
+			[
+				'hits'          => 0,
+				'misses'        => 0,
+				'writes'        => 0,
+				'last_hit_at'   => 0,
+				'last_miss_at'  => 0,
+				'last_write_at' => 0,
+				'last_key'      => '',
+			],
+			false
+		);
 		// Reset daily stats.
 		DailyStats::reset();
 		wp_send_json_success();
@@ -106,10 +110,12 @@ final class CacheAjaxController {
 	public function ajax_get_cache_stats(): void {
 		$this->verify_request( false );
 
-		wp_send_json_success( [
-			'stats'   => \WPMind\Cache\ExactCache::instance()->get_stats(),
-			'daily'   => DailyStats::get_daily_data(),
-			'savings' => CostEstimator::get_estimated_savings(),
-		] );
+		wp_send_json_success(
+			[
+				'stats'   => \WPMind\Cache\ExactCache::instance()->get_stats(),
+				'daily'   => DailyStats::get_daily_data(),
+				'savings' => CostEstimator::get_estimated_savings(),
+			]
+		);
 	}
 }

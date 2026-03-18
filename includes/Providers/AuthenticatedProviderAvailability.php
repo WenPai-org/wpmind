@@ -34,69 +34,71 @@ use WordPress\AiClient\Providers\Models\TextGeneration\Contracts\TextGenerationM
  * @since 1.3.0
  */
 class AuthenticatedProviderAvailability implements
-    ProviderAvailabilityInterface,
-    WithRequestAuthenticationInterface,
-    WithHttpTransporterInterface
-{
-    use WithRequestAuthenticationTrait;
-    use WithHttpTransporterTrait;
+	ProviderAvailabilityInterface,
+	WithRequestAuthenticationInterface,
+	WithHttpTransporterInterface {
 
-    /**
-     * @var ModelInterface&TextGenerationModelInterface 用于检查可用性的模型
-     */
-    private ModelInterface $model;
+	use WithRequestAuthenticationTrait;
+	use WithHttpTransporterTrait;
 
-    /**
-     * 构造函数
-     *
-     * @param ModelInterface $model 用于检查可用性的模型
-     * @throws Exception 如果模型不实现 TextGenerationModelInterface
-     */
-    public function __construct(ModelInterface $model)
-    {
-        if (!($model instanceof TextGenerationModelInterface)) {
-            throw new Exception(
-                'The model class to check provider availability must implement TextGenerationModelInterface.'
-            );
-        }
-        $this->model = $model;
-    }
+	/**
+	 * @var ModelInterface&TextGenerationModelInterface 用于检查可用性的模型
+	 */
+	private ModelInterface $model;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since 1.3.0
-     */
-    public function isConfigured(): bool
-    {
-        // 将 HTTP transporter 传递给模型
-        if ($this->model instanceof WithHttpTransporterInterface) {
-            $this->model->setHttpTransporter($this->getHttpTransporter());
-        }
+	/**
+	 * 构造函数
+	 *
+	 * @param ModelInterface $model 用于检查可用性的模型
+	 * @throws Exception 如果模型不实现 TextGenerationModelInterface
+	 */
+	public function __construct( ModelInterface $model ) {
+		if ( ! ( $model instanceof TextGenerationModelInterface ) ) {
+			throw new Exception(
+				'The model class to check provider availability must implement TextGenerationModelInterface.'
+			);
+		}
+		$this->model = $model;
+	}
 
-        // 将认证传递给模型
-        if ($this->model instanceof WithRequestAuthenticationInterface) {
-            $this->model->setRequestAuthentication($this->getRequestAuthentication());
-        }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @since 1.3.0
+	 */
+	public function isConfigured(): bool {
+		// 将 HTTP transporter 传递给模型
+		if ( $this->model instanceof WithHttpTransporterInterface ) {
+			$this->model->setHttpTransporter( $this->getHttpTransporter() );
+		}
 
-        // 设置最小资源配置
-        $modelConfig = ModelConfig::fromArray([
-            ModelConfig::KEY_MAX_TOKENS => 1,
-        ]);
-        $this->model->setConfig($modelConfig);
+		// 将认证传递给模型
+		if ( $this->model instanceof WithRequestAuthenticationInterface ) {
+			$this->model->setRequestAuthentication( $this->getRequestAuthentication() );
+		}
 
-        try {
-            // 尝试生成文本以检查 Provider 是否可用
-            $this->model->generateTextResult([
-                new Message(
-                    MessageRoleEnum::user(),
-                    [new MessagePart('a')]
-                ),
-            ]);
-            return true;
-        } catch (Exception $e) {
-            // 如果发生异常，Provider 不可用
-            return false;
-        }
-    }
+		// 设置最小资源配置
+		$modelConfig = ModelConfig::fromArray(
+			[
+				ModelConfig::KEY_MAX_TOKENS => 1,
+			]
+		);
+		$this->model->setConfig( $modelConfig );
+
+		try {
+			// 尝试生成文本以检查 Provider 是否可用
+			$this->model->generateTextResult(
+				[
+					new Message(
+						MessageRoleEnum::user(),
+						[ new MessagePart( 'a' ) ]
+					),
+				]
+			);
+			return true;
+		} catch ( Exception $e ) {
+			// 如果发生异常，Provider 不可用
+			return false;
+		}
+	}
 }

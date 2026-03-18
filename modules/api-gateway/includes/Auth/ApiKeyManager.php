@@ -45,12 +45,12 @@ class ApiKeyManager {
 		$now = current_time( 'mysql', true );
 
 		$data = [
-			'key_id'       => $key_id,
-			'key_prefix'   => $key_prefix,
-			'secret_hash'  => $secret_hash,
-			'secret_salt'  => $salt_hex,
-			'created_at'   => $now,
-			'updated_at'   => $now,
+			'key_id'      => $key_id,
+			'key_prefix'  => $key_prefix,
+			'secret_hash' => $secret_hash,
+			'secret_salt' => $salt_hex,
+			'created_at'  => $now,
+			'updated_at'  => $now,
 		];
 
 		// Merge optional attributes.

@@ -67,8 +67,8 @@ final class SseStreamController {
 		$request_id = $context->request_id();
 
 		// Resolve concurrency limit from auth result.
-		$auth_result    = $context->auth_result();
-		$per_key_limit  = $auth_result->concurrency_limit ?? 2;
+		$auth_result   = $context->auth_result();
+		$per_key_limit = $auth_result->concurrency_limit ?? 2;
 
 		// Step 1: Acquire SSE slot.
 		$slot = $this->guard->acquire_slot( $key_id, $request_id, $per_key_limit );
@@ -176,8 +176,8 @@ final class SseStreamController {
 	/**
 	 * Send SSE response headers.
 	 *
-	 * @param string                 $request_id Request ID for X-Request-Id header.
-	 * @param GatewayRequestContext  $context    Context for additional headers.
+	 * @param string                $request_id Request ID for X-Request-Id header.
+	 * @param GatewayRequestContext $context    Context for additional headers.
 	 */
 	private function send_sse_headers( string $request_id, GatewayRequestContext $context ): void {
 		// Core SSE headers.

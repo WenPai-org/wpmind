@@ -46,11 +46,15 @@ class NsfwDetector {
 			return;
 		}
 
-		$result = wpmind_vision( $image_url, 'Is this image NSFW? Reply only "safe" or "nsfw".', [
-			'max_tokens'  => 10,
-			'temperature' => 0.1,
-			'context'     => 'media_nsfw_check',
-		] );
+		$result = wpmind_vision(
+			$image_url,
+			'Is this image NSFW? Reply only "safe" or "nsfw".',
+			[
+				'max_tokens'  => 10,
+				'temperature' => 0.1,
+				'context'     => 'media_nsfw_check',
+			]
+		);
 
 		if ( is_wp_error( $result ) ) {
 			return;

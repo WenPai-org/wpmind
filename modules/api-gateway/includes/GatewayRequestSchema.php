@@ -138,12 +138,12 @@ final class GatewayRequestSchema {
 	 */
 	public static function responses(): array {
 		return [
-			'model'       => [
+			'model'        => [
 				'type'              => 'string',
 				'required'          => true,
 				'sanitize_callback' => 'sanitize_text_field',
 			],
-			'input'       => [
+			'input'        => [
 				'type'     => [ 'string', 'array' ],
 				'required' => true,
 			],
@@ -152,23 +152,23 @@ final class GatewayRequestSchema {
 				'default'           => null,
 				'sanitize_callback' => 'sanitize_textarea_field',
 			],
-			'temperature' => [
+			'temperature'  => [
 				'type'    => 'number',
 				'default' => 1.0,
 				'minimum' => 0,
 				'maximum' => 2,
 			],
-			'max_tokens'  => [
+			'max_tokens'   => [
 				'type'    => 'integer',
 				'default' => null,
 				'minimum' => 1,
 			],
-			'tools'       => [
+			'tools'        => [
 				'type'              => 'array',
 				'default'           => null,
 				'validate_callback' => [ __CLASS__, 'validate_tools' ],
 			],
-			'stream'      => [
+			'stream'       => [
 				'type'    => 'boolean',
 				'default' => false,
 			],

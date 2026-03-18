@@ -106,10 +106,13 @@ class WenPai_License {
 			}
 		}
 
-		$response = $this->api_request( '/api/v1/license/verify', [
-			'license_key' => $key,
-			'site_url'    => home_url(),
-		] );
+		$response = $this->api_request(
+			'/api/v1/license/verify',
+			[
+				'license_key' => $key,
+				'site_url'    => home_url(),
+			]
+		);
 
 		if ( is_wp_error( $response ) ) {
 			// Grace period: use last known good state for up to 7 days.
@@ -148,10 +151,13 @@ class WenPai_License {
 			return false;
 		}
 
-		$response = $this->api_request( '/api/v1/license/activate', [
-			'license_key' => $key,
-			'site_url'    => home_url(),
-		] );
+		$response = $this->api_request(
+			'/api/v1/license/activate',
+			[
+				'license_key' => $key,
+				'site_url'    => home_url(),
+			]
+		);
 
 		if ( is_wp_error( $response ) ) {
 			return false;
@@ -179,10 +185,13 @@ class WenPai_License {
 			return false;
 		}
 
-		$response = $this->api_request( '/api/v1/license/deactivate', [
-			'license_key' => $key,
-			'site_url'    => home_url(),
-		] );
+		$response = $this->api_request(
+			'/api/v1/license/deactivate',
+			[
+				'license_key' => $key,
+				'site_url'    => home_url(),
+			]
+		);
 
 		delete_transient( $this->cache_key );
 		delete_option( $this->cache_key . '_grace' );
@@ -252,11 +261,14 @@ class WenPai_License {
 	private function api_request( string $endpoint, array $body ) {
 		$url = $this->api_url . $endpoint;
 
-		$response = wp_remote_post( $url, [
-			'timeout' => 15,
-			'headers' => [ 'Content-Type' => 'application/json' ],
-			'body'    => wp_json_encode( $body ),
-		] );
+		$response = wp_remote_post(
+			$url,
+			[
+				'timeout' => 15,
+				'headers' => [ 'Content-Type' => 'application/json' ],
+				'body'    => wp_json_encode( $body ),
+			]
+		);
 
 		if ( is_wp_error( $response ) ) {
 			return $response;
@@ -303,9 +315,9 @@ class WenPai_License {
 	 */
 	private function free_features(): array {
 		return [
-			'analytics_days'   => 7,
-			'cache_limit'      => 100,
-			'auto_meta_daily'  => 10,
+			'analytics_days'  => 7,
+			'cache_limit'     => 100,
+			'auto_meta_daily' => 10,
 		];
 	}
 }

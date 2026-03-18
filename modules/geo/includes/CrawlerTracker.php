@@ -177,16 +177,16 @@ class CrawlerTracker {
 
 		if ( ! isset( $stats[ $key ] ) ) {
 			$stats[ $key ] = array(
-				'company'     => $crawler_info['company'],
-				'is_ai'       => $crawler_info['is_ai'],
-				'total_hits'  => 0,
-				'first_seen'  => current_time( 'mysql' ),
-				'last_seen'   => current_time( 'mysql' ),
-				'daily_hits'  => array(),
+				'company'    => $crawler_info['company'],
+				'is_ai'      => $crawler_info['is_ai'],
+				'total_hits' => 0,
+				'first_seen' => current_time( 'mysql' ),
+				'last_seen'  => current_time( 'mysql' ),
+				'daily_hits' => array(),
 			);
 		}
 
-		$stats[ $key ]['total_hits']++;
+		++$stats[ $key ]['total_hits'];
 		$stats[ $key ]['last_seen'] = current_time( 'mysql' );
 
 		// Track daily hits.
@@ -194,7 +194,7 @@ class CrawlerTracker {
 		if ( ! isset( $stats[ $key ]['daily_hits'][ $today ] ) ) {
 			$stats[ $key ]['daily_hits'][ $today ] = 0;
 		}
-		$stats[ $key ]['daily_hits'][ $today ]++;
+		++$stats[ $key ]['daily_hits'][ $today ];
 
 		// Keep only last 30 days.
 		$stats[ $key ]['daily_hits'] = array_slice(
@@ -272,10 +272,10 @@ class CrawlerTracker {
 
 		foreach ( $stats as $crawler => $data ) {
 			if ( $data['is_ai'] ) {
-				$summary['total_ai_hits'] += $data['total_hits'];
+				$summary['total_ai_hits']          += $data['total_hits'];
 				$summary['ai_crawlers'][ $crawler ] = $data['total_hits'];
 			} else {
-				$summary['total_search_hits'] += $data['total_hits'];
+				$summary['total_search_hits']          += $data['total_hits'];
 				$summary['search_crawlers'][ $crawler ] = $data['total_hits'];
 			}
 		}
