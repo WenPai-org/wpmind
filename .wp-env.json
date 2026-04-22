@@ -1,0 +1,13 @@
+{
+  "core": "https://wordpress.org/latest.zip",
+  "plugins": [
+    "."
+  ],
+  "themes": [],
+  "config": {
+    "WP_DEBUG": true,
+    "WP_DEBUG_LOG": true,
+    "WP_DEBUG_DISPLAY": false
+  },
+  "testsEnvironment": false
+}

@@ -1,0 +1,24 @@
+{
+  "name": "wpmind",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "wp-env:start": "wp-env-start-patched .",
+    "wp-env:stop": "wp-env stop",
+    "wp-env:destroy": "wp-env destroy",
+    "e2e": "playwright test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@feicode.com:2222/WenPai-org/wpmind.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@wordpress/env": "^11.2.0"
+  }
+}
