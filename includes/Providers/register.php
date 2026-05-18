@@ -34,6 +34,12 @@ function register_wpmind_providers(): void {
 		return;
 	}
 
+	// WP 7.0+ 禁用 AI 时跳过注册
+	if ( function_exists( 'wp_supports_ai' ) && ! wp_supports_ai() ) {
+		debug_log( 'AI support disabled by wp_supports_ai()' );
+		return;
+	}
+
 	// 检查 WP AI Client 是否可用
 	if ( ! class_exists( 'WordPress\\AiClient\\AiClient' ) ) {
 		debug_log( 'AiClient class not found' );
@@ -153,6 +159,11 @@ add_filter( 'pre_option_wp_ai_client_provider_credentials', __NAMESPACE__ . '\\p
 /**
  * 在 WP 7.0+ Connectors 系统中注册 WPMind 的国产 AI Providers
  *
+ * WP 7.0 auto-discovery 自动从 ProviderRegistry 创建 connector 卡片（init:15）。
+ * 本函数作为补充：
+ * 1. 为 auto-discovery 未覆盖的 provider 手动注册（兼容旧版）
+ * 2. 将 WPMind 管理的 API key 同步到 connector option（Connectors UI 显示连接状态）
+ *
  * @since 3.8.0
  */
 function register_wpmind_connectors( \WP_Connector_Registry $registry ): void {
@@ -165,20 +176,20 @@ function register_wpmind_connectors( \WP_Connector_Registry $registry ): void {
 	$meta      = ProviderRegistrar::getConnectorMeta();
 
 	foreach ( $meta as $provider_id => $connector_data ) {
-		// 仅注册已启用的 provider
+		// 仅处理已启用的 provider.
 		if ( empty( $endpoints[ $provider_id ]['enabled'] ) ) {
-			continue;
-		}
-
-		// 跳过已被核心或其他插件注册的 connector
-		if ( $registry->is_registered( $provider_id ) ) {
-			debug_log( "Connector '{$provider_id}' already registered, skipping" );
 			continue;
 		}
 
 		$setting_name = 'connectors_ai_' . $provider_id . '_api_key';
 
-		// 解析 logo URL
+		// Auto-discovery already registered, just sync the API key.
+		if ( $registry->is_registered( $provider_id ) ) {
+			sync_api_key_to_connector( $provider_id, $setting_name, $endpoints );
+			continue;
+		}
+
+		// Not registered (pre-7.0 or auto-discovery gap), register manually.
 		$logo_path = WPMIND_PLUGIN_DIR . 'assets/images/providers/' . $provider_id . '.svg';
 		$logo_url  = file_exists( $logo_path )
 			? WPMIND_PLUGIN_URL . 'assets/images/providers/' . $provider_id . '.svg'
@@ -199,19 +210,35 @@ function register_wpmind_connectors( \WP_Connector_Registry $registry ): void {
 			]
 		);
 
-		// 将 WPMind 管理的 API key 同步到 connector 的 option
-		if ( ! empty( $endpoints[ $provider_id ]['api_key'] ) ) {
-			$existing = get_option( $setting_name, '' );
-			if ( '' === $existing ) {
-				update_option( $setting_name, $endpoints[ $provider_id ]['api_key'] );
-			}
-		}
+		sync_api_key_to_connector( $provider_id, $setting_name, $endpoints );
 	}
 
-	debug_log( 'WPMind connectors registered for WP 7.0+' );
+	debug_log( 'WPMind connectors synced for WP 7.0+' );
 }
 
-// WP 7.0+ Connectors API — _wp_connectors_init 在 init:15 触发
+/**
+ * 将 WPMind 管理的 API key 同步到 WP 7.0 connector option
+ *
+ * WP 7.0 Connectors UI 从 connectors_ai_{id}_api_key option 读取 key 状态。
+ * 此同步确保在 WPMind 设置中配置的 key 也能在 Connectors UI 显示。
+ *
+ * @param string $provider_id  Provider ID.
+ * @param string $setting_name WP option name.
+ * @param array  $endpoints    WPMind endpoint configuration.
+ * @since 4.1.0
+ */
+function sync_api_key_to_connector( string $provider_id, string $setting_name, array $endpoints ): void {
+	if ( empty( $endpoints[ $provider_id ]['api_key'] ) ) {
+		return;
+	}
+
+	$existing = get_option( $setting_name, '' );
+	if ( '' === $existing ) {
+		update_option( $setting_name, $endpoints[ $provider_id ]['api_key'] );
+	}
+}
+
+// WP 7.0+ Connectors API: _wp_connectors_init fires at init:15.
 if ( class_exists( 'WP_Connector_Registry' ) ) {
 	add_action( 'wp_connectors_init', __NAMESPACE__ . '\\register_wpmind_connectors' );
 }
