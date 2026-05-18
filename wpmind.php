@@ -321,6 +321,9 @@ final class WPMind {
 		// WP 7.0+ 全局熔断：所有 provider 都不可用时阻止 AI prompt
 		add_filter( 'wp_ai_client_prevent_prompt', [ $this, 'should_prevent_prompt' ] );
 
+		// WP 7.0+ core AI call token usage into Cost Control.
+		add_action( 'wp_ai_client_after_generate_result', [ $this, 'capture_core_ai_usage' ] );
+
 		$this->init_mcp_gateway();
 
 		// 图像生成能力
@@ -420,8 +423,55 @@ final class WPMind {
 		return ! Failover\FailoverManager::instance()->has_available_provider();
 	}
 
+
 	/**
-	 * 初始化 MCP Gateway
+	 * Capture token usage from WP 7.0 core AI calls into Cost Control.
+	 *
+	 * WP 7.0 dispatches AfterGenerateResultEvent after every AI call made
+	 * through wp_ai_client_prompt(). This hook records the token usage so
+	 * that Cost Control tracks ALL AI usage, not just WPMind-routed calls.
+	 *
+	 * @param object $event AfterGenerateResultEvent from WP 7.0 core.
+	 * @since 4.2.0
+	 */
+	public function capture_core_ai_usage( $event ): void {
+		if ( ! is_object( $event ) ) {
+			return;
+		}
+
+		$provider_id = '';
+		$model_name  = '';
+
+		try {
+			$model       = $event->getModel();
+			$provider_id = $model->providerMetadata()->getId();
+			$model_name  = $model->metadata()->getName();
+		} catch ( \Throwable $e ) {
+			return;
+		}
+
+		$input_tokens  = 0;
+		$output_tokens = 0;
+
+		try {
+			$result = $event->getResult();
+			$usage  = $result->getTokenUsage();
+			if ( null !== $usage ) {
+				$input_tokens  = $usage->getPromptTokens();
+				$output_tokens = $usage->getCompletionTokens();
+			}
+		} catch ( \Throwable $e ) {
+			return;
+		}
+
+		if ( $input_tokens > 0 || $output_tokens > 0 ) {
+			/** This action is documented in modules/cost-control/CostControlModule.php */
+			do_action( 'wpmind_usage_record', $provider_id, $model_name, $input_tokens, $output_tokens, 0 );
+		}
+	}
+
+	/**
+	 * Initialize MCP Gateway.
 	 *
 	 * @return void
 	 */
@@ -624,14 +674,20 @@ final class WPMind {
 				continue;
 			}
 
-			// 检查自定义 URL
-			if ( ! empty( $config['custom_base_url'] ) && str_contains( $url, wp_parse_url( $config['custom_base_url'], PHP_URL_HOST ) ) ) {
-				return $provider;
+			// Check custom URL.
+			if ( ! empty( $config['custom_base_url'] ) ) {
+				$host = wp_parse_url( $config['custom_base_url'], PHP_URL_HOST );
+				if ( is_string( $host ) && '' !== $host && str_contains( $url, $host ) ) {
+					return $provider;
+				}
 			}
 
-			// 检查默认 base_url
-			if ( ! empty( $config['base_url'] ) && str_contains( $url, wp_parse_url( $config['base_url'], PHP_URL_HOST ) ) ) {
-				return $provider;
+			// Check default base_url.
+			if ( ! empty( $config['base_url'] ) ) {
+				$host = wp_parse_url( $config['base_url'], PHP_URL_HOST );
+				if ( is_string( $host ) && '' !== $host && str_contains( $url, $host ) ) {
+					return $provider;
+				}
 			}
 		}
 

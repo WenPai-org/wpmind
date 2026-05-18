@@ -190,10 +190,10 @@ class IntelligentRouter {
 			return array_key_first( $this->providers );
 		}
 
-		// 如果有首选 Provider 且可用，优先使用
+		// Preferred provider takes priority, but skip if circuit breaker is open.
 		$preferred = $context->get_preferred_provider();
 		if ( $preferred !== null && isset( $this->providers[ $preferred ] ) ) {
-			if ( ! $context->is_excluded( $preferred ) ) {
+			if ( ! $context->is_excluded( $preferred ) && $this->is_provider_available( $preferred ) ) {
 				return $preferred;
 			}
 		}
@@ -340,5 +340,24 @@ class IntelligentRouter {
 	public function has_manual_priority(): bool {
 		$priority = $this->get_manual_priority();
 		return ! empty( $priority );
+	}
+
+	/**
+	 * Check if a provider is available (not circuit-broken).
+	 *
+	 * @param string $provider_id Provider ID.
+	 * @return bool
+	 */
+	private function is_provider_available( string $provider_id ): bool {
+		if ( ! class_exists( '\\WPMind\\Failover\\FailoverManager' ) ) {
+			return true;
+		}
+
+		$breaker = \WPMind\Failover\FailoverManager::instance()->get_circuit_breaker( $provider_id );
+		if ( null === $breaker ) {
+			return true;
+		}
+
+		return $breaker->is_available();
 	}
 }

@@ -240,18 +240,42 @@ class Pricing {
 	public static function calculate_cost(
 		string $provider,
 		string $model,
-		int $inputTokens,
-		int $outputTokens
+		int $input_tokens,
+		int $output_tokens
 	): float {
 		$pricing      = self::DATA[ $provider ] ?? [];
-		$modelPricing = $pricing[ $model ] ?? $pricing['default'] ?? [
+		$model_pricing = self::resolve_model_pricing( $pricing, $model );
+
+		$input_cost  = ( $input_tokens / 1_000_000 ) * ( $model_pricing['input'] ?? 0 );
+		$output_cost = ( $output_tokens / 1_000_000 ) * ( $model_pricing['output'] ?? 0 );
+
+		return round( $input_cost + $output_cost, 6 );
+	}
+
+	/**
+	 * Resolve pricing for a model with prefix-based fallback.
+	 *
+	 * @param array  $pricing Provider pricing data.
+	 * @param string $model   Model identifier from the API call.
+	 * @return array{input: float, output: float}
+	 */
+	private static function resolve_model_pricing( array $pricing, string $model ): array {
+		if ( isset( $pricing[ $model ] ) ) {
+			return $pricing[ $model ];
+		}
+
+		foreach ( $pricing as $key => $data ) {
+			if ( 'default' === $key || ! is_array( $data ) ) {
+				continue;
+			}
+			if ( str_starts_with( $model, (string) $key ) ) {
+				return $data;
+			}
+		}
+
+		return $pricing['default'] ?? [
 			'input'  => 0,
 			'output' => 0,
 		];
-
-		$inputCost  = ( $inputTokens / 1_000_000 ) * ( $modelPricing['input'] ?? 0 );
-		$outputCost = ( $outputTokens / 1_000_000 ) * ( $modelPricing['output'] ?? 0 );
-
-		return round( $inputCost + $outputCost, 6 );
 	}
 }
