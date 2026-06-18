@@ -1,0 +1,46 @@
+# 文派项目通用 pre-commit 配置
+# 使用: cp ~/.pre-commit-config.yaml ~/Projects/<project>/.pre-commit-config.yaml
+# 安装: cd ~/Projects/<project> && pre-commit install
+repos:
+  # PHP 语法检查
+  - repo: local
+    hooks:
+      - id: phpcs
+        name: PHPCS (WordPress Coding Standards)
+        entry: phpcs --standard=phpcs.xml.dist
+        language: system
+        types: [php]
+        pass_filenames: true
+
+      - id: php-lint
+        name: PHP Syntax Check
+        entry: php -l
+        language: system
+        types: [php]
+        pass_filenames: true
+
+  # Shell 检查
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
+        args: [--severity=warning]
+
+  # 密钥泄漏检测
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.27.2
+    hooks:
+      - id: gitleaks
+
+  # 通用检查
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '\.(min\.js|min\.css|map)$'
+      - id: end-of-file-fixer
+        exclude: '\.(min\.js|min\.css|map)$'
+      - id: check-yaml
+      - id: check-json
+      - id: no-commit-to-branch
+        args: [--branch, main, --branch, master]
