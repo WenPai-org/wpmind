@@ -20,11 +20,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( class_exists( 'WenPai_Updater' ) ) {
+if ( class_exists( 'WPMind_Updater' ) ) {
 	return;
 }
 
-class WenPai_Updater {
+/**
+ * WPMind 自更新器.
+ *
+ * 每个文派插件捆绑一份本文件，类名必须各插件唯一，
+ * 不得共用同一个全局类名，否则多插件同装时会致命冲突.
+ */
+class WPMind_Updater {
 
 	/**
 	 * 更新器版本号。
@@ -64,16 +70,19 @@ class WenPai_Updater {
 	/**
 	 * 初始化更新器。
 	 *
-	 * @param string $plugin_file 插件主文件路径（plugin_basename 格式）。
-	 * @param string $version     当前插件版本号。
+	 * @param string $plugin_file 插件主文件路径（plugin_basename 格式）.
+	 * @param string $version     当前插件版本号.
 	 */
 	public function __construct( string $plugin_file, string $version ) {
 		$this->plugin_file = $plugin_file;
 		$this->slug        = dirname( $plugin_file );
 		$this->version     = $version;
 
-		// 检查是否被 wp-china-yes 集中更新接管
+		// 检查是否被 wp-china-yes 集中更新接管.
+		// 钩子名是文派插件间的共用契约，wp-china-yes 据此接管更新，
+		// 加插件前缀会断掉对接，故豁免前缀规则.
 		$is_overridden = apply_filters(
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			'wenpai_updater_override',
 			false,
 			$this->slug
@@ -88,7 +97,7 @@ class WenPai_Updater {
 	 * 注册 WordPress hooks。
 	 */
 	private function register_hooks(): void {
-		// Update URI: https://updates.wenpai.net 触发此 filter
+		// Update URI: https://updates.wenpai.net 触发此 filter.
 		add_filter(
 			'update_plugins_updates.wenpai.net',
 			[ $this, 'check_update' ],
@@ -96,7 +105,7 @@ class WenPai_Updater {
 			4
 		);
 
-		// 插件详情弹窗
+		// 插件详情弹窗.
 		add_filter( 'plugins_api', [ $this, 'plugin_info' ], 20, 3 );
 	}
 
@@ -106,13 +115,13 @@ class WenPai_Updater {
 	 * WordPress 在检查更新时，对声明了 Update URI 的插件
 	 * 触发 update_plugins_{hostname} filter。
 	 *
-	 * @param array|false $update      当前更新数据。
-	 * @param array       $plugin_data 插件头信息。
-	 * @param string      $plugin_file 插件文件路径。
-	 * @param string[]    $locales     语言列表。
+	 * @param array|false $update      当前更新数据.
+	 * @param array       $plugin_data 插件头信息.
+	 * @param string      $plugin_file 插件文件路径.
+	 * @param string[]    $locales     语言列表.
 	 * @return object|false 更新数据或 false。
 	 */
-	public function check_update( $update, array $plugin_data, string $plugin_file, array $locales ) {
+	public function check_update( $update, array $plugin_data, string $plugin_file, array $locales ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- $locales 由 WordPress 的 update_plugins_{hostname} filter 签名要求，必须保留.
 		if ( $plugin_file !== $this->plugin_file ) {
 			return $update;
 		}
@@ -155,9 +164,9 @@ class WenPai_Updater {
 	 *
 	 * 当用户在 WP 后台点击"查看详情"时触发。
 	 *
-	 * @param false|object|array $result 当前结果。
-	 * @param string             $action API 动作。
-	 * @param object             $args   请求参数。
+	 * @param false|object|array $result 当前结果.
+	 * @param string             $action API 动作.
+	 * @param object             $args   请求参数.
 	 * @return false|object 插件信息或 false。
 	 */
 	public function plugin_info( $result, string $action, object $args ) {
@@ -191,7 +200,7 @@ class WenPai_Updater {
 			return $info;
 		}
 
-		// API 不可用或插件未注册时，用本地插件头信息兜底
+		// API 不可用或插件未注册时，用本地插件头信息兜底.
 		$plugin_path = WP_PLUGIN_DIR . '/' . $this->plugin_file;
 		if ( ! file_exists( $plugin_path ) ) {
 			return $result;
@@ -222,8 +231,8 @@ class WenPai_Updater {
 	/**
 	 * 向云桥 API 发送请求。
 	 *
-	 * @param string     $endpoint API 端点（不含 /api/v1/ 前缀）。
-	 * @param array|null $body     POST 请求体（null 则用 GET）。
+	 * @param string     $endpoint API 端点（不含 /api/v1/ 前缀）.
+	 * @param array|null $body     POST 请求体（null 则用 GET）.
 	 * @return array|WP_Error 解码后的响应或错误。
 	 */
 	private function api_request( string $endpoint, ?array $body = null ) {
@@ -273,7 +282,7 @@ class WenPai_Updater {
 	 * 仅处理 API 返回的 changelog 中常见的 Markdown 子集：
 	 * 标题、列表、加粗、斜体、行内代码、链接。
 	 *
-	 * @param string $text Markdown 文本。
+	 * @param string $text Markdown 文本.
 	 * @return string HTML。
 	 */
 	private function markdown_to_html( string $text ): string {
@@ -281,7 +290,7 @@ class WenPai_Updater {
 			return $text;
 		}
 
-		// 去掉 CI 自动生成的冗余标题行（WordPress 弹窗已显示插件名和版本）
+		// 去掉 CI 自动生成的冗余标题行（WordPress 弹窗已显示插件名和版本）.
 		$text = preg_replace( '/^##\s+\S+\s+v[\d.]+\s*\n+/m', '', $text );
 		$text = preg_replace( '/^###?\s+What\'s Changed\s*\n+/mi', '', $text );
 
@@ -300,7 +309,7 @@ class WenPai_Updater {
 				continue;
 			}
 
-			// 标题 h2-h4
+			// 标题 h2-h4.
 			if ( preg_match( '/^(#{2,4})\s+(.+)$/', $trimmed, $m ) ) {
 				if ( $in_ul ) {
 					$html .= "</ul>\n";
@@ -311,7 +320,7 @@ class WenPai_Updater {
 				continue;
 			}
 
-			// 无序列表
+			// 无序列表.
 			if ( preg_match( '/^[-*]\s+(.+)$/', $trimmed, $m ) ) {
 				if ( ! $in_ul ) {
 					$html .= "<ul>\n";
@@ -321,7 +330,7 @@ class WenPai_Updater {
 				continue;
 			}
 
-			// 普通段落
+			// 普通段落.
 			if ( $in_ul ) {
 				$html .= "</ul>\n";
 				$in_ul = false;
@@ -338,6 +347,9 @@ class WenPai_Updater {
 
 	/**
 	 * 处理行内 Markdown：加粗、斜体、行内代码、链接。
+	 *
+	 * @param string $text 待处理的 Markdown 文本.
+	 * @return string 转换后的 HTML.
 	 */
 	private function inline_markdown( string $text ): string {
 		$text = esc_html( $text );
