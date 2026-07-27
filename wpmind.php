@@ -317,6 +317,13 @@ final class WPMind {
 		// AI 过滤器 - 对齐官方 WordPress AI 插件 filter hook
 		add_filter( 'ai_experiments_preferred_models_for_text_generation', [ $this, 'filter_preferred_models' ] );
 		add_filter( 'wp_ai_client_default_request_timeout', [ $this, 'filter_request_timeout' ] );
+
+		// WP 7.0+ 全局熔断：所有 provider 都不可用时阻止 AI prompt
+		add_filter( 'wp_ai_client_prevent_prompt', [ $this, 'should_prevent_prompt' ] );
+
+		// WP 7.0+ core AI call token usage into Cost Control.
+		add_action( 'wp_ai_client_after_generate_result', [ $this, 'capture_core_ai_usage' ] );
+
 		$this->init_mcp_gateway();
 
 		// 图像生成能力
@@ -386,7 +393,85 @@ final class WPMind {
 	}
 
 	/**
-	 * 初始化 MCP Gateway
+	 * WP 7.0+ 全局熔断检查
+	 *
+	 * 当所有 WPMind provider 都处于熔断状态时，阻止 AI prompt 执行。
+	 * 返回清晰错误而非逐个超时。
+	 *
+	 * @param bool $prevent 是否阻止 prompt
+	 * @return bool
+	 * @since 4.1.0
+	 */
+	public function should_prevent_prompt( bool $prevent ): bool {
+		if ( $prevent ) {
+			return true;
+		}
+
+		// Only check when at least one provider is enabled.
+		$has_enabled = false;
+		foreach ( $this->custom_endpoints as $endpoint ) {
+			if ( ! empty( $endpoint['enabled'] ) && ! empty( $endpoint['api_key'] ) ) {
+				$has_enabled = true;
+				break;
+			}
+		}
+
+		if ( ! $has_enabled ) {
+			return false;
+		}
+
+		return ! Failover\FailoverManager::instance()->has_available_provider();
+	}
+
+
+	/**
+	 * Capture token usage from WP 7.0 core AI calls into Cost Control.
+	 *
+	 * WP 7.0 dispatches AfterGenerateResultEvent after every AI call made
+	 * through wp_ai_client_prompt(). This hook records the token usage so
+	 * that Cost Control tracks ALL AI usage, not just WPMind-routed calls.
+	 *
+	 * @param object $event AfterGenerateResultEvent from WP 7.0 core.
+	 * @since 4.2.0
+	 */
+	public function capture_core_ai_usage( $event ): void {
+		if ( ! is_object( $event ) ) {
+			return;
+		}
+
+		$provider_id = '';
+		$model_name  = '';
+
+		try {
+			$model       = $event->getModel();
+			$provider_id = $model->providerMetadata()->getId();
+			$model_name  = $model->metadata()->getName();
+		} catch ( \Throwable $e ) {
+			return;
+		}
+
+		$input_tokens  = 0;
+		$output_tokens = 0;
+
+		try {
+			$result = $event->getResult();
+			$usage  = $result->getTokenUsage();
+			if ( null !== $usage ) {
+				$input_tokens  = $usage->getPromptTokens();
+				$output_tokens = $usage->getCompletionTokens();
+			}
+		} catch ( \Throwable $e ) {
+			return;
+		}
+
+		if ( $input_tokens > 0 || $output_tokens > 0 ) {
+			/** This action is documented in modules/cost-control/CostControlModule.php */
+			do_action( 'wpmind_usage_record', $provider_id, $model_name, $input_tokens, $output_tokens, 0 );
+		}
+	}
+
+	/**
+	 * Initialize MCP Gateway.
 	 *
 	 * @return void
 	 */
@@ -589,14 +674,20 @@ final class WPMind {
 				continue;
 			}
 
-			// 检查自定义 URL
-			if ( ! empty( $config['custom_base_url'] ) && str_contains( $url, wp_parse_url( $config['custom_base_url'], PHP_URL_HOST ) ) ) {
-				return $provider;
+			// Check custom URL.
+			if ( ! empty( $config['custom_base_url'] ) ) {
+				$host = wp_parse_url( $config['custom_base_url'], PHP_URL_HOST );
+				if ( is_string( $host ) && '' !== $host && str_contains( $url, $host ) ) {
+					return $provider;
+				}
 			}
 
-			// 检查默认 base_url
-			if ( ! empty( $config['base_url'] ) && str_contains( $url, wp_parse_url( $config['base_url'], PHP_URL_HOST ) ) ) {
-				return $provider;
+			// Check default base_url.
+			if ( ! empty( $config['base_url'] ) ) {
+				$host = wp_parse_url( $config['base_url'], PHP_URL_HOST );
+				if ( is_string( $host ) && '' !== $host && str_contains( $url, $host ) ) {
+					return $provider;
+				}
 			}
 		}
 

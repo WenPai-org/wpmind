@@ -21,6 +21,14 @@
         <exclude name="Universal.Operators.DisallowShortTernary"/>
     </rule>
 
+    <!-- includes/ 与 modules/ 走 composer PSR-4 自动加载（WPMind\ => includes/），
+         文件名必须与类名一致（StudlyCase），与 WPCS 的"连字符小写文件名"规则本质冲突。
+         项目已豁免同一意图的 InvalidClassFileName，此处补齐 NotHyphenatedLowercase。 -->
+    <rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+        <exclude-pattern>*/includes/*</exclude-pattern>
+        <exclude-pattern>*/modules/*</exclude-pattern>
+    </rule>
+
     <rule ref="WordPress-Docs"/>
 
     <!-- PHP 兼容性检查 -->

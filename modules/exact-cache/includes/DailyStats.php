@@ -12,29 +12,57 @@ declare(strict_types=1);
 
 namespace WPMind\Modules\ExactCache;
 
+/**
+ * 日维度缓存统计.
+ *
+ * 命中/未命中/写入三项指标先缓冲在内存，shutdown 时批量落库，只保留最近 7 天.
+ */
 final class DailyStats {
 
 	private const OPTION_KEY = 'wpmind_exact_cache_daily_stats';
 	private const LOCK_KEY   = 'wpmind_daily_stats_lock';
 	private const MAX_DAYS   = 7;
 
-	/** @var array<string, array{hits: int, misses: int, writes: int}> */
+	/**
+	 * 待刷新的统计数据缓冲区（shutdown 时批量写入）
+	 *
+	 * @var array<string, array{hits: int, misses: int, writes: int}>
+	 */
 	private static array $pending = [];
 
+	/**
+	 * Shutdown 钩子是否已注册，避免重复挂载.
+	 *
+	 * @var bool
+	 */
 	private static bool $shutdown_registered = false;
 
+	/**
+	 * 记录一次缓存命中.
+	 */
 	public static function record_hit(): void {
 		self::buffer( 'hits' );
 	}
 
+	/**
+	 * 记录一次缓存未命中.
+	 */
 	public static function record_miss(): void {
 		self::buffer( 'misses' );
 	}
 
+	/**
+	 * 记录一次缓存写入.
+	 */
 	public static function record_write(): void {
 		self::buffer( 'writes' );
 	}
 
+	/**
+	 * 把指标累加到当日缓冲区，并确保 shutdown 钩子已注册.
+	 *
+	 * @param string $metric 指标名，hits / misses / writes.
+	 */
 	private static function buffer( string $metric ): void {
 		$today = wp_date( 'Y-m-d' );
 		if ( ! isset( self::$pending[ $today ] ) ) {
@@ -52,16 +80,21 @@ final class DailyStats {
 		}
 	}
 
+	/**
+	 * 将缓冲区批量写入 option，并做 7 天滚动清理.
+	 *
+	 * 取锁失败两次后放弃本次写入（统计非关键数据，可接受丢失）.
+	 */
 	public static function flush_pending(): void {
 		if ( empty( self::$pending ) ) {
 			return;
 		}
 
-		// Retry-once lock: 首次失败后等 100ms 重试一次
+		// Retry-once lock: 首次失败后等 100ms 重试一次.
 		if ( ! self::acquire_lock() ) {
 			usleep( 100000 ); // 100ms
 			if ( ! self::acquire_lock() ) {
-				// 仍然失败，接受丢失（统计非关键数据）
+				// 仍然失败，接受丢失（统计非关键数据）.
 				return;
 			}
 		}
@@ -84,10 +117,12 @@ final class DailyStats {
 			$data[ $date ]['writes'] += $metrics['writes'];
 		}
 
-		// 滚动清理：只保留最近 7 天
+		// 滚动清理：只保留最近 7 天.
 		ksort( $data );
-		while ( count( $data ) > self::MAX_DAYS ) {
+		$day_count = count( $data );
+		while ( $day_count > self::MAX_DAYS ) {
 			array_shift( $data );
+			--$day_count;
 		}
 
 		update_option( self::OPTION_KEY, $data, false );
@@ -95,6 +130,11 @@ final class DailyStats {
 		self::$pending = [];
 	}
 
+	/**
+	 * 尝试获取写入锁.
+	 *
+	 * @return bool 成功获取返回 true.
+	 */
 	private static function acquire_lock(): bool {
 		if ( get_transient( self::LOCK_KEY ) ) {
 			return false;
@@ -114,7 +154,7 @@ final class DailyStats {
 			return [];
 		}
 
-		// 补齐最近 7 天
+		// 补齐最近 7 天.
 		$result = [];
 		for ( $i = 6; $i >= 0; $i-- ) {
 			$date            = wp_date( 'Y-m-d', strtotime( "-{$i} days" ) );
@@ -127,6 +167,9 @@ final class DailyStats {
 		return $result;
 	}
 
+	/**
+	 * 清空全部统计数据.
+	 */
 	public static function reset(): void {
 		delete_option( self::OPTION_KEY );
 	}

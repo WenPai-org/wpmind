@@ -420,8 +420,20 @@ class BudgetChecker {
 	 * 获取服务商本月费用
 	 */
 	private function get_provider_month_cost( string $provider ): float {
-		$stats = UsageTracker::get_stats();
-		return $stats['providers'][ $provider ]['total_cost'] ?? 0;
+		$history    = UsageTracker::get_history( 1000 );
+		$monthStart = strtotime( wp_date( 'Y-m' ) . '-01' );
+		$cost       = 0;
+
+		foreach ( $history as $record ) {
+			if ( ( $record['provider'] ?? '' ) !== $provider ) {
+				continue;
+			}
+			if ( ( $record['timestamp'] ?? 0 ) >= $monthStart ) {
+				$cost += $record['cost'] ?? 0;
+			}
+		}
+
+		return $cost;
 	}
 
 	/**
