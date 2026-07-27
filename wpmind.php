@@ -3,7 +3,7 @@
  * Plugin Name: WPMind
  * Plugin URI: https://wpcy.com/mind
  * Description: 文派心思 - WordPress AI 自定义端点扩展，支持国内外多种 AI 服务
- * Version: 0.11.4
+ * Version: 0.11.5
  * Author: 文派心思
  * Author URI: https://wpcy.com/mind
  * License: GPL-2.0-or-later
@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-	define( 'WPMIND_VERSION', '0.11.4' );
+	define( 'WPMIND_VERSION', '0.11.5' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
 	define( 'WPMIND_PLUGIN_FILE', __FILE__ );
@@ -843,7 +843,7 @@ spl_autoload_register(
 
 // 加载 WenPai 更新器（跨插件共享组件，不走 PSR-4）
 require_once WPMIND_PLUGIN_DIR . 'includes/class-wenpai-updater.php';
-new \WenPai_Updater( WPMIND_PLUGIN_BASENAME, WPMIND_VERSION );
+new \WPMind_Updater( WPMIND_PLUGIN_BASENAME, WPMIND_VERSION );
 
 // 加载 WenPai 授权客户端
 require_once WPMIND_PLUGIN_DIR . 'includes/class-wenpai-license.php';
