@@ -20,12 +20,13 @@
     }
   },
   "scripts": {
-    "lint": "phpcs --standard=phpcs.xml.dist .",
+    "lint": "@php tests/php-lint.php",
     "analyze": "phpstan analyse --level=5 --memory-limit=512M .",
     "check": [
       "@lint",
-      "@analyze",
+      "@test",
       "composer audit"
-    ]
+    ],
+    "test": "phpunit --configuration phpunit.xml.dist"
   }
 }

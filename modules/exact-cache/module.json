@@ -19,5 +19,6 @@
     "requires": {
         "php": "8.1",
         "wordpress": "6.0"
-    }
+    },
+    "default_enabled": true
 }

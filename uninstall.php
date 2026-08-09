@@ -31,6 +31,9 @@ function wpmind_cleanup_site_data(): void {
 		'wpmind_usage_history',
 		'wpmind_budget_settings',
 		'wpmind_routing_settings',
+		'wpmind_installed_version',
+		'wenpai_license_key_wpmind',
+		'wenpai_license_wpmind_grace',
 		// GEO 模块设置
 		'wpmind_geo_enabled',
 		'wpmind_chinese_optimize',
@@ -44,6 +47,13 @@ function wpmind_cleanup_site_data(): void {
 		'wpmind_crawler_stats',
 		// API Gateway 模块设置
 		'wpmind_api_gateway_schema_version',
+		'wpmind_gateway_enabled',
+		'wpmind_gateway_sse_global_limit',
+		'wpmind_gateway_default_rpm',
+		'wpmind_gateway_default_tpm',
+		'wpmind_gateway_max_body_bytes',
+		'wpmind_gateway_max_tokens_cap',
+		'wpmind_gateway_log_prompts',
 		// Exact Cache 模块设置
 		'wpmind_exact_cache_enabled',
 		'wpmind_exact_cache_default_ttl',
@@ -54,6 +64,15 @@ function wpmind_cleanup_site_data(): void {
 		'wpmind_exact_cache_daily_stats',
 		// 激活标记
 		'wpmind_flush_rewrite_rules',
+		// WordPress 7.0 Connector credential mirrors managed by WPMind.
+		'connectors_ai_deepseek_api_key',
+		'connectors_ai_qwen_api_key',
+		'connectors_ai_zhipu_api_key',
+		'connectors_ai_moonshot_api_key',
+		'connectors_ai_doubao_api_key',
+		'connectors_ai_siliconflow_api_key',
+		'connectors_ai_baidu_api_key',
+		'connectors_ai_minimax_api_key',
 	];
 
 	foreach ( $options as $option ) {
@@ -67,6 +86,7 @@ function wpmind_cleanup_site_data(): void {
 		'wpmind_budget_notices',
 		'wpmind_round_robin_index',
 		'wpmind_daily_stats_lock',
+		'wenpai_license_wpmind',
 	];
 
 	foreach ( $transients as $transient ) {
@@ -98,14 +118,22 @@ function wpmind_cleanup_site_data(): void {
 		)
 	);
 
-	// 删除动态模块启用选项和 llms.txt 缓存
+	// 删除动态模块设置、网关/GEO 设置和 llms.txt 缓存。
 	$wpdb->query(
 		$wpdb->prepare(
 			"DELETE FROM {$wpdb->options}
              WHERE option_name LIKE %s
+                OR option_name LIKE %s
+                OR option_name LIKE %s
+                OR option_name LIKE %s
+                OR option_name LIKE %s
                 OR option_name LIKE %s",
 			'wpmind_module_%',
-			'_transient_wpmind_llms_txt_%'
+			'_transient_wpmind_llms_txt_%',
+			'wpmind_gateway_%',
+			'wpmind_geo_%',
+			'wpmind_ai_%',
+			'wpmind_brand_%'
 		)
 	);
 

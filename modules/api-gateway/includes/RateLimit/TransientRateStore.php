@@ -28,15 +28,23 @@ final class TransientRateStore implements RateStoreInterface {
 	private const LOCK_TTL = 2;
 
 	/**
-	 * {@inheritDoc}
+	 * Consume rate-limit capacity.
+	 *
+	 * @param string $key        Bucket key.
+	 * @param int    $window_sec Window size in seconds.
+	 * @param int    $cost       Capacity consumed.
+	 * @param int    $limit      Maximum capacity.
+	 * @param string $rid        Request identifier.
+	 * @param int    $now        Current Unix timestamp.
+	 * @return RateStoreResult Consumption result.
 	 */
 	public function consume( string $key, int $window_sec, int $cost, int $limit, string $rid, int $now ): RateStoreResult {
 		$lock_key = 'wpmind_rl_lock_' . md5( $key );
 		$reset    = $now + $window_sec;
 
 		if ( ! $this->acquire_lock( $lock_key ) ) {
-			error_log( '[WPMind] TransientRateStore: lock acquisition failed for ' . $key . ', failing open.' );
-			return new RateStoreResult( true, $limit, $reset );
+			error_log( '[WPMind] TransientRateStore: lock acquisition failed for ' . $key . ', failing closed.' );
+			return new RateStoreResult( false, 0, $reset );
 		}
 
 		try {
@@ -64,7 +72,10 @@ final class TransientRateStore implements RateStoreInterface {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Roll back a previously consumed request.
+	 *
+	 * @param string $key Bucket key.
+	 * @param string $rid Request identifier.
 	 */
 	public function rollback( string $key, string $rid ): void {
 		$lock_key = 'wpmind_rl_lock_' . md5( $key );

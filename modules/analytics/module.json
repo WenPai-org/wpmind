@@ -8,11 +8,14 @@
     "class": "WPMind\\Modules\\Analytics\\AnalyticsModule",
     "can_disable": true,
     "settings_tab": "analytics",
-    "requires": ["cost-control"],
+    "requires": [
+        "cost-control"
+    ],
     "features": [
         "用量趋势图表",
         "服务商对比分析",
         "成本统计报表",
         "实时监控面板"
-    ]
+    ],
+    "default_enabled": false
 }
