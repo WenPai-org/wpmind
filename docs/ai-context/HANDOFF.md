@@ -25,3 +25,11 @@
 - `deploy.sh` 默认 dry-run，实际写入必须传 `--apply`，并排除 vendor/node_modules/tests 等开发文件。
 - 验证：Composer check 通过（PHP 语法 176 文件、PHPUnit 48 tests/76 assertions、composer audit 无已知漏洞）；npm test 通过；composer validate --strict 通过；deploy.sh bash 语法通过；git diff --check 通过。
 - 未执行：未部署到 wpcy.com，未推送远端，未运行浏览器 E2E，未建立 PHPCS/PHPStan 基线。
+
+## 2026-08-09 [CX] WordPress 7.1 / Gutenberg 23.6 全插件审计
+
+- 审计报告：`docs/audits/wpmind-wp71-gutenberg236-audit-2026-08-09.md`，覆盖全部模块、WordPress 7.0/7.1、Gutenberg 23.6、AI Client、Connectors、Abilities/MCP、媒体处理和协作保存。
+- 发现三个 P0：全局 `wp_ai_client_prevent_prompt` 会阻断第三方 Provider；MCP `create_server()` 参数与当前 Adapter 不匹配且改名共享默认服务器；Provider Registry 与手工 Connector 双重注册/密钥同步会覆盖 Core 凭据来源。
+- Gutenberg 不是大量既有 block 冲突，而是插件几乎没有编辑器集成；GEO 仍以传统 meta box 为主。建议先做 Editor Sidebar、Command Palette 和任务状态，不先做自定义 AI block。
+- 产品边界保持单插件、无 Pro/Add-on；Provider、路由、预算/审计、内容与媒体能力保留，重复后台、手工 Connector、默认 MCP 改名和静默 HTTP 旁路应删除或合并。
+- 验证：`composer check` 通过（PHP lint 176 文件、PHPUnit 48 tests/76 assertions、composer audit 无已知漏洞）。PHPStan 未安装；项目 wp-env 包装脚本损坏，直接镜像启动未完成，因此未声称 WordPress 7.1/Gutenberg 真实运行通过。
