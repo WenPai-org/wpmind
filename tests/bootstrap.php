@@ -9,13 +9,16 @@ declare(strict_types=1);
 
 // Plugin constants.
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-	define( 'WPMIND_VERSION', '0.11.4' );
+	define( 'WPMIND_VERSION', '0.12.0' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
 	define( 'WPMIND_PLUGIN_FILE', __DIR__ . '/../wpmind.php' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_DIR' ) ) {
 	define( 'WPMIND_PLUGIN_DIR', __DIR__ . '/../' );
+}
+if ( ! defined( 'WPMIND_PATH' ) ) {
+	define( 'WPMIND_PATH', WPMIND_PLUGIN_DIR );
 }
 if ( ! defined( 'WPMIND_PLUGIN_URL' ) ) {
 	define( 'WPMIND_PLUGIN_URL', 'http://example.org/wp-content/plugins/wpmind/' );
@@ -28,6 +31,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // WP function stubs.
+$GLOBALS['wpmind_test_options'] = [];
+$GLOBALS['wpmind_test_actions'] = [];
 if ( ! function_exists( '__' ) ) {
 	function __( string $text, string $domain = 'default' ): string {
 		return $text;
@@ -42,19 +47,49 @@ if ( ! function_exists( 'is_wp_error' ) ) {
 
 if ( ! function_exists( 'get_option' ) ) {
 	function get_option( string $key, $default = false ) {
-		return $default;
+		return array_key_exists( $key, $GLOBALS['wpmind_test_options'] ) ? $GLOBALS['wpmind_test_options'][ $key ] : $default;
 	}
 }
 
 if ( ! function_exists( 'update_option' ) ) {
-	function update_option( string $key, $value ): bool {
+	function update_option( string $key, $value, bool $autoload = true ): bool {
+		$GLOBALS['wpmind_test_options'][ $key ] = $value;
 		return true;
 	}
 }
 
 if ( ! function_exists( 'add_option' ) ) {
 	function add_option( string $key, $value, string $deprecated = '', bool $autoload = true ): bool {
+		if ( array_key_exists( $key, $GLOBALS['wpmind_test_options'] ) ) {
+			return false;
+		}
+		$GLOBALS['wpmind_test_options'][ $key ] = $value;
 		return true;
+	}
+}
+
+if ( ! function_exists( 'delete_option' ) ) {
+	function delete_option( string $key ): bool {
+		unset( $GLOBALS['wpmind_test_options'][ $key ] );
+		return true;
+	}
+}
+
+if ( ! function_exists( 'is_admin' ) ) {
+	function is_admin(): bool {
+		return false;
+	}
+}
+
+if ( ! function_exists( 'wp_using_ext_object_cache' ) ) {
+	function wp_using_ext_object_cache(): bool {
+		return (bool) ( $GLOBALS['wpmind_test_ext_cache'] ?? false );
+	}
+}
+
+if ( ! function_exists( 'wp_cache_add' ) ) {
+	function wp_cache_add( string $key, $value, string $group = '', int $expire = 0 ): bool {
+		return (bool) ( $GLOBALS['wpmind_test_cache_add_result'] ?? false );
 	}
 }
 
@@ -90,6 +125,7 @@ if ( ! function_exists( 'apply_filters' ) ) {
 
 if ( ! function_exists( 'add_action' ) ) {
 	function add_action( string $tag, callable $callback, int $priority = 10, int $args = 1 ): true {
+		$GLOBALS['wpmind_test_actions'][ $tag ][] = $callback;
 		return true;
 	}
 }

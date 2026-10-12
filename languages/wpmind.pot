@@ -2832,54 +2832,6 @@ msgstr ""
 msgid "支持的模型"
 msgstr ""
 
-#: templates/tabs/license.php:19
-msgid "授权管理"
-msgstr ""
-
-#: templates/tabs/license.php:21
-msgid "输入您的授权密钥以解锁 Pro/Enterprise 功能。"
-msgstr ""
-
-#: templates/tabs/license.php:26
-msgid "当前状态"
-msgstr ""
-
-#. translators: %s: plan name
-#: templates/tabs/license.php:32
-#, php-format
-msgid "已激活 — %s"
-msgstr ""
-
-#. translators: %s: expiration date
-#: templates/tabs/license.php:42
-#, php-format
-msgid "到期时间: %s"
-msgstr ""
-
-#: templates/tabs/license.php:50
-msgid "免费版"
-msgstr ""
-
-#: templates/tabs/license.php:59
-msgid "License Key"
-msgstr ""
-
-#: templates/tabs/license.php:68
-msgid "在 wenpai.net 购买后获取授权密钥。"
-msgstr ""
-
-#: templates/tabs/license.php:78
-msgid "停用授权"
-msgstr ""
-
-#: templates/tabs/license.php:82
-msgid "激活授权"
-msgstr ""
-
-#: templates/tabs/license.php:127
-msgid "请求失败"
-msgstr ""
-
 #: templates/tabs/modules.php:23
 msgid "启用或禁用 WPMind 功能模块。禁用不需要的模块可以提升性能。"
 msgstr ""

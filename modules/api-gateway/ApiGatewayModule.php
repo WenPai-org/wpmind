@@ -116,11 +116,8 @@ class ApiGatewayModule implements ModuleInterface {
 	 * Initialize the module.
 	 */
 	public function init(): void {
-		// Ensure database schema is up to date.
-		SchemaManager::maybe_upgrade();
-
-		// Register REST API routes.
-		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
+		// Register settings even while the gateway runtime is disabled.
+		// This lets administrators opt in without exposing public routes first.
 
 		// Register settings tab.
 		add_filter( 'wpmind_settings_tabs', array( $this, 'register_settings_tab' ) );
@@ -134,7 +131,13 @@ class ApiGatewayModule implements ModuleInterface {
 			add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
 		}
 
-		// Audit logging for SSE streams (bypasses pipeline finalization).
+		if ( ! $this->is_gateway_enabled() ) {
+			return;
+		}
+
+		// Runtime-only setup starts after the explicit gateway opt-in.
+		SchemaManager::maybe_upgrade();
+		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 		add_action( 'wpmind_gateway_sse_complete', array( $this, 'log_sse_completion' ), 10, 3 );
 
 		/**
@@ -168,8 +171,19 @@ class ApiGatewayModule implements ModuleInterface {
 	 * Instantiates the RestController and registers all gateway endpoints.
 	 */
 	public function register_rest_routes(): void {
+		if ( ! $this->is_gateway_enabled() ) {
+			return;
+		}
+
 		$controller = new RestController();
 		$controller->register_routes();
+	}
+
+	/**
+	 * Whether the public gateway runtime has been explicitly enabled.
+	 */
+	private function is_gateway_enabled(): bool {
+		return '1' === get_option( 'wpmind_gateway_enabled', '0' );
 	}
 
 	/**

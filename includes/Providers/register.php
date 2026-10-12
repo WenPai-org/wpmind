@@ -228,13 +228,15 @@ function register_wpmind_connectors( \WP_Connector_Registry $registry ): void {
  * @since 4.1.0
  */
 function sync_api_key_to_connector( string $provider_id, string $setting_name, array $endpoints ): void {
-	if ( empty( $endpoints[ $provider_id ]['api_key'] ) ) {
+	$api_key = (string) ( $endpoints[ $provider_id ]['api_key'] ?? '' );
+
+	if ( '' === $api_key ) {
+		delete_option( $setting_name );
 		return;
 	}
 
-	$existing = get_option( $setting_name, '' );
-	if ( '' === $existing ) {
-		update_option( $setting_name, $endpoints[ $provider_id ]['api_key'] );
+	if ( get_option( $setting_name, '' ) !== $api_key ) {
+		update_option( $setting_name, $api_key, false );
 	}
 }
 

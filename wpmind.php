@@ -3,7 +3,7 @@
  * Plugin Name: WPMind
  * Plugin URI: https://wpcy.com/mind
  * Description: 文派心思 - WordPress AI 自定义端点扩展，支持国内外多种 AI 服务
- * Version: 0.11.5
+ * Version: 0.12.0
  * Author: 文派心思
  * Author URI: https://wpcy.com/mind
  * License: GPL-2.0-or-later
@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // 插件常量（防止重复定义）
 if ( ! defined( 'WPMIND_VERSION' ) ) {
-	define( 'WPMIND_VERSION', '0.11.5' );
+	define( 'WPMIND_VERSION', '0.12.0' );
 }
 if ( ! defined( 'WPMIND_PLUGIN_FILE' ) ) {
 	define( 'WPMIND_PLUGIN_FILE', __FILE__ );
@@ -767,6 +767,12 @@ function wpmind(): WPMind {
  * @since 1.1.0
  */
 function activate(): void {
+	if ( false === get_option( 'wpmind_installed_version' ) ) {
+		add_option( 'wpmind_installed_version', WPMIND_VERSION, '', false );
+	} else {
+		update_option( 'wpmind_installed_version', WPMIND_VERSION, false );
+	}
+
 	if ( false === get_option( 'wpmind_request_timeout' ) ) {
 		add_option( 'wpmind_request_timeout', 60, '', false ); // autoload = false
 	}
@@ -776,6 +782,36 @@ function activate(): void {
 	add_option( 'wpmind_flush_rewrite_rules', '1' );
 }
 register_activation_hook( WPMIND_PLUGIN_FILE, __NAMESPACE__ . '\\activate' );
+
+/**
+ * Preserve legacy module behavior once when upgrading from pre-0.12 releases.
+ * New installations receive explicit defaults from each module manifest.
+ */
+function maybe_upgrade_module_defaults(): void {
+	if ( false !== get_option( 'wpmind_installed_version', false ) ) {
+		return;
+	}
+
+	$legacy_modules = [
+		'analytics',
+		'api-gateway',
+		'auto-meta',
+		'cost-control',
+		'exact-cache',
+		'geo',
+		'media-intelligence',
+	];
+
+	foreach ( $legacy_modules as $module_id ) {
+		$option = "wpmind_module_{$module_id}_enabled";
+		if ( false === get_option( $option, false ) ) {
+			add_option( $option, '1', '', false );
+		}
+	}
+
+	add_option( 'wpmind_installed_version', WPMIND_VERSION, '', false );
+}
+add_action( 'plugins_loaded', __NAMESPACE__ . '\\maybe_upgrade_module_defaults', 1 );
 
 /**
  * 插件停用钩子
@@ -844,23 +880,6 @@ spl_autoload_register(
 // 加载 WenPai 更新器（跨插件共享组件，不走 PSR-4）
 require_once WPMIND_PLUGIN_DIR . 'includes/class-wenpai-updater.php';
 new \WPMind_Updater( WPMIND_PLUGIN_BASENAME, WPMIND_VERSION );
-
-// 加载 WenPai 授权客户端
-require_once WPMIND_PLUGIN_DIR . 'includes/class-wenpai-license.php';
-
-/**
- * 获取 WPMind 授权实例。
- *
- * @since 4.0.0
- * @return \WenPai_License
- */
-function wpmind_license(): \WenPai_License {
-	static $instance = null;
-	if ( null === $instance ) {
-		$instance = new \WenPai_License( 'wpmind' );
-	}
-	return $instance;
-}
 
 // 加载 Provider 注册模块
 require_once WPMIND_PLUGIN_DIR . 'includes/Providers/register.php';

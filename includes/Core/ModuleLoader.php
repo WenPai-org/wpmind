@@ -112,7 +112,7 @@ class ModuleLoader {
 				'class'        => $meta['class'] ?? $this->get_module_class_name( $module_id ),
 				'class_file'   => $class_file,
 				'path'         => $dir,
-				'enabled'      => $this->is_module_enabled( $module_id ),
+				'enabled'      => $this->is_module_enabled( $module_id, (bool) ( $meta['default_enabled'] ?? false ) ),
 				'can_disable'  => $meta['can_disable'] ?? true,
 				'settings_tab' => $meta['settings_tab'] ?? '',
 				'requires'     => $meta['requires'] ?? [],
@@ -302,13 +302,15 @@ class ModuleLoader {
 	 * Uses string '1'/'0' instead of boolean to avoid WordPress update_option() issues
 	 * where false values may be stored inconsistently or cause option deletion.
 	 *
-	 * @param string $module_id Module ID.
+	 * @param string $module_id      Module ID.
+	 * @param bool   $default_enabled Whether new installations enable it by default.
 	 * @return bool True if enabled.
 	 */
-	public function is_module_enabled( string $module_id ): bool {
-		$value = get_option( "wpmind_module_{$module_id}_enabled", '1' );
+	public function is_module_enabled( string $module_id, bool $default_enabled = false ): bool {
+		$default = $default_enabled ? '1' : '0';
+		$value   = get_option( "wpmind_module_{$module_id}_enabled", $default );
 		// Handle both legacy boolean and new string format.
-		return $value === '1' || $value === true || $value === 1;
+		return in_array( $value, [ '1', true, 1 ], true );
 	}
 
 	/**
