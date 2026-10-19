@@ -1,5 +1,10 @@
 # WPMind 更新日志
 
+> 版本号说明：正式发布的版本从 0.11.3 开始（2026-02-18 由 `b89c177` 把内部版本号 3.11.3 重置为 0.11.3，发布前阶段）。
+> 文末「内部开发版本」一节的 1.x–3.x 是 2026 年 1–2 月的内部迭代号，没有对外发布，保留原文仅作历史记录；其中 3.9.x、3.10.0/3.10.1、3.10.3、3.11.2、3.11.3 当时没有写记录。
+> 发版说明由 `.forgejo/workflows/release.yml` 从提交记录生成，本文件供人工阅读。
+
+
 ## [0.12.0] - 2026-08-09
 
 ### 单插件稳定化
@@ -13,79 +18,108 @@
 - 发布版本统一为 0.12.0，部署脚本默认 dry-run 并排除开发依赖。
 - 删除重复 CI 与引用不存在脚本的定时工作流。
 
-## [3.11.1] - 2026-02-09
+## [0.11.5] - 2026-07-27
 
-### CSS 架构重构
+- 适配 WordPress 7.0 的 `AbstractClientDiscoveryStrategy` 和 Connectors API，为国产 AI Provider 注册 Connector 元数据和品牌图标。
+- 修复 25 个 PHPCS 安全检查问题，并按 WPCS 3.x 全量格式化。
+- 更新器同步到 WenPai_Updater 1.2.0（changelog 从 Markdown 转 HTML），类名改为唯一的 `WPMind_Updater`。
+- 将 logo 图片纳入版本控制，修复打包缺图。
+- 加入 Playwright E2E 测试框架和 wp-env 配置，接入 WenPai-org 共享 CI 工作流。
+
+## [0.11.4] - 2026-03-03
+
+- 接入文派更新检查器（updates.wenpai.net），修复更新详情弹窗。
+- 新增 `languages/wpmind.pot` 翻译模板，部署时自动生成。
+- 新增 WenPai License SDK 与 `WENPAI_LICENSE_URL` 常量（0.12.0 已移除授权入口）。
+- 本地化 Remixicon 图标库，移除 jsdelivr CDN 依赖。
+- 修复发版包排除 vendor 资源导致资源加载失败。
+
+## [0.11.3] - 2026-02-18
+
+- 第一个 0.x 版本号：内部版本号 3.11.3 重置为 0.11.3，新增 Forgejo 标签触发的自动发版工作流。
+- GEO：新增品牌实体子标签（Organization Schema）、WebSite/BreadcrumbList Schema、作者 sameAs 和分标签 JSON-LD 预览。
+- 设置页 header 贴边布局调整；移除 init 钩子里的 Provider 连通性调试循环。
+- 包含此前内部 1.x–3.11.x 迭代的全部功能（见下文「内部开发版本」）。
+
+---
+
+## 内部开发版本（1.3.0–3.11.1，未发布）
+
+以下为原始记录，标题层级下移一级，内容未改。
+
+### [3.11.1] - 2026-02-09
+
+#### CSS 架构重构
 
 统一模块设置页 CSS 架构，消除跨模块样式耦合。
 
-#### 变更
+##### 变更
 - **新建** `assets/css/components/module-layout.css` — 共享模块布局组件（header/badge/stats/subtabs/options/actions）
 - **统一命名**: `wpmind-geo-*`/`wpmind-mi-*` 共享类 → `wpmind-module-*`
 - **JS 作用域化**: GEO/MI/AM 三个模块的 jQuery 选择器限定到各自 panel 容器，防止子标签切换互相干扰
 - **模块 CSS 瘦身**: 各模块 CSS 仅保留模块专属样式，共享部分统一引用 module-layout.css
 
-#### 影响范围
+##### 影响范围
 - 20 个文件变更（6 CSS + 3 JS + 1 PHP + 10 模板）
 - 420 行新增，499 行删除（净减 79 行）
 
 ---
 
-## [3.11.0] - 2026-02-09
+### [3.11.0] - 2026-02-09
 
-### Media Intelligence 模块
+#### Media Intelligence 模块
 
 AI 驱动的图片元数据自动生成，复用多模态 Vision API。
 
-#### 核心功能
+##### 核心功能
 - **Alt Text 生成**: 上传图片时自动生成无障碍描述
 - **图片标题**: 自动生成语义化标题
 - **图片描述**: 自动生成详细描述文本
 - **批量处理**: 对已有媒体库图片批量生成元数据
 - **安全检测**: NSFW 内容识别（可选）
 
-#### 技术实现
+##### 技术实现
 - **触发方式**: `add_attachment` hook（上传时）+ 手动批量触发
 - **执行模式**: WP-Cron 异步处理，批量模式支持进度追踪
 - **API 策略**: `wpmind_vision()` 调用多模态 Provider（Qwen-VL/GPT-4o/Gemini）
 - **Failover**: Vision API 故障时自动切换到支持视觉的备用 Provider
 - **语言支持**: 根据站点 locale 自动选择生成语言
 
-#### 设置页
+##### 设置页
 - 子标签页布局：功能开关 + 批量处理
 - 独立开关（alt text/标题/描述/安全检测）
 - 生成语言选择
 - 批量处理进度条和结果统计
 
-### Auto-Meta 模块
+#### Auto-Meta 模块
 
 发布时自动生成摘要、标签、分类、FAQ Schema、SEO 描述，与 GEO 模块协同提升 AI 搜索引擎可见性。
 
-#### 核心功能
+##### 核心功能
 - **自动摘要**: 发布文章时生成 100-150 字摘要，仅在摘要为空时填充
 - **智能标签**: 自动提取 3-5 个关键词标签，仅在无标签时添加
 - **分类建议**: 从已有分类中匹配最佳分类，仅在只有默认分类时替换（默认关闭）
 - **FAQ Schema**: 生成 3 个常见问题及回答，通过 `wpmind_article_schema` filter 注入 GEO 模块
 - **SEO 描述**: 生成 120-160 字符 SEO 描述，存储在 post meta 中
 
-#### 技术实现
+##### 技术实现
 - **触发方式**: `transition_post_status`（首次发布）+ `post_updated`（内容变更）
 - **执行模式**: WP-Cron 异步（延迟 30 秒），手动触发同步执行
 - **API 策略**: 单次 `wpmind_structured()` 调用生成全部 5 项元数据
 - **防护机制**: 并发锁、内容哈希去重、hook 临时移除防递归、功能预检跳过无效 AI 调用
 - **FAQ 注入**: 优先级 15（AiSummary:10 之后，EntityLinker:20 之前）
 
-#### 设置页
+##### 设置页
 - 子标签页布局：功能开关 + 手动生成
 - 5 个独立功能开关（摘要/标签/分类/FAQ/SEO 描述）
 - 支持的文章类型多选（默认 post + page）
 - 手动输入文章 ID 生成并预览结果
 
-#### 代码统计
+##### 代码统计
 - 新增 7 个文件（5 PHP + 1 CSS + 1 JS），约 1,200 行
 - 修改 2 个文件（settings-page.php + wpmind.php）
 
-#### Codex 评审修复
+##### Codex 评审修复
 - **High**: 新增 `has_enabled_features()` 预检，所有开关关闭时跳过 AI 调用
 - **Medium**: `on_update` 允许 source 为空时重试（首次 API 失败后不再永久跳过）
 - **Medium**: `inject_faq_schema` 新增 FAQ 开关检查，关闭后不再输出 Schema
@@ -93,18 +127,18 @@ AI 驱动的图片元数据自动生成，复用多模态 Vision API。
 
 ---
 
-## [3.10.2] - 2026-02-08
+### [3.10.2] - 2026-02-08
 
-### API Gateway 模块 (Phase 0-10)
+#### API Gateway 模块 (Phase 0-10)
 
 将 WordPress 变为 OpenAI 兼容的自托管 AI API 网关。
 
-#### 核心架构
+##### 核心架构
 - **8 级中间件管道**: Auth → Budget → Quota → RequestTransform → Route → ResponseTransform → Error → Log
 - **API Key 系统**: `sk_mind_{key_id}_{secret}` 格式，SHA-256 + 常量时间验证，防时序攻击
 - **3 张数据库表**: `wpmind_api_keys`、`wpmind_api_key_usage`、`wpmind_api_audit_log`
 
-#### REST API 端点 (OpenAI 兼容)
+##### REST API 端点 (OpenAI 兼容)
 - `POST /wp-json/mind/v1/chat/completions` — 对话补全（支持流式 SSE）
 - `POST /wp-json/mind/v1/embeddings` — 向量嵌入
 - `POST /wp-json/mind/v1/responses` — Responses API 兼容
@@ -112,7 +146,7 @@ AI 驱动的图片元数据自动生成，复用多模态 Vision API。
 - `GET /wp-json/mind/v1/models/{id}` — 单模型详情
 - `GET /wp-json/mind/v1/status` — 网关状态（管理端点）
 
-#### 功能特性
+##### 功能特性
 - **SSE 流式输出**: CancellationToken + 并发槽位控制 + 心跳保活
 - **速率限制**: Redis 滑动窗口（Lua 原子操作）+ Transient 回退
 - **预算控制**: 月度预算检查 + 用量统计
@@ -120,22 +154,22 @@ AI 驱动的图片元数据自动生成，复用多模态 Vision API。
 - **错误格式**: 14 种错误码映射为 OpenAI 标准格式
 - **Admin UI**: 设置页（状态卡片 + 基础设置 + API Key 管理）
 
-#### 代码统计
+##### 代码统计
 - 36 个 PHP 文件，5,336 行源代码
 - 5 个 PHPUnit 测试（36 个测试方法）+ 1 个集成测试脚本
 - 部署文档 (DEPLOYMENT.md)
 
-#### 修复
+##### 修复
 - `generate_key_id`: `random_bytes(8)` → `(12)` 确保 key_id 始终 12 字符
 - `settings-page.php`: 添加 API Gateway 标签页到设置页导航
 
 ---
 
-## [3.8.0] - 2026-02-07
+### [3.8.0] - 2026-02-07
 
-### 🧹 兼容层清理 + 扩展点增强
+#### 🧹 兼容层清理 + 扩展点增强
 
-#### 兼容层清理（-2,245 行）
+##### 兼容层清理（-2,245 行）
 - **删除 10 个兼容层文件**: `includes/Usage/`、`includes/Budget/`、`includes/Analytics/` 下的代理类和回退实现
 - **命名空间迁移**: 所有调用方直接引用模块类（`WPMind\Modules\CostControl\*`、`WPMind\Modules\Analytics\*`）
 - **cost-control 模块不可禁用**: `can_disable: false`，用量追踪是路由策略和 API 状态的核心依赖
@@ -143,14 +177,14 @@ AI 驱动的图片元数据自动生成，复用多模态 Vision API。
 - **analytics 模块守卫**: `routing.php` 和 `AjaxController` 添加 `class_exists()` 检查，禁用时优雅降级
 - **wpmind.php 精简**: 删除向后兼容 fallback 代码块，`do_action('wpmind_usage_record')` 保留
 
-#### Provider 懒加载
+##### Provider 懒加载
 - **ProviderRegistrar 重构**: 移除 8 个 `use` 导入，改用字符串 FQCN 常量
 - **`wpmind_provider_map` filter**: 允许第三方注册自定义 Provider
 
-#### 路由策略可插拔
+##### 路由策略可插拔
 - **`wpmind_register_routing_strategies` action**: 允许第三方在默认策略注册后添加自定义路由策略
 
-#### 受影响文件（26 个）
+##### 受影响文件（26 个）
 - 修改 16 个文件（命名空间替换 + 守卫 + filter/action）
 - 删除 10 个文件（兼容层代理 + 回退实现）
 - 保留 `includes/Usage/Pricing.php`（共享定价数据类）
@@ -159,11 +193,11 @@ AI 驱动的图片元数据自动生成，复用多模态 Vision API。
 
 ---
 
-## [3.7.0] - 2026-02-07
+### [3.7.0] - 2026-02-07
 
-### 🏗️ PublicAPI Facade 拆分 + 安全加固
+#### 🏗️ PublicAPI Facade 拆分 + 安全加固
 
-#### 架构重构
+##### 架构重构
 - **PublicAPI.php 拆分**: 2124 行单文件拆分为 Facade + 6 个 Service 类
   - `PublicAPI.php` (398 行): 瘦 Facade，保留单例、递归保护、状态方法
   - `Services/AbstractService.php` (194 行): 共享基础设施（provider 解析、failover、缓存）
@@ -177,7 +211,7 @@ AI 驱动的图片元数据自动生成，复用多模态 Vision API。
 - **递归保护留在 Facade**: Service 内部互调不触发递归检查
 - **PSR-4 自动加载**: 现有 autoloader 自动映射 `WPMind\API\Services\*`
 
-#### 安全加固（Codex 审计 9 项）
+##### 安全加固（Codex 审计 9 项）
 - **transcribe() SSRF 防护**: `wp_http_validate_url()` + 协议白名单
 - **transcribe() 路径遍历防护**: `realpath()` + uploads 目录校验
 - **transcribe() 文件验证**: 25MB 大小上限 + 扩展名白名单
@@ -188,7 +222,7 @@ AI 驱动的图片元数据自动生成，复用多模态 Vision API。
 - **SDKAdapter 空值保护**: `getTokenUsage()` null 安全
 - **SDKAdapter 异常脱敏**: 仅 `WP_DEBUG` 记录详细异常
 
-#### 文档清理
+##### 文档清理
 - 归档 5 个过时文档到 `docs/_archive/`
 - 更新 WPMIND-ROADMAP.md Phase 3/3.5 完成状态
 
@@ -196,23 +230,23 @@ AI 驱动的图片元数据自动生成，复用多模态 Vision API。
 
 ---
 
-## [3.6.0] - 2026-02-07
+### [3.6.0] - 2026-02-07
 
-### 🔗 执行层统一到 WP AI Client SDK (Phase C)
+#### 🔗 执行层统一到 WP AI Client SDK (Phase C)
 
-#### C1: SDKAdapter 适配器类
+##### C1: SDKAdapter 适配器类
 - **新增** `includes/SDK/SDKAdapter.php`: 封装 WP AI Client SDK 调用
 - 异常→WP_Error 转换，保留 HTTP 状态码信息用于重试判断
 - GenerativeAiResult→PublicAPI 数组格式转换
 - 支持 SDK 内置 Provider (OpenAI/Anthropic/Google) + WPMind 注册 Provider
 
-#### C2: SDK 路径集成
+##### C2: SDK 路径集成
 - **execute_chat_request()** 增加 SDK 优先路径，失败自动回退原 HTTP 实现
 - **错误分类处理**: 适配错误静默回退（不消耗重试预算），Provider 错误记录失败
 - 健康统计在 SDK 和 HTTP 两条路径下都正常记录
 - 新增 `wpmind_sdk_fallback` action hook 用于监控回退事件
 
-#### C3: 能力 gate + Provider 白名单
+##### C3: 能力 gate + Provider 白名单
 - **should_use_sdk()**: 5 层检查（SDK 可用性、用户配置、能力 gate、Provider 白名单）
 - 默认对 Anthropic/Google 启用 SDK（解决 PublicAPI 中不可用的问题）
 - tools 请求暂不走 SDK（v3.6.0 限制）
@@ -223,26 +257,26 @@ AI 驱动的图片元数据自动生成，复用多模态 Vision API。
 
 ---
 
-## [3.5.0] - 2026-02-07
+### [3.5.0] - 2026-02-07
 
-### 🔀 模型重选 + 路由统一 (Phase B)
+#### 🔀 模型重选 + 路由统一 (Phase B)
 
-#### B1: Failover 模型重选
+##### B1: Failover 模型重选
 - **model=auto 下移**: failover 循环内每个 provider 动态获取默认模型，不再固化首选 provider 的模型 (N2)
 - **显式模型回退**: 目标 provider 不支持用户指定模型时，自动回退到该 provider 默认模型
 - **model_fallback 标记**: 模型被自动替换时在结果中标注 `model_fallback: true` + `original_model`
 
-#### B2: stream() 接入路由和故障转移
+##### B2: stream() 接入路由和故障转移
 - **路由接入**: stream() 接入 `wpmind_select_provider` filter (I2)
 - **故障转移**: 通过 FailoverManager 获取故障转移链，fopen 失败自动切换 provider
 - **健康记录**: 成功/失败均记录到 FailoverManager，影响后续路由决策
 
-#### B3: embed() 接入路由和故障转移
+##### B3: embed() 接入路由和故障转移
 - **路由接入**: embed() 接入 `wpmind_select_provider` filter (I2)
 - **故障转移**: wp_remote_post 失败或 HTTP 错误时自动切换 provider
 - **动态模型**: embed model 在循环内根据 provider 动态选择
 
-#### B4: transcribe/speech 接入路由
+##### B4: transcribe/speech 接入路由
 - **路由接入**: transcribe() 和 speech() 接入 `wpmind_select_provider` filter
 - **能力过滤**: failover 链自动过滤不支持 audio API 的 provider
 - **支持列表**: transcribe 仅 OpenAI，speech 支持 OpenAI + DeepSeek
@@ -251,16 +285,16 @@ AI 驱动的图片元数据自动生成，复用多模态 Vision API。
 
 ---
 
-## [3.4.0] - 2026-02-07
+### [3.4.0] - 2026-02-07
 
-### 🛡️ AI 请求链路可靠性修复 (Phase A)
+#### 🛡️ AI 请求链路可靠性修复 (Phase A)
 
-#### P0 修复
+##### P0 修复
 - **缓存键加入 provider/model**: `generate_cache_key()` 包含服务商和模型参数，避免跨 Provider 缓存污染 (N1)
 - **非 JSON 响应防护**: `execute_chat_request()` 检测 `json_decode` 失败，返回 `wpmind_invalid_response` 错误而非 fatal (N3)
 - **stream() 默认 provider 统一**: 从硬编码 `deepseek` 改为 `get_option()`，与 `chat()` 行为一致 (N4)
 
-#### P1 修复
+##### P1 修复
 - **per-provider 重试逻辑**: 激活 `ErrorHandler::should_retry()` + `get_retry_delay()` 死代码，429/5xx 先重试再 failover (I1)
   - 非最后 Provider: 最多 1 次重试
   - 最后 Provider: 最多 3 次重试，指数退避 1s→2s→4s
@@ -271,9 +305,9 @@ AI 驱动的图片元数据自动生成，复用多模态 Vision API。
 
 ---
 
-## [3.3.0] - 2026-02-07
+### [3.3.0] - 2026-02-07
 
-### 🔧 编码规范化 (Phase 1 完成)
+#### 🔧 编码规范化 (Phase 1 完成)
 - **方法名 camelCase → snake_case**: 39 文件全量重命名，符合 WordPress PHP 编码规范
 - 涉及模块: Routing、Failover、Budget、Analytics、Usage、ErrorHandler、API
 - 兼容层 (`__callStatic` 代理) 同步更新
@@ -286,17 +320,17 @@ AI 驱动的图片元数据自动生成，复用多模态 Vision API。
 
 ---
 
-## [3.2.1] - 2026-02-06
+### [3.2.1] - 2026-02-06
 
-### 🔒 全面审查修复 (18 个问题)
+#### 🔒 全面审查修复 (18 个问题)
 
-#### P0 紧急修复
+##### P0 紧急修复
 - **AnalyticsModule Fatal Error**: 移除私有构造函数单例模式，改为 public 构造函数
 - **版本号统一**: 插件头部、常量、CLAUDE.md 统一为 3.2.0
 - **损坏注释块**: 删除 wpmind.php 残留的未闭合 PHPDoc 注释
 - **设置链接 404**: `options-general.php` 修正为 `admin.php`
 
-#### P1 高优先级修复
+##### P1 高优先级修复
 - **ImageRouter 命名空间**: `Routing\ImageRouter` 修正为 `Providers\Image\ImageRouter`
 - **Analytics nonce 错误**: `wpmind_admin_nonce` 修正为 `wpmind_ajax`
 - **AJAX 重复注册**: 移除 `wpmind_clear_usage_stats` 重复注册
@@ -305,7 +339,7 @@ AI 驱动的图片元数据自动生成，复用多模态 Vision API。
 - **speech() 路径遍历**: 添加 uploads 目录路径验证
 - **模块依赖排序**: ModuleLoader 添加 `resolve_load_order()` 确保加载顺序
 
-#### P2 中优先级修复
+##### P2 中优先级修复
 - **XSS 防护**: admin.js errorCode 添加 `escapeHtml()`
 - **wp_unslash**: GeoModule/CostControlModule 统一使用 `wp_unslash()`
 - **命名空间验证**: ModuleLoader 添加 `WPMind\` 前缀安全检查
@@ -315,56 +349,56 @@ AI 驱动的图片元数据自动生成，复用多模态 Vision API。
 
 ---
 
-## [3.2.0] - 2026-02-05
+### [3.2.0] - 2026-02-05
 
-### ✨ 模块化架构
+#### ✨ 模块化架构
 
 将 Cost Control 和 Analytics 功能迁移为独立可选模块：
 
-#### 🏗️ 模块系统
+##### 🏗️ 模块系统
 - **ModuleLoader**: 模块发现、加载、生命周期管理
 - **ModuleInterface**: 标准模块契约
 - **module.json**: 模块元数据和配置
 - 支持模块启用/禁用切换
 
-#### 📦 三个模块
+##### 📦 三个模块
 - **Cost Control**: 用量追踪、预算限额、告警通知
 - **Analytics**: 用量趋势、服务商对比、成本分析
 - **GEO**: Markdown Feeds、llms.txt、Schema.org、AI 爬虫追踪
 
-#### 🔧 兼容层
+##### 🔧 兼容层
 - 保留 `includes/Usage/`、`includes/Budget/`、`includes/Analytics/` 兼容层
 - 模块加载时委托给模块实现，未加载时使用 Fallback
 
 ---
 
-## [3.1.0] - 2026-02-05
+### [3.1.0] - 2026-02-05
 
-### ✨ GEO 增强
+#### ✨ GEO 增强
 
-#### 统一核心管线
+##### 统一核心管线
 - **MarkdownProcessor**: 统一的 Markdown 处理管线，替代分散的处理逻辑
 - **ProcessOptions**: 处理选项封装类
 
-#### 新功能
+##### 新功能
 - **llms.txt 生成器**: `/llms.txt` 端点，AI 友好的站点描述
 - **Schema.org 集成**: 自动注入结构化数据 (Article/WebPage)
 - **GEO 设置界面**: 5 个配置选项的管理界面
 
-#### 修复
+##### 修复
 - admin.js AJAX 变量错误 (wpmind_admin → wpmindData)
 - 多站点缓存键问题 (添加 blog_id)
 - 中文阅读时间计算 (400字/分钟)
 
 ---
 
-## [3.0.0] - 2026-02-05
+### [3.0.0] - 2026-02-05
 
-### ✨ GEO 优化模块 (Generative Engine Optimization)
+#### ✨ GEO 优化模块 (Generative Engine Optimization)
 
 面向 AI 搜索引擎的内容优化：
 
-#### 核心功能
+##### 核心功能
 - **Markdown Feed**: `/?feed=markdown` 端点，AI 友好的内容格式
 - **单篇 .md 支持**: 任意文章添加 `.md` 后缀获取 Markdown 版本
 - **Accept 内容协商**: `Accept: text/markdown` 自动返回 Markdown
@@ -372,7 +406,7 @@ AI 驱动的图片元数据自动生成，复用多模态 Vision API。
 - **GEO 信号注入**: 权威性声明、引用格式等 AI 引用信号
 - **AI 爬虫追踪**: 追踪 GPTBot、ClaudeBot 等 AI 爬虫访问
 
-#### 📁 新增文件
+##### 📁 新增文件
 ```
 includes/GEO/
 ├── MarkdownFeed.php        # Markdown Feed 端点
@@ -385,40 +419,40 @@ includes/GEO/
 
 ---
 
-## [2.5.0] - 2026-02-04
+### [2.5.0] - 2026-02-04
 
-### ✨ 稳定性增强
+#### ✨ 稳定性增强
 
-#### 公共 API
+##### 公共 API
 - **PublicAPI 类**: 统一的 AI 能力调用接口
 - **递归调用保护**: 防止无限循环
 - **便捷函数**: `wpmind_chat()`, `wpmind_translate()`, `wpmind_summarize()` 等
 - **图像生成 API**: 支持 8 个图像生成 Provider
 
-#### UI 错误反馈优化
+##### UI 错误反馈优化
 - Toast 通知位置调整
 - 自动跳过不健康 Provider
 - 手动优先级设置
 
-#### 安全修复 (Codex 审计)
+##### 安全修复 (Codex 审计)
 - 输入验证加强
 - ErrorHandler 加载顺序修复
 
 ---
 
-## [2.0.0] - 2026-02-01
+### [2.0.0] - 2026-02-01
 
-### ✨ 重大更新：Gutenberg 风格设计系统
+#### ✨ 重大更新：Gutenberg 风格设计系统
 
 全新的现代化 UI 设计，采用 Gutenberg 设计语言：
 
-#### 🎨 设计系统
+##### 🎨 设计系统
 - **CSS 变量**: 统一的颜色、间距、字体、阴影令牌
 - **8px 网格系统**: 一致的间距规范
 - **现代配色**: 基于 Tailwind 的灰度和状态色
 - **组件化样式**: 可复用的按钮、徽章、卡片、表单组件
 
-#### 📁 CSS 模块化
+##### 📁 CSS 模块化
 ```
 assets/css/
 ├── admin.css      # 设计系统 + 基础组件
@@ -426,42 +460,42 @@ assets/css/
 └── responsive.css # 响应式适配
 ```
 
-#### 🔧 Tab 导航
+##### 🔧 Tab 导航
 - **仪表板**: 用量统计 + 分析图表 + 服务状态
 - **服务配置**: AI 服务端点 + 全局设置
 - **智能路由**: 路由策略 + Provider 排名
 - **预算管理**: 预算限额 + 告警设置
 
-#### 📱 响应式优化
+##### 📱 响应式优化
 - 平板/手机端 Tab 导航自适应
 - 网格布局响应式断点
 - 对话框移动端适配
 
 ---
 
-## [1.9.0] - 2026-02-01
+### [1.9.0] - 2026-02-01
 
-### ✨ 新功能：智能路由系统
+#### ✨ 新功能：智能路由系统
 
 基于策略的 Provider 智能路由选择，自动优化 AI 服务调用：
 
-#### 🎯 路由策略
+##### 🎯 路由策略
 - **成本优先**: 选择成本最低的 Provider，适合预算敏感场景
 - **延迟优先**: 选择响应最快的 Provider，适合实时性要求高的场景
 - **可用性优先**: 选择健康分数最高的 Provider，适合稳定性要求高的场景
 - **负载均衡**: 在多个 Provider 之间分散请求，避免单点过载
 
-#### 🔀 复合策略
+##### 🔀 复合策略
 - **平衡策略**: 成本、延迟、可用性各占 1/3
 - **性能优先**: 延迟 50%，可用性 30%，成本 20%
 - **经济策略**: 成本 60%，可用性 30%，延迟 10%
 
-#### 📊 可视化
+##### 📊 可视化
 - Provider 得分排名实时显示
 - 故障转移链可视化
 - 推荐 Provider 高亮显示
 
-#### 🏗️ 技术实现
+##### 🏗️ 技术实现
 - 新增 `includes/Routing/` 目录
   - `RoutingStrategyInterface.php`: 策略接口定义
   - `RoutingContext.php`: 路由上下文封装
@@ -478,19 +512,19 @@ assets/css/
 
 ---
 
-## [1.8.0] - 2026-02-01
+### [1.8.0] - 2026-02-01
 
-### ✨ 新功能：分析仪表板
+#### ✨ 新功能：分析仪表板
 
 全新的可视化分析仪表板，帮助您了解 AI 服务使用情况：
 
-#### 📊 图表功能
+##### 📊 图表功能
 - **用量趋势图**: 展示 Token 使用量和请求数的时间趋势
 - **服务商对比**: 环形图展示各服务商的请求分布
 - **成本趋势**: 柱状图展示 USD/CNY 费用趋势
 - **模型排行**: 横向柱状图展示最常用的模型
 
-#### 🔧 技术实现
+##### 🔧 技术实现
 - 集成 Chart.js 4.5.0 图表库（CDN 加载）
 - 新增 `includes/Analytics/AnalyticsManager.php` 数据聚合类
 - 新增 AJAX 接口 `wpmind_get_analytics_data`
@@ -498,30 +532,30 @@ assets/css/
 
 ---
 
-## [1.7.0] - 2026-02-01
+### [1.7.0] - 2026-02-01
 
-### ✨ 新功能：预算与支出护栏
+#### ✨ 新功能：预算与支出护栏
 
 全新的预算管理系统，帮助您控制 AI 服务支出：
 
-#### 🎯 预算限制
+##### 🎯 预算限制
 - **全局预算**: 设置每日/每月的支出上限
 - **多币种支持**: 同时支持 USD 和 CNY 限额
 - **实时监控**: 进度条显示当前预算使用情况
 
-#### ⚠️ 告警系统
+##### ⚠️ 告警系统
 - **预警阈值**: 可配置的预警百分比（默认 80%）
 - **三种执行模式**:
   - 仅告警：超限时发送通知但不阻止请求
   - 禁用服务：超限时自动禁用 AI 服务
   - 降级模型：超限时自动切换到更便宜的模型
 
-#### 📧 通知方式
+##### 📧 通知方式
 - **管理后台通知**: WordPress 原生 admin notice
 - **邮件告警**: 可选的邮件通知功能
 - **告警去重**: 使用 transient 防止重复告警
 
-#### 🏗️ 技术实现
+##### 🏗️ 技术实现
 - 新增 `includes/Budget/` 目录
   - `BudgetManager.php`: 预算配置管理
   - `BudgetChecker.php`: 预算检查逻辑
@@ -531,14 +565,14 @@ assets/css/
 
 ---
 
-## [1.6.7] - 2026-02-01
+### [1.6.7] - 2026-02-01
 
-### 🎨 图标系统修正
+#### 🎨 图标系统修正
 - **升级 Remixicon 到 4.9.1**: 使用最新版本的 Remixicon 图标库
 - **使用官方 AI 品牌图标**: Remixicon 4.9.1 新增了大量 AI 服务品牌图标
   - OpenAI、Claude、Gemini、DeepSeek、Qwen、智谱 AI 等均有官方品牌图标
 
-### 📝 更新后的图标映射表
+#### 📝 更新后的图标映射表
 | 服务商 | 图标 | 类型 |
 |--------|------|------|
 | OpenAI | `ri-openai-fill` | 品牌图标 |
@@ -555,9 +589,9 @@ assets/css/
 
 ---
 
-## [1.6.6] - 2026-02-01
+### [1.6.6] - 2026-02-01
 
-### 🎨 图标系统升级
+#### 🎨 图标系统升级
 - **引入 Remixicon**: 使用 Remixicon 4.6.0 替代 lobe-icons
   - 通过 jsDelivr CDN 加载
   - 不再依赖外部 SVG 图标
@@ -568,13 +602,13 @@ assets/css/
   - 其他服务商使用语义化图标
 - **品牌颜色**: 为每个服务商配置品牌色
 
-### 🔧 技术改进
+#### 🔧 技术改进
 - 新增 `getProviderIcon()` 方法获取 Remixicon 图标类
 - 新增 `getProviderColor()` 方法获取品牌颜色
 - 移除 lobe-icons CDN 依赖和 `<img>` 标签
 - 使用 `<i>` 标签和 CSS 类显示图标
 
-### 📝 图标映射表
+#### 📝 图标映射表
 | 服务商 | 图标 | 颜色 |
 |--------|------|------|
 | OpenAI | `ri-openai-fill` | #10a37f |
@@ -591,45 +625,45 @@ assets/css/
 
 ---
 
-## [1.6.5] - 2026-01-31
+### [1.6.5] - 2026-01-31
 
-### 🐛 高优先级修复
+#### 🐛 高优先级修复
 - **并发安全**: 使用 WordPress transient 锁防止并发写入导致数据丢失
   - `updateStats()` 和 `addToHistory()` 现在使用独立的锁机制
   - 最多重试 3 次，每次间隔 50ms
 - **零 Token 请求漏记**: 即使 tokens 为 0 也计入请求数，只是不记录到历史
 
-### 🔧 中优先级修复
+#### 🔧 中优先级修复
 - **时区修复**: 使用 `wp_date()` 替代 `date()`，统计按 WordPress 站点时区
 - **类型安全**: 所有 `get_option()` 返回值添加 `is_array()` 检查，防止 TypeError
 
-### 🎨 UI 改进
+#### 🎨 UI 改进
 - **上次更新时间**: 标题区显示"更新于 X 分钟前"
 - **空状态提示**: 无数据时显示友好的空状态界面
 - **费用说明**: 添加"费用为估算值"的说明提示
 - **无障碍优化**: 为刷新/清除按钮添加 `aria-label`
 - **响应式布局**: 小屏幕自动切换为纵向堆叠布局
 
-### 📱 响应式断点
+#### 📱 响应式断点
 - `< 782px`: 卡片内容纵向排列，2 列网格
 - `< 480px`: 单列网格布局
 
 ---
 
-## [1.6.4] - 2026-01-31
+### [1.6.4] - 2026-01-31
 
-### ✨ 新功能
+#### ✨ 新功能
 - **分货币费用统计**: 汇总统计分别显示 USD 和 CNY 费用，避免货币混乱
   - 今日/本周/本月/总计 费用显示格式：`$0.50 / ¥2.00`
   - 只有一种货币时只显示该货币
 
-### 🔧 技术改进
+#### 🔧 技术改进
 - 数据结构改为分货币存储：`cost_usd` 和 `cost_cny`
 - 新增 `formatCostByCurrency()` 方法格式化分货币显示
 - `updateStats()` 根据 Provider 货币类型分别累加费用
 - 优化费用显示样式，支持较长的双货币文本
 
-### 📊 显示效果
+#### 📊 显示效果
 ```
 今日：1.2K Tokens | $0.50 / ¥2.00 | 5 请求
 本周：8.5K Tokens | $3.20 / ¥15.00 | 32 请求
@@ -637,34 +671,34 @@ assets/css/
 
 ---
 
-## [1.6.3] - 2026-01-31
+### [1.6.3] - 2026-01-31
 
-### ✨ 新功能
+#### ✨ 新功能
 - **周用量统计**: 新增本周用量统计卡片
   - 统计周一到今天的累计用量
   - 显示 Tokens、费用、请求数
 
-### 🔧 技术改进
+#### 🔧 技术改进
 - 新增 `getWeekStats()` 方法获取本周统计数据
 - 用量统计面板现在显示：今日 → 本周 → 本月 → 总计
 
 ---
 
-## [1.6.2] - 2026-01-31
+### [1.6.2] - 2026-01-31
 
-### ✨ 新功能
+#### ✨ 新功能
 - **多货币支持**: 国内服务商使用人民币 (CNY) 计价，国际服务商使用美元 (USD)
 - **分渠道用量统计**: 设置页面新增各渠道独立用量统计网格
   - 显示每个 Provider 的 tokens、费用、请求数
   - 费用按服务商货币显示（$ 或 ¥）
 
-### 🔧 技术改进
+#### 🔧 技术改进
 - 新增 `getCurrency()` 方法获取服务商货币类型
 - 新增 `getProviderDisplayName()` 方法获取服务商中文名称
 - `formatCost()` 方法支持货币参数，自动显示正确的货币符号
 - PRICING 常量添加 `currency` 字段区分 USD/CNY
 
-### 💰 定价更新（人民币计价）
+#### 💰 定价更新（人民币计价）
 | 服务商 | 输入价格 | 输出价格 | 单位 |
 |--------|----------|----------|------|
 | DeepSeek | ¥1 | ¥2 | /1M tokens |
@@ -678,13 +712,13 @@ assets/css/
 
 ---
 
-## [1.6.1] - 2026-01-31
+### [1.6.1] - 2026-01-31
 
-### 🐛 修复
+#### 🐛 修复
 - **Anthropic 格式兼容**: 支持 `input_tokens`/`output_tokens` 格式（Anthropic API）
 - **输入验证**: 确保 tokens 和延迟值非负
 
-### 🚀 性能优化
+#### 🚀 性能优化
 - **对象缓存**: 使用 `wp_cache` 减少数据库读取
   - 统计数据缓存 5 分钟
   - 历史记录缓存 5 分钟
@@ -692,9 +726,9 @@ assets/css/
 
 ---
 
-## [1.6.0] - 2026-01-31
+### [1.6.0] - 2026-01-31
 
-### ✨ 新功能
+#### ✨ 新功能
 - **Token 用量统计**: 自动追踪每次 AI 请求的 token 用量
   - 记录 input/output tokens
   - 自动计算费用估算（基于各服务商定价）
@@ -704,22 +738,22 @@ assets/css/
   - 实时显示 tokens、费用、请求数
   - 支持刷新和清除统计
 
-### 📁 新增文件
+#### 📁 新增文件
 ```
 includes/Usage/
 └── UsageTracker.php    # 用量追踪核心类
 ```
 
-### 🔧 技术改进
+#### 🔧 技术改进
 - 支持 11 个服务商的定价配置
 - 自动清理 30 天前的日统计和 12 个月前的月统计
 - 历史记录最多保留 1000 条
 
 ---
 
-## [1.5.3] - 2026-01-31
+### [1.5.3] - 2026-01-31
 
-### 🎨 UI 改进
+#### 🎨 UI 改进
 - **WordPress 原生通知样式**: Toast 通知改用 WordPress 原生 `.notice` 类
 - 支持 `notice-success/error/warning/info` 四种类型
 - 使用 `slideDown/slideUp` 动画效果
@@ -727,32 +761,32 @@ includes/Usage/
 
 ---
 
-## [1.5.2] - 2026-01-31
+### [1.5.2] - 2026-01-31
 
-### 🐛 修复 (Codex 审查)
+#### 🐛 修复 (Codex 审查)
 - **时间窗口过滤**: CircuitBreaker 现在只统计最近 60 秒内的请求计算失败率
 - **类型安全**: `getData()` 和 `getAllHealth()` 添加 `is_array()` 类型检查
 - **半开状态计数**: `recordFailure()` 在半开状态下正确递增 `half_open_failures`
 - **延迟计算修复**: ProviderHealthTracker 使用 `foreach` 替代有问题的 `array_filter`
 - **XSS 防护**: Toast 组件使用 `.text()` 方法防止 XSS 攻击
 
-### 🎨 UI 改进
+#### 🎨 UI 改进
 - **自定义 Dialog**: 使用自定义确认对话框替代浏览器原生 `confirm()`
 - **事件委托**: 使用 `$(document).on()` 修复动态元素点击问题
 - 移除所有 `alert()` 和 `confirm()` 调用
 
 ---
 
-## [1.5.1] - 2026-01-31
+### [1.5.1] - 2026-01-31
 
-### 🐛 修复
+#### 🐛 修复
 - **Transient TTL 修复**: 将熔断器状态存储时间从 600s 增加到 2400s，避免状态过早重置
 - **状态查询优化**: 新增 `isAvailableReadOnly()` 方法，状态查询不再触发状态转换
 - **实际请求集成**: 故障转移现在集成到实际 AI 请求流程，不仅限于测试连接
 - **双重计数修复**: 测试连接请求添加 `_wpmind_skip_tracking` 标记，避免与 `http_api_debug` 钩子双重计数
 - **自定义 URL 支持**: `identify_provider_from_url()` 现在支持用户自定义的 base_url
 
-### 🔧 技术改进
+#### 🔧 技术改进
 - `filter_preferred_models` 现在会排除熔断中的 Provider（使用只读方法）
 - 新增 `http_api_debug` 钩子追踪 AI 请求结果
 - 新增 `identify_provider_from_url()` 方法识别请求目标，支持 11 个 Provider
@@ -760,9 +794,9 @@ includes/Usage/
 
 ---
 
-## [1.5.0] - 2026-01-31
+### [1.5.0] - 2026-01-31
 
-### ✨ 新功能
+#### ✨ 新功能
 - **故障转移机制**: 实现双层故障转移架构
   - Layer 1: 软故障转移 - 单次请求失败时自动重试
   - Layer 2: 熔断器 - 持续故障时自动切换到备用服务
@@ -772,7 +806,7 @@ includes/Usage/
 - **Provider 健康追踪**: 记录每个服务的成功率和延迟
 - **AJAX API**: 新增获取状态和重置熔断器接口
 
-### 📁 新增文件
+#### 📁 新增文件
 ```
 includes/Failover/
 ├── CircuitBreaker.php          # 熔断器核心类
@@ -780,16 +814,16 @@ includes/Failover/
 └── FailoverManager.php         # 故障转移管理器
 ```
 
-### 🔧 技术改进
+#### 🔧 技术改进
 - 基于 Salesforce Agentforce 实践的参数配置
 - 使用 WordPress transient 存储状态
 - 模块化设计，可独立禁用
 
 ---
 
-## [1.4.0] - 2026-01-31
+### [1.4.0] - 2026-01-31
 
-### ✨ 新功能
+#### ✨ 新功能
 - **新增百度文心供应商**: 支持 ERNIE-4.0、ERNIE-3.5 等模型
 - **新增 MiniMax 供应商**: 支持 abab6.5s-chat、abab6.5-chat 等模型
 - **集成 lobe-icons**: 使用 LobeHub 提供的 AI 供应商图标
@@ -798,18 +832,18 @@ includes/Failover/
   - `includes/Providers/Baidu/` - 百度 ERNIE Provider
   - `includes/Providers/MiniMax/` - MiniMax Provider
 
-### 🎨 UI 改进
+#### 🎨 UI 改进
 - 使用 CDN 加载供应商图标 (npmmirror.com)
 - 图标加载失败时自动回退到 dashicons
 - 优化图标显示样式
 - 使用英文产品名称作为显示名称 (Qwen, ChatGLM, Doubao, SiliconFlow, ERNIE)
 
-### 🔧 技术改进
+#### 🔧 技术改进
 - 添加百度和 MiniMax 的 API Key 验证规则
 - 更新供应商配置结构，支持自定义图标
 - 更新 ProviderRegistrar 支持 8 个国内 Provider
 
-### 🛡️ 错误处理增强
+#### 🛡️ 错误处理增强
 - **新增 ErrorHandler 类**: 统一的错误消息映射和用户友好的错误反馈
 - **HTTP 状态码映射**: 将 HTTP 错误码转换为用户友好的中文消息
 - **Provider 特定错误提示**: 针对不同供应商提供具体的错误解决建议
@@ -817,7 +851,7 @@ includes/Failover/
 - **指数退避**: 重试间隔采用指数退避策略（1s、2s、4s...）
 - **详细错误信息**: 前端显示更详细的错误信息，支持 hover 查看详情
 
-### 📝 供应商图标映射
+#### 📝 供应商图标映射
 | 供应商 | 图标 |
 |--------|------|
 | OpenAI | openai |
@@ -834,14 +868,14 @@ includes/Failover/
 
 ---
 
-## [1.3.1] - 2026-01-31
+### [1.3.1] - 2026-01-31
 
-### 🐛 Bug 修复
+#### 🐛 Bug 修复
 - 修复高级设置按钮无响应问题(通过版本号更新强制缓存刷新)
 - 修复 HTML 验证错误: label 的 `for` 属性指向不存在的 input ID
 - **修复样式丢失问题**: 更新 hook suffix 从 `settings_page_wpmind` 到 `toplevel_page_wpmind`
 
-### ✨ 功能改进
+#### ✨ 功能改进
 - **提升为一级菜单**: WPMind 现在是 WordPress 后台的一级菜单,名称为"心思"
 - **优化服务显示名称**: 使用更友好的产品名称(如 ChatGPT、Claude、Gemini)替代技术 ID
 - **统一 API Key 管理**: 所有 AI 服务(包括官方服务)现在都在 WPMind 中直接管理
@@ -849,7 +883,7 @@ includes/Failover/
 - 官方服务的 API Key 会自动同步到 WordPress AI Client
 - 简化连接测试按钮逻辑,所有服务统一处理
 
-### 🎨 UI/UX 改进
+#### 🎨 UI/UX 改进
 - 菜单图标: 使用心形图标 (dashicons-heart)
 - 菜单位置: 位于 WordPress 后台左侧菜单栏第 30 位
 - 服务标识: 显示产品名称而非技术 ID
@@ -860,12 +894,12 @@ includes/Failover/
   - zhipu → 智谱清言
   - doubao → 豆包
 
-### 🔧 技术改进
+#### 🔧 技术改进
 - 添加 JavaScript 调试日志,便于问题诊断
 - 优化高级设置切换功能的控制台输出
 - 改进代码注释和文档
 
-### 📝 技术细节
+#### 📝 技术细节
 - 更新插件版本号从 1.3.0 到 1.3.1
 - 将 `add_options_page()` 改为 `add_menu_page()` 创建一级菜单
 - 为每个服务添加 `display_name` 字段
@@ -875,9 +909,9 @@ includes/Failover/
 
 ---
 
-## [1.3.0] - 2026-01-26
+### [1.3.0] - 2026-01-26
 
-### ✨ 新增功能
+#### ✨ 新增功能
 - 完整的 Provider 架构实现
 - 6 个国内 AI 服务 Provider (DeepSeek、Qwen、Zhipu、Moonshot、Doubao、SiliconFlow)
 - 3 个官方服务支持 (OpenAI、Anthropic、Google AI)
@@ -887,14 +921,14 @@ includes/Failover/
 - 自定义 Base URL 支持
 - 折叠式高级设置界面
 
-### 🔧 技术改进
+#### 🔧 技术改进
 - AuthenticatedProviderAvailability - 解决 API Key 认证传递问题
 - AbstractOpenAiCompatibleTextGenerationModel - 强制 n=1 适配国内 API
 - pre_option_ filter - 合并 WPMind 凭据到 AI Client
 - 实时 API Key 格式验证
 - AJAX 连接测试
 
-### 🐛 已解决的问题
+#### 🐛 已解决的问题
 - Provider 注册时机问题(改用 init 钩子)
 - HTTP transporter 未初始化问题
 - candidateCount 限制导致模型被过滤问题
