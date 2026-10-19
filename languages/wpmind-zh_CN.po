@@ -2,7 +2,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: wpmind\n"
-"PO-Revision-Date: 2026-08-12 00:00+0800\n"
+"Report-Msgid-Bugs-To: https://feicode.com/WenPai-org/wpmind/issues\n"
+"POT-Creation-Date: 2026-10-19T20:25:03+08:00\n"
+"PO-Revision-Date: 2026-10-19 20:30+0800\n"
 "Last-Translator: WenPai Translation Team\n"
 "Language-Team: Chinese (Simplified)\n"
 "Language: zh_CN\n"
@@ -29,39 +31,39 @@ msgid "文派心思 - WordPress AI 自定义端点扩展，支持国内外多种
 msgstr "文派心思 - WordPress AI 自定义端点扩展，支持国内外多种 AI 服务"
 
 #. Author of the plugin
-#: wpmind.php templates/settings-page.php:19 templates/tabs/overview.php:96
+#: wpmind.php templates/settings-page.php:19 templates/tabs/overview.php:98
 msgid "文派心思"
 msgstr "文派心思"
 
-#: includes/Admin/AdminAssets.php:198
+#: includes/Admin/AdminAssets.php:189
 msgid "连接成功！"
 msgstr "连接成功！"
 
-#: includes/Admin/AdminAssets.php:199
+#: includes/Admin/AdminAssets.php:190
 msgid "连接失败："
 msgstr "连接失败："
 
-#: includes/Admin/AdminAssets.php:200
+#: includes/Admin/AdminAssets.php:191
 msgid "测试中..."
 msgstr "测试中..."
 
-#: includes/Admin/AdminAssets.php:201
-#: modules/cost-control/templates/settings.php:130
+#: includes/Admin/AdminAssets.php:192
+#: modules/cost-control/templates/settings.php:142
 #: modules/geo/templates/settings.php:103 templates/tabs/budget.php:28
-#: templates/tabs/geo.php:86 templates/tabs/images.php:156
-#: templates/tabs/modules.php:64 templates/tabs/services.php:105
+#: templates/tabs/geo.php:86 templates/tabs/images.php:175
+#: templates/tabs/modules.php:64 templates/tabs/services.php:106
 msgid "已启用"
 msgstr "已启用"
 
-#: includes/Admin/AdminAssets.php:202
+#: includes/Admin/AdminAssets.php:193
 msgid "请为已启用的服务填写 API Key"
 msgstr "请为已启用的服务填写 API Key"
 
-#: includes/Admin/AdminAssets.php:203
+#: includes/Admin/AdminAssets.php:194
 msgid "已设置"
 msgstr "已设置"
 
-#: includes/Admin/AdminAssets.php:204
+#: includes/Admin/AdminAssets.php:195
 msgid "API Key 将被清除"
 msgstr "API Key 将被清除"
 
@@ -73,113 +75,111 @@ msgstr "心思设置"
 msgid "心思"
 msgstr "心思"
 
-#: includes/Admin/AdminPage.php:367 templates/tabs/modules.php:71
+#: includes/Admin/AdminPage.php:366 templates/tabs/modules.php:71
 msgid "设置"
 msgstr "设置"
 
-#: includes/Admin/AdminPage.php:389 templates/settings-page.php:26
+#: includes/Admin/AdminPage.php:388 templates/settings-page.php:26
 msgid "文档"
 msgstr "文档"
 
-#: includes/Admin/AjaxController.php:85 includes/Admin/AjaxController.php:202
-#: includes/Admin/AjaxController.php:247 includes/Admin/AjaxController.php:268
-#: includes/Admin/AjaxController.php:292 includes/Admin/AjaxController.php:317
-#: includes/Admin/AjaxController.php:385 includes/Admin/AjaxController.php:409
-#: includes/Admin/AjaxController.php:433 includes/Admin/AjaxController.php:451
-#: includes/Admin/AjaxController.php:482 includes/Admin/AjaxController.php:520
-#: includes/Core/ModuleLoader.php:420
-#: modules/analytics/AnalyticsModule.php:154
+#: includes/Admin/AjaxController.php:84 includes/Admin/AjaxController.php:210
+#: includes/Admin/AjaxController.php:259 includes/Admin/AjaxController.php:282
+#: includes/Admin/AjaxController.php:306 includes/Admin/AjaxController.php:333
+#: includes/Admin/AjaxController.php:401 includes/Admin/AjaxController.php:425
+#: includes/Admin/AjaxController.php:449 includes/Admin/AjaxController.php:467
+#: includes/Admin/AjaxController.php:500 includes/Admin/AjaxController.php:540
+#: includes/Core/ModuleLoader.php:422 modules/analytics/AnalyticsModule.php:142
 #: modules/api-gateway/includes/Admin/GatewayAjaxController.php:44
 #: modules/api-gateway/includes/Admin/GatewayAjaxController.php:80
-#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:150
-#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:165
-#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:196
-#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:272
+#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:152
+#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:167
+#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:198
+#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:274
 #: modules/cost-control/CostControlModule.php:191
 #: modules/cost-control/CostControlModule.php:251
-#: modules/cost-control/CostControlModule.php:276
-#: modules/geo/GeoModule.php:250
+#: modules/cost-control/CostControlModule.php:278 modules/geo/GeoModule.php:250
 msgid "权限不足"
 msgstr "权限不足"
 
-#: includes/Admin/AjaxController.php:93 includes/Admin/AjaxController.php:208
+#: includes/Admin/AjaxController.php:92 includes/Admin/AjaxController.php:216
 msgid "缺少服务标识"
 msgstr "缺少服务标识"
 
-#: includes/Admin/AjaxController.php:100
+#: includes/Admin/AjaxController.php:99
 msgid "服务不存在"
 msgstr "服务不存在"
 
-#: includes/Admin/AjaxController.php:111 includes/Admin/AjaxController.php:221
+#: includes/Admin/AjaxController.php:110 includes/Admin/AjaxController.php:229
 msgid "请先配置 API Key"
 msgstr "请先配置 API Key"
 
-#: includes/Admin/AjaxController.php:162 includes/Admin/AjaxController.php:229
+#: includes/Admin/AjaxController.php:167 includes/Admin/AjaxController.php:238
 msgid "连接成功"
 msgstr "连接成功"
 
-#: includes/Admin/AjaxController.php:215
+#: includes/Admin/AjaxController.php:223
 msgid "服务未配置"
 msgstr "服务未配置"
 
-#: includes/Admin/AjaxController.php:233
+#: includes/Admin/AjaxController.php:244
 msgid "连接失败"
 msgstr "连接失败"
 
-#: includes/Admin/AjaxController.php:276
+#: includes/Admin/AjaxController.php:290
 msgid "所有熔断器已重置"
 msgstr "所有熔断器已重置"
 
-#: includes/Admin/AjaxController.php:279
+#: includes/Admin/AjaxController.php:293
 msgid "熔断器已重置"
 msgstr "熔断器已重置"
 
-#: includes/Admin/AjaxController.php:323 includes/Admin/AjaxController.php:391
+#: includes/Admin/AjaxController.php:339 includes/Admin/AjaxController.php:407
 msgid "Cost Control 模块未启用"
 msgstr "Cost Control 模块未启用"
 
-#: includes/Admin/AjaxController.php:331
+#: includes/Admin/AjaxController.php:347
 #: modules/cost-control/CostControlModule.php:199
 msgid "无效的数据格式"
 msgstr "无效的数据格式"
 
-#: includes/Admin/AjaxController.php:370
+#: includes/Admin/AjaxController.php:386
 msgid "预算设置已保存"
 msgstr "预算设置已保存"
 
-#: includes/Admin/AjaxController.php:372 includes/Admin/AjaxController.php:507
+#: includes/Admin/AjaxController.php:388 includes/Admin/AjaxController.php:527
 #: modules/api-gateway/templates/settings.php:380
 #: modules/cost-control/CostControlModule.php:240
 msgid "保存失败"
 msgstr "保存失败"
 
-#: includes/Admin/AjaxController.php:415
+#: includes/Admin/AjaxController.php:431
 msgid "Analytics 模块未启用"
 msgstr "Analytics 模块未启用"
 
-#: includes/Admin/AjaxController.php:457
+#: includes/Admin/AjaxController.php:473
 msgid "请选择路由策略"
 msgstr "请选择路由策略"
 
-#: includes/Admin/AjaxController.php:465
+#: includes/Admin/AjaxController.php:482
 msgid "路由策略已更新"
 msgstr "路由策略已更新"
 
-#: includes/Admin/AjaxController.php:469
+#: includes/Admin/AjaxController.php:487
 msgid "无效的路由策略"
 msgstr "无效的路由策略"
 
-#: includes/Admin/AjaxController.php:492
+#: includes/Admin/AjaxController.php:510
 msgid "已清除手动优先级设置"
 msgstr "已清除手动优先级设置"
 
-#: includes/Admin/AjaxController.php:495
+#: includes/Admin/AjaxController.php:513
 msgid "Provider 优先级已更新"
 msgstr "Provider 优先级已更新"
 
-#: includes/API/ErrorHandler.php:83 includes/API/Services/AudioService.php:270
-#: includes/API/Services/ChatService.php:511
-#: includes/API/Services/EmbeddingService.php:98 includes/ErrorHandler.php:211
+#: includes/API/ErrorHandler.php:83 includes/API/Services/AudioService.php:298
+#: includes/API/Services/ChatService.php:540
+#: includes/API/Services/EmbeddingService.php:109 includes/ErrorHandler.php:206
 msgid "未知错误"
 msgstr "未知错误"
 
@@ -188,74 +188,74 @@ msgstr "未知错误"
 msgid "无效的参数: %s"
 msgstr "无效的参数: %s"
 
-#: includes/API/ErrorHandler.php:146
+#: includes/API/ErrorHandler.php:152
 #, php-format
 msgid "检测到循环调用: %s"
 msgstr "检测到循环调用: %s"
 
-#: includes/API/ErrorHandler.php:162
+#: includes/API/ErrorHandler.php:171
 #, php-format
-msgid "调用深度超限: %s (当前 %d, 最大 %d)"
-msgstr "调用深度超限: %s (当前 %d, 最大 %d)"
+msgid "调用深度超限: %1$s (当前 %2$d, 最大 %3$d)"
+msgstr "调用深度超限: %1$s (当前 %2$d, 最大 %3$d)"
 
-#: includes/API/ErrorHandler.php:183
+#: includes/API/ErrorHandler.php:196
 msgid "未知 API 错误"
 msgstr "未知 API 错误"
 
-#: includes/API/ErrorHandler.php:302
+#: includes/API/ErrorHandler.php:319
 msgid "AI 服务暂不可用，请稍后再试或检查插件设置。"
 msgstr "AI 服务暂不可用，请稍后再试或检查插件设置。"
 
-#: includes/API/ErrorHandler.php:303
+#: includes/API/ErrorHandler.php:320
 msgid "请求太频繁，请稍后再试。"
 msgstr "请求太频繁，请稍后再试。"
 
-#: includes/API/ErrorHandler.php:304
+#: includes/API/ErrorHandler.php:321
 msgid "本月 AI 使用额度已用完，请联系管理员。"
 msgstr "本月 AI 使用额度已用完，请联系管理员。"
 
-#: includes/API/ErrorHandler.php:305
+#: includes/API/ErrorHandler.php:322
 msgid "AI 服务响应超时，请稍后再试。"
 msgstr "AI 服务响应超时，请稍后再试。"
 
-#: includes/API/ErrorHandler.php:306
+#: includes/API/ErrorHandler.php:323
 msgid "AI 服务认证失败，请联系管理员检查配置。"
 msgstr "AI 服务认证失败，请联系管理员检查配置。"
 
-#: includes/API/ErrorHandler.php:309
+#: includes/API/ErrorHandler.php:326
 msgid "操作失败，请稍后再试。"
 msgstr "操作失败，请稍后再试。"
 
-#: includes/API/functions.php:131 includes/API/functions.php:169
-#: includes/API/functions.php:204 includes/API/functions.php:252
-#: includes/API/functions.php:317 includes/API/functions.php:346
-#: includes/API/functions.php:376 includes/API/functions.php:399
-#: includes/API/functions.php:420 includes/API/functions.php:469
-#: includes/API/functions.php:492 includes/API/functions.php:513
-#: includes/API/functions.php:536
+#: includes/API/functions.php:135 includes/API/functions.php:173
+#: includes/API/functions.php:208 includes/API/functions.php:259
+#: includes/API/functions.php:337 includes/API/functions.php:366
+#: includes/API/functions.php:396 includes/API/functions.php:419
+#: includes/API/functions.php:440 includes/API/functions.php:489
+#: includes/API/functions.php:512 includes/API/functions.php:533
+#: includes/API/functions.php:556
 msgid "WPMind 插件未激活"
 msgstr "WPMind 插件未激活"
 
-#: includes/API/Services/AbstractService.php:110
+#: includes/API/Services/AbstractService.php:115
 #, php-format
 msgid "没有可用的 %s 服务商"
 msgstr "没有可用的 %s 服务商"
 
-#: includes/API/Services/AbstractService.php:121
-#: includes/API/Services/ChatService.php:228
-#: includes/API/Services/ChatService.php:443
+#: includes/API/Services/AbstractService.php:127
+#: includes/API/Services/ChatService.php:239
+#: includes/API/Services/ChatService.php:469
 #, php-format
 msgid "服务商 %s 未配置"
 msgstr "服务商 %s 未配置"
 
-#: includes/API/Services/AbstractService.php:130
-#: includes/API/Services/ChatService.php:237
-#: includes/API/Services/ChatService.php:453
+#: includes/API/Services/AbstractService.php:138
+#: includes/API/Services/ChatService.php:250
+#: includes/API/Services/ChatService.php:479
 #, php-format
 msgid "服务商 %s 未配置 API Key"
 msgstr "服务商 %s 未配置 API Key"
 
-#: includes/API/Services/AbstractService.php:148
+#: includes/API/Services/AbstractService.php:157
 #, php-format
 msgid "%s 请求失败"
 msgstr "%s 请求失败"
@@ -276,86 +276,86 @@ msgstr "文件路径必须在 uploads 目录内"
 msgid "音频文件不存在"
 msgstr "音频文件不存在"
 
-#: includes/API/Services/AudioService.php:101
+#: includes/API/Services/AudioService.php:102
 #, php-format
 msgid "不支持的音频格式: %s"
 msgstr "不支持的音频格式: %s"
 
-#: includes/API/Services/AudioService.php:111
+#: includes/API/Services/AudioService.php:114
 #, php-format
 msgid "文件大小超过限制 (%s)"
 msgstr "文件大小超过限制 (%s)"
 
-#: includes/API/Services/AudioService.php:174
+#: includes/API/Services/AudioService.php:186
 #, php-format
 msgid "转录请求失败: %s"
 msgstr "转录请求失败: %s"
 
-#: includes/API/Services/AudioService.php:185
+#: includes/API/Services/AudioService.php:199
 #, php-format
-msgid "转录 API 错误 (%d): %s"
-msgstr "转录 API 错误 (%d): %s"
+msgid "转录 API 错误 (%1$d): %2$s"
+msgstr "转录 API 错误 (%1$d): %2$s"
 
-#: includes/API/Services/AudioService.php:261
+#: includes/API/Services/AudioService.php:288
 #, php-format
 msgid "语音合成请求失败: %s"
 msgstr "语音合成请求失败: %s"
 
-#: includes/API/Services/AudioService.php:272
+#: includes/API/Services/AudioService.php:301
 #, php-format
-msgid "语音合成 API 错误 (%d): %s"
-msgstr "语音合成 API 错误 (%d): %s"
+msgid "语音合成 API 错误 (%1$d): %2$s"
+msgstr "语音合成 API 错误 (%1$d): %2$s"
 
-#: includes/API/Services/AudioService.php:290
+#: includes/API/Services/AudioService.php:320
 msgid "保存路径必须在 uploads 目录内"
 msgstr "保存路径必须在 uploads 目录内"
 
-#: includes/API/Services/AudioService.php:294
+#: includes/API/Services/AudioService.php:324
 msgid "文件写入失败"
 msgstr "文件写入失败"
 
-#: includes/API/Services/ChatService.php:86
+#: includes/API/Services/ChatService.php:91
 msgid "没有可用的服务商支持此请求类型"
 msgstr "没有可用的服务商支持此请求类型"
 
-#: includes/API/Services/ChatService.php:280
+#: includes/API/Services/ChatService.php:295
 msgid "流式输出需要 PHP allow_url_fopen 配置启用"
 msgstr "流式输出需要 PHP allow_url_fopen 配置启用"
 
-#: includes/API/Services/ChatService.php:292
+#: includes/API/Services/ChatService.php:309
 #, php-format
 msgid "服务商 %s 无法建立流式连接"
 msgstr "服务商 %s 无法建立流式连接"
 
-#: includes/API/Services/ChatService.php:333
+#: includes/API/Services/ChatService.php:359
 msgid "无法建立流式连接"
 msgstr "无法建立流式连接"
 
-#: includes/API/Services/ChatService.php:500
+#: includes/API/Services/ChatService.php:529
 #, php-format
 msgid "请求失败: %s"
 msgstr "请求失败: %s"
 
-#: includes/API/Services/ChatService.php:514
+#: includes/API/Services/ChatService.php:543
 #, php-format
-msgid "API 错误 (%d): %s"
-msgstr "API 错误 (%d): %s"
+msgid "API 错误 (%1$d): %2$s"
+msgstr "API 错误 (%1$d): %2$s"
 
-#: includes/API/Services/ChatService.php:524
+#: includes/API/Services/ChatService.php:556
 msgid "服务商返回了无效的响应格式"
 msgstr "服务商返回了无效的响应格式"
 
-#: includes/API/Services/EmbeddingService.php:89
+#: includes/API/Services/EmbeddingService.php:99
 #, php-format
 msgid "嵌入请求失败: %s"
 msgstr "嵌入请求失败: %s"
 
-#: includes/API/Services/EmbeddingService.php:100
+#: includes/API/Services/EmbeddingService.php:112
 #, php-format
-msgid "嵌入 API 错误 (%d): %s"
-msgstr "嵌入 API 错误 (%d): %s"
+msgid "嵌入 API 错误 (%1$d): %2$s"
+msgstr "嵌入 API 错误 (%1$d): %2$s"
 
-#: includes/API/Services/EmbeddingService.php:105
+#: includes/API/Services/EmbeddingService.php:118
 msgid "嵌入 API 返回了无效的响应格式"
 msgstr "嵌入 API 返回了无效的响应格式"
 
@@ -363,52 +363,52 @@ msgstr "嵌入 API 返回了无效的响应格式"
 msgid "图像生成服务不可用"
 msgstr "图像生成服务不可用"
 
-#: includes/API/Services/StructuredOutputService.php:105
+#: includes/API/Services/StructuredOutputService.php:123
 #, php-format
-msgid "结构化输出失败（尝试 %d 次）: %s"
-msgstr "结构化输出失败（尝试 %d 次）: %s"
+msgid "结构化输出失败（尝试 %1$d 次）: %2$s"
+msgstr "结构化输出失败（尝试 %1$d 次）: %2$s"
 
-#: includes/Core/ModuleLoader.php:427
+#: includes/Core/ModuleLoader.php:429
 msgid "无效的模块 ID"
 msgstr "无效的模块 ID"
 
-#: includes/Core/ModuleLoader.php:433
+#: includes/Core/ModuleLoader.php:435
 msgid "模块不存在"
 msgstr "模块不存在"
 
-#: includes/Core/ModuleLoader.php:437
+#: includes/Core/ModuleLoader.php:439
 msgid "此模块不能被禁用"
 msgstr "此模块不能被禁用"
 
-#: includes/Core/ModuleLoader.php:442
+#: includes/Core/ModuleLoader.php:444
 #, php-format
 msgid "模块 %s 已启用"
 msgstr "模块 %s 已启用"
 
-#: includes/Core/ModuleLoader.php:445
+#: includes/Core/ModuleLoader.php:447
 #, php-format
 msgid "模块 %s 已禁用"
 msgstr "模块 %s 已禁用"
 
-#: includes/ErrorHandler.php:112
+#: includes/ErrorHandler.php:111
 #, php-format
 msgid "连接失败：HTTP %d"
 msgstr "连接失败：HTTP %d"
 
-#: includes/Failover/CircuitBreaker.php:289
-#: modules/cost-control/includes/BudgetChecker.php:441
+#: includes/Failover/CircuitBreaker.php:282
+#: modules/cost-control/includes/BudgetChecker.php:483
 msgid "正常"
 msgstr "正常"
 
-#: includes/Failover/CircuitBreaker.php:290
+#: includes/Failover/CircuitBreaker.php:283
 msgid "熔断中"
 msgstr "熔断中"
 
-#: includes/Failover/CircuitBreaker.php:291
+#: includes/Failover/CircuitBreaker.php:284
 msgid "恢复测试"
 msgstr "恢复测试"
 
-#: includes/Failover/CircuitBreaker.php:292
+#: includes/Failover/CircuitBreaker.php:285
 msgid "未知"
 msgstr "未知"
 
@@ -516,42 +516,72 @@ msgstr "路由策略别名。"
 msgid "Routing strategy switch result payload."
 msgstr "路由策略切换结果数据。"
 
-#: includes/SDK/SDKAdapter.php:50
+#: includes/Providers/ProviderRegistrar.php:79
+msgid "Text generation with DeepSeek models."
+msgstr "使用 DeepSeek 模型生成文本。"
+
+#: includes/Providers/ProviderRegistrar.php:84
+msgid "Text generation with Alibaba Qwen models."
+msgstr "使用阿里通义千问模型生成文本。"
+
+#: includes/Providers/ProviderRegistrar.php:89
+msgid "Text generation with Zhipu GLM models."
+msgstr "使用智谱 GLM 模型生成文本。"
+
+#: includes/Providers/ProviderRegistrar.php:94
+msgid "Text generation with Moonshot Kimi models."
+msgstr "使用月之暗面 Kimi 模型生成文本。"
+
+#: includes/Providers/ProviderRegistrar.php:99
+msgid "Text generation with ByteDance Doubao models."
+msgstr "使用字节跳动豆包模型生成文本。"
+
+#: includes/Providers/ProviderRegistrar.php:104
+msgid "Text generation via SiliconFlow model hub."
+msgstr "通过硅基流动模型中心生成文本。"
+
+#: includes/Providers/ProviderRegistrar.php:109
+msgid "Text generation with Baidu ERNIE models."
+msgstr "使用百度文心模型生成文本。"
+
+#: includes/Providers/ProviderRegistrar.php:114
+msgid "Text generation with MiniMax models."
+msgstr "使用 MiniMax 模型生成文本。"
+
+#: includes/SDK/SDKAdapter.php:56
 msgid "WP AI Client SDK 不可用"
 msgstr "WP AI Client SDK 不可用"
 
-#: includes/SDK/SDKAdapter.php:199
+#. translators: %d: HTTP status code.
+#: includes/SDK/SDKAdapter.php:314
 #, php-format
 msgid "SDK 请求失败 (HTTP %d)"
 msgstr "SDK 请求失败 (HTTP %d)"
 
-#: includes/SDK/SDKAdapter.php:200
+#: includes/SDK/SDKAdapter.php:317
 msgid "SDK 请求失败"
 msgstr "SDK 请求失败"
 
-#: modules/analytics/AnalyticsModule.php:137 templates/settings-page.php:74
+#: modules/analytics/AnalyticsModule.php:126 templates/settings-page.php:803
 msgid "数据分析"
 msgstr "数据分析"
 
-#: modules/analytics/templates/dashboard.php:31
-#: templates/tabs/dashboard.php:31
+#: modules/analytics/templates/dashboard.php:31 templates/tabs/dashboard.php:31
 msgid "Token 用量统计"
 msgstr "Token 用量统计"
 
-#: modules/analytics/templates/dashboard.php:34
-#: templates/tabs/dashboard.php:34
+#: modules/analytics/templates/dashboard.php:34 templates/tabs/dashboard.php:34
 msgid "上次更新时间"
 msgstr "上次更新时间"
 
 #. translators: %s: relative time
-#: modules/analytics/templates/dashboard.php:38
-#: templates/tabs/dashboard.php:38
+#: modules/analytics/templates/dashboard.php:38 templates/tabs/dashboard.php:38
 #, php-format
 msgid "更新于 %s"
 msgstr "更新于 %s"
 
-#: modules/analytics/templates/dashboard.php:39
-#: templates/tabs/dashboard.php:39 templates/tabs/overview.php:448
+#: modules/analytics/templates/dashboard.php:39 templates/tabs/dashboard.php:39
+#: templates/tabs/overview.php:633
 msgid "前"
 msgstr "前"
 
@@ -561,50 +591,44 @@ msgstr "前"
 msgid "刷新统计"
 msgstr "刷新统计"
 
-#: modules/analytics/templates/dashboard.php:44
-#: templates/tabs/dashboard.php:44
+#: modules/analytics/templates/dashboard.php:44 templates/tabs/dashboard.php:44
 msgid "刷新用量统计"
 msgstr "刷新用量统计"
 
 #: modules/analytics/templates/dashboard.php:47
-#: modules/cost-control/templates/settings.php:251
+#: modules/cost-control/templates/settings.php:263
 #: templates/tabs/dashboard.php:47
 msgid "清除统计"
 msgstr "清除统计"
 
-#: modules/analytics/templates/dashboard.php:47
-#: templates/tabs/dashboard.php:47
+#: modules/analytics/templates/dashboard.php:47 templates/tabs/dashboard.php:47
 msgid "清除所有用量统计数据"
 msgstr "清除所有用量统计数据"
 
-#: modules/analytics/templates/dashboard.php:49
-#: templates/tabs/dashboard.php:49 templates/tabs/routing.php:219
+#: modules/analytics/templates/dashboard.php:49 templates/tabs/dashboard.php:49
+#: templates/tabs/routing.php:226
 msgid "清除"
 msgstr "清除"
 
-#: modules/analytics/templates/dashboard.php:54
-#: templates/tabs/dashboard.php:54
+#: modules/analytics/templates/dashboard.php:54 templates/tabs/dashboard.php:54
 msgid "追踪各 AI 服务的 Token 消耗和费用估算，帮助优化成本。"
 msgstr "追踪各 AI 服务的 Token 消耗和费用估算，帮助优化成本。"
 
 #: modules/analytics/templates/dashboard.php:61
-#: modules/cost-control/templates/settings.php:272
+#: modules/cost-control/templates/settings.php:284
 #: templates/tabs/dashboard.php:61
 msgid "暂无用量数据"
 msgstr "暂无用量数据"
 
-#: modules/analytics/templates/dashboard.php:62
-#: templates/tabs/dashboard.php:62
+#: modules/analytics/templates/dashboard.php:62 templates/tabs/dashboard.php:62
 msgid "当 AI 服务被调用时，用量统计将自动记录在这里。"
 msgstr "当 AI 服务被调用时，用量统计将自动记录在这里。"
 
-#: modules/analytics/templates/dashboard.php:67
-#: templates/tabs/dashboard.php:67
+#: modules/analytics/templates/dashboard.php:67 templates/tabs/dashboard.php:67
 msgid "费用为估算值，按各服务商官方定价计算（每百万 tokens）。实际费用以服务商账单为准。"
 msgstr "费用为估算值，按各服务商官方定价计算（每百万 tokens）。实际费用以服务商账单为准。"
 
-#: modules/analytics/templates/dashboard.php:74
-#: templates/tabs/dashboard.php:74
+#: modules/analytics/templates/dashboard.php:74 templates/tabs/dashboard.php:74
 msgid "今日"
 msgstr "今日"
 
@@ -612,10 +636,10 @@ msgstr "今日"
 #: modules/analytics/templates/dashboard.php:99
 #: modules/analytics/templates/dashboard.php:119
 #: modules/analytics/templates/dashboard.php:139
-#: modules/analytics/templates/dashboard.php:174
+#: modules/analytics/templates/dashboard.php:175
 #: templates/tabs/dashboard.php:79 templates/tabs/dashboard.php:99
 #: templates/tabs/dashboard.php:119 templates/tabs/dashboard.php:139
-#: templates/tabs/dashboard.php:174
+#: templates/tabs/dashboard.php:175
 msgid "Tokens"
 msgstr "令牌"
 
@@ -623,10 +647,10 @@ msgstr "令牌"
 #: modules/analytics/templates/dashboard.php:103
 #: modules/analytics/templates/dashboard.php:123
 #: modules/analytics/templates/dashboard.php:143
-#: modules/analytics/templates/dashboard.php:178
+#: modules/analytics/templates/dashboard.php:179
 #: templates/tabs/dashboard.php:83 templates/tabs/dashboard.php:103
 #: templates/tabs/dashboard.php:123 templates/tabs/dashboard.php:143
-#: templates/tabs/dashboard.php:178
+#: templates/tabs/dashboard.php:179
 msgid "费用"
 msgstr "费用"
 
@@ -634,16 +658,15 @@ msgstr "费用"
 #: modules/analytics/templates/dashboard.php:107
 #: modules/analytics/templates/dashboard.php:127
 #: modules/analytics/templates/dashboard.php:147
-#: modules/analytics/templates/dashboard.php:182
-#: modules/cost-control/templates/settings.php:291
+#: modules/analytics/templates/dashboard.php:183
+#: modules/cost-control/templates/settings.php:304
 #: templates/tabs/dashboard.php:87 templates/tabs/dashboard.php:107
 #: templates/tabs/dashboard.php:127 templates/tabs/dashboard.php:147
-#: templates/tabs/dashboard.php:182
+#: templates/tabs/dashboard.php:183
 msgid "请求"
 msgstr "请求"
 
-#: modules/analytics/templates/dashboard.php:94
-#: templates/tabs/dashboard.php:94
+#: modules/analytics/templates/dashboard.php:94 templates/tabs/dashboard.php:94
 msgid "本周"
 msgstr "本周"
 
@@ -662,81 +685,81 @@ msgstr "总计"
 msgid "各渠道用量"
 msgstr "各渠道用量"
 
-#: modules/analytics/templates/dashboard.php:199
-#: templates/tabs/dashboard.php:199
+#: modules/analytics/templates/dashboard.php:200
+#: templates/tabs/dashboard.php:200
 msgid "分析仪表板"
 msgstr "分析仪表板"
 
-#: modules/analytics/templates/dashboard.php:201
-#: templates/tabs/dashboard.php:201
+#: modules/analytics/templates/dashboard.php:202
+#: templates/tabs/dashboard.php:202
 msgid "最近 7 天"
 msgstr "最近 7 天"
 
-#: modules/analytics/templates/dashboard.php:202
-#: templates/tabs/dashboard.php:202
+#: modules/analytics/templates/dashboard.php:203
+#: templates/tabs/dashboard.php:203
 msgid "最近 30 天"
 msgstr "最近 30 天"
 
-#: modules/analytics/templates/dashboard.php:204
-#: templates/tabs/dashboard.php:204
+#: modules/analytics/templates/dashboard.php:205
+#: templates/tabs/dashboard.php:205
 msgid "刷新图表"
 msgstr "刷新图表"
 
-#: modules/analytics/templates/dashboard.php:212
-#: templates/tabs/dashboard.php:212
+#: modules/analytics/templates/dashboard.php:213
+#: templates/tabs/dashboard.php:213
 msgid "用量趋势"
 msgstr "用量趋势"
 
-#: modules/analytics/templates/dashboard.php:220
-#: templates/tabs/dashboard.php:220
+#: modules/analytics/templates/dashboard.php:221
+#: templates/tabs/dashboard.php:221
 msgid "服务商对比"
 msgstr "服务商对比"
 
-#: modules/analytics/templates/dashboard.php:228
-#: templates/tabs/dashboard.php:228
+#: modules/analytics/templates/dashboard.php:229
+#: templates/tabs/dashboard.php:229
 msgid "成本趋势"
 msgstr "成本趋势"
 
-#: modules/analytics/templates/dashboard.php:236
-#: templates/tabs/dashboard.php:236
+#: modules/analytics/templates/dashboard.php:237
+#: templates/tabs/dashboard.php:237
 msgid "模型使用排行"
 msgstr "模型使用排行"
 
-#: modules/analytics/templates/dashboard.php:249
-#: templates/tabs/dashboard.php:249
+#: modules/analytics/templates/dashboard.php:250
+#: templates/tabs/dashboard.php:250
 msgid "服务状态"
 msgstr "服务状态"
 
-#: modules/analytics/templates/dashboard.php:250
-#: templates/tabs/dashboard.php:250
+#: modules/analytics/templates/dashboard.php:251
+#: templates/tabs/dashboard.php:251
 msgid "刷新状态"
 msgstr "刷新状态"
 
-#: modules/analytics/templates/dashboard.php:253
-#: templates/tabs/dashboard.php:253
+#: modules/analytics/templates/dashboard.php:254
+#: templates/tabs/dashboard.php:254
 msgid "重置所有熔断器"
 msgstr "重置所有熔断器"
 
-#: modules/analytics/templates/dashboard.php:255
-#: templates/tabs/dashboard.php:255
+#: modules/analytics/templates/dashboard.php:256
+#: templates/tabs/dashboard.php:256
 msgid "重置"
 msgstr "重置"
 
-#: modules/analytics/templates/dashboard.php:264
-#: templates/tabs/dashboard.php:264
+#: modules/analytics/templates/dashboard.php:265
+#: templates/tabs/dashboard.php:265
 msgid "健康分数"
 msgstr "健康分数"
 
-#: modules/analytics/templates/dashboard.php:269
-#: templates/tabs/dashboard.php:269
+#: modules/analytics/templates/dashboard.php:270
+#: templates/tabs/dashboard.php:270
 #, php-format
 msgid "%d分钟后恢复"
 msgstr "%d分钟后恢复"
 
 #: modules/api-gateway/ApiGatewayModule.php:76
-#: modules/api-gateway/ApiGatewayModule.php:183
+#: modules/api-gateway/ApiGatewayModule.php:197
 #: modules/api-gateway/templates/settings.php:34
-#: templates/settings-page.php:89
+#: templates/settings-page.php:818
 msgid "API Gateway"
 msgstr "API 网关"
 
@@ -753,41 +776,41 @@ msgid "请输入 Key 名称"
 msgstr "请输入 Key 名称"
 
 #: modules/api-gateway/includes/Admin/GatewayAjaxController.php:128
-#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:244
+#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:246
 msgid "过期时间格式无效"
 msgstr "过期时间格式无效"
 
-#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:136
+#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:137
 msgid "API Key 创建成功"
 msgstr "API Key 创建成功"
 
-#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:171
-#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:202
+#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:173
+#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:204
 msgid "缺少 Key ID"
 msgstr "缺少 Key ID"
 
-#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:177
-#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:207
+#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:179
+#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:209
 msgid "API Key 不存在"
 msgstr "API Key 不存在"
 
-#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:181
+#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:183
 msgid "该 Key 已被吊销"
 msgstr "该 Key 已被吊销"
 
-#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:186
+#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:188
 msgid "API Key 已吊销"
 msgstr "API Key 已吊销"
 
-#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:253
+#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:255
 msgid "没有需要更新的字段"
 msgstr "没有需要更新的字段"
 
-#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:259
+#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:261
 msgid "API Key 已更新"
 msgstr "API Key 已更新"
 
-#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:261
+#: modules/api-gateway/includes/Admin/GatewayAjaxController.php:263
 #: modules/api-gateway/templates/settings.php:520
 msgid "更新失败"
 msgstr "更新失败"
@@ -876,13 +899,13 @@ msgstr "记录 Prompt 内容"
 
 #: modules/api-gateway/templates/settings.php:137
 #: modules/auto-meta/templates/settings.php:169
-#: modules/cost-control/templates/settings.php:247
+#: modules/cost-control/templates/settings.php:259
 #: modules/exact-cache/templates/settings.php:142
-#: modules/geo/templates/settings.php:904
+#: modules/geo/templates/settings.php:906
 #: modules/media-intelligence/templates/settings.php:143
 #: modules/media-intelligence/templates/settings.php:195
-#: templates/tabs/geo.php:245 templates/tabs/images.php:265
-#: templates/tabs/services.php:218
+#: templates/tabs/geo.php:245 templates/tabs/images.php:284
+#: templates/tabs/services.php:219
 msgid "保存设置"
 msgstr "保存设置"
 
@@ -1071,7 +1094,7 @@ msgid "白名单"
 msgstr "白名单"
 
 #: modules/api-gateway/templates/settings.php:475
-#: templates/tabs/routing.php:224
+#: templates/tabs/routing.php:231
 msgid "保存"
 msgstr "保存"
 
@@ -1105,7 +1128,7 @@ msgstr "已复制"
 
 #: modules/auto-meta/AutoMetaModule.php:50
 #: modules/auto-meta/AutoMetaModule.php:126
-#: modules/auto-meta/templates/settings.php:36 templates/settings-page.php:104
+#: modules/auto-meta/templates/settings.php:36 templates/settings-page.php:833
 msgid "Auto-Meta"
 msgstr "自动元数据"
 
@@ -1113,30 +1136,29 @@ msgstr "自动元数据"
 msgid "发布时自动生成摘要、标签、分类、FAQ Schema、SEO 描述"
 msgstr "发布时自动生成摘要、标签、分类、FAQ Schema、SEO 描述"
 
-#: modules/auto-meta/includes/AutoMetaAjaxController.php:89
-#: modules/cost-control/CostControlModule.php:238
-#: modules/geo/GeoModule.php:380
-#: modules/media-intelligence/includes/MediaAjaxController.php:78
+#: modules/auto-meta/includes/AutoMetaAjaxController.php:90
+#: modules/cost-control/CostControlModule.php:238 modules/geo/GeoModule.php:380
+#: modules/media-intelligence/includes/MediaAjaxController.php:79
 msgid "设置已保存"
 msgstr "设置已保存"
 
-#: modules/auto-meta/includes/AutoMetaAjaxController.php:100
+#: modules/auto-meta/includes/AutoMetaAjaxController.php:102
 msgid "无效的文章 ID"
 msgstr "无效的文章 ID"
 
-#: modules/auto-meta/includes/AutoMetaAjaxController.php:105
+#: modules/auto-meta/includes/AutoMetaAjaxController.php:107
 msgid "文章不存在"
 msgstr "文章不存在"
 
-#: modules/auto-meta/includes/AutoMetaAjaxController.php:109
+#: modules/auto-meta/includes/AutoMetaAjaxController.php:111
 msgid "仅支持已发布的文章，当前状态："
 msgstr "仅支持已发布的文章，当前状态："
 
-#: modules/auto-meta/includes/AutoMetaAjaxController.php:118
+#: modules/auto-meta/includes/AutoMetaAjaxController.php:120
 msgid "生成失败，请检查 API 配置"
 msgstr "生成失败，请检查 API 配置"
 
-#: modules/auto-meta/includes/AutoMetaAjaxController.php:125
+#: modules/auto-meta/includes/AutoMetaAjaxController.php:128
 msgid "元数据生成成功"
 msgstr "元数据生成成功"
 
@@ -1145,7 +1167,7 @@ msgid "AI 驱动的文章元数据自动生成：摘要、标签、分类、FAQ 
 msgstr "AI 驱动的文章元数据自动生成：摘要、标签、分类、FAQ Schema、SEO 描述。"
 
 #: modules/auto-meta/templates/settings.php:59
-#: modules/media-intelligence/includes/AltTextGenerator.php:163
+#: modules/media-intelligence/includes/AltTextGenerator.php:171
 msgid "已生成"
 msgstr "已生成"
 
@@ -1252,96 +1274,96 @@ msgstr "成本控制"
 msgid "AI 服务费用控制 - 用量追踪、预算限额、告警通知"
 msgstr "AI 服务费用控制 - 用量追踪、预算限额、告警通知"
 
-#: modules/cost-control/CostControlModule.php:280
+#: modules/cost-control/CostControlModule.php:282
 msgid "用量统计已清除"
 msgstr "用量统计已清除"
 
-#: modules/cost-control/includes/BudgetAlert.php:133
+#: modules/cost-control/includes/BudgetAlert.php:126
 msgid "每日 USD 预算"
 msgstr "每日 USD 预算"
 
-#: modules/cost-control/includes/BudgetAlert.php:134
+#: modules/cost-control/includes/BudgetAlert.php:127
 msgid "每日 CNY 预算"
 msgstr "每日 CNY 预算"
 
-#: modules/cost-control/includes/BudgetAlert.php:135
+#: modules/cost-control/includes/BudgetAlert.php:128
 msgid "每月 USD 预算"
 msgstr "每月 USD 预算"
 
-#: modules/cost-control/includes/BudgetAlert.php:136
+#: modules/cost-control/includes/BudgetAlert.php:129
 msgid "每月 CNY 预算"
 msgstr "每月 CNY 预算"
 
-#: modules/cost-control/includes/BudgetAlert.php:146
+#: modules/cost-control/includes/BudgetAlert.php:139
 #, php-format
 msgid "WPMind 预算告警：%1$s 已使用 %4$s%%（%2$s / %3$s）"
 msgstr "WPMind 预算告警：%1$s 已使用 %4$s%%（%2$s / %3$s）"
 
-#: modules/cost-control/includes/BudgetAlert.php:154
+#: modules/cost-control/includes/BudgetAlert.php:147
 #, php-format
 msgid "WPMind 预算超限：%1$s 已超出限额（%2$s / %3$s）"
 msgstr "WPMind 预算超限：%1$s 已超出限额（%2$s / %3$s）"
 
-#: modules/cost-control/includes/BudgetAlert.php:225
+#: modules/cost-control/includes/BudgetAlert.php:214
 msgid "[WPMind] 预算超限告警"
 msgstr "[WPMind] 预算超限告警"
 
-#: modules/cost-control/includes/BudgetAlert.php:226
+#: modules/cost-control/includes/BudgetAlert.php:215
 msgid "[WPMind] 预算接近限额告警"
 msgstr "[WPMind] 预算接近限额告警"
 
-#: modules/cost-control/includes/BudgetAlert.php:230
+#: modules/cost-control/includes/BudgetAlert.php:219
 #, php-format
 msgid "站点：%s"
 msgstr "站点：%s"
 
-#: modules/cost-control/includes/BudgetAlert.php:234
+#: modules/cost-control/includes/BudgetAlert.php:223
 #, php-format
 msgid "时间：%s"
 msgstr "时间：%s"
 
-#: modules/cost-control/includes/BudgetAlert.php:237
+#: modules/cost-control/includes/BudgetAlert.php:226
 msgid "请登录 WordPress 后台查看详情。"
 msgstr "请登录 WordPress 后台查看详情。"
 
-#: modules/cost-control/includes/BudgetChecker.php:214
+#: modules/cost-control/includes/BudgetChecker.php:237
 msgid "已超出全局预算限额"
 msgstr "已超出全局预算限额"
 
-#: modules/cost-control/includes/BudgetChecker.php:225
+#: modules/cost-control/includes/BudgetChecker.php:248
 #, php-format
 msgid "已超出 %s 的预算限额"
 msgstr "已超出 %s 的预算限额"
 
-#: modules/cost-control/includes/BudgetChecker.php:442
+#: modules/cost-control/includes/BudgetChecker.php:484
 msgid "接近限额"
 msgstr "接近限额"
 
-#: modules/cost-control/includes/BudgetChecker.php:443
+#: modules/cost-control/includes/BudgetChecker.php:485
 msgid "已超限"
 msgstr "已超限"
 
-#: modules/cost-control/includes/BudgetManager.php:303
+#: modules/cost-control/includes/BudgetManager.php:285
 msgid "仅告警"
 msgstr "仅告警"
 
-#: modules/cost-control/includes/BudgetManager.php:304
+#: modules/cost-control/includes/BudgetManager.php:286
 msgid "禁用服务"
 msgstr "禁用服务"
 
-#: modules/cost-control/includes/BudgetManager.php:305
+#: modules/cost-control/includes/BudgetManager.php:287
 msgid "降级模型"
 msgstr "降级模型"
 
-#: modules/cost-control/includes/BudgetManager.php:316
+#: modules/cost-control/includes/BudgetManager.php:297
 msgid "仅告警 - 超限时发送通知，不阻止请求"
 msgstr "仅告警 - 超限时发送通知，不阻止请求"
 
-#: modules/cost-control/includes/BudgetManager.php:317
+#: modules/cost-control/includes/BudgetManager.php:298
 msgid "禁用服务 - 超限时禁用该服务商"
 msgstr "禁用服务 - 超限时禁用该服务商"
 
-#: modules/cost-control/includes/BudgetManager.php:318
+#: modules/cost-control/includes/BudgetManager.php:299
 msgid "降级模型 - 超限时自动切换到更便宜的模型"
 msgstr "降级模型 - 超限时自动切换到更便宜的模型"
 
@@ -1355,145 +1377,136 @@ msgstr "Cost Control 模块未正确加载"
 msgid "监控 AI 服务费用，设置预算限额，接收告警通知。"
 msgstr "监控 AI 服务费用，设置预算限额，接收告警通知。"
 
-#: modules/cost-control/templates/settings.php:79
+#: modules/cost-control/templates/settings.php:83
 msgid "今日费用"
 msgstr "今日费用"
 
-#: modules/cost-control/templates/settings.php:93
-#: templates/tabs/overview.php:174
+#: modules/cost-control/templates/settings.php:101
+#: templates/tabs/overview.php:223
 msgid "本月费用"
 msgstr "本月费用"
 
-#: modules/cost-control/templates/settings.php:104
-#: templates/tabs/overview.php:139 templates/tabs/routing.php:79
+#: modules/cost-control/templates/settings.php:112
+#: templates/tabs/overview.php:172 templates/tabs/routing.php:84
 msgid "今日请求"
 msgstr "今日请求"
 
-#: modules/cost-control/templates/settings.php:117
-#: templates/tabs/overview.php:156
+#: modules/cost-control/templates/settings.php:129
+#: templates/tabs/overview.php:197
 msgid "今日 Tokens"
 msgstr "今日 Tokens"
 
-#: modules/cost-control/templates/settings.php:128
+#: modules/cost-control/templates/settings.php:140
 msgid "预算限额"
 msgstr "预算限额"
 
-#: modules/cost-control/templates/settings.php:138
-#: templates/tabs/budget.php:41
+#: modules/cost-control/templates/settings.php:150 templates/tabs/budget.php:41
 msgid "启用预算限额"
 msgstr "启用预算限额"
 
-#: modules/cost-control/templates/settings.php:140
-#: templates/tabs/budget.php:43
+#: modules/cost-control/templates/settings.php:152 templates/tabs/budget.php:43
 msgid "启用后，当费用达到设定限额时将触发告警或自动限制服务。"
 msgstr "启用后，当费用达到设定限额时将触发告警或自动限制服务。"
 
-#: modules/cost-control/templates/settings.php:146
-#: templates/tabs/budget.php:51
+#: modules/cost-control/templates/settings.php:158 templates/tabs/budget.php:51
 msgid "全局限额"
 msgstr "全局限额"
 
-#: modules/cost-control/templates/settings.php:152
-#: templates/tabs/budget.php:55
+#: modules/cost-control/templates/settings.php:164 templates/tabs/budget.php:55
 msgid "每日 USD"
 msgstr "每日 USD"
 
-#: modules/cost-control/templates/settings.php:161
-#: templates/tabs/budget.php:64
+#: modules/cost-control/templates/settings.php:173 templates/tabs/budget.php:64
 msgid "每月 USD"
 msgstr "每月 USD"
 
-#: modules/cost-control/templates/settings.php:170
-#: templates/tabs/budget.php:73
+#: modules/cost-control/templates/settings.php:182 templates/tabs/budget.php:73
 msgid "每日 CNY"
 msgstr "每日 CNY"
 
-#: modules/cost-control/templates/settings.php:179
-#: templates/tabs/budget.php:82
+#: modules/cost-control/templates/settings.php:191 templates/tabs/budget.php:82
 msgid "每月 CNY"
 msgstr "每月 CNY"
 
-#: modules/cost-control/templates/settings.php:188
-#: templates/tabs/budget.php:91
+#: modules/cost-control/templates/settings.php:200 templates/tabs/budget.php:91
 msgid "设置为 0 表示不限制"
 msgstr "设置为 0 表示不限制"
 
-#: modules/cost-control/templates/settings.php:193
-#: templates/tabs/budget.php:98
+#: modules/cost-control/templates/settings.php:205 templates/tabs/budget.php:98
 msgid "告警设置"
 msgstr "告警设置"
 
-#: modules/cost-control/templates/settings.php:196
+#: modules/cost-control/templates/settings.php:208
 #: templates/tabs/budget.php:102
 msgid "告警阈值"
 msgstr "告警阈值"
 
-#: modules/cost-control/templates/settings.php:203
+#: modules/cost-control/templates/settings.php:215
 #: templates/tabs/budget.php:109
 msgid "当费用达到限额的此百分比时发送告警"
 msgstr "当费用达到限额的此百分比时发送告警"
 
-#: modules/cost-control/templates/settings.php:206
+#: modules/cost-control/templates/settings.php:218
 #: templates/tabs/budget.php:112
 msgid "超限处理"
 msgstr "超限处理"
 
-#: modules/cost-control/templates/settings.php:220
+#: modules/cost-control/templates/settings.php:232
 #: templates/tabs/budget.php:128
 msgid "通知方式"
 msgstr "通知方式"
 
-#: modules/cost-control/templates/settings.php:227
+#: modules/cost-control/templates/settings.php:239
 #: templates/tabs/budget.php:133
 msgid "后台通知 - 在 WordPress 后台显示告警"
 msgstr "后台通知 - 在 WordPress 后台显示告警"
 
-#: modules/cost-control/templates/settings.php:231
+#: modules/cost-control/templates/settings.php:243
 #: templates/tabs/budget.php:137
 msgid "邮件通知 - 发送告警邮件"
 msgstr "邮件通知 - 发送告警邮件"
 
-#: modules/cost-control/templates/settings.php:236
+#: modules/cost-control/templates/settings.php:248
 #: templates/tabs/budget.php:142
 msgid "告警邮箱地址"
 msgstr "告警邮箱地址"
 
-#: modules/cost-control/templates/settings.php:263
+#: modules/cost-control/templates/settings.php:275
 msgid "服务商用量"
 msgstr "服务商用量"
 
-#: modules/cost-control/templates/settings.php:273
+#: modules/cost-control/templates/settings.php:285
 msgid "使用 AI 服务后，用量数据将显示在这里。"
 msgstr "使用 AI 服务后，用量数据将显示在这里。"
 
-#: modules/cost-control/templates/settings.php:305
+#: modules/cost-control/templates/settings.php:318
 msgid "费用说明"
 msgstr "费用说明"
 
-#: modules/cost-control/templates/settings.php:308
+#: modules/cost-control/templates/settings.php:321
 msgid "Cost Control 模块帮助您监控和控制 AI 服务费用："
 msgstr "Cost Control 模块帮助您监控和控制 AI 服务费用："
 
-#: modules/cost-control/templates/settings.php:310
+#: modules/cost-control/templates/settings.php:323
 msgid "自动追踪每次 API 调用的 Token 用量"
 msgstr "自动追踪每次 API 调用的 Token 用量"
 
-#: modules/cost-control/templates/settings.php:311
+#: modules/cost-control/templates/settings.php:324
 msgid "根据各服务商定价计算费用（USD/CNY）"
 msgstr "根据各服务商定价计算费用（USD/CNY）"
 
-#: modules/cost-control/templates/settings.php:312
+#: modules/cost-control/templates/settings.php:325
 msgid "设置每日/每月预算限额"
 msgstr "设置每日/每月预算限额"
 
-#: modules/cost-control/templates/settings.php:313
+#: modules/cost-control/templates/settings.php:326
 msgid "接近或超出限额时发送告警通知"
 msgstr "接近或超出限额时发送告警通知"
 
 #: modules/exact-cache/ExactCacheModule.php:44
-#: modules/exact-cache/ExactCacheModule.php:117
+#: modules/exact-cache/ExactCacheModule.php:120
 #: modules/exact-cache/templates/settings.php:30
-#: templates/settings-page.php:94
+#: templates/settings-page.php:823
 msgid "精确缓存"
 msgstr "精确缓存"
 
@@ -1588,7 +1601,7 @@ msgid "决定缓存 key 的隔离粒度。角色隔离是最安全的默认值�
 msgstr "决定缓存 key 的隔离粒度。角色隔离是最安全的默认值。"
 
 #: modules/geo/GeoModule.php:64 modules/geo/templates/settings.php:63
-#: templates/settings-page.php:84 templates/tabs/geo.php:43
+#: templates/settings-page.php:813 templates/tabs/geo.php:43
 msgid "GEO 优化"
 msgstr "GEO 优化"
 
@@ -1601,7 +1614,7 @@ msgid "GEO"
 msgstr "生成式引擎优化"
 
 #: modules/geo/includes/AiIndexingManager.php:138
-#: modules/geo/templates/settings.php:572
+#: modules/geo/templates/settings.php:573
 msgid "AI 索引指令"
 msgstr "AI 索引指令"
 
@@ -1638,7 +1651,7 @@ msgid "AI 生成内容"
 msgstr "AI 生成内容"
 
 #: modules/geo/includes/AiSummaryManager.php:121
-#: modules/geo/templates/settings.php:329
+#: modules/geo/templates/settings.php:330
 msgid "AI 摘要"
 msgstr "AI 摘要"
 
@@ -1685,77 +1698,75 @@ msgid "输入 Wikidata 或 Wikipedia 链接，将作为 Schema.org about.sameAs 
 msgstr "输入 Wikidata 或 Wikipedia 链接，将作为 Schema.org about.sameAs 输出。"
 
 #. translators: %s: site name
-#: modules/geo/includes/LlmsTxtGenerator.php:174
+#: modules/geo/includes/LlmsTxtGenerator.php:175
 #, php-format
 msgid "Welcome to %s"
 msgstr "欢迎来到 %s"
 
-#: modules/geo/includes/LlmsTxtGenerator.php:193
+#: modules/geo/includes/LlmsTxtGenerator.php:194
 #, php-format
 msgid "Primary language: %s."
 msgstr "主要语言：%s。"
 
 #. translators: %s: list of content types
-#: modules/geo/includes/LlmsTxtGenerator.php:200
+#: modules/geo/includes/LlmsTxtGenerator.php:201
 #, php-format
 msgid "Content types: %s."
 msgstr "内容类型：%s。"
 
-#: modules/geo/includes/LlmsTxtGenerator.php:206
-msgid ""
-"When citing content from this site, please include the author name, article "
-"title, and URL."
+#: modules/geo/includes/LlmsTxtGenerator.php:207
+msgid "When citing content from this site, please include the author name, article title, and URL."
 msgstr "引用本站内容时，请注明作者、文章标题和网址。"
 
-#: modules/geo/includes/LlmsTxtGenerator.php:230
+#: modules/geo/includes/LlmsTxtGenerator.php:231
 msgid "Categories"
 msgstr "分类"
 
-#: modules/geo/includes/LlmsTxtGenerator.php:237
+#: modules/geo/includes/LlmsTxtGenerator.php:238
 #, php-format
 msgid "%d posts"
 msgstr "%d 篇文章"
 
-#: modules/geo/includes/LlmsTxtGenerator.php:255
+#: modules/geo/includes/LlmsTxtGenerator.php:256
 msgid "Recent Posts"
 msgstr "近期文章"
 
-#: modules/geo/includes/LlmsTxtGenerator.php:278
+#: modules/geo/includes/LlmsTxtGenerator.php:279
 msgid "Pages"
 msgstr "页面"
 
-#: modules/geo/includes/LlmsTxtGenerator.php:286
+#: modules/geo/includes/LlmsTxtGenerator.php:287
 msgid "Site page"
 msgstr "站点页面"
 
-#: modules/geo/includes/LlmsTxtGenerator.php:309
+#: modules/geo/includes/LlmsTxtGenerator.php:310
 msgid "RSS Feed"
 msgstr "RSS 订阅源"
 
-#: modules/geo/includes/LlmsTxtGenerator.php:311
+#: modules/geo/includes/LlmsTxtGenerator.php:312
 msgid "Subscribe to updates"
 msgstr "订阅更新"
 
-#: modules/geo/includes/LlmsTxtGenerator.php:318
+#: modules/geo/includes/LlmsTxtGenerator.php:319
 #: modules/geo/templates/settings.php:104
-#: modules/geo/templates/settings.php:243 templates/tabs/geo.php:87
+#: modules/geo/templates/settings.php:244 templates/tabs/geo.php:87
 #: templates/tabs/geo.php:99
 msgid "Markdown Feed"
 msgstr "Markdown 订阅源"
 
-#: modules/geo/includes/LlmsTxtGenerator.php:320
+#: modules/geo/includes/LlmsTxtGenerator.php:321
 msgid "AI-optimized content feed"
 msgstr "针对 AI 优化的内容订阅源"
 
-#: modules/geo/includes/LlmsTxtGenerator.php:328
+#: modules/geo/includes/LlmsTxtGenerator.php:329
 msgid "Sitemap"
 msgstr "站点地图"
 
-#: modules/geo/includes/LlmsTxtGenerator.php:330
+#: modules/geo/includes/LlmsTxtGenerator.php:331
 msgid "Complete site structure"
 msgstr "完整站点结构"
 
-#: modules/geo/includes/SchemaGenerator.php:484
+#: modules/geo/includes/SchemaGenerator.php:485
 msgid "微博 URL"
 msgstr "微博 URL"
 
@@ -1851,685 +1862,667 @@ msgstr "暂无爬虫访问记录"
 msgid "启用 Markdown Feed 后，AI 爬虫的访问将被记录在这里。"
 msgstr "启用 Markdown Feed 后，AI 爬虫的访问将被记录在这里。"
 
-#: modules/geo/templates/settings.php:205 templates/tabs/geo.php:274
+#: modules/geo/templates/settings.php:206 templates/tabs/geo.php:275
 msgid "AI"
 msgstr "AI"
 
-#: modules/geo/templates/settings.php:210 templates/tabs/geo.php:279
+#: modules/geo/templates/settings.php:211 templates/tabs/geo.php:280
 msgid "次访问"
 msgstr "次访问"
 
-#: modules/geo/templates/settings.php:220 templates/tabs/geo.php:291
+#: modules/geo/templates/settings.php:221 templates/tabs/geo.php:292
 msgid "什么是 GEO？"
 msgstr "什么是 GEO？"
 
-#: modules/geo/templates/settings.php:223 templates/tabs/geo.php:294
-msgid ""
-"GEO (Generative Engine Optimization) 是针对 AI 搜索引擎的优化策略，帮助您的内容在 "
-"ChatGPT、Claude、Perplexity 等 AI 助手中获得更好的引用和展示。"
-msgstr ""
-"GEO (Generative Engine Optimization) 是针对 AI 搜索引擎的优化策略，帮助您的内容在 "
-"ChatGPT、Claude、Perplexity 等 AI 助手中获得更好的引用和展示。"
+#: modules/geo/templates/settings.php:224 templates/tabs/geo.php:295
+msgid "GEO (Generative Engine Optimization) 是针对 AI 搜索引擎的优化策略，帮助您的内容在 ChatGPT、Claude、Perplexity 等 AI 助手中获得更好的引用和展示。"
+msgstr "GEO (Generative Engine Optimization) 是针对 AI 搜索引擎的优化策略，帮助您的内容在 ChatGPT、Claude、Perplexity 等 AI 助手中获得更好的引用和展示。"
 
-#: modules/geo/templates/settings.php:225 templates/tabs/geo.php:296
+#: modules/geo/templates/settings.php:226 templates/tabs/geo.php:297
 msgid "提供结构化 Markdown 格式，便于 AI 解析"
 msgstr "提供结构化 Markdown 格式，便于 AI 解析"
 
-#: modules/geo/templates/settings.php:226 templates/tabs/geo.php:297
+#: modules/geo/templates/settings.php:227 templates/tabs/geo.php:298
 msgid "注入权威性信号，提高内容可信度"
 msgstr "注入权威性信号，提高内容可信度"
 
-#: modules/geo/templates/settings.php:227
+#: modules/geo/templates/settings.php:228
 msgid "关联 Wikidata 实体，消除语义歧义"
 msgstr "关联 Wikidata 实体，消除语义歧义"
 
-#: modules/geo/templates/settings.php:228
+#: modules/geo/templates/settings.php:229
 msgid "控制 AI 爬虫访问，保护敏感内容"
 msgstr "控制 AI 爬虫访问，保护敏感内容"
 
-#: modules/geo/templates/settings.php:230
-#: modules/geo/templates/settings.php:371
-#: modules/geo/templates/settings.php:628
-#: modules/geo/templates/settings.php:709
-#: modules/geo/templates/settings.php:893
+#: modules/geo/templates/settings.php:231
+#: modules/geo/templates/settings.php:372
+#: modules/geo/templates/settings.php:629
+#: modules/geo/templates/settings.php:711
+#: modules/geo/templates/settings.php:895
 msgid "了解更多 →"
 msgstr "了解更多 →"
 
-#: modules/geo/templates/settings.php:245 templates/tabs/geo.php:102
+#: modules/geo/templates/settings.php:246 templates/tabs/geo.php:102
 msgid "为 AI 爬虫提供结构化的 Markdown 格式内容。"
 msgstr "为 AI 爬虫提供结构化的 Markdown 格式内容。"
 
-#: modules/geo/templates/settings.php:249 templates/tabs/geo.php:108
+#: modules/geo/templates/settings.php:250 templates/tabs/geo.php:108
 msgid "检测到官方 AI Experiments 插件，WPMind 将自动增强其 Markdown Feed。"
 msgstr "检测到官方 AI Experiments 插件，WPMind 将自动增强其 Markdown Feed。"
 
-#: modules/geo/templates/settings.php:257 templates/tabs/geo.php:118
+#: modules/geo/templates/settings.php:258 templates/tabs/geo.php:118
 msgid "启用独立 Markdown Feed"
 msgstr "启用独立 Markdown Feed"
 
-#: modules/geo/templates/settings.php:258 templates/tabs/geo.php:119
+#: modules/geo/templates/settings.php:259 templates/tabs/geo.php:119
 msgid "提供 /?feed=markdown 端点和 .md 后缀访问"
 msgstr "提供 /?feed=markdown 端点和 .md 后缀访问"
 
-#: modules/geo/templates/settings.php:264 templates/tabs/geo.php:126
+#: modules/geo/templates/settings.php:265 templates/tabs/geo.php:126
 msgid "访问方式："
 msgstr "访问方式："
 
-#: modules/geo/templates/settings.php:275 templates/tabs/geo.php:183
+#: modules/geo/templates/settings.php:276 templates/tabs/geo.php:183
 msgid "llms.txt"
 msgstr "llms.txt 文件"
 
-#: modules/geo/templates/settings.php:277 templates/tabs/geo.php:187
+#: modules/geo/templates/settings.php:278 templates/tabs/geo.php:187
 msgid "为 AI 爬虫提供站点导航和内容索引。"
 msgstr "为 AI 爬虫提供站点导航和内容索引。"
 
-#: modules/geo/templates/settings.php:282 templates/tabs/geo.php:194
+#: modules/geo/templates/settings.php:283 templates/tabs/geo.php:194
 msgid "启用 llms.txt"
 msgstr "启用 llms.txt"
 
-#: modules/geo/templates/settings.php:283 templates/tabs/geo.php:195
+#: modules/geo/templates/settings.php:284 templates/tabs/geo.php:195
 msgid "在 /llms.txt 提供站点内容导航"
 msgstr "在 /llms.txt 提供站点内容导航"
 
-#: modules/geo/templates/settings.php:289
-#: modules/geo/templates/settings.php:319 templates/tabs/geo.php:202
+#: modules/geo/templates/settings.php:290
+#: modules/geo/templates/settings.php:320 templates/tabs/geo.php:202
 msgid "访问地址："
 msgstr "访问地址："
 
-#: modules/geo/templates/settings.php:299
+#: modules/geo/templates/settings.php:300
 msgid "AI Sitemap"
 msgstr "AI 站点地图"
 
-#: modules/geo/templates/settings.php:301
+#: modules/geo/templates/settings.php:302
 msgid "为 AI 爬虫提供专属 XML Sitemap，包含内容声明和摘要等元数据。"
 msgstr "为 AI 爬虫提供专属 XML Sitemap，包含内容声明和摘要等元数据。"
 
-#: modules/geo/templates/settings.php:306
+#: modules/geo/templates/settings.php:307
 msgid "启用 AI Sitemap"
 msgstr "启用 AI Sitemap"
 
-#: modules/geo/templates/settings.php:307
+#: modules/geo/templates/settings.php:308
 msgid "在 /ai-sitemap.xml 提供 AI 专属站点地图"
 msgstr "在 /ai-sitemap.xml 提供 AI 专属站点地图"
 
-#: modules/geo/templates/settings.php:313
+#: modules/geo/templates/settings.php:314
 msgid "最大条目数："
 msgstr "最大条目数："
 
-#: modules/geo/templates/settings.php:316
+#: modules/geo/templates/settings.php:317
 msgid "(10-5000)"
 msgstr "（10–5000 条）"
 
-#: modules/geo/templates/settings.php:330
-#: modules/geo/templates/settings.php:644
-#: modules/geo/templates/settings.php:725 templates/tabs/geo.php:184
+#: modules/geo/templates/settings.php:331
+#: modules/geo/templates/settings.php:645
+#: modules/geo/templates/settings.php:727 templates/tabs/geo.php:184
 #: templates/tabs/geo.php:213
 msgid "NEW"
 msgstr "新"
 
-#: modules/geo/templates/settings.php:332
+#: modules/geo/templates/settings.php:333
 msgid "控制 AI 如何描述您的文章，而非让 AI 自行猜测。"
 msgstr "控制 AI 如何描述您的文章，而非让 AI 自行猜测。"
 
-#: modules/geo/templates/settings.php:337
+#: modules/geo/templates/settings.php:338
 msgid "启用 AI 摘要"
 msgstr "启用 AI 摘要"
 
-#: modules/geo/templates/settings.php:338
+#: modules/geo/templates/settings.php:339
 msgid "在编辑器中添加 AI 摘要字段，输出为 meta 标签和 Schema.org abstract"
 msgstr "在编辑器中添加 AI 摘要字段，输出为 meta 标签和 Schema.org abstract"
 
-#: modules/geo/templates/settings.php:344
+#: modules/geo/templates/settings.php:345
 msgid "无摘要时的回退："
 msgstr "无摘要时的回退："
 
-#: modules/geo/templates/settings.php:346
+#: modules/geo/templates/settings.php:347
 msgid "使用文章摘要 (excerpt)"
 msgstr "使用文章摘要 (excerpt)"
 
-#: modules/geo/templates/settings.php:347
+#: modules/geo/templates/settings.php:348
 msgid "不输出"
 msgstr "不输出"
 
-#: modules/geo/templates/settings.php:352
+#: modules/geo/templates/settings.php:353
 msgid "在编辑器侧边栏的「AI 摘要」面板中为每篇文章编写专属摘要。"
 msgstr "在编辑器侧边栏的「AI 摘要」面板中为每篇文章编写专属摘要。"
 
-#: modules/geo/templates/settings.php:361
+#: modules/geo/templates/settings.php:362
 msgid "AI 内容分发"
 msgstr "AI 内容分发"
 
-#: modules/geo/templates/settings.php:364
-msgid ""
-"AI 搜索引擎通过 Markdown Feed、llms.txt 和 AI Sitemap 等专用通道获取内容。与传统 HTML "
-"不同，这些格式去除了导航、广告等噪音，让 AI 能直接解析核心内容。"
-msgstr ""
-"AI 搜索引擎通过 Markdown Feed、llms.txt 和 AI Sitemap 等专用通道获取内容。与传统 HTML "
-"不同，这些格式去除了导航、广告等噪音，让 AI 能直接解析核心内容。"
+#: modules/geo/templates/settings.php:365
+msgid "AI 搜索引擎通过 Markdown Feed、llms.txt 和 AI Sitemap 等专用通道获取内容。与传统 HTML 不同，这些格式去除了导航、广告等噪音，让 AI 能直接解析核心内容。"
+msgstr "AI 搜索引擎通过 Markdown Feed、llms.txt 和 AI Sitemap 等专用通道获取内容。与传统 HTML 不同，这些格式去除了导航、广告等噪音，让 AI 能直接解析核心内容。"
 
-#: modules/geo/templates/settings.php:366
+#: modules/geo/templates/settings.php:367
 msgid "Markdown Feed 提供纯净的结构化内容"
 msgstr "Markdown Feed 提供纯净的结构化内容"
 
-#: modules/geo/templates/settings.php:367
+#: modules/geo/templates/settings.php:368
 msgid "llms.txt 是 AI 时代的 robots.txt，引导 AI 发现内容"
 msgstr "llms.txt 是 AI 时代的 robots.txt，引导 AI 发现内容"
 
-#: modules/geo/templates/settings.php:368
+#: modules/geo/templates/settings.php:369
 msgid "AI Sitemap 包含内容声明等 AI 专属元数据"
 msgstr "AI Sitemap 包含内容声明等 AI 专属元数据"
 
-#: modules/geo/templates/settings.php:369
+#: modules/geo/templates/settings.php:370
 msgid "AI 摘要让您主动控制 AI 如何描述文章"
 msgstr "AI 摘要让您主动控制 AI 如何描述文章"
 
-#: modules/geo/templates/settings.php:386 templates/tabs/geo.php:212
+#: modules/geo/templates/settings.php:387 templates/tabs/geo.php:212
 msgid "Schema.org"
 msgstr "Schema.org 结构化数据"
 
-#: modules/geo/templates/settings.php:388 templates/tabs/geo.php:216
+#: modules/geo/templates/settings.php:389 templates/tabs/geo.php:216
 msgid "为内容添加结构化数据，帮助 AI 理解语义。"
 msgstr "为内容添加结构化数据，帮助 AI 理解语义。"
 
-#: modules/geo/templates/settings.php:393 templates/tabs/geo.php:223
+#: modules/geo/templates/settings.php:394 templates/tabs/geo.php:223
 msgid "启用 Schema.org"
 msgstr "启用 Schema.org"
 
-#: modules/geo/templates/settings.php:394 templates/tabs/geo.php:224
+#: modules/geo/templates/settings.php:395 templates/tabs/geo.php:224
 msgid "自动为文章添加 Article 结构化数据"
 msgstr "自动为文章添加 Article 结构化数据"
 
-#: modules/geo/templates/settings.php:400 templates/tabs/geo.php:231
+#: modules/geo/templates/settings.php:401 templates/tabs/geo.php:231
 msgid "兼容模式："
 msgstr "兼容模式："
 
-#: modules/geo/templates/settings.php:402 templates/tabs/geo.php:233
+#: modules/geo/templates/settings.php:403 templates/tabs/geo.php:233
 msgid "自动 - 检测到 SEO 插件时不输出"
 msgstr "自动 - 检测到 SEO 插件时不输出"
 
-#: modules/geo/templates/settings.php:403 templates/tabs/geo.php:234
+#: modules/geo/templates/settings.php:404 templates/tabs/geo.php:234
 msgid "合并 - 与现有 Schema 合并 (即将推出)"
 msgstr "合并 - 与现有 Schema 合并 (即将推出)"
 
-#: modules/geo/templates/settings.php:404 templates/tabs/geo.php:235
+#: modules/geo/templates/settings.php:405 templates/tabs/geo.php:235
 msgid "强制 - 始终输出（可能重复）"
 msgstr "强制 - 始终输出（可能重复）"
 
-#: modules/geo/templates/settings.php:414
+#: modules/geo/templates/settings.php:415
 msgid "Schema.org 与 AI 搜索"
 msgstr "Schema.org 与 AI 搜索"
 
-#: modules/geo/templates/settings.php:417
-msgid ""
-"Schema.org JSON-LD 是 AI 理解页面语义的核心通道。与 HTML 不同，结构化数据直接告诉 AI "
-"\"这是什么类型的内容、谁写的、什么时候发布的\"。"
-msgstr ""
-"Schema.org JSON-LD 是 AI 理解页面语义的核心通道。与 HTML 不同，结构化数据直接告诉 AI "
-"\"这是什么类型的内容、谁写的、什么时候发布的\"。"
+#: modules/geo/templates/settings.php:418
+msgid "Schema.org JSON-LD 是 AI 理解页面语义的核心通道。与 HTML 不同，结构化数据直接告诉 AI \"这是什么类型的内容、谁写的、什么时候发布的\"。"
+msgstr "Schema.org JSON-LD 是 AI 理解页面语义的核心通道。与 HTML 不同，结构化数据直接告诉 AI \"这是什么类型的内容、谁写的、什么时候发布的\"。"
 
-#: modules/geo/templates/settings.php:419
+#: modules/geo/templates/settings.php:420
 msgid "Article/BlogPosting/NewsArticle 类型自动识别"
 msgstr "Article/BlogPosting/NewsArticle 类型自动识别"
 
-#: modules/geo/templates/settings.php:420
+#: modules/geo/templates/settings.php:421
 msgid "headline, author, datePublished 等核心属性"
 msgstr "headline, author, datePublished 等核心属性"
 
-#: modules/geo/templates/settings.php:421
+#: modules/geo/templates/settings.php:422
 msgid "publisher 由品牌实体自动增强"
 msgstr "publisher 由品牌实体自动增强"
 
-#: modules/geo/templates/settings.php:422
+#: modules/geo/templates/settings.php:423
 msgid "wordCount, articleSection, keywords 辅助 AI 分类"
 msgstr "wordCount, articleSection, keywords 辅助 AI 分类"
 
-#: modules/geo/templates/settings.php:423
+#: modules/geo/templates/settings.php:424
 msgid "inLanguage 帮助多语言内容正确归类"
 msgstr "inLanguage 帮助多语言内容正确归类"
 
-#: modules/geo/templates/settings.php:431
+#: modules/geo/templates/settings.php:432
 msgid "输出属性一览"
 msgstr "输出属性一览"
 
-#: modules/geo/templates/settings.php:434
+#: modules/geo/templates/settings.php:435
 msgid "每篇文章自动输出以下 JSON-LD 属性："
 msgstr "每篇文章自动输出以下 JSON-LD 属性："
 
-#: modules/geo/templates/settings.php:437
+#: modules/geo/templates/settings.php:438
 msgid "48h 内 NewsArticle，之后 BlogPosting，页面 Article"
 msgstr "48h 内 NewsArticle，之后 BlogPosting，页面 Article"
 
-#: modules/geo/templates/settings.php:438
+#: modules/geo/templates/settings.php:439
 msgid "文章标题"
 msgstr "文章标题"
 
-#: modules/geo/templates/settings.php:439
+#: modules/geo/templates/settings.php:440
 msgid "Person: name + url + sameAs (社交档案)"
 msgstr "Person: name + url + sameAs (社交档案)"
 
-#: modules/geo/templates/settings.php:440
+#: modules/geo/templates/settings.php:441
 msgid "Organization (品牌实体增强)"
 msgstr "Organization (品牌实体增强)"
 
-#: modules/geo/templates/settings.php:441
+#: modules/geo/templates/settings.php:442
 msgid "特色图片或正文首图"
 msgstr "特色图片或正文首图"
 
-#: modules/geo/templates/settings.php:442
+#: modules/geo/templates/settings.php:443
 msgid "文章摘要"
 msgstr "文章摘要"
 
-#: modules/geo/templates/settings.php:443
+#: modules/geo/templates/settings.php:444
 msgid "字数统计"
 msgstr "字数统计"
 
-#: modules/geo/templates/settings.php:444
+#: modules/geo/templates/settings.php:445
 msgid "所属分类"
 msgstr "所属分类"
 
-#: modules/geo/templates/settings.php:445
+#: modules/geo/templates/settings.php:446
 msgid "文章标签"
 msgstr "文章标签"
 
-#: modules/geo/templates/settings.php:446
+#: modules/geo/templates/settings.php:447
 msgid "内容语言"
 msgstr "内容语言"
 
-#: modules/geo/templates/settings.php:447
+#: modules/geo/templates/settings.php:448
 msgid "BreadcrumbList (每篇文章)"
 msgstr "BreadcrumbList (每篇文章)"
 
-#: modules/geo/templates/settings.php:448
+#: modules/geo/templates/settings.php:449
 msgid "首页 > 分类层级 > 当前页"
 msgstr "首页 > 分类层级 > 当前页"
 
-#: modules/geo/templates/settings.php:449
+#: modules/geo/templates/settings.php:450
 msgid "WebSite (仅首页)"
 msgstr "WebSite (仅首页)"
 
-#: modules/geo/templates/settings.php:450
+#: modules/geo/templates/settings.php:451
 msgid "SearchAction 站内搜索"
 msgstr "SearchAction 站内搜索"
 
-#: modules/geo/templates/settings.php:458
+#: modules/geo/templates/settings.php:459
 msgid "JSON-LD 预览"
 msgstr "JSON-LD 预览"
 
-#: modules/geo/templates/settings.php:461
+#: modules/geo/templates/settings.php:462
 msgid "基于当前设置生成的示例输出："
 msgstr "基于当前设置生成的示例输出："
 
-#: modules/geo/templates/settings.php:475
-#: modules/geo/templates/settings.php:512
+#: modules/geo/templates/settings.php:476
+#: modules/geo/templates/settings.php:513
 msgid "示例文章标题"
 msgstr "示例文章标题"
 
-#: modules/geo/templates/settings.php:483
+#: modules/geo/templates/settings.php:484
 msgid "文章摘要内容..."
 msgstr "文章摘要内容..."
 
-#: modules/geo/templates/settings.php:506
+#: modules/geo/templates/settings.php:507
 msgid "示例分类"
 msgstr "示例分类"
 
-#: modules/geo/templates/settings.php:540
+#: modules/geo/templates/settings.php:541
 msgid "Article"
 msgstr "文章"
 
-#: modules/geo/templates/settings.php:541
+#: modules/geo/templates/settings.php:542
 msgid "Breadcrumb"
 msgstr "面包屑导航"
 
-#: modules/geo/templates/settings.php:542
+#: modules/geo/templates/settings.php:543
 msgid "WebSite"
 msgstr "网站"
 
-#: modules/geo/templates/settings.php:547
+#: modules/geo/templates/settings.php:548
 msgid "每篇文章/页面自动输出。品牌实体启用后 publisher 将自动增强。"
 msgstr "每篇文章/页面自动输出。品牌实体启用后 publisher 将自动增强。"
 
-#: modules/geo/templates/settings.php:551
+#: modules/geo/templates/settings.php:552
 msgid "每篇文章/页面自动输出面包屑导航。支持分类层级和页面父子关系。"
 msgstr "每篇文章/页面自动输出面包屑导航。支持分类层级和页面父子关系。"
 
-#: modules/geo/templates/settings.php:555
+#: modules/geo/templates/settings.php:556
 msgid "仅在首页输出。包含站内搜索 SearchAction，帮助搜索引擎展示站内搜索框。"
 msgstr "仅在首页输出。包含站内搜索 SearchAction，帮助搜索引擎展示站内搜索框。"
 
-#: modules/geo/templates/settings.php:574
+#: modules/geo/templates/settings.php:575
 msgid "控制 AI 爬虫对内容的索引和训练权限。"
 msgstr "控制 AI 爬虫对内容的索引和训练权限。"
 
-#: modules/geo/templates/settings.php:579
+#: modules/geo/templates/settings.php:580
 msgid "启用 AI 索引指令"
 msgstr "启用 AI 索引指令"
 
-#: modules/geo/templates/settings.php:580
+#: modules/geo/templates/settings.php:581
 msgid "输出 noai/nollm meta 标签和 X-Robots-Tag HTTP 头"
 msgstr "输出 noai/nollm meta 标签和 X-Robots-Tag HTTP 头"
 
-#: modules/geo/templates/settings.php:586
+#: modules/geo/templates/settings.php:587
 msgid "默认内容声明："
 msgstr "默认内容声明："
 
-#: modules/geo/templates/settings.php:588
+#: modules/geo/templates/settings.php:589
 msgid "原创内容 (original)"
 msgstr "原创内容 (original)"
 
-#: modules/geo/templates/settings.php:589
+#: modules/geo/templates/settings.php:590
 msgid "AI 辅助创作 (ai-assisted)"
 msgstr "AI 辅助创作 (ai-assisted)"
 
-#: modules/geo/templates/settings.php:590
+#: modules/geo/templates/settings.php:591
 msgid "AI 生成内容 (ai-generated)"
 msgstr "AI 生成内容 (ai-generated)"
 
-#: modules/geo/templates/settings.php:594
+#: modules/geo/templates/settings.php:595
 msgid "排除的内容类型："
 msgstr "排除的内容类型："
 
-#: modules/geo/templates/settings.php:595
+#: modules/geo/templates/settings.php:596
 msgid "勾选的内容类型将输出 noai, nollm 指令，禁止 AI 索引和训练。"
 msgstr "勾选的内容类型将输出 noai, nollm 指令，禁止 AI 索引和训练。"
 
-#: modules/geo/templates/settings.php:609
+#: modules/geo/templates/settings.php:610
 msgid "单篇文章可在编辑器侧边栏的「AI 索引指令」面板中覆盖全局设置。"
 msgstr "单篇文章可在编辑器侧边栏的「AI 索引指令」面板中覆盖全局设置。"
 
-#: modules/geo/templates/settings.php:618
+#: modules/geo/templates/settings.php:619
 msgid "AI 索引权限控制"
 msgstr "AI 索引权限控制"
 
-#: modules/geo/templates/settings.php:621
-msgid ""
-"随着 AI 爬虫大量抓取网站内容用于训练和索引，内容创作者需要明确声明权限意愿。noai 和 nollm 是新兴的 meta robots 指令标准。"
-msgstr ""
-"随着 AI 爬虫大量抓取网站内容用于训练和索引，内容创作者需要明确声明权限意愿。noai 和 nollm 是新兴的 meta robots 指令标准。"
+#: modules/geo/templates/settings.php:622
+msgid "随着 AI 爬虫大量抓取网站内容用于训练和索引，内容创作者需要明确声明权限意愿。noai 和 nollm 是新兴的 meta robots 指令标准。"
+msgstr "随着 AI 爬虫大量抓取网站内容用于训练和索引，内容创作者需要明确声明权限意愿。noai 和 nollm 是新兴的 meta robots 指令标准。"
 
-#: modules/geo/templates/settings.php:623
+#: modules/geo/templates/settings.php:624
 msgid "noai — 禁止 AI 搜索引擎索引内容"
 msgstr "noai — 禁止 AI 搜索引擎索引内容"
 
-#: modules/geo/templates/settings.php:624
+#: modules/geo/templates/settings.php:625
 msgid "nollm — 禁止将内容用于 LLM 训练"
 msgstr "nollm — 禁止将内容用于 LLM 训练"
 
-#: modules/geo/templates/settings.php:625
+#: modules/geo/templates/settings.php:626
 msgid "内容声明标注 AI 参与程度（原创/辅助/生成）"
 msgstr "内容声明标注 AI 参与程度（原创/辅助/生成）"
 
-#: modules/geo/templates/settings.php:626
+#: modules/geo/templates/settings.php:627
 msgid "X-Robots-Tag HTTP 头对非 HTML 资源生效"
 msgstr "X-Robots-Tag HTTP 头对非 HTML 资源生效"
 
-#: modules/geo/templates/settings.php:643
+#: modules/geo/templates/settings.php:644
 msgid "robots.txt AI 管理"
 msgstr "robots.txt AI 管理"
 
-#: modules/geo/templates/settings.php:646
+#: modules/geo/templates/settings.php:647
 msgid "通过 robots.txt 控制 AI 爬虫的访问权限，不修改物理文件。"
 msgstr "通过 robots.txt 控制 AI 爬虫的访问权限，不修改物理文件。"
 
-#: modules/geo/templates/settings.php:651
+#: modules/geo/templates/settings.php:652
 msgid "启用 robots.txt AI 管理"
 msgstr "启用 robots.txt AI 管理"
 
-#: modules/geo/templates/settings.php:652
+#: modules/geo/templates/settings.php:653
 msgid "在 robots.txt 中注入 AI 爬虫的 Allow/Disallow 规则"
 msgstr "在 robots.txt 中注入 AI 爬虫的 Allow/Disallow 规则"
 
-#: modules/geo/templates/settings.php:661
+#: modules/geo/templates/settings.php:662
 msgid "爬虫"
 msgstr "爬虫"
 
-#: modules/geo/templates/settings.php:662
+#: modules/geo/templates/settings.php:663
 msgid "公司"
 msgstr "公司"
 
-#: modules/geo/templates/settings.php:663
+#: modules/geo/templates/settings.php:664
 msgid "规则"
 msgstr "规则"
 
-#: modules/geo/templates/settings.php:678
+#: modules/geo/templates/settings.php:680
 msgid "不管理"
 msgstr "不管理"
 
-#: modules/geo/templates/settings.php:679
+#: modules/geo/templates/settings.php:681
 msgid "Allow"
 msgstr "允许"
 
-#: modules/geo/templates/settings.php:680
+#: modules/geo/templates/settings.php:682
 msgid "Disallow"
 msgstr "禁止"
 
-#: modules/geo/templates/settings.php:689
+#: modules/geo/templates/settings.php:691
 msgid "预览地址："
 msgstr "预览地址："
 
-#: modules/geo/templates/settings.php:699
+#: modules/geo/templates/settings.php:701
 msgid "AI 爬虫生态"
 msgstr "AI 爬虫生态"
 
-#: modules/geo/templates/settings.php:702
-msgid ""
-"目前活跃的 AI 爬虫超过 20 种，来自 OpenAI、Anthropic、Google、百度等公司。通过 robots.txt "
-"可以精细控制每个爬虫的访问权限。"
-msgstr ""
-"目前活跃的 AI 爬虫超过 20 种，来自 OpenAI、Anthropic、Google、百度等公司。通过 robots.txt "
-"可以精细控制每个爬虫的访问权限。"
-
 #: modules/geo/templates/settings.php:704
+msgid "目前活跃的 AI 爬虫超过 20 种，来自 OpenAI、Anthropic、Google、百度等公司。通过 robots.txt 可以精细控制每个爬虫的访问权限。"
+msgstr "目前活跃的 AI 爬虫超过 20 种，来自 OpenAI、Anthropic、Google、百度等公司。通过 robots.txt 可以精细控制每个爬虫的访问权限。"
+
+#: modules/geo/templates/settings.php:706
 msgid "GPTBot、ClaudeBot 是最活跃的 AI 爬虫"
 msgstr "GPTBot、ClaudeBot 是最活跃的 AI 爬虫"
 
-#: modules/geo/templates/settings.php:705
+#: modules/geo/templates/settings.php:707
 msgid "中国 AI 爬虫：百度蜘蛛、搜狗、360、神马"
 msgstr "中国 AI 爬虫：百度蜘蛛、搜狗、360、神马"
 
-#: modules/geo/templates/settings.php:706
+#: modules/geo/templates/settings.php:708
 msgid "规则通过 WordPress 过滤器注入，不修改物理文件"
 msgstr "规则通过 WordPress 过滤器注入，不修改物理文件"
 
-#: modules/geo/templates/settings.php:707
+#: modules/geo/templates/settings.php:709
 msgid "Allow 允许爬取，Disallow 禁止爬取"
 msgstr "Allow 允许爬取，Disallow 禁止爬取"
 
-#: modules/geo/templates/settings.php:724
+#: modules/geo/templates/settings.php:726
 msgid "组织基础"
 msgstr "组织基础"
 
-#: modules/geo/templates/settings.php:727
+#: modules/geo/templates/settings.php:729
 msgid "定义品牌实体信息，增强 publisher Schema 并在首页输出 Organization JSON-LD。"
 msgstr "定义品牌实体信息，增强 publisher Schema 并在首页输出 Organization JSON-LD。"
 
-#: modules/geo/templates/settings.php:732
+#: modules/geo/templates/settings.php:734
 msgid "启用品牌实体"
 msgstr "启用品牌实体"
 
-#: modules/geo/templates/settings.php:733
+#: modules/geo/templates/settings.php:735
 msgid "丰富文章 publisher Schema，并在首页输出独立 Organization JSON-LD"
 msgstr "丰富文章 publisher Schema，并在首页输出独立 Organization JSON-LD"
 
-#: modules/geo/templates/settings.php:740
+#: modules/geo/templates/settings.php:742
 msgid "组织类型"
 msgstr "组织类型"
 
-#: modules/geo/templates/settings.php:742
+#: modules/geo/templates/settings.php:744
 msgid "Organization (通用)"
 msgstr "Organization (通用)"
 
-#: modules/geo/templates/settings.php:743
+#: modules/geo/templates/settings.php:745
 msgid "Corporation (公司)"
 msgstr "Corporation (公司)"
 
-#: modules/geo/templates/settings.php:744
+#: modules/geo/templates/settings.php:746
 msgid "LocalBusiness (本地商户)"
 msgstr "LocalBusiness (本地商户)"
 
-#: modules/geo/templates/settings.php:745
+#: modules/geo/templates/settings.php:747
 msgid "OnlineBusiness (在线业务)"
 msgstr "OnlineBusiness (在线业务)"
 
-#: modules/geo/templates/settings.php:746
+#: modules/geo/templates/settings.php:748
 msgid "NewsMediaOrganization (新闻媒体)"
 msgstr "NewsMediaOrganization (新闻媒体)"
 
-#: modules/geo/templates/settings.php:750
+#: modules/geo/templates/settings.php:752
 msgid "品牌名称"
 msgstr "品牌名称"
 
-#: modules/geo/templates/settings.php:753
+#: modules/geo/templates/settings.php:755
 msgid "留空则使用站点名称"
 msgstr "留空则使用站点名称"
 
-#: modules/geo/templates/settings.php:756
+#: modules/geo/templates/settings.php:758
 msgid "品牌描述"
 msgstr "品牌描述"
 
-#: modules/geo/templates/settings.php:758
+#: modules/geo/templates/settings.php:760
 msgid "简要描述您的品牌/组织"
 msgstr "简要描述您的品牌/组织"
 
-#: modules/geo/templates/settings.php:761
+#: modules/geo/templates/settings.php:763
 msgid "品牌 URL"
 msgstr "品牌 URL"
 
-#: modules/geo/templates/settings.php:764
+#: modules/geo/templates/settings.php:766
 msgid "留空则使用站点首页地址"
 msgstr "留空则使用站点首页地址"
 
-#: modules/geo/templates/settings.php:767
+#: modules/geo/templates/settings.php:769
 msgid "创立日期"
 msgstr "创立日期"
 
-#: modules/geo/templates/settings.php:769
+#: modules/geo/templates/settings.php:771
 msgid "例如：2020 或 2020-01-01"
 msgstr "例如：2020 或 2020-01-01"
 
-#: modules/geo/templates/settings.php:780
+#: modules/geo/templates/settings.php:782
 msgid "社交档案"
 msgstr "社交档案"
 
-#: modules/geo/templates/settings.php:782
+#: modules/geo/templates/settings.php:784
 msgid "社交平台主页 URL，将作为 Schema.org sameAs 输出。"
 msgstr "社交平台主页 URL，将作为 Schema.org sameAs 输出。"
 
-#: modules/geo/templates/settings.php:791
+#: modules/geo/templates/settings.php:793
 msgid "微博"
 msgstr "微博"
 
-#: modules/geo/templates/settings.php:792
+#: modules/geo/templates/settings.php:794
 msgid "知乎"
 msgstr "知乎"
 
-#: modules/geo/templates/settings.php:793
+#: modules/geo/templates/settings.php:795
 msgid "微信公众号"
 msgstr "微信公众号"
 
-#: modules/geo/templates/settings.php:811
+#: modules/geo/templates/settings.php:813
 msgid "联系方式"
 msgstr "联系方式"
 
-#: modules/geo/templates/settings.php:813
+#: modules/geo/templates/settings.php:815
 msgid "可选的联系信息，将作为 Schema.org contactPoint 输出。"
 msgstr "可选的联系信息，将作为 Schema.org contactPoint 输出。"
 
-#: modules/geo/templates/settings.php:816
+#: modules/geo/templates/settings.php:818
 msgid "联系邮箱"
 msgstr "联系邮箱"
 
-#: modules/geo/templates/settings.php:822
+#: modules/geo/templates/settings.php:824
 msgid "联系电话"
 msgstr "联系电话"
 
-#: modules/geo/templates/settings.php:834
+#: modules/geo/templates/settings.php:836
 msgid "Knowledge Graph"
 msgstr "知识图谱"
 
-#: modules/geo/templates/settings.php:836
+#: modules/geo/templates/settings.php:838
 msgid "关联品牌的 Wikidata/Wikipedia 页面，强化知识图谱信号。"
 msgstr "关联品牌的 Wikidata/Wikipedia 页面，强化知识图谱信号。"
 
-#: modules/geo/templates/settings.php:839
+#: modules/geo/templates/settings.php:841
 msgid "Wikidata URL"
 msgstr "Wikidata 网址"
 
-#: modules/geo/templates/settings.php:845
+#: modules/geo/templates/settings.php:847
 msgid "Wikipedia URL"
 msgstr "Wikipedia 网址"
 
-#: modules/geo/templates/settings.php:857
+#: modules/geo/templates/settings.php:859
 msgid "文章实体关联"
 msgstr "文章实体关联"
 
-#: modules/geo/templates/settings.php:859
+#: modules/geo/templates/settings.php:861
 msgid "将每篇文章关联到 Wikidata/Wikipedia 实体，帮助 AI 消除歧义并建立权威性。"
 msgstr "将每篇文章关联到 Wikidata/Wikipedia 实体，帮助 AI 消除歧义并建立权威性。"
 
-#: modules/geo/templates/settings.php:864
+#: modules/geo/templates/settings.php:866
 msgid "启用文章实体关联"
 msgstr "启用文章实体关联"
 
-#: modules/geo/templates/settings.php:865
+#: modules/geo/templates/settings.php:867
 msgid "在编辑器中添加实体关联字段，输出为 Schema.org about.sameAs"
 msgstr "在编辑器中添加实体关联字段，输出为 Schema.org about.sameAs"
 
-#: modules/geo/templates/settings.php:872
+#: modules/geo/templates/settings.php:874
 msgid "在编辑器侧边栏的「实体关联」面板中为每篇文章关联 Wikidata 实体。"
 msgstr "在编辑器侧边栏的「实体关联」面板中为每篇文章关联 Wikidata 实体。"
 
-#: modules/geo/templates/settings.php:882
+#: modules/geo/templates/settings.php:884
 msgid "实体与 AI 搜索"
 msgstr "实体与 AI 搜索"
 
-#: modules/geo/templates/settings.php:885
+#: modules/geo/templates/settings.php:887
 msgid "品牌实体是 GEO 的基础层。AI 搜索引擎必须先\"理解\"品牌身份，才能信任并推荐其内容。"
 msgstr "品牌实体是 GEO 的基础层。AI 搜索引擎必须先\"理解\"品牌身份，才能信任并推荐其内容。"
 
-#: modules/geo/templates/settings.php:887
+#: modules/geo/templates/settings.php:889
 msgid "Organization JSON-LD 在首页输出，是知识图谱的主要信号源"
 msgstr "Organization JSON-LD 在首页输出，是知识图谱的主要信号源"
 
-#: modules/geo/templates/settings.php:888
+#: modules/geo/templates/settings.php:890
 msgid "sameAs 关联社交档案，帮助 AI 验证品牌真实性"
 msgstr "sameAs 关联社交档案，帮助 AI 验证品牌真实性"
 
-#: modules/geo/templates/settings.php:889
+#: modules/geo/templates/settings.php:891
 msgid "Wikidata/Wikipedia 链接强化实体消歧"
 msgstr "Wikidata/Wikipedia 链接强化实体消歧"
 
-#: modules/geo/templates/settings.php:890
+#: modules/geo/templates/settings.php:892
 msgid "文章 publisher 自动增强，无需逐篇配置"
 msgstr "文章 publisher 自动增强，无需逐篇配置"
 
-#: modules/geo/templates/settings.php:891
+#: modules/geo/templates/settings.php:893
 msgid "文章实体关联通过 about.sameAs 消除语义歧义"
 msgstr "文章实体关联通过 about.sameAs 消除语义歧义"
 
-#: modules/media-intelligence/includes/AltTextGenerator.php:156
+#: modules/media-intelligence/includes/AltTextGenerator.php:164
 msgid "AI Alt Text"
 msgstr "AI 替代文本"
 
-#: modules/media-intelligence/includes/AltTextGenerator.php:162
+#: modules/media-intelligence/includes/AltTextGenerator.php:170
 msgid "生成中..."
 msgstr "生成中..."
 
-#: modules/media-intelligence/includes/AltTextGenerator.php:164
+#: modules/media-intelligence/includes/AltTextGenerator.php:172
 msgid "失败"
 msgstr "失败"
 
-#: modules/media-intelligence/includes/AltTextGenerator.php:165
+#: modules/media-intelligence/includes/AltTextGenerator.php:173
 msgid "重新生成"
 msgstr "重新生成"
 
-#: modules/media-intelligence/includes/MediaAjaxController.php:221
+#: modules/media-intelligence/includes/MediaAjaxController.php:234
 msgid "生成失败，请重试"
 msgstr "生成失败，请重试"
 
 #: modules/media-intelligence/MediaIntelligenceModule.php:51
 #: modules/media-intelligence/MediaIntelligenceModule.php:137
 #: modules/media-intelligence/templates/settings.php:28
-#: templates/settings-page.php:99
+#: templates/settings-page.php:828
 msgid "媒体智能"
 msgstr "媒体智能"
 
@@ -2617,41 +2610,37 @@ msgstr "上传时自动检测不当内容并标记，管理员可在媒体库中
 msgid "启用后，每张新上传的图片会额外消耗一次 Vision API 调用进行安全检测。检测结果保存在图片元数据中，不会阻止上传。"
 msgstr "启用后，每张新上传的图片会额外消耗一次 Vision API 调用进行安全检测。检测结果保存在图片元数据中，不会阻止上传。"
 
-#: templates/settings-page.php:30 templates/tabs/overview.php:538
+#: templates/settings-page.php:759 templates/tabs/overview.php:748
 msgid "GitHub"
 msgstr "GitHub 服务"
 
-#: templates/settings-page.php:34
+#: templates/settings-page.php:763
 msgid "支持"
 msgstr "支持"
 
-#: templates/settings-page.php:61
+#: templates/settings-page.php:790
 msgid "概览"
 msgstr "概览"
 
-#: templates/settings-page.php:64
+#: templates/settings-page.php:793
 msgid "文本服务"
 msgstr "文本服务"
 
-#: templates/settings-page.php:67
+#: templates/settings-page.php:796
 msgid "图像服务"
 msgstr "图像服务"
 
-#: templates/settings-page.php:70 templates/tabs/routing.php:48
+#: templates/settings-page.php:799 templates/tabs/routing.php:53
 msgid "智能路由"
 msgstr "智能路由"
 
-#: templates/settings-page.php:79 templates/tabs/budget.php:25
+#: templates/settings-page.php:808 templates/tabs/budget.php:25
 msgid "预算管理"
 msgstr "预算管理"
 
-#: templates/settings-page.php:108 templates/tabs/modules.php:18
+#: templates/settings-page.php:837 templates/tabs/modules.php:18
 msgid "模块管理"
 msgstr "模块管理"
-
-#: templates/settings-page.php:111
-msgid "授权"
-msgstr "授权"
 
 #: templates/tabs/budget.php:33
 msgid "设置 AI 服务的费用限额和告警规则，控制成本支出。"
@@ -2665,137 +2654,89 @@ msgstr "保存预算设置"
 msgid "限时免费"
 msgstr "限时免费"
 
-#: templates/tabs/geo.php:298
+#: templates/tabs/geo.php:299
 msgid "优化中文内容，提升本土化体验"
 msgstr "优化中文内容，提升本土化体验"
 
-#: templates/tabs/geo.php:299
+#: templates/tabs/geo.php:300
 msgid "追踪 AI 爬虫，了解内容被索引情况"
 msgstr "追踪 AI 爬虫，了解内容被索引情况"
 
-#: templates/tabs/images.php:87
+#: templates/tabs/images.php:105
 msgid "图片生成"
 msgstr "图片生成"
 
-#: templates/tabs/images.php:92
+#: templates/tabs/images.php:110
 msgid "配置 AI 图像生成服务，支持 DALL-E、Imagen、混元、通义万相等多个平台。"
 msgstr "配置 AI 图像生成服务，支持 DALL-E、Imagen、混元、通义万相等多个平台。"
 
-#: templates/tabs/images.php:100 templates/tabs/services.php:37
+#: templates/tabs/images.php:118 templates/tabs/services.php:37
 msgid "全局设置"
 msgstr "全局设置"
 
-#: templates/tabs/images.php:106
+#: templates/tabs/images.php:124
 msgid "默认图像服务"
 msgstr "默认图像服务"
 
-#: templates/tabs/images.php:112 templates/tabs/services.php:69
+#: templates/tabs/images.php:130 templates/tabs/services.php:69
 msgid "— 选择默认服务 —"
 msgstr "— 选择默认服务 —"
 
-#: templates/tabs/images.php:122
+#: templates/tabs/images.php:140
 msgid "启用智能路由时将自动选择最优服务"
 msgstr "启用智能路由时将自动选择最优服务"
 
-#: templates/tabs/images.php:130
+#: templates/tabs/images.php:148
 msgid "图像生成服务"
 msgstr "图像生成服务"
 
-#: templates/tabs/images.php:133
+#: templates/tabs/images.php:151
 msgid "配置图像生成 AI 服务商。启用后可在 AI Experiments 中使用 Image Generation 功能。"
 msgstr "配置图像生成 AI 服务商。启用后可在 AI Experiments 中使用 Image Generation 功能。"
 
-#: templates/tabs/images.php:164 templates/tabs/services.php:113
+#: templates/tabs/images.php:183 templates/tabs/services.php:114
 msgid "启用"
 msgstr "启用"
 
-#: templates/tabs/images.php:173 templates/tabs/services.php:122
+#: templates/tabs/images.php:192 templates/tabs/services.php:123
 msgid "启用此服务"
 msgstr "启用此服务"
 
-#: templates/tabs/images.php:182 templates/tabs/services.php:130
+#: templates/tabs/images.php:201 templates/tabs/services.php:131
 msgid "API Key"
 msgstr "API 密钥"
 
-#: templates/tabs/images.php:193 templates/tabs/services.php:141
+#: templates/tabs/images.php:212 templates/tabs/services.php:142
 msgid "请输入 API Key"
 msgstr "请输入 API Key"
 
-#: templates/tabs/images.php:197 templates/tabs/services.php:145
+#: templates/tabs/images.php:216 templates/tabs/services.php:146
 msgid "切换密码显示"
 msgstr "切换密码显示"
 
-#: templates/tabs/images.php:207 templates/tabs/services.php:155
+#: templates/tabs/images.php:226 templates/tabs/services.php:156
 msgid "清除 API Key"
 msgstr "清除 API Key"
 
-#: templates/tabs/images.php:213 templates/tabs/services.php:166
+#: templates/tabs/images.php:232 templates/tabs/services.php:167
 msgid "连接测试"
 msgstr "连接测试"
 
-#: templates/tabs/images.php:219 templates/tabs/services.php:172
+#: templates/tabs/images.php:238 templates/tabs/services.php:173
 msgid "测试连接"
 msgstr "测试连接"
 
-#: templates/tabs/images.php:228 templates/tabs/services.php:181
+#: templates/tabs/images.php:247 templates/tabs/services.php:182
 msgid "高级设置"
 msgstr "高级设置"
 
-#: templates/tabs/images.php:239 templates/tabs/services.php:192
+#: templates/tabs/images.php:258 templates/tabs/services.php:193
 msgid "自定义 Base URL"
 msgstr "自定义 Base URL"
 
-#: templates/tabs/images.php:252 templates/tabs/services.php:205
+#: templates/tabs/images.php:271 templates/tabs/services.php:206
 msgid "支持的模型"
 msgstr "支持的模型"
-
-#: templates/tabs/license.php:19
-msgid "授权管理"
-msgstr "授权管理"
-
-#: templates/tabs/license.php:21
-msgid "输入您的授权密钥以解锁 Pro/Enterprise 功能。"
-msgstr "输入您的授权密钥以解锁 Pro/Enterprise 功能。"
-
-#: templates/tabs/license.php:26
-msgid "当前状态"
-msgstr "当前状态"
-
-#. translators: %s: plan name
-#: templates/tabs/license.php:32
-#, php-format
-msgid "已激活 — %s"
-msgstr "已激活 — %s"
-
-#. translators: %s: expiration date
-#: templates/tabs/license.php:42
-#, php-format
-msgid "到期时间: %s"
-msgstr "到期时间: %s"
-
-#: templates/tabs/license.php:50
-msgid "免费版"
-msgstr "免费版"
-
-#: templates/tabs/license.php:59
-msgid "License Key"
-msgstr "许可证密钥"
-
-#: templates/tabs/license.php:68
-msgid "在 wenpai.net 购买后获取授权密钥。"
-msgstr "在 wenpai.net 购买后获取授权密钥。"
-
-#: templates/tabs/license.php:78
-msgid "停用授权"
-msgstr "停用授权"
-
-#: templates/tabs/license.php:82
-msgid "激活授权"
-msgstr "激活授权"
-
-#: templates/tabs/license.php:127
-msgid "请求失败"
-msgstr "请求失败"
 
 #: templates/tabs/modules.php:23
 msgid "启用或禁用 WPMind 功能模块。禁用不需要的模块可以提升性能。"
@@ -2805,7 +2746,7 @@ msgstr "启用或禁用 WPMind 功能模块。禁用不需要的模块可以提�
 msgid "核心模块，不可禁用"
 msgstr "核心模块，不可禁用"
 
-#: templates/tabs/modules.php:35 templates/tabs/overview.php:273
+#: templates/tabs/modules.php:35 templates/tabs/overview.php:371
 msgid "核心"
 msgstr "核心"
 
@@ -2825,207 +2766,207 @@ msgstr "已禁用"
 msgid "暂无可用模块"
 msgstr "暂无可用模块"
 
-#: templates/tabs/overview.php:100
+#: templates/tabs/overview.php:106
 msgid "WordPress AI 智能路由引擎 — 多 Provider 智能路由、熔断降级、用量追踪，一站式管理您的 AI 服务。"
 msgstr "WordPress AI 智能路由引擎 — 多 Provider 智能路由、熔断降级、用量追踪，一站式管理您的 AI 服务。"
 
-#: templates/tabs/overview.php:106
+#: templates/tabs/overview.php:116
 msgid "个 Provider"
 msgstr "个 Provider"
 
-#: templates/tabs/overview.php:112
+#: templates/tabs/overview.php:127
 msgid "模块启用"
 msgstr "模块启用"
 
-#: templates/tabs/overview.php:115 templates/tabs/overview.php:375
+#: templates/tabs/overview.php:134 templates/tabs/overview.php:521
 msgid "缓存命中率"
 msgstr "缓存命中率"
 
-#: templates/tabs/overview.php:118
+#: templates/tabs/overview.php:139
 msgid "添加 Provider"
 msgstr "添加 Provider"
 
-#: templates/tabs/overview.php:122
+#: templates/tabs/overview.php:147
 msgid "Token 统计"
 msgstr "Token 统计"
 
-#: templates/tabs/overview.php:191
+#: templates/tabs/overview.php:252
 msgid "Provider 在线"
 msgstr "Provider 在线"
 
-#: templates/tabs/overview.php:205
+#: templates/tabs/overview.php:270
 msgid "Provider 状态"
 msgstr "Provider 状态"
 
-#: templates/tabs/overview.php:209 templates/tabs/overview.php:259
+#: templates/tabs/overview.php:278 templates/tabs/overview.php:354
 msgid "管理"
 msgstr "管理"
 
-#: templates/tabs/overview.php:218
+#: templates/tabs/overview.php:291
 msgid "还没有配置 Provider"
 msgstr "还没有配置 Provider"
 
-#: templates/tabs/overview.php:222
+#: templates/tabs/overview.php:299
 msgid "去配置"
 msgstr "去配置"
 
-#: templates/tabs/overview.php:255
+#: templates/tabs/overview.php:346
 msgid "模块状态"
 msgstr "模块状态"
 
-#: templates/tabs/overview.php:302
+#: templates/tabs/overview.php:408
 msgid "本月摘要"
 msgstr "本月摘要"
 
-#: templates/tabs/overview.php:317
+#: templates/tabs/overview.php:431
 msgid "最常用模型"
 msgstr "最常用模型"
 
-#: templates/tabs/overview.php:331
+#: templates/tabs/overview.php:453
 msgid "平均响应时间"
 msgstr "平均响应时间"
 
-#: templates/tabs/overview.php:345
+#: templates/tabs/overview.php:475
 msgid "服务可用率"
 msgstr "服务可用率"
 
-#: templates/tabs/overview.php:361
+#: templates/tabs/overview.php:499
 msgid "本月总 Tokens"
 msgstr "本月总 Tokens"
 
-#: templates/tabs/overview.php:391
+#: templates/tabs/overview.php:549
 msgid "缓存占用"
 msgstr "缓存占用"
 
-#: templates/tabs/overview.php:405
+#: templates/tabs/overview.php:571
 msgid "缓存命中次数"
 msgstr "缓存命中次数"
 
-#: templates/tabs/overview.php:418
+#: templates/tabs/overview.php:588
 msgid "最近活动"
 msgstr "最近活动"
 
-#: templates/tabs/overview.php:423
+#: templates/tabs/overview.php:597
 msgid "查看全部"
 msgstr "查看全部"
 
-#: templates/tabs/overview.php:433
+#: templates/tabs/overview.php:611
 msgid "暂无 API 调用记录"
 msgstr "暂无 API 调用记录"
 
-#: templates/tabs/overview.php:437
+#: templates/tabs/overview.php:619
 msgid "使用 AI 功能后，调用记录将显示在这里"
 msgstr "使用 AI 功能后，调用记录将显示在这里"
 
-#: templates/tabs/overview.php:495
+#: templates/tabs/overview.php:699
 msgid "帮助文档"
 msgstr "帮助文档"
 
-#: templates/tabs/overview.php:504
+#: templates/tabs/overview.php:710
 msgid "如何配置 AI Provider"
 msgstr "如何配置 AI Provider"
 
-#: templates/tabs/overview.php:508
+#: templates/tabs/overview.php:714
 msgid "如何设置路由策略"
 msgstr "如何设置路由策略"
 
-#: templates/tabs/overview.php:512
+#: templates/tabs/overview.php:718
 msgid "预算与限额指南"
 msgstr "预算与限额指南"
 
-#: templates/tabs/overview.php:516
+#: templates/tabs/overview.php:722
 msgid "Token 用量统计说明"
 msgstr "Token 用量统计说明"
 
-#: templates/tabs/overview.php:525
+#: templates/tabs/overview.php:733
 msgid "浏览更多"
 msgstr "浏览更多"
 
-#: templates/tabs/overview.php:534
+#: templates/tabs/overview.php:744
 msgid "使用文档"
 msgstr "使用文档"
 
-#: templates/tabs/overview.php:542
+#: templates/tabs/overview.php:752
 msgid "问题反馈"
 msgstr "问题反馈"
 
-#: templates/tabs/overview.php:546
+#: templates/tabs/overview.php:756
 msgid "版本发布"
 msgstr "版本发布"
 
-#: templates/tabs/routing.php:50
+#: templates/tabs/routing.php:55
 msgid "刷新路由状态"
 msgstr "刷新路由状态"
 
-#: templates/tabs/routing.php:52
+#: templates/tabs/routing.php:57
 msgid "刷新"
 msgstr "刷新"
 
-#: templates/tabs/routing.php:57
+#: templates/tabs/routing.php:62
 msgid "智能路由根据策略自动选择最优 AI Provider，支持故障转移和负载均衡。"
 msgstr "智能路由根据策略自动选择最优 AI Provider，支持故障转移和负载均衡。"
 
-#: templates/tabs/routing.php:88
+#: templates/tabs/routing.php:93
 msgid "平均延迟"
 msgstr "平均延迟"
 
-#: templates/tabs/routing.php:97
+#: templates/tabs/routing.php:102
 msgid "活跃 Provider"
 msgstr "活跃 Provider"
 
-#: templates/tabs/routing.php:106
+#: templates/tabs/routing.php:111
 msgid "今日成本"
 msgstr "今日成本"
 
-#: templates/tabs/routing.php:117
+#: templates/tabs/routing.php:122
 msgid "路由策略"
 msgstr "路由策略"
 
-#: templates/tabs/routing.php:119
+#: templates/tabs/routing.php:124
 msgid "选择 AI 服务的路由策略"
 msgstr "选择 AI 服务的路由策略"
 
-#: templates/tabs/routing.php:156
+#: templates/tabs/routing.php:163
 msgid "正在使用"
 msgstr "正在使用"
 
-#: templates/tabs/routing.php:167
+#: templates/tabs/routing.php:174
 msgid "综合得分"
 msgstr "综合得分"
 
-#: templates/tabs/routing.php:178
+#: templates/tabs/routing.php:185
 msgid "故障转移链"
 msgstr "故障转移链"
 
-#: templates/tabs/routing.php:191
+#: templates/tabs/routing.php:198
 msgid "主"
 msgstr "主"
 
-#: templates/tabs/routing.php:213
+#: templates/tabs/routing.php:220
 msgid "手动优先级"
 msgstr "手动优先级"
 
-#: templates/tabs/routing.php:217
+#: templates/tabs/routing.php:224
 msgid "清除手动优先级"
 msgstr "清除手动优先级"
 
-#: templates/tabs/routing.php:222
+#: templates/tabs/routing.php:229
 msgid "保存优先级"
 msgstr "保存优先级"
 
-#: templates/tabs/routing.php:229
+#: templates/tabs/routing.php:236
 msgid "拖拽调整 Provider 顺序，设置故障转移优先级。排在前面的 Provider 会优先使用。"
 msgstr "拖拽调整 Provider 顺序，设置故障转移优先级。排在前面的 Provider 会优先使用。"
 
-#: templates/tabs/routing.php:231
+#: templates/tabs/routing.php:238
 msgid "已启用手动优先级"
 msgstr "已启用手动优先级"
 
-#: templates/tabs/routing.php:260
+#: templates/tabs/routing.php:269
 msgid "Provider 排名"
 msgstr "Provider 排名"
 
-#: templates/tabs/routing.php:262
+#: templates/tabs/routing.php:271
 msgid "基于当前策略的 Provider 得分排名，得分越高越优先被选中"
 msgstr "基于当前策略的 Provider 得分排名，得分越高越优先被选中"
 
@@ -3053,34 +2994,10 @@ msgstr "默认服务"
 msgid "AI 服务端点"
 msgstr "AI 服务端点"
 
-#: templates/tabs/services.php:160
+#: templates/tabs/services.php:161
 msgid "此 API Key 将同步到 WordPress AI Client"
 msgstr "此 API Key 将同步到 WordPress AI Client"
 
-#: wpmind.php:432
+#: wpmind.php:516
 msgid "没有配置图像生成服务"
 msgstr "没有配置图像生成服务"
-
-msgid "Text generation via SiliconFlow model hub."
-msgstr "通过硅基流动模型中心生成文本。"
-
-msgid "Text generation with Alibaba Qwen models."
-msgstr "使用阿里通义千问模型生成文本。"
-
-msgid "Text generation with Baidu ERNIE models."
-msgstr "使用百度文心模型生成文本。"
-
-msgid "Text generation with ByteDance Doubao models."
-msgstr "使用字节跳动豆包模型生成文本。"
-
-msgid "Text generation with DeepSeek models."
-msgstr "使用 DeepSeek 模型生成文本。"
-
-msgid "Text generation with MiniMax models."
-msgstr "使用 MiniMax 模型生成文本。"
-
-msgid "Text generation with Moonshot Kimi models."
-msgstr "使用月之暗面 Kimi 模型生成文本。"
-
-msgid "Text generation with Zhipu GLM models."
-msgstr "使用智谱 GLM 模型生成文本。"
