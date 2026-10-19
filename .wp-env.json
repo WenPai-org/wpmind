@@ -4,6 +4,9 @@
     "."
   ],
   "themes": [],
+  "mappings": {
+    "wp-content/mu-plugins": "./tests/E2E/mu-plugins"
+  },
   "config": {
     "WP_DEBUG": true,
     "WP_DEBUG_LOG": true,

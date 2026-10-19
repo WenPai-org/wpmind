@@ -1,0 +1,52 @@
+name: WPMind 测试
+
+# 仓库自己的测试 workflow（wp-plugin-ci.yml 由 WenPai-org/ci-workflows 统一下发，这里不动它）。
+#
+# runner：linux-arm64 是 host 模式（fedora-runner），没有 job 容器，PHP/composer/node 由主机提供，
+# 所以不用 setup-php。按团队记录这台 runner 起不了 docker，因此这里暂时只有单测 job；
+# wp-env（docker）+ Playwright 的 e2e job 要等有 docker 模式的 runner 再加，本地跑法见 tests/E2E/README.md。
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  unit:
+    name: composer check
+    runs-on: linux-arm64
+    env:
+      COMPOSER_NO_INTERACTION: '1'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 工具链与 PHP 最低版本
+        run: |
+          php -v | head -1
+          php -r 'exit(version_compare(PHP_VERSION, "8.1", ">=") ? 0 : 1);'
+          composer --version
+
+      - name: composer install（网络抖动重试 3 次）
+        run: |
+          for attempt in 1 2 3; do
+            if composer install --no-interaction --no-progress --prefer-dist; then
+              exit 0
+            fi
+            echo "composer install 失败（第 ${attempt} 次）"
+            sleep $(( attempt * 10 ))
+          done
+          exit 1
+
+      - name: composer check（php-lint + phpunit + composer audit）
+        run: composer check
+
+      - name: 跑完后工作区必须干净
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo '测试在仓库里留下了改动：'
+            git status --porcelain
+            exit 1
+          fi
+          echo '工作区干净'
