@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         name="WPMind PHP Compatibility"
+         xsi:noNamespaceSchemaLocation="https://schema.phpcodesniffer.com/phpcs.xsd">
+
+    <description>PHP 兼容性检查。与 phpcs.xml.dist 一起由 tests/phpcs-baseline.php（composer cs）运行。</description>
+
+    <config name="testVersion" value="8.1-"/>
+    <rule ref="PHPCompatibilityWP">
+        <include-pattern>*.php$</include-pattern>
+    </rule>
+</ruleset>
