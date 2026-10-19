@@ -125,7 +125,7 @@ $cache_max_entries = (int) ( $cache_stats['max_entries'] ?? 0 );
 			);
 			?>
 			<?php esc_html_e( '模块启用', 'wpmind' ); ?>
-			&middot; 
+			&middot;
 			<?php
 			echo $cache_enabled
 			? esc_html( number_format_i18n( $cache_hit_rate, 1 ) . '%' )
@@ -315,7 +315,7 @@ $cache_max_entries = (int) ( $cache_stats['max_entries'] ?? 0 );
 							$icon  = $is_ok ? 'ri-checkbox-circle-fill' : 'ri-error-warning-fill';
 							?>
 						<div class="wpmind-overview-provider-item">
-							<span class="dashicons 
+							<span class="dashicons
 							<?php
 							echo esc_attr(
 								$icon,
@@ -373,7 +373,7 @@ $cache_max_entries = (int) ( $cache_stats['max_entries'] ?? 0 );
 						: '';
 						?>
 					<div class="wpmind-overview-module-item">
-						<span class="dashicons 
+						<span class="dashicons
 						<?php
 						echo esc_attr(
 							$icon,
@@ -705,19 +705,19 @@ $cache_max_entries = (int) ( $cache_stats['max_entries'] ?? 0 );
 			</div>
 			<div class="wpmind-overview-card-body">
 				<div class="wpmind-overview-link-list">
-					<a href="https://wpcommunity.com/c/wpmind/" target="_blank" rel="noopener" class="wpmind-overview-link-item">
+					<a href="https://wpcommunity.com/c/wpmind/" target="_blank" rel="noopener noreferrer" class="wpmind-overview-link-item">
 						<span class="dashicons ri-server-line"></span>
 						<?php esc_html_e( '如何配置 AI Provider', 'wpmind' ); ?>
 					</a>
-					<a href="https://wpcommunity.com/c/wpmind/" target="_blank" rel="noopener" class="wpmind-overview-link-item">
+					<a href="https://wpcommunity.com/c/wpmind/" target="_blank" rel="noopener noreferrer" class="wpmind-overview-link-item">
 						<span class="dashicons ri-route-line"></span>
 						<?php esc_html_e( '如何设置路由策略', 'wpmind' ); ?>
 					</a>
-					<a href="https://wpcommunity.com/c/wpmind/" target="_blank" rel="noopener" class="wpmind-overview-link-item">
+					<a href="https://wpcommunity.com/c/wpmind/" target="_blank" rel="noopener noreferrer" class="wpmind-overview-link-item">
 						<span class="dashicons ri-wallet-line"></span>
 						<?php esc_html_e( '预算与限额指南', 'wpmind' ); ?>
 					</a>
-					<a href="https://wpcommunity.com/c/wpmind/" target="_blank" rel="noopener" class="wpmind-overview-link-item">
+					<a href="https://wpcommunity.com/c/wpmind/" target="_blank" rel="noopener noreferrer" class="wpmind-overview-link-item">
 						<span class="dashicons ri-line-chart-line"></span>
 						<?php esc_html_e( 'Token 用量统计说明', 'wpmind' ); ?>
 					</a>
@@ -739,19 +739,19 @@ $cache_max_entries = (int) ( $cache_stats['max_entries'] ?? 0 );
 			</div>
 			<div class="wpmind-overview-card-body">
 				<div class="wpmind-overview-link-list">
-					<a href="https://wpcy.com/mind/" target="_blank" rel="noopener" class="wpmind-overview-link-item">
+					<a href="https://wpcy.com/mind/" target="_blank" rel="noopener noreferrer" class="wpmind-overview-link-item">
 						<span class="dashicons ri-book-open-line"></span>
 						<?php esc_html_e( '使用文档', 'wpmind' ); ?>
 					</a>
-					<a href="https://github.com/WenPai-org/wpmind" target="_blank" rel="noopener" class="wpmind-overview-link-item">
+					<a href="https://github.com/WenPai-org/wpmind" target="_blank" rel="noopener noreferrer" class="wpmind-overview-link-item">
 						<span class="dashicons ri-github-line"></span>
 						<?php esc_html_e( 'GitHub', 'wpmind' ); ?>
 					</a>
-					<a href="https://github.com/WenPai-org/wpmind/issues" target="_blank" rel="noopener" class="wpmind-overview-link-item">
+					<a href="https://github.com/WenPai-org/wpmind/issues" target="_blank" rel="noopener noreferrer" class="wpmind-overview-link-item">
 						<span class="dashicons ri-bug-line"></span>
 						<?php esc_html_e( '问题反馈', 'wpmind' ); ?>
 					</a>
-					<a href="https://feicode.com/WenPai-org/wpmind/releases" target="_blank" rel="noopener" class="wpmind-overview-link-item">
+					<a href="https://feicode.com/WenPai-org/wpmind/releases" target="_blank" rel="noopener noreferrer" class="wpmind-overview-link-item">
 						<span class="dashicons ri-download-line"></span>
 						<?php esc_html_e( '版本发布', 'wpmind' ); ?>
 					</a>
