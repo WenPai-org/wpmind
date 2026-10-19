@@ -258,14 +258,14 @@ class MarkdownFeed {
 		$instance = new self();
 		$instance->register_rewrite_rules();
 
-		// Flush rules.
-		flush_rewrite_rules();
+		// Flush rules (soft, no .htaccess write).
+		flush_rewrite_rules( false );
 	}
 
 	/**
 	 * Flush rewrite rules on deactivation.
 	 */
 	public static function deactivate(): void {
-		flush_rewrite_rules();
+		flush_rewrite_rules( false );
 	}
 }

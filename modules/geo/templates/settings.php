@@ -288,7 +288,13 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
 					<?php if ( $llms_txt_enabled ) : ?>
 					<div class="wpmind-geo-urls">
 						<p class="wpmind-geo-url-title"><?php esc_html_e( '访问地址：', 'wpmind' ); ?></p>
-						<code class="wpmind-geo-url"><?php echo esc_url( home_url( '/llms.txt' ) ); ?></code>
+						<code class="wpmind-geo-url"><?php echo esc_url( \WPMind\Modules\Geo\LlmsTxtGenerator::get_public_url() ); ?></code>
+						<?php if ( '' === (string) get_option( 'permalink_structure' ) ) : ?>
+						<p class="description"><?php esc_html_e( '当前是朴素固定链接，只能用上面这个带参数的地址。启用固定链接后才有 /llms.txt。', 'wpmind' ); ?></p>
+						<?php endif; ?>
+						<?php foreach ( \WPMind\Modules\Geo\LlmsTxtGenerator::detect_conflicts() as $wpmind_llms_conflict ) : ?>
+						<p class="description wpmind-geo-warning"><?php echo esc_html( $wpmind_llms_conflict ); ?></p>
+						<?php endforeach; ?>
 					</div>
 					<?php endif; ?>
 				</div>
@@ -318,7 +324,7 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
 					</div>
 					<div class="wpmind-geo-urls" style="margin-top:12px;">
 						<p class="wpmind-geo-url-title"><?php esc_html_e( '访问地址：', 'wpmind' ); ?></p>
-						<code class="wpmind-geo-url"><?php echo esc_url( home_url( '/ai-sitemap.xml' ) ); ?></code>
+						<code class="wpmind-geo-url"><?php echo esc_url( \WPMind\Modules\Geo\AiSitemapGenerator::get_public_url() ); ?></code>
 					</div>
 					<?php endif; ?>
 				</div>
