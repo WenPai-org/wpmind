@@ -15,12 +15,12 @@ const NAV_TAB = {
 
 test.describe.configure({ mode: 'serial' });
 
-test.beforeEach(() => {
-	resetToFreshInstall();
+test.beforeEach(async () => {
+	await resetToFreshInstall();
 });
 
-test.afterAll(() => {
-	resetToFreshInstall();
+test.afterAll(async () => {
+	await resetToFreshInstall();
 });
 
 test('新装站点：7 个模块卡片都渲染，默认状态与 manifest 一致', async ({ page }) => {
@@ -64,14 +64,14 @@ test('开启 GEO：刷新后卡片启用、导航出现 GEO 页签、选项为 1
 	await expect(card(page, 'geo').locator('input.wpmind-module-switch')).toBeChecked();
 	await expect(card(page, 'geo').locator('.wpmind-module-settings-link')).toHaveCount(1);
 	await expect(navTab(page, 'geo')).toHaveCount(1);
-	expect(getOptions(['wpmind_module_geo_enabled']).wpmind_module_geo_enabled).toBe('1');
+	expect((await getOptions(['wpmind_module_geo_enabled'])).wpmind_module_geo_enabled).toBe('1');
 
 	const off = await toggleModule(page, 'geo');
 	expect(off.data.enabled).toBe(false);
 	await openModulesTab(page);
 	await expect(card(page, 'geo')).toHaveClass(/\bis-disabled\b/);
 	await expect(navTab(page, 'geo')).toHaveCount(0);
-	expect(getOptions(['wpmind_module_geo_enabled']).wpmind_module_geo_enabled).toBe('0');
+	expect((await getOptions(['wpmind_module_geo_enabled'])).wpmind_module_geo_enabled).toBe('0');
 });
 
 test('直接 POST 禁用 cost-control 被拒，选项没有被写成 0', async ({ page }) => {
@@ -89,7 +89,7 @@ test('直接 POST 禁用 cost-control 被拒，选项没有被写成 0', async (
 	expect(res.success).toBe(false);
 	expect(res.data.message).toBe('此模块不能被禁用');
 	// 新装站点 cost-control 靠 manifest 默认值启用，选项可能还没写过（null）；关键是没被写成 '0'。
-	expect([null, '1']).toContain(getOptions(['wpmind_module_cost-control_enabled'])['wpmind_module_cost-control_enabled']);
+	expect([null, '1']).toContain((await getOptions(['wpmind_module_cost-control_enabled']))['wpmind_module_cost-control_enabled']);
 
 	await openModulesTab(page);
 	await expect(card(page, 'cost-control')).toHaveClass(/\bis-enabled\b/);
@@ -108,24 +108,24 @@ test('不带有效 nonce 的开关请求被拒，选项不变', async ({ page })
 		return r.status;
 	});
 	expect(status).toBe(403);
-	expect(getOptions(['wpmind_module_geo_enabled']).wpmind_module_geo_enabled).toBe(null);
+	expect((await getOptions(['wpmind_module_geo_enabled'])).wpmind_module_geo_enabled).toBe(null);
 });
 
 test('analytics 依赖 cost-control：cost-control 被改成 0 也会被强制拉回 1，analytics 照常启用并出页签', async ({ page }) => {
 	// 模拟库里被写成 0 的旧数据。
-	setOptions({ 'wpmind_module_cost-control_enabled': '0' });
+	await setOptions({ 'wpmind_module_cost-control_enabled': '0' });
 
 	await openModulesTab(page);
 	// 核心模块强制启用（ModuleLoader::discover_modules）。
 	await expect(card(page, 'cost-control')).toHaveClass(/\bis-enabled\b/);
-	expect(getOptions(['wpmind_module_cost-control_enabled'])['wpmind_module_cost-control_enabled']).toBe('1');
+	expect((await getOptions(['wpmind_module_cost-control_enabled']))['wpmind_module_cost-control_enabled']).toBe('1');
 
 	await toggleModule(page, 'analytics');
 	await openModulesTab(page);
 	await expect(card(page, 'analytics')).toHaveClass(/\bis-enabled\b/);
 	await expect(navTab(page, 'analytics')).toHaveCount(1);
 	await expect(navTab(page, 'budget')).toHaveCount(1);
-	expect(getOptions(['wpmind_module_analytics_enabled']).wpmind_module_analytics_enabled).toBe('1');
+	expect((await getOptions(['wpmind_module_analytics_enabled'])).wpmind_module_analytics_enabled).toBe('1');
 });
 
 test('API Gateway：模块关闭或网关开关关闭时不注册 mind/v1 REST 路由，两者都开才注册', async ({ request }) => {
@@ -145,19 +145,19 @@ test('API Gateway：模块关闭或网关开关关闭时不注册 mind/v1 REST �
 	expect(s.mind).toEqual([]);
 
 	// 模块开，但网关总开关关（wpmind_gateway_enabled 默认 '0'）。
-	setOptions({ 'wpmind_module_api-gateway_enabled': '1', wpmind_gateway_enabled: '0' });
+	await setOptions({ 'wpmind_module_api-gateway_enabled': '1', wpmind_gateway_enabled: '0' });
 	s = await routes();
 	expect(s.ns).not.toContain('mind/v1');
 	expect(s.mind).toEqual([]);
 
 	// 正向对照：两者都开才有路由，证明上面的断言不是因为查错了前缀。
-	setOptions({ wpmind_gateway_enabled: '1' });
+	await setOptions({ wpmind_gateway_enabled: '1' });
 	s = await routes();
 	expect(s.ns).toContain('mind/v1');
 	expect(s.mind.length).toBeGreaterThan(0);
 
 	// 再关掉模块：路由消失。
-	setOptions({ 'wpmind_module_api-gateway_enabled': '0' });
+	await setOptions({ 'wpmind_module_api-gateway_enabled': '0' });
 	s = await routes();
 	expect(s.ns).not.toContain('mind/v1');
 	expect(s.mind).toEqual([]);

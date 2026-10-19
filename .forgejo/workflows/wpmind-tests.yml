@@ -3,8 +3,9 @@ name: WPMind 测试
 # 仓库自己的测试 workflow（wp-plugin-ci.yml 由 WenPai-org/ci-workflows 统一下发，这里不动它）。
 #
 # runner：linux-arm64 是 host 模式（fedora-runner），没有 job 容器，PHP/composer/node 由主机提供，
-# 所以不用 setup-php。按团队记录这台 runner 起不了 docker，因此这里暂时只有单测 job；
-# wp-env（docker）+ Playwright 的 e2e job 要等有 docker 模式的 runner 再加，本地跑法见 tests/E2E/README.md。
+# 所以不用 setup-php。这台 runner 起不了 docker，e2e 用 wp-env 的 playground runtime（PHP wasm + SQLite）
+# 加系统 chromium（写法参考 wpslug 的 wp-plugin-ci.yml）。playground 不支持 `wp-env run`，
+# 用例改走 tests/E2E/mu-plugins/wpmind-e2e-reset.php 的测试专用 REST 端点复位状态。本地跑法见 tests/E2E/README.md。
 
 on:
   push:
@@ -46,6 +47,74 @@ jobs:
         run: |
           if [ -n "$(git status --porcelain)" ]; then
             echo '测试在仓库里留下了改动：'
+            git status --porcelain
+            exit 1
+          fi
+          echo '工作区干净'
+
+  e2e:
+    name: Playwright e2e（wp-env playground）
+    runs-on: linux-arm64
+    needs: unit
+    env:
+      WP_CORE_TAG: '7.1.3'
+      WP_CORE_SHA: 'fc9832bef919c2a08541248db23af90d14ffb082'
+      # 和同一台 runner 上 wpslug 的 8888 错开。
+      WP_ENV_PORT: '8946'
+      WP_BASE_URL: http://localhost:8946
+      PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH: /usr/sbin/chromium-browser
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 工具链
+        run: |
+          node --version
+          node -e 'const [a,b]=process.versions.node.split(".").map(Number); process.exit(a>20||(a===20&&b>=10)?0:1)'
+          npm --version
+          jq --version
+          test -x "${PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}"
+          "${PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}" --version || true
+
+      - name: npm ci
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+        run: npm ci --no-audit --no-fund
+
+      - name: 准备 WordPress core 和 wp-env 配置（core 固定到 tag + commit）
+        run: |
+          set -euo pipefail
+          ASSET_DIR=$(mktemp -d /tmp/wpmind-wp-env.XXXXXX)
+          CORE_DIR="${ASSET_DIR}/wordpress-core"
+          git clone --quiet --depth=1 --branch "${WP_CORE_TAG}" \
+            https://github.com/WordPress/WordPress.git "${CORE_DIR}"
+          test "$(git -C "${CORE_DIR}" rev-parse HEAD)" = "${WP_CORE_SHA}"
+          grep -Fq "\$wp_version = '${WP_CORE_TAG}';" "${CORE_DIR}/wp-includes/version.php"
+          jq --arg core "${CORE_DIR}" --arg plugin "${PWD}" \
+            '.core = $core | .plugins = [$plugin] | .mappings["wp-content/mu-plugins"] = ($plugin + "/tests/E2E/mu-plugins")' \
+            .wp-env.json > "${ASSET_DIR}/wp-env.json"
+          jq -e '.config.WPMIND_E2E_RESET == true' "${ASSET_DIR}/wp-env.json"
+          echo "WPMIND_WP_ENV_CONFIG=${ASSET_DIR}/wp-env.json" >> "${GITHUB_ENV}"
+          echo "WPMIND_WP_ENV_ASSETS=${ASSET_DIR}" >> "${GITHUB_ENV}"
+
+      - name: 启动 WordPress Playground
+        run: npx wp-env start --runtime=playground --config "${WPMIND_WP_ENV_CONFIG}"
+
+      - name: Playwright
+        run: npx playwright test
+
+      - name: 停止 WordPress Playground
+        if: always()
+        run: |
+          if [ -n "${WPMIND_WP_ENV_CONFIG:-}" ]; then
+            npx wp-env stop --runtime=playground --config "${WPMIND_WP_ENV_CONFIG}" || true
+          fi
+
+      - name: 跑完后工作区必须干净
+        if: always()
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo 'e2e 在仓库里留下了改动：'
             git status --porcelain
             exit 1
           fi
