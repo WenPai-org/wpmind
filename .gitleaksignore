@@ -6,3 +6,5 @@
 9a6ff099dc3995de3db88ee2973d88d16dc2c053:docs/WPCY-CROSS-SELL-STRATEGY.md:generic-api-key:84
 # ⑤ fixed test fixture value for ApiKeyHasher unit test (not a real key)
 9d79cf157e33b9156f6a161e25a5215808853544:tests/ApiGateway/Auth/ApiKeyHasherTest.php:generic-api-key:46
+# ② 用户 2026-10-19 确认为测试 key、已作废
+9a6ff099dc3995de3db88ee2973d88d16dc2c053:docs/WENPAI-MARKETPLACE-SETUP-GUIDE.md:generic-api-key:449
