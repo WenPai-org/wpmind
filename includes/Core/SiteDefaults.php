@@ -49,9 +49,17 @@ final class SiteDefaults {
 	/**
 	 * Preserve legacy module behavior once when upgrading from pre-0.12 releases.
 	 * New installations receive explicit defaults from each module manifest.
+	 *
+	 * A site without a version and without any wpmind_ option (e.g. a subsite
+	 * that existed before network activation) is a fresh install, not an upgrade.
 	 */
 	public static function maybe_upgrade_module_defaults(): void {
 		if ( false !== get_option( self::VERSION_OPTION, false ) ) {
+			return;
+		}
+
+		if ( ! self::has_wpmind_settings() ) {
+			add_option( self::VERSION_OPTION, WPMIND_VERSION, '', false );
 			return;
 		}
 
@@ -63,6 +71,31 @@ final class SiteDefaults {
 		}
 
 		add_option( self::VERSION_OPTION, WPMIND_VERSION, '', false );
+	}
+
+	/**
+	 * Whether the current site has any stored option named wpmind_*.
+	 *
+	 * Transients (_transient_wpmind_*, _transient_timeout_wpmind_*) do not
+	 * start with wpmind_ and so do not count. Only called while the site has
+	 * no installed version, i.e. once per site.
+	 *
+	 * @return bool True when unsure (no $wpdb), so a legacy site never loses its upgrade.
+	 */
+	public static function has_wpmind_settings(): bool {
+		global $wpdb;
+		if ( ! is_object( $wpdb ) || ! method_exists( $wpdb, 'get_var' ) ) {
+			return true;
+		}
+
+		$found = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s LIMIT 1",
+				$wpdb->esc_like( 'wpmind_' ) . '%'
+			)
+		);
+
+		return null !== $found && '' !== $found;
 	}
 
 	/**
