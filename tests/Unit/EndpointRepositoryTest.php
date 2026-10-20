@@ -157,7 +157,9 @@ final class EndpointRepositoryTest extends TestCase {
 		// 原 option 是回滚镜像：name/base_url 来自代码，提交的值被忽略.
 		self::assertSame( ProviderDefinitions::DEFINITIONS['deepseek']['name'], $out['deepseek']['name'] );
 		self::assertSame( ProviderDefinitions::default_base_url( 'deepseek' ), $out['deepseek']['base_url'] );
-		self::assertArrayNotHasKey( 'custom_base_url', $out['deepseek'], 'v2-only fields stay out of the mirror' );
+		// F5：v0.11.5 用 custom_base_url ?? base_url 取地址，非空的自定义地址必须进镜像.
+		self::assertArrayHasKey( 'custom_base_url', $out['deepseek'] );
+		self::assertArrayNotHasKey( 'key_meta', $out['deepseek'], 'v2-only metadata stays out of the mirror' );
 		self::assertTrue( $out['deepseek']['enabled'] );
 		self::assertSame( self::FAKE_KEY, $out['deepseek']['api_key'], 'blank input keeps the saved key' );
 		self::assertSame( [ 'my-finetune' ], $out['deepseek']['models'], 'submitted models are not stored' );

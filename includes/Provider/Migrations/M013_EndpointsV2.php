@@ -212,8 +212,10 @@ final class M013_EndpointsV2 implements MigrationInterface {
 	public static function transform_entry( string $id, array $entry, array &$notes, array $previous = [] ): array {
 		$models = EndpointRepository::normalize_models( $entry['models'] ?? [] );
 		if ( ProviderDefinitions::is_historical_default_models( $id, $models ) ) {
-			$models  = [];
-			$notes[] = $id . ': default models copy ignored';
+			// F6：旧版只改 key 保存会把 models 重置成历史默认值；v2 里已有用户自配的 models 就沿用.
+			$kept    = EndpointRepository::normalize_models( $previous['models'] ?? [] );
+			$models  = $kept;
+			$notes[] = $id . ( [] !== $kept ? ': default models copy ignored, v2 custom models kept' : ': default models copy ignored' );
 		} elseif ( [] !== $models ) {
 			$notes[] = $id . ': custom models kept';
 		}
@@ -227,9 +229,14 @@ final class M013_EndpointsV2 implements MigrationInterface {
 			return '';
 		};
 
+		// F5：旧版能读写 custom_base_url，旧字段里有这个键就以旧字段为准（包括在旧版里清空）.
+		$custom_base_url = array_key_exists( 'custom_base_url', $entry )
+			? trim( is_string( $entry['custom_base_url'] ) ? $entry['custom_base_url'] : '' )
+			: $pick( 'custom_base_url' );
+
 		$out = [
 			'enabled'         => ! empty( $entry['enabled'] ),
-			'custom_base_url' => $pick( 'custom_base_url' ),
+			'custom_base_url' => $custom_base_url,
 			'models'          => $models,
 			'default_model'   => $pick( 'default_model' ),
 		];

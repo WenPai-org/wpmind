@@ -105,9 +105,19 @@ final class MigrationEndpointsV2Test extends TestCase {
 				'models'   => ProviderDefinitions::HISTORICAL_DEFAULT_MODELS['0.11.5'][ $id ],
 				'enabled'  => (bool) ( $changes[ $id ]['enabled'] ?? $current['enabled'] ),
 				'api_key'  => (string) ( $changes[ $id ]['api_key'] ?? $current['api_key'] ),
+				// v0.11.5 的表单回显并提交 custom_base_url（esc_url_raw，空就是 ''）.
+				'custom_base_url' => (string) ( $changes[ $id ]['custom_base_url'] ?? $current['custom_base_url'] ?? '' ),
 			];
 		}
 		self::seed( $saved );
+	}
+
+	/**
+	 * 模拟 v0.11.5 ChatService 取请求地址：custom_base_url ?? base_url。
+	 */
+	private static function url_like_0115( string $id ): string {
+		$endpoint = self::stored()[ $id ] ?? [];
+		return (string) ( $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '' );
 	}
 
 	private static function seed( array $option ): void {
@@ -552,5 +562,69 @@ final class MigrationEndpointsV2Test extends TestCase {
 		self::assertTrue( ProviderDefinitions::is_historical_default_models( 'openai', [ 'gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-3.5-turbo' ] ) );
 		self::assertFalse( ProviderDefinitions::is_historical_default_models( 'openai', [ 'gpt-4o-mini', 'gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo' ] ), 'order matters' );
 		self::assertFalse( ProviderDefinitions::is_historical_default_models( 'openai', [] ) );
+	}
+
+	public function test_f5_custom_base_url_reaches_mirror_and_hash(): void {
+		self::seed( self::v1_option( [ 'deepseek' => [ 'enabled' => true, 'api_key' => self::FAKE_DEEPSEEK_KEY ] ] ) );
+		Migrator::maybe_run();
+
+		$mirror = AdminPage::instance()->sanitize_endpoints(
+			[ 'deepseek' => [ 'enabled' => '1', 'api_key' => '', 'custom_base_url' => 'https://proxy.example.com/v1' ] ]
+		);
+		self::seed( $mirror );
+
+		self::assertSame( 'https://proxy.example.com/v1', $mirror['deepseek']['custom_base_url'] );
+		self::assertArrayNotHasKey( 'custom_base_url', $mirror['openai'], 'empty custom url is not written' );
+		self::assertSame( 'https://proxy.example.com/v1', self::url_like_0115( 'deepseek' ), 'v0.11.5 still sends to the relay' );
+		self::assertSame( self::FAKE_DEEPSEEK_KEY, self::read_like_0115( 'deepseek' )['api_key'] );
+
+		$without = $mirror;
+		unset( $without['deepseek']['custom_base_url'] );
+		self::assertNotSame( EndpointRepository::legacy_hash( $without ), EndpointRepository::legacy_hash( $mirror ) );
+		self::assertSame( EndpointRepository::legacy_hash( $mirror ), self::v2()['legacy_hash'] );
+
+		// 旧版改了中转地址 → 重新迁移读进 v2；在旧版里清空也要生效.
+		self::save_like_0115( [ 'deepseek' => [ 'custom_base_url' => 'https://relay2.example.com/v1' ] ] );
+		Migrator::maybe_run_admin();
+		self::assertSame( 'https://relay2.example.com/v1', self::v2()['providers']['deepseek']['custom_base_url'] );
+		self::save_like_0115( [ 'deepseek' => [ 'custom_base_url' => '' ] ] );
+		Migrator::maybe_run_admin();
+		self::assertSame( '', self::v2()['providers']['deepseek']['custom_base_url'] );
+
+		$haystack = (string) json_encode( [ self::v2(), Migrator::log() ] );
+		foreach ( (array) self::opt( M013_EndpointsV2::BACKUP_INDEX_OPTION ) as $name ) {
+			$haystack .= (string) json_encode( self::opt( $name ) );
+		}
+		$haystack .= (string) json_encode( self::opt( M013_EndpointsV2::BACKUP_OPTION ) );
+		self::assertStringNotContainsString( self::FAKE_DEEPSEEK_KEY, (string) $haystack );
+	}
+
+	public function test_f5_v0115_custom_base_url_migrates_into_v2(): void {
+		self::seed( self::v1_option( [ 'openai' => [ 'enabled' => true, 'api_key' => self::FAKE_OPENAI_KEY, 'custom_base_url' => 'https://relay.example.com/v1' ] ] ) );
+		Migrator::maybe_run();
+
+		self::assertSame( 'https://relay.example.com/v1', self::v2()['providers']['openai']['custom_base_url'] );
+		self::assertSame( 'https://relay.example.com/v1', self::url_like_0115( 'openai' ) );
+	}
+
+	public function test_f6_key_only_save_in_0115_keeps_v2_custom_models(): void {
+		self::seed( self::v1_option( [ 'openai' => [ 'enabled' => true, 'api_key' => self::FAKE_OPENAI_KEY ] ] ) );
+		Migrator::maybe_run();
+		// 新版里用户自配 models（存进 v2），镜像照常重写.
+		$v2                                  = self::v2();
+		$v2['providers']['openai']['models'] = [ 'my-model-a', 'my-model-b' ];
+		( new EndpointRepository() )->save_v2( $v2['providers'], (string) $v2['legacy_hash'] );
+		self::seed( AdminPage::instance()->sanitize_endpoints( [ 'openai' => [ 'enabled' => '1', 'api_key' => '' ] ] ) );
+		$custom = self::v2()['providers']['openai']['models'];
+		self::assertSame( [ 'my-model-a', 'my-model-b' ], $custom );
+
+		// v0.11.5 里只换 key：models 被写回历史默认值.
+		self::save_like_0115( [ 'openai' => [ 'api_key' => self::FAKE_NEW_KEY ] ] );
+		self::assertSame( ProviderDefinitions::HISTORICAL_DEFAULT_MODELS['0.11.5']['openai'], self::stored()['openai']['models'] );
+
+		Migrator::maybe_run_admin();
+
+		self::assertSame( $custom, self::v2()['providers']['openai']['models'] );
+		self::assertSame( self::FAKE_NEW_KEY, ( new EndpointRepository() )->get( 'openai' )->api_key );
 	}
 }

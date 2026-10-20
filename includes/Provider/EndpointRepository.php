@@ -161,13 +161,21 @@ final class EndpointRepository {
 		$legacy   = ProviderDefinitions::legacy_base_urls( $id );
 		$base_url = ( ! empty( $v2_entry['needs_reconfigure'] ) && [] !== $legacy ) ? $legacy[0] : ProviderDefinitions::default_base_url( $id );
 
-		return [
+		$mirror = [
 			'name'     => (string) ( $definition['name'] ?? $id ),
 			'base_url' => $base_url,
 			'models'   => $models,
 			'enabled'  => ! empty( $v2_entry['enabled'] ),
 			'api_key'  => $api_key,
 		];
+
+		// F5：v0.11.5 取地址用 custom_base_url ?? base_url，自定义地址必须进镜像（也就进了 legacy_hash）.
+		$custom = trim( (string) ( $v2_entry['custom_base_url'] ?? '' ) );
+		if ( '' !== $custom ) {
+			$mirror['custom_base_url'] = $custom;
+		}
+
+		return $mirror;
 	}
 
 	/**
