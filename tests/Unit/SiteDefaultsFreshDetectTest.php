@@ -7,8 +7,8 @@
  * version stamp. A site with any wpmind_* setting takes the legacy upgrade. Sites created while the
  * plugin is only active on a single subsite get no options (unchanged).
  *
- * Tests marked I2-RED fail on main 2b43647 by design. They are skipped as incomplete unless
- * WPMIND_QA_I2_RED=1, so composer check stays green until the fix lands.
+ * Cases (a) and (c) failed on main 2b43647 and pass with PR #30 (a5ee5cb). The site probe goes
+ * through the shared WPMind_Test_WPDB double from tests/bootstrap.php.
  *
  * @package WPMind
  * @group i2
@@ -21,51 +21,6 @@ use WPMind\Core\SiteDefaults;
 
 require_once WPMIND_PLUGIN_DIR . 'includes/Core/SiteDefaults.php';
 require_once __DIR__ . '/SiteDefaultsTest.php'; // Multisite stubs (is_multisite, switch_to_blog, …).
-
-/**
- * Minimal $wpdb stand-in over the per-site option arrays, in case the fix detects
- * "any wpmind_* option" with a LIKE query instead of get_option().
- */
-final class WPMind_QA_I2_Wpdb {
-	public string $options = 'wp_options';
-	public function esc_like( string $text ): string {
-		return addcslashes( $text, '_%\\' );
-	}
-	public function prepare( string $query, ...$args ): string {
-		$args = is_array( $args[0] ?? null ) ? $args[0] : $args;
-		$i    = 0;
-		return (string) preg_replace_callback(
-			'/%[sd]/',
-			static function () use ( &$i, $args ): string {
-				return "'" . (string) ( $args[ $i++ ] ?? '' ) . "'";
-			},
-			$query
-		);
-	}
-	private function matches( string $query ): array {
-		$names = array_keys( $GLOBALS['wpmind_test_options'] ?? [] );
-		if ( ! preg_match_all( "/LIKE\s+'([^']*)'/i", $query, $m ) ) {
-			return $names;
-		}
-		$out = [];
-		foreach ( $m[1] as $like ) {
-			$re = '/^' . strtr( preg_quote( stripslashes( str_replace( [ '\\_', '\\%' ], [ "\x01", "\x02" ], $like ) ), '/' ), [ '%' => '.*', '_' => '.', "\x01" => '_', "\x02" => '%' ] ) . '$/';
-			foreach ( $names as $n ) {
-				if ( preg_match( $re, (string) $n ) ) {
-					$out[] = $n;
-				}
-			}
-		}
-		return array_values( array_unique( $out ) );
-	}
-	public function get_var( string $query ) {
-		$hits = $this->matches( $query );
-		return stripos( $query, 'COUNT(' ) !== false ? (string) count( $hits ) : ( $hits[0] ?? null );
-	}
-	public function get_col( string $query ): array {
-		return $this->matches( $query );
-	}
-}
 
 /**
  * @covers \WPMind\Core\SiteDefaults
@@ -82,28 +37,22 @@ final class SiteDefaultsFreshDetectTest extends TestCase {
 		$GLOBALS['wpmind_test_blog_stack']     = [];
 		$GLOBALS['wpmind_test_multisite']      = true;
 		$GLOBALS['wpmind_test_network_active'] = true;
-		$this->had_wpdb                        = isset( $GLOBALS['wpdb'] );
-		if ( ! $this->had_wpdb ) {
-			$GLOBALS['wpdb'] = new WPMind_QA_I2_Wpdb();
-		}
+		$this->previous_wpdb                   = $GLOBALS['wpdb'] ?? null;
+		$this->db                              = new WPMind_Test_WPDB();
+		$GLOBALS['wpdb']                       = $this->db;
 	}
 
-	private bool $had_wpdb = false;
+	/** @var mixed */
+	private $previous_wpdb;
+
+	private WPMind_Test_WPDB $db;
 
 	protected function tearDown(): void {
-		if ( ! $this->had_wpdb ) {
-			unset( $GLOBALS['wpdb'] );
-		}
+		$GLOBALS['wpdb'] = $this->previous_wpdb;
 		unset( $GLOBALS['wpmind_test_options'] );
 		$GLOBALS['wpmind_test_options']        = [];
 		$GLOBALS['wpmind_test_multisite']      = false;
 		$GLOBALS['wpmind_test_network_active'] = false;
-	}
-
-	private function red(): void {
-		if ( '1' !== getenv( 'WPMIND_QA_I2_RED' ) ) {
-			self::markTestIncomplete( 'I2-RED: expected to fail until the fresh-site detection fix lands (set WPMIND_QA_I2_RED=1 to run).' );
-		}
 	}
 
 	/** Run the per-request hook on blog $id the way plugins_loaded does. */
@@ -129,9 +78,8 @@ final class SiteDefaultsFreshDetectTest extends TestCase {
 		}
 	}
 
-	/** (a) Empty subsite that existed before network activation → fresh install. I2-RED on main. */
+	/** (a) Empty subsite that existed before network activation → fresh install (was I2-RED on main). */
 	public function test_a_empty_preexisting_subsite_is_fresh(): void {
-		$this->red();
 		$GLOBALS['wpmind_test_site_options'][2] = [ 'blogname' => 'S2' ];
 		self::load_on( 2 );
 		self::assert_fresh( 2 );
@@ -157,10 +105,9 @@ final class SiteDefaultsFreshDetectTest extends TestCase {
 
 	/**
 	 * (c) Site used before, uninstalled (options cleared; uninstall leaves only the
-	 * `_transient_timeout_wpmind_llms_txt_content_N` row, see PR #25 F4), then network-activated → fresh. I2-RED on main.
+	 * `_transient_timeout_wpmind_llms_txt_content_N` row, see PR #25 F4), then network-activated → fresh (was I2-RED on main).
 	 */
 	public function test_c_cleared_after_uninstall_is_fresh(): void {
-		$this->red();
 		$GLOBALS['wpmind_test_site_options'][4] = [ '_transient_timeout_wpmind_llms_txt_content_4' => time() + 3600 ];
 		self::load_on( 4 );
 		self::assert_fresh( 4 );
@@ -184,5 +131,81 @@ final class SiteDefaultsFreshDetectTest extends TestCase {
 		SiteDefaults::on_initialize_site( (object) [ 'blog_id' => 6 ] );
 		$opts = $GLOBALS['wpmind_test_site_options'][6] ?? [];
 		self::assertSame( [], array_filter( array_keys( $opts ), static fn( $k ) => str_starts_with( (string) $k, 'wpmind_' ) ) );
+	}
+
+	/** (a) again: the probe runs once per site; later requests on a stamped site do not query. */
+	public function test_a_second_request_on_fresh_subsite_does_not_probe(): void {
+		$GLOBALS['wpmind_test_site_options'][2] = [ 'blogname' => 'S2' ];
+		self::load_on( 2 );
+		self::load_on( 2 );
+		self::load_on( 2 );
+		self::assertCount( 1, $this->db->queries );
+		self::assertSame( [ 'wpmind\\_%' ], $this->db->like_args );
+	}
+
+	/** The probe looks at the current blog's options only (other sites' data does not leak in). */
+	public function test_probe_is_per_site(): void {
+		$GLOBALS['wpmind_test_site_options'][1] = [ 'wpmind_request_timeout' => 60, SiteDefaults::VERSION_OPTION => '0.12.0' ];
+		$GLOBALS['wpmind_test_site_options'][2] = [];
+		$GLOBALS['wpmind_test_site_options'][3] = [ 'wpmind_routing_settings' => [] ];
+		self::load_on( 2 );
+		self::load_on( 3 );
+		self::assert_fresh( 2 );
+		self::assertSame( '1', self::opt( 3, 'wpmind_module_geo_enabled' ) );
+	}
+
+	/**
+	 * Single site: a v0.11.5 install that has any WPMind setting takes the legacy upgrade,
+	 * and modules the user switched off stay off.
+	 *
+	 * @dataProvider v0115_single_site_options
+	 */
+	public function test_single_site_v0115_with_any_setting_takes_legacy_upgrade( array $stored ): void {
+		$GLOBALS['wpmind_test_multisite']      = false;
+		$GLOBALS['wpmind_test_network_active'] = false;
+		$GLOBALS['wpmind_test_site_options'][1] = $stored + [ 'wpmind_module_analytics_enabled' => '0' ];
+		$GLOBALS['wpmind_test_options']         = &$GLOBALS['wpmind_test_site_options'][1];
+
+		SiteDefaults::maybe_upgrade_module_defaults();
+
+		self::assertSame( '0', self::opt( 1, 'wpmind_module_analytics_enabled' ), 'user choice kept' );
+		foreach ( array_diff( SiteDefaults::LEGACY_MODULES, [ 'analytics' ] ) as $m ) {
+			self::assertSame( '1', self::opt( 1, "wpmind_module_{$m}_enabled" ), $m );
+		}
+		self::assertSame( WPMIND_VERSION, self::opt( 1, SiteDefaults::VERSION_OPTION ) );
+	}
+
+	/** Only one v0.11.5 option present, no module switch at all → still a legacy upgrade. */
+	public function test_single_site_v0115_activation_only_option_takes_legacy_upgrade(): void {
+		$GLOBALS['wpmind_test_multisite']      = false;
+		$GLOBALS['wpmind_test_network_active'] = false;
+		$GLOBALS['wpmind_test_site_options'][1] = [ 'wpmind_request_timeout' => 60 ];
+		$GLOBALS['wpmind_test_options']         = &$GLOBALS['wpmind_test_site_options'][1];
+
+		SiteDefaults::maybe_upgrade_module_defaults();
+
+		foreach ( SiteDefaults::LEGACY_MODULES as $m ) {
+			self::assertSame( '1', self::opt( 1, "wpmind_module_{$m}_enabled" ), $m );
+		}
+	}
+
+	/** @return array<string, array{0: array<string, mixed>}> Options v0.11.5 writes (activation, settings pages, stats). */
+	public static function v0115_single_site_options(): array {
+		return [
+			'request timeout (activation)' => [ [ 'wpmind_request_timeout' => 60 ] ],
+			'flush flag'                   => [ [ 'wpmind_flush_rewrite_rules' => '1' ] ],
+			'endpoints'                    => [ [ 'wpmind_custom_endpoints' => [ 'openai' => [ 'api_key' => 'sk-qa-FAKE-0001' ] ] ] ],
+			'routing'                      => [ [ 'wpmind_routing_settings' => [ 'strategy' => 'cost' ] ] ],
+			'brand'                        => [ [ 'wpmind_brand_contact_email' => 'qa@example.invalid' ] ],
+			'stats only'                   => [ [ 'wpmind_crawler_stats' => [] ] ],
+		];
+	}
+
+	/** No $wpdb available → treat as old site (upgrade), never as fresh. */
+	public function test_without_wpdb_subsite_takes_legacy_upgrade(): void {
+		$GLOBALS['wpdb']                        = null;
+		$GLOBALS['wpmind_test_site_options'][2] = [];
+		self::load_on( 2 );
+		self::assertSame( '1', self::opt( 2, 'wpmind_module_geo_enabled' ) );
 	}
 }
