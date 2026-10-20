@@ -105,9 +105,11 @@ final class MigrationEndpointsV2Test extends TestCase {
 				'models'   => ProviderDefinitions::HISTORICAL_DEFAULT_MODELS['0.11.5'][ $id ],
 				'enabled'  => (bool) ( $changes[ $id ]['enabled'] ?? $current['enabled'] ),
 				'api_key'  => (string) ( $changes[ $id ]['api_key'] ?? $current['api_key'] ),
-				// v0.11.5 的表单回显并提交 custom_base_url（esc_url_raw，空就是 ''）.
-				'custom_base_url' => (string) ( $changes[ $id ]['custom_base_url'] ?? $current['custom_base_url'] ?? '' ),
 			];
+			// 真实 v0.11.5 表单保存不存 custom_base_url；只有显式传入（模拟直接改 option）才写.
+			if ( array_key_exists( 'custom_base_url', $changes[ $id ] ?? [] ) ) {
+				$saved[ $id ]['custom_base_url'] = (string) $changes[ $id ]['custom_base_url'];
+			}
 		}
 		self::seed( $saved );
 	}
@@ -605,6 +607,32 @@ final class MigrationEndpointsV2Test extends TestCase {
 
 		self::assertSame( 'https://relay.example.com/v1', self::v2()['providers']['openai']['custom_base_url'] );
 		self::assertSame( 'https://relay.example.com/v1', self::url_like_0115( 'openai' ) );
+	}
+
+	public function test_f7b_rollback_upgrade_without_save_rollback_again_keeps_relay(): void {
+		self::seed( self::v1_option( [ 'deepseek' => [ 'enabled' => true, 'api_key' => self::FAKE_DEEPSEEK_KEY ] ] ) );
+		Migrator::maybe_run();
+		self::seed(
+			AdminPage::instance()->sanitize_endpoints(
+				[ 'deepseek' => [ 'enabled' => '1', 'api_key' => '', 'custom_base_url' => 'https://proxy.example.com/v1' ] ]
+			)
+		);
+
+		// 回滚 v0.11.5，在它的表单里保存一次（丢掉 custom_base_url）.
+		self::save_like_0115( [ 'qwen' => [ 'enabled' => true ] ] );
+		self::assertArrayNotHasKey( 'custom_base_url', self::stored()['deepseek'] );
+
+		// 升级，只来一个 admin 请求，新版里不保存.
+		Migrator::maybe_run_admin();
+		self::assertSame( 'https://proxy.example.com/v1', self::v2()['providers']['deepseek']['custom_base_url'] );
+		self::assertSame( 'https://proxy.example.com/v1', self::stored()['deepseek']['custom_base_url'], 'mirror restored' );
+		self::assertSame( EndpointRepository::legacy_hash( self::stored() ), self::v2()['legacy_hash'] );
+		self::assertArrayNotHasKey( 'custom_base_url', self::stored()['openai'] );
+
+		// 再次回滚：v0.11.5 仍然发往中转地址；第二个 admin 请求不再迁移.
+		self::assertSame( 'https://proxy.example.com/v1', self::url_like_0115( 'deepseek' ) );
+		self::assertSame( [], ( new Migrator() )->pending( true ) );
+		self::assertStringNotContainsString( self::FAKE_DEEPSEEK_KEY, (string) json_encode( [ self::v2(), Migrator::log() ] ) );
 	}
 
 	public function test_f6_key_only_save_in_0115_keeps_v2_custom_models(): void {

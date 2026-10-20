@@ -158,6 +158,24 @@ final class M013_EndpointsV2 implements MigrationInterface {
 			}
 		}
 
+		// F7b：v0.11.5 的设置表单保存时会整个丢掉 custom_base_url 键。
+		// 规则：旧条目有这个键 → 以旧值为准（含清空，只有直接改 option 才会出现）；
+		// 没有这个键 → 沿用 v2 的地址，并把它写回镜像，否则再次回滚时 v0.11.5 会发到官方地址.
+		$original = $before;
+		$restored = [];
+		foreach ( $providers as $id => $entry ) {
+			$custom = (string) ( $entry['custom_base_url'] ?? '' );
+			if ( '' !== $custom && is_array( $before[ $id ] ?? null ) && ! array_key_exists( 'custom_base_url', $before[ $id ] ) ) {
+				$before[ $id ]['custom_base_url'] = $custom;
+				$restored[]                       = $id;
+			}
+		}
+		if ( [] !== $restored ) {
+			update_option( EndpointRepository::OPTION, $before, false );
+			$hash    = EndpointRepository::legacy_hash( $before );
+			$notes[] = 'custom_base_url restored into mirror: ' . implode( ',', $restored );
+		}
+
 		$repository->save_v2( $providers, $hash );
 
 		$reread = $repository->v2();
@@ -166,6 +184,9 @@ final class M013_EndpointsV2 implements MigrationInterface {
 				delete_option( EndpointRepository::V2_OPTION );
 			} else {
 				update_option( EndpointRepository::V2_OPTION, $v2, false );
+			}
+			if ( [] !== $restored ) {
+				update_option( EndpointRepository::OPTION, $original, false );
 			}
 			$notes[] = 'verify failed: enabled changed or api_key present, v2 restored';
 			return [
