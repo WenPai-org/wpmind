@@ -84,8 +84,66 @@ class LlmsTxtGenerator {
 			}
 		);
 
-		// Handle request.
-		add_action( 'template_redirect', array( $this, 'handle_request' ) );
+		// Handle request before redirect_canonical (template_redirect/10) can
+		// turn /llms.txt into a front-page style /llms.txt/ 301.
+		add_action( 'template_redirect', array( $this, 'handle_request' ), 1 );
+
+		// Fallback for code that runs redirect_canonical() earlier.
+		add_filter( 'redirect_canonical', array( $this, 'filter_redirect_canonical' ) );
+	}
+
+	/**
+	 * Never canonical-redirect a llms.txt request.
+	 *
+	 * @param string|false $redirect_url Redirect target computed by core.
+	 * @return string|false False for llms.txt requests, otherwise unchanged.
+	 */
+	public function filter_redirect_canonical( $redirect_url ) {
+		if ( get_query_var( 'wpmind_llms_txt' ) ) {
+			return false;
+		}
+		return $redirect_url;
+	}
+
+	/**
+	 * Public URL of llms.txt for the current site.
+	 *
+	 * Plain permalinks have no rewrite rules, so only the query form works there.
+	 *
+	 * @return string URL.
+	 */
+	public static function get_public_url(): string {
+		if ( '' === (string) get_option( 'permalink_structure' ) ) {
+			return add_query_arg( 'wpmind_llms_txt', '1', home_url( '/' ) );
+		}
+		return home_url( '/llms.txt' );
+	}
+
+	/**
+	 * Detect other providers of /llms.txt (detect and warn only, never yield).
+	 *
+	 * @return string[] Human-readable conflict notices.
+	 */
+	public static function detect_conflicts(): array {
+		global $wp_rewrite;
+
+		$conflicts = array();
+
+		$root = function_exists( 'get_home_path' ) ? get_home_path() : ABSPATH;
+		if ( file_exists( trailingslashit( $root ) . 'llms.txt' ) ) {
+			$conflicts[] = __( '站点根目录已有一个 llms.txt 文件，服务器会直接返回这个文件，WPMind 生成的内容不会生效。', 'wpmind' );
+		}
+
+		if ( $wp_rewrite instanceof \WP_Rewrite ) {
+			foreach ( $wp_rewrite->extra_rules_top as $regex => $query ) {
+				if ( false !== strpos( (string) $regex, 'llms' ) && false === strpos( (string) $query, 'wpmind_llms_txt' ) ) {
+					$conflicts[] = __( '另一个插件也注册了 llms.txt 的重写规则，/llms.txt 可能由它响应。', 'wpmind' );
+					break;
+				}
+			}
+		}
+
+		return $conflicts;
 	}
 
 	/**
@@ -104,9 +162,14 @@ class LlmsTxtGenerator {
 	 * Render llms.txt content.
 	 */
 	public function render(): void {
-		// Set content type.
-		header( 'Content-Type: text/markdown; charset=utf-8' );
+		// Explicit 200: the matched rule leaves WP_Query looking like the front page.
+		// /llms.txt/ is answered here too (no 301 back, cached 301s would loop).
+		status_header( 200 );
+		header( 'Content-Type: text/plain; charset=utf-8' );
+		header( 'X-Content-Type-Options: nosniff' );
 		header( 'X-Robots-Tag: noindex' );
+		header( 'X-WPMind-Llms-Txt: 1' );
+		header( 'Link: <' . esc_url_raw( self::get_public_url() ) . '>; rel="canonical"' );
 
 		// Try to get cached content.
 		$content = $this->get_cached_content();
@@ -411,14 +474,14 @@ class LlmsTxtGenerator {
 		$instance = new self();
 		$instance->register_routes();
 
-		// Flush rules.
-		flush_rewrite_rules();
+		// Flush rules (soft, no .htaccess write).
+		flush_rewrite_rules( false );
 	}
 
 	/**
 	 * Flush rewrite rules on deactivation.
 	 */
 	public static function deactivate(): void {
-		flush_rewrite_rules();
+		flush_rewrite_rules( false );
 	}
 }

@@ -27,3 +27,7 @@ node_modules/
 *.swp
 *~
 .phpunit.result.cache
+
+# Playwright 产物
+/test-results/
+/playwright-report/

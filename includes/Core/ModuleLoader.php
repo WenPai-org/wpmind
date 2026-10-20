@@ -328,8 +328,9 @@ class ModuleLoader {
 		update_option( "wpmind_module_{$module_id}_enabled", '1', false );
 		$this->modules[ $module_id ]['enabled'] = true;
 
-		// Flush rewrite rules to register module routes.
-		flush_rewrite_rules();
+		// Defer the flush: this request loaded modules with the old state, so
+		// flushing now would store rules without the module routes.
+		RewriteFlush::request_flush();
 
 		/**
 		 * Fires when a module is enabled.
@@ -361,8 +362,9 @@ class ModuleLoader {
 		update_option( "wpmind_module_{$module_id}_enabled", '0', false );
 		$this->modules[ $module_id ]['enabled'] = false;
 
-		// Flush rewrite rules to remove module routes.
-		flush_rewrite_rules();
+		// Defer the flush: the module is still loaded in this request, so
+		// flushing now would write its routes back.
+		RewriteFlush::request_flush();
 
 		/**
 		 * Fires when a module is disabled.

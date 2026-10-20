@@ -1,11 +1,13 @@
 includes:
     - %rootDir%/../../szepeviktor/phpstan-wordpress/extension.neon
+    - tests/baseline/phpstan-baseline.neon
 
 parameters:
-    level: 3
+    level: 5
     paths:
         - includes
         - modules
+        - templates
         - wpmind.php
         - uninstall.php
     excludePaths:
@@ -13,7 +15,5 @@ parameters:
             - vendor (?)
             - tests (?)
             - node_modules (?)
-    # 忽略的错误模式（level 3 暂无需忽略，升级 level 时按需添加）
-    ignoreErrors: []
     checkUninitializedProperties: true
     checkMissingCallableSignature: true

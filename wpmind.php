@@ -46,6 +46,10 @@ if ( ! defined( 'WPMIND_PLUGIN_BASENAME' ) ) {
 if ( ! defined( 'WPMIND_PATH' ) ) {
 	define( 'WPMIND_PATH', WPMIND_PLUGIN_DIR );
 }
+// Per-site DB schema version (integer, decoupled from the plugin version; +1 when routes or tables change).
+if ( ! defined( 'WPMIND_DB_VERSION' ) ) {
+	define( 'WPMIND_DB_VERSION', 2 );
+}
 
 /**
  * 插件主类
@@ -761,6 +765,9 @@ function wpmind(): WPMind {
 	return WPMind::instance();
 }
 
+// Deferred rewrite flush; activation/deactivation hooks use it too, so load it here.
+require_once WPMIND_PLUGIN_DIR . 'includes/Core/RewriteFlush.php';
+
 /**
  * 插件激活钩子
  *
@@ -779,7 +786,7 @@ function activate(): void {
 
 	// Schedule rewrite rules flush for after plugin is fully loaded.
 	// This ensures module routes are registered before flushing.
-	add_option( 'wpmind_flush_rewrite_rules', '1' );
+	\WPMind\Core\RewriteFlush::request_flush();
 }
 register_activation_hook( WPMIND_PLUGIN_FILE, __NAMESPACE__ . '\\activate' );
 
@@ -819,36 +826,27 @@ add_action( 'plugins_loaded', __NAMESPACE__ . '\\maybe_upgrade_module_defaults',
  * @since 1.1.0
  */
 function deactivate(): void {
-	// Flush rewrite rules to remove plugin routes.
-	flush_rewrite_rules();
+	// Drop the stored rules; core rebuilds them without WPMind routes on the next request.
+	// Flushing here would write the still-registered routes back.
+	\WPMind\Core\RewriteFlush::on_deactivate();
 }
 register_deactivation_hook( WPMIND_PLUGIN_FILE, __NAMESPACE__ . '\\deactivate' );
 
 // 初始化插件
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\wpmind' );
 
-// Flush rewrite rules after plugin activation (delayed to ensure routes are registered).
-// Use admin_init for admin requests, or a later init priority for frontend.
-add_action(
-	'admin_init',
-	function (): void {
-		if ( get_option( 'wpmind_flush_rewrite_rules' ) === '1' ) {
-			delete_option( 'wpmind_flush_rewrite_rules' );
-			flush_rewrite_rules();
-		}
-	}
-);
+// Deferred rewrite flush: route-related option changes only set a per-site flag;
+// the single consumer runs on wp_loaded (after every module's init, before
+// admin_init and parse_request), deletes the flag, then soft flushes.
+\WPMind\Core\RewriteFlush::register_hooks();
 
-// Also check on frontend requests with high priority.
-add_action(
-	'wp_loaded',
-	function (): void {
-		if ( get_option( 'wpmind_flush_rewrite_rules' ) === '1' ) {
-			delete_option( 'wpmind_flush_rewrite_rules' );
-			flush_rewrite_rules();
-		}
-	}
-);
+/**
+ * Per-site db_version upgrade; runs after modules load (plugins_loaded/10).
+ */
+function maybe_upgrade_db(): void {
+	\WPMind\Core\RewriteFlush::maybe_upgrade_db( (int) WPMIND_DB_VERSION );
+}
+add_action( 'plugins_loaded', __NAMESPACE__ . '\\maybe_upgrade_db', 20 );
 
 /**
  * PSR-4 自动加载器

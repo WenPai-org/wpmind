@@ -1,0 +1,553 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../includes/API/ErrorHandler.php
+
+		-
+			message: '#^Variable \$body on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
+			count: 1
+			path: ../../includes/API/ErrorHandler.php
+
+		-
+			message: '#^Variable \$temp_file in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.variable
+			count: 4
+			path: ../../includes/API/Services/AudioService.php
+
+		-
+			message: '#^Call to function is_wp_error\(\) with array will always evaluate to false\.$#'
+			identifier: function.impossibleType
+			count: 1
+			path: ../../includes/API/Services/ImageService.php
+
+		-
+			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
+			identifier: constant.notFound
+			count: 17
+			path: ../../includes/Admin/AdminAssets.php
+
+		-
+			message: '#^Constant WPMIND_PLUGIN_DIR not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: ../../includes/Admin/AdminPage.php
+
+		-
+			message: '#^Comparison operation "\>" between 2 and 1 is always true\.$#'
+			identifier: greater.alwaysTrue
+			count: 2
+			path: ../../includes/Admin/AjaxController.php
+
+		-
+			message: '#^Ternary operator condition is always true\.$#'
+			identifier: ternary.alwaysTrue
+			count: 1
+			path: ../../includes/Admin/AjaxController.php
+
+		-
+			message: '#^Offset ''hits''\|''misses''\|''writes'' on array\{hits\: int, misses\: int, writes\: int, last_hit_at\: int, last_miss_at\: int, last_write_at\: int, last_key\: string\} in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 2
+			path: ../../includes/Cache/ExactCache.php
+
+		-
+			message: '#^Offset ''last_hit_at''\|''last_key''\|''last_miss_at''\|''last_write_at'' on array\{hits\: int, misses\: int, writes\: int, last_hit_at\: int, last_miss_at\: int, last_write_at\: int, last_key\: string\} in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 1
+			path: ../../includes/Cache/ExactCache.php
+
+		-
+			message: '#^Property WPMind\\Cache\\ExactCache\:\:\$pending_stats \(array\<string, int\|string\>\) in empty\(\) is not falsy\.$#'
+			identifier: empty.property
+			count: 1
+			path: ../../includes/Cache/ExactCache.php
+
+		-
+			message: '#^Property WPMind\\Cache\\ExactCache\:\:\$pending_stats \(array\{hits\: int, misses\: int, writes\: int, last_hit_at\: int, last_miss_at\: int, last_write_at\: int, last_key\: string\}\) does not accept array\{\}\.$#'
+			identifier: assign.propertyType
+			count: 2
+			path: ../../includes/Cache/ExactCache.php
+
+		-
+			message: '#^Property WPMind\\Cache\\ExactCache\:\:\$pending_stats \(array\{hits\: int, misses\: int, writes\: int, last_hit_at\: int, last_miss_at\: int, last_write_at\: int, last_key\: string\}\) does not accept default value of type array\{\}\.$#'
+			identifier: property.defaultValue
+			count: 1
+			path: ../../includes/Cache/ExactCache.php
+
+		-
+			message: '#^Right side of && is always true\.$#'
+			identifier: booleanAnd.rightAlwaysTrue
+			count: 1
+			path: ../../includes/Cache/ExactCache.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between non\-empty\-string and '''' will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: ../../includes/Cache/ExactCache.php
+
+		-
+			message: '#^Call to function is_array\(\) with array\<mixed\> will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../includes/MCP/Gateway.php
+
+		-
+			message: '#^Constant WPMIND_PLUGIN_DIR not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: ../../includes/Providers/AbstractOpenAiCompatibleProvider.php
+
+		-
+			message: '#^Class WPMind\\Providers\\Image\\AbstractImageProvider has an uninitialized property \$base_url\. Give it default value or assign it in the constructor\.$#'
+			identifier: property.uninitialized
+			count: 1
+			path: ../../includes/Providers/Image/AbstractImageProvider.php
+
+		-
+			message: '#^Class WPMind\\Providers\\Image\\AbstractImageProvider has an uninitialized property \$id\. Give it default value or assign it in the constructor\.$#'
+			identifier: property.uninitialized
+			count: 1
+			path: ../../includes/Providers/Image/AbstractImageProvider.php
+
+		-
+			message: '#^Class WPMind\\Providers\\Image\\AbstractImageProvider has an uninitialized property \$name\. Give it default value or assign it in the constructor\.$#'
+			identifier: property.uninitialized
+			count: 1
+			path: ../../includes/Providers/Image/AbstractImageProvider.php
+
+		-
+			message: '#^Offset 0 on non\-empty\-list\<string\> on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../includes/Providers/Image/FluxImageProvider.php
+
+		-
+			message: '#^Offset 0 on non\-empty\-list\<non\-falsy\-string\> on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../includes/Providers/Image/GeminiImageProvider.php
+
+		-
+			message: '#^Call to static method init\(\) on an unknown class WordPress\\AI_Client\\HTTP\\WP_AI_Client_Discovery_Strategy\.$#'
+			identifier: class.notFound
+			count: 1
+			path: ../../includes/Providers/register.php
+
+		-
+			message: '#^Constant WPMIND_PLUGIN_DIR not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: ../../includes/Providers/register.php
+
+		-
+			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: ../../includes/Providers/register.php
+
+		-
+			message: '#^Offset ''credentials_url'' on array\{name\: string, description\: string, credentials_url\: string\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../includes/Providers/register.php
+
+		-
+			message: '#^Right side of && is always true\.$#'
+			identifier: booleanAnd.rightAlwaysTrue
+			count: 1
+			path: ../../includes/Providers/register.php
+
+		-
+			message: '#^Method WPMind\\Routing\\RoutingHooks\:\:infer_model_type\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: ../../includes/Routing/RoutingHooks.php
+
+		-
+			message: '#^Invalid array key type array\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 2
+			path: ../../includes/Routing/Strategies/LoadBalancedStrategy.php
+
+		-
+			message: '#^Method WPMind\\Routing\\Strategies\\LoadBalancedStrategy\:\:random\(\) should return string but returns array\.$#'
+			identifier: return.type
+			count: 1
+			path: ../../includes/Routing/Strategies/LoadBalancedStrategy.php
+
+		-
+			message: '#^Method WPMind\\Routing\\Strategies\\LoadBalancedStrategy\:\:round_robin\(\) should return string but returns array\.$#'
+			identifier: return.type
+			count: 1
+			path: ../../includes/Routing/Strategies/LoadBalancedStrategy.php
+
+		-
+			message: '#^Offset array on array\<string, int\> on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../includes/Routing/Strategies/LoadBalancedStrategy.php
+
+		-
+			message: '#^Parameter \#1 \$providerId of method WPMind\\Routing\\RoutingContext\:\:get_health_score\(\) expects string, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../includes/Routing/Strategies/LoadBalancedStrategy.php
+
+		-
+			message: '#^Parameter \#1 \$providers of method WPMind\\Routing\\Strategies\\LoadBalancedStrategy\:\:random\(\) expects array\<string, array\>, array\<string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../includes/Routing/Strategies/LoadBalancedStrategy.php
+
+		-
+			message: '#^Parameter \#1 \$providers of method WPMind\\Routing\\Strategies\\LoadBalancedStrategy\:\:round_robin\(\) expects array\<string, array\>, array\<string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../includes/Routing/Strategies/LoadBalancedStrategy.php
+
+		-
+			message: '#^Parameter \#1 \$providers of method WPMind\\Routing\\Strategies\\LoadBalancedStrategy\:\:weighted\(\) expects array\<string, array\>, array\<string\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../includes/Routing/Strategies/LoadBalancedStrategy.php
+
+		-
+			message: '#^Offset ''input'' on array\{input\: float, output\: float\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../includes/Usage/Pricing.php
+
+		-
+			message: '#^Offset ''output'' on array\{input\: float, output\: float\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../includes/Usage/Pricing.php
+
+		-
+			message: '#^Offset ''AuthorName'' on array\{Name\: string, PluginURI\: string, Version\: string, Description\: string, Author\: string, AuthorURI\: string, TextDomain\: string, DomainPath\: string, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../includes/class-wenpai-updater.php
+
+		-
+			message: '#^Offset ''Description'' on array\{Name\: string, PluginURI\: string, Version\: string, Description\: string, Author\: string, AuthorURI\: string, TextDomain\: string, DomainPath\: string, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../includes/class-wenpai-updater.php
+
+		-
+			message: '#^Offset ''Name'' on array\{Name\: string, PluginURI\: string, Version\: string, Description\: string, Author\: string, AuthorURI\: string, TextDomain\: string, DomainPath\: string, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../includes/class-wenpai-updater.php
+
+		-
+			message: '#^Offset ''PluginURI'' on array\{Name\: string, PluginURI\: string, Version\: string, Description\: string, Author\: string, AuthorURI\: string, TextDomain\: string, DomainPath\: string, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../includes/class-wenpai-updater.php
+
+		-
+			message: '#^Offset ''RequiresPHP'' on array\{Name\: string, PluginURI\: string, Version\: string, Description\: string, Author\: string, AuthorURI\: string, TextDomain\: string, DomainPath\: string, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../includes/class-wenpai-updater.php
+
+		-
+			message: '#^Offset ''RequiresWP'' on array\{Name\: string, PluginURI\: string, Version\: string, Description\: string, Author\: string, AuthorURI\: string, TextDomain\: string, DomainPath\: string, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../includes/class-wenpai-updater.php
+
+		-
+			message: '#^Comparison operation "\>" between int\<1, max\> and 0 is always true\.$#'
+			identifier: greater.alwaysTrue
+			count: 1
+			path: ../../modules/analytics/includes/AnalyticsManager.php
+
+		-
+			message: '#^Parameter \#2 \$callback of function usort expects callable\(array\{provider\: int\|string, provider_name\: string, avg_latency\: float, min_latency\: mixed, max_latency\: mixed, sample_count\: int\<1, max\>\}, array\{provider\: int\|string, provider_name\: string, avg_latency\: float, min_latency\: mixed, max_latency\: mixed, sample_count\: int\<1, max\>\}\)\: int, Closure\(mixed, mixed\)\: float given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../modules/analytics/includes/AnalyticsManager.php
+
+		-
+			message: '#^@param tag must not be named \$this\. Choose a descriptive alias, for example \$instance\.$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../modules/api-gateway/ApiGatewayModule.php
+
+		-
+			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: ../../modules/api-gateway/ApiGatewayModule.php
+
+		-
+			message: '#^Class WPMind\\Modules\\ApiGateway\\Pipeline\\GatewayRequestContext has an uninitialized property \$operation\. Give it default value or assign it in the constructor\.$#'
+			identifier: property.uninitialized
+			count: 1
+			path: ../../modules/api-gateway/includes/Pipeline/GatewayRequestContext.php
+
+		-
+			message: '#^Class WPMind\\Modules\\ApiGateway\\Pipeline\\GatewayRequestContext has an uninitialized property \$request_id\. Give it default value or assign it in the constructor\.$#'
+			identifier: property.uninitialized
+			count: 1
+			path: ../../modules/api-gateway/includes/Pipeline/GatewayRequestContext.php
+
+		-
+			message: '#^Class WPMind\\Modules\\ApiGateway\\Pipeline\\GatewayRequestContext has an uninitialized property \$rest_request\. Give it default value or assign it in the constructor\.$#'
+			identifier: property.uninitialized
+			count: 1
+			path: ../../modules/api-gateway/includes/Pipeline/GatewayRequestContext.php
+
+		-
+			message: '#^Class WPMind\\Modules\\ApiGateway\\Pipeline\\GatewayRequestContext has an uninitialized property \$start_time\. Give it default value or assign it in the constructor\.$#'
+			identifier: property.uninitialized
+			count: 1
+			path: ../../modules/api-gateway/includes/Pipeline/GatewayRequestContext.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>key_id" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: ../../modules/api-gateway/includes/Pipeline/GatewayRequestContext.php
+
+		-
+			message: '#^Negated boolean expression is always false\.$#'
+			identifier: booleanNot.alwaysFalse
+			count: 1
+			path: ../../modules/api-gateway/includes/Pipeline/RequestTransformMiddleware.php
+
+		-
+			message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../modules/api-gateway/includes/RateLimit/RedisRateStore.php
+
+		-
+			message: '#^@param tag must not be named \$this\. Choose a descriptive alias, for example \$instance\.$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../modules/auto-meta/AutoMetaModule.php
+
+		-
+			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: ../../modules/auto-meta/AutoMetaModule.php
+
+		-
+			message: '#^Method WPMind\\Modules\\AutoMeta\\AutoMetaModule\:\:get_settings_tab\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: ../../modules/auto-meta/AutoMetaModule.php
+
+		-
+			message: '#^@param tag must not be named \$this\. Choose a descriptive alias, for example \$instance\.$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../modules/cost-control/CostControlModule.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, float\|int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../modules/cost-control/includes/BudgetAlert.php
+
+		-
+			message: '#^Constant WPMind\\Modules\\CostControl\\UsageTracker\:\:PRICING is unused\.$#'
+			identifier: classConstant.unused
+			count: 1
+			path: ../../modules/cost-control/includes/UsageTracker.php
+
+		-
+			message: '#^Offset ''daily'' on non\-empty\-array\<mixed\> on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../modules/cost-control/includes/UsageTracker.php
+
+		-
+			message: '#^Offset ''monthly'' on non\-empty\-array\<mixed\> on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../modules/cost-control/includes/UsageTracker.php
+
+		-
+			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: ../../modules/exact-cache/ExactCacheModule.php
+
+		-
+			message: '#^Method WPMind\\Modules\\ExactCache\\ExactCacheModule\:\:get_settings_tab\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: ../../modules/exact-cache/ExactCacheModule.php
+
+		-
+			message: '#^Negated boolean expression is always true\.$#'
+			identifier: booleanNot.alwaysTrue
+			count: 1
+			path: ../../modules/exact-cache/includes/DailyStats.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
+			identifier: argument.type
+			count: 2
+			path: ../../modules/exact-cache/templates/settings.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_html expects string, int given\.$#'
+			identifier: argument.type
+			count: 2
+			path: ../../modules/exact-cache/templates/settings.php
+
+		-
+			message: '#^@param tag must not be named \$this\. Choose a descriptive alias, for example \$instance\.$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../modules/geo/GeoModule.php
+
+		-
+			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: ../../modules/geo/GeoModule.php
+
+		-
+			message: '#^Array has 2 duplicate keys with value ''"'' \(''"'', ''"''\)\.$#'
+			identifier: array.duplicateKey
+			count: 1
+			path: ../../modules/geo/includes/ChineseOptimizer.php
+
+		-
+			message: '#^Parameter \#2 \$user_id of function get_the_author_meta expects int\|false, ''''\|numeric\-string given\.$#'
+			identifier: argument.type
+			count: 3
+			path: ../../modules/geo/includes/GeoSignalInjector.php
+
+		-
+			message: '#^Offset 1 on array\{non\-falsy\-string, string, string\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../modules/geo/includes/HtmlToMarkdown.php
+
+		-
+			message: '#^Variable \$metadata in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: ../../modules/geo/includes/MarkdownProcessor.php
+
+		-
+			message: '#^Parameter \#1 \$author_id of function get_author_posts_url expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../modules/geo/includes/SchemaGenerator.php
+
+		-
+			message: '#^Parameter \#1 \$user_id of function get_user_meta expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../modules/geo/includes/SchemaGenerator.php
+
+		-
+			message: '#^Parameter \#1 \$user_id of function get_userdata expects int, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../modules/geo/includes/SchemaGenerator.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_html expects string, int\<0, max\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../modules/geo/templates/settings.php
+
+		-
+			message: '#^@param tag must not be named \$this\. Choose a descriptive alias, for example \$instance\.$#'
+			identifier: phpDoc.parseError
+			count: 1
+			path: ../../modules/media-intelligence/MediaIntelligenceModule.php
+
+		-
+			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: ../../modules/media-intelligence/MediaIntelligenceModule.php
+
+		-
+			message: '#^Method WPMind\\Modules\\MediaIntelligence\\MediaIntelligenceModule\:\:get_settings_tab\(\) never returns null so it can be removed from the return type\.$#'
+			identifier: return.unusedType
+			count: 1
+			path: ../../modules/media-intelligence/MediaIntelligenceModule.php
+
+		-
+			message: '#^Constant WPMIND_PLUGIN_DIR not found\.$#'
+			identifier: constant.notFound
+			count: 7
+			path: ../../templates/settings-page.php
+
+		-
+			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: ../../templates/settings-page.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_html expects string, int\<0, max\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../templates/tabs/geo.php
+
+		-
+			message: '#^Offset ''color'' on array\{icon\: ''ri\-cloud\-line''\|''ri\-fire\-line''\|''ri\-gemini\-line''\|''ri\-openai\-line''\|''ri\-rainbow\-line''\|''ri\-sparkling\-2\-line'', color\: ''\#50575e''\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../templates/tabs/images.php
+
+		-
+			message: '#^Offset ''icon'' on array\{icon\: ''ri\-cloud\-line''\|''ri\-fire\-line''\|''ri\-gemini\-line''\|''ri\-openai\-line''\|''ri\-rainbow\-line''\|''ri\-sparkling\-2\-line'', color\: ''\#50575e''\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: ../../templates/tabs/images.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_html expects string, int\<0, max\> given\.$#'
+			identifier: argument.type
+			count: 5
+			path: ../../templates/tabs/overview.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_html expects string, float\|int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../templates/tabs/routing.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_html expects string, int\<0, max\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../templates/tabs/routing.php
+
+		-
+			message: '#^Parameter \#1 \$text of function esc_html expects string, int\<1, max\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: ../../templates/tabs/routing.php
+
+		-
+			message: '#^Action callback returns WPMind\\WPMind but should not return anything\.$#'
+			identifier: return.void
+			count: 1
+			path: ../../wpmind.php
+
+		-
+			message: '#^Call to function is_object\(\) with object will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: ../../wpmind.php

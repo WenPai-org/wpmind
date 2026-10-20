@@ -1,0 +1,30 @@
+# gitleaks 配置（CI 与 pre-commit 均为 gitleaks v8.27.2）
+# gitleaks detect --source=. 会自动读取仓库根目录的 .gitleaks.toml。
+title = "wpmind gitleaks config"
+
+[extend]
+# 继承 gitleaks 内置的全部默认规则，只在其上追加放行项。
+useDefault = true
+
+# API 网关文档和设置页里的 curl 示例使用固定占位符 sk_mind_xxx / sk_mind_YOUR_KEY，
+# 被 curl-auth-header 规则误报。这里只对 curl-auth-header 这一条规则放行，
+# 并且 condition = "AND"：提取出的密钥必须恰好是这两个占位符之一，同时文件必须是这两个文件之一。
+# 不写提交和行号（settings.php 的这一处在不同提交里行号不同，256 和 270 都出现过）。
+#
+# 用规则级 allowlist 而不用全局 [[allowlists]]：v8.27.2 实测全局 [[allowlists]] 的 AND
+# 在 git 模式下正常，但在 `gitleaks dir` 模式下会退化成只看路径（这两个文件里的任何密钥都被放过）；
+# 全局 [[allowlists]] 加 targetRules 在 extend 配置里不生效。规则级 allowlist 两种模式下都是真正的 AND。
+[[rules]]
+id = "curl-auth-header"
+
+  [[rules.allowlists]]
+  description = "Documented sk_mind placeholder keys in API gateway curl examples"
+  condition = "AND"
+  # regexTarget 默认是 secret（提取出的密钥本身），首尾锚定，只认这两个占位符。
+  regexes = [
+    '''^sk_mind_(?:xxx|YOUR_KEY)$''',
+  ]
+  paths = [
+    '''^modules/api-gateway/DEPLOYMENT\.md$''',
+    '''^modules/api-gateway/templates/settings\.php$''',
+  ]

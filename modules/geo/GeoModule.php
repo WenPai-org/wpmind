@@ -231,12 +231,14 @@ class GeoModule implements ModuleInterface {
 	}
 
 	/**
-	 * Flush rewrite rules if flagged by AJAX save.
+	 * Hand a legacy (pre-db_version 2) flush transient over to the deferred flag.
+	 *
+	 * Kept for one release so a transient set by the previous version is not lost.
 	 */
 	public function maybe_flush_rewrite_rules(): void {
 		if ( get_transient( 'wpmind_flush_rewrite_rules' ) ) {
 			delete_transient( 'wpmind_flush_rewrite_rules' );
-			flush_rewrite_rules();
+			\WPMind\Core\RewriteFlush::request_flush();
 		}
 	}
 
@@ -374,7 +376,7 @@ class GeoModule implements ModuleInterface {
 		// Flush rewrite rules if markdown feed or AI sitemap setting changed.
 		if ( isset( $settings['wpmind_standalone_markdown_feed'] ) || isset( $settings['wpmind_ai_sitemap_enabled'] ) ) {
 			// Schedule flush for next page load to ensure routes are registered.
-			set_transient( 'wpmind_flush_rewrite_rules', '1', 60 );
+			\WPMind\Core\RewriteFlush::request_flush();
 		}
 
 		wp_send_json_success( array( 'message' => __( '设置已保存', 'wpmind' ) ) );

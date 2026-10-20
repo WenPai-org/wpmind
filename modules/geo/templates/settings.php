@@ -228,7 +228,7 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
 									<li><?php esc_html_e( '关联 Wikidata 实体，消除语义歧义', 'wpmind' ); ?></li>
 									<li><?php esc_html_e( '控制 AI 爬虫访问，保护敏感内容', 'wpmind' ); ?></li>
 								</ul>
-								<p><a href="<?php echo esc_url( $learn_more_url ); ?>" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
+								<p><a href="<?php echo esc_url( $learn_more_url ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
 							</div>
 						</div>
 					</div><!-- /right -->
@@ -288,7 +288,13 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
 					<?php if ( $llms_txt_enabled ) : ?>
 					<div class="wpmind-geo-urls">
 						<p class="wpmind-geo-url-title"><?php esc_html_e( '访问地址：', 'wpmind' ); ?></p>
-						<code class="wpmind-geo-url"><?php echo esc_url( home_url( '/llms.txt' ) ); ?></code>
+						<code class="wpmind-geo-url"><?php echo esc_url( \WPMind\Modules\Geo\LlmsTxtGenerator::get_public_url() ); ?></code>
+						<?php if ( '' === (string) get_option( 'permalink_structure' ) ) : ?>
+						<p class="description"><?php esc_html_e( '当前是朴素固定链接，只能用上面这个带参数的地址。启用固定链接后才有 /llms.txt。', 'wpmind' ); ?></p>
+						<?php endif; ?>
+						<?php foreach ( \WPMind\Modules\Geo\LlmsTxtGenerator::detect_conflicts() as $wpmind_llms_conflict ) : ?>
+						<p class="description wpmind-geo-warning"><?php echo esc_html( $wpmind_llms_conflict ); ?></p>
+						<?php endforeach; ?>
 					</div>
 					<?php endif; ?>
 				</div>
@@ -318,7 +324,7 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
 					</div>
 					<div class="wpmind-geo-urls" style="margin-top:12px;">
 						<p class="wpmind-geo-url-title"><?php esc_html_e( '访问地址：', 'wpmind' ); ?></p>
-						<code class="wpmind-geo-url"><?php echo esc_url( home_url( '/ai-sitemap.xml' ) ); ?></code>
+						<code class="wpmind-geo-url"><?php echo esc_url( \WPMind\Modules\Geo\AiSitemapGenerator::get_public_url() ); ?></code>
 					</div>
 					<?php endif; ?>
 				</div>
@@ -369,7 +375,7 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
 								<li><?php esc_html_e( 'AI Sitemap 包含内容声明等 AI 专属元数据', 'wpmind' ); ?></li>
 								<li><?php esc_html_e( 'AI 摘要让您主动控制 AI 如何描述文章', 'wpmind' ); ?></li>
 							</ul>
-							<p><a href="<?php echo esc_url( $learn_more_url ); ?>" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
+							<p><a href="<?php echo esc_url( $learn_more_url ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
 						</div>
 					</div>
 				</div><!-- /right -->
@@ -626,7 +632,7 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
 								<li><?php esc_html_e( '内容声明标注 AI 参与程度（原创/辅助/生成）', 'wpmind' ); ?></li>
 								<li><?php esc_html_e( 'X-Robots-Tag HTTP 头对非 HTML 资源生效', 'wpmind' ); ?></li>
 							</ul>
-							<p><a href="<?php echo esc_url( $learn_more_url ); ?>" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
+							<p><a href="<?php echo esc_url( $learn_more_url ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
 						</div>
 					</div>
 				</div><!-- /right -->
@@ -708,7 +714,7 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
 								<li><?php esc_html_e( '规则通过 WordPress 过滤器注入，不修改物理文件', 'wpmind' ); ?></li>
 								<li><?php esc_html_e( 'Allow 允许爬取，Disallow 禁止爬取', 'wpmind' ); ?></li>
 							</ul>
-							<p><a href="<?php echo esc_url( $learn_more_url ); ?>" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
+							<p><a href="<?php echo esc_url( $learn_more_url ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
 						</div>
 					</div>
 				</div><!-- /right -->
@@ -892,7 +898,7 @@ $learn_more_url = 'https://wpcy.com/c/wpmind';
 								<li><?php esc_html_e( '文章 publisher 自动增强，无需逐篇配置', 'wpmind' ); ?></li>
 								<li><?php esc_html_e( '文章实体关联通过 about.sameAs 消除语义歧义', 'wpmind' ); ?></li>
 							</ul>
-							<p><a href="<?php echo esc_url( $learn_more_url ); ?>" target="_blank" rel="noopener"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
+							<p><a href="<?php echo esc_url( $learn_more_url ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( '了解更多 →', 'wpmind' ); ?></a></p>
 						</div>
 					</div>
 				</div><!-- /right -->
