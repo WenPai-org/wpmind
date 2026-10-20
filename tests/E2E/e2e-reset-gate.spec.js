@@ -30,14 +30,27 @@ const ANON_STATE = {
 	origins: [],
 };
 
-const SUB = { username: 'wpmind_e2e_subscriber', email: 'wpmind-e2e-sub@example.org' };
+// 多站点只允许小写字母和数字的用户名，所以不用下划线。
+const SUB = { username: 'wpminde2esubscriber', email: 'wpmind-e2e-sub@example.org' };
+
+async function findSubscriber() {
+	const users = await e2eCore('GET', `/wp/v2/users&search=${SUB.username}&context=edit`);
+	return users.find((u) => u.username === SUB.username);
+}
 
 async function deleteSubscriber() {
-	const users = await e2eCore('GET', `/wp/v2/users&search=${SUB.username}&context=edit`);
-	for (const u of users) {
-		if (u.username === SUB.username) {
-			await e2eCore('DELETE', `/wp/v2/users/${u.id}&force=true&reassign=1`);
-		}
+	// 多站点的 Core REST 不支持删用户（501），保留用户，下次用例重设密码和角色。
+	if ((await e2eRest('GET', '/info')).multisite) return;
+	const u = await findSubscriber();
+	if (u) await e2eCore('DELETE', `/wp/v2/users/${u.id}&force=true&reassign=1`);
+}
+
+async function createOrResetSubscriber(password) {
+	const u = await findSubscriber();
+	if (u) {
+		await e2eCore('POST', `/wp/v2/users/${u.id}`, { password, roles: ['subscriber'] });
+	} else {
+		await e2eCore('POST', '/wp/v2/users', { ...SUB, password, roles: ['subscriber'] });
 	}
 }
 
@@ -85,7 +98,7 @@ test('未登录、管理员 cookie 不带 nonce：401，选项不被写入', asy
 test('subscriber 登录并带自己的 nonce：403，选项不被写入', async ({ browser }) => {
 	await deleteSubscriber();
 	const password = `Sub-${Date.now()}-e2e!Pw`;
-	await e2eCore('POST', '/wp/v2/users', { ...SUB, password, roles: ['subscriber'] });
+	await createOrResetSubscriber(password);
 
 	const ctx = await browser.newContext({ baseURL, storageState: ANON_STATE });
 	const page = await ctx.newPage();
