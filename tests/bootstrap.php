@@ -276,3 +276,74 @@ if ( ! function_exists( 'sanitize_key' ) ) {
 
 // Autoload the plugin classes.
 require_once WPMIND_PLUGIN_DIR . 'includes/SDK/SDKAdapter.php';
+
+if ( ! class_exists( 'WPMind_Test_WPDB' ) ) {
+	/**
+	 * Minimal $wpdb double backed by $GLOBALS['wpmind_test_options'].
+	 *
+	 * Supports esc_like(), prepare() with %s/%d and get_var() for
+	 * "SELECT option_name FROM {options} WHERE option_name LIKE %s LIMIT 1".
+	 * Not installed as $GLOBALS['wpdb'] by default; tests opt in.
+	 */
+	class WPMind_Test_WPDB {
+		/** @var string */
+		public $options = 'wp_options';
+
+		/** @var list<string> Queries passed to get_var(). */
+		public $queries = [];
+
+		/** @var list<string> Raw LIKE patterns seen by prepare(). */
+		public $like_args = [];
+
+		public function esc_like( string $text ): string {
+			return addcslashes( $text, '_%\\' );
+		}
+
+		public function prepare( string $query, ...$args ): string {
+			$args = ( 1 === count( $args ) && is_array( $args[0] ) ) ? $args[0] : $args;
+			foreach ( $args as $arg ) {
+				$this->like_args[] = (string) $arg;
+			}
+			$i = 0;
+			return (string) preg_replace_callback(
+				'/%[sd]/',
+				static function ( array $m ) use ( $args, &$i ): string {
+					$value = $args[ $i++ ] ?? '';
+					return '%d' === $m[0] ? (string) (int) $value : "'" . addslashes( (string) $value ) . "'";
+				},
+				$query
+			);
+		}
+
+		/**
+		 * @return string|null
+		 */
+		public function get_var( string $query ) {
+			$this->queries[] = $query;
+			if ( ! preg_match( "/option_name LIKE '((?:[^'\\\\]|\\\\.)*)'/", $query, $m ) ) {
+				return null;
+			}
+			$pattern = stripslashes( $m[1] );
+			$regex   = '';
+			$len     = strlen( $pattern );
+			for ( $k = 0; $k < $len; $k++ ) {
+				$c = $pattern[ $k ];
+				if ( '\\' === $c && $k + 1 < $len ) {
+					$regex .= preg_quote( $pattern[ ++$k ], '/' );
+				} elseif ( '%' === $c ) {
+					$regex .= '.*';
+				} elseif ( '_' === $c ) {
+					$regex .= '.';
+				} else {
+					$regex .= preg_quote( $c, '/' );
+				}
+			}
+			foreach ( array_keys( $GLOBALS['wpmind_test_options'] ) as $name ) {
+				if ( preg_match( '/^' . $regex . '$/s', (string) $name ) ) {
+					return (string) $name;
+				}
+			}
+			return null;
+		}
+	}
+}
