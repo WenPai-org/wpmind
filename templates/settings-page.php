@@ -21,11 +21,11 @@ defined( 'ABSPATH' ) || exit(); ?>
 		</span>
 
 		<span class="wpmind-title-right">
-			<a href="https://wpcy.com/mind/" target="_blank" class="wpmind-title-link">
+			<a href="https://wpcy.com/mind/" target="_blank" rel="noopener noreferrer" class="wpmind-title-link">
 				<span class="dashicons ri-book-2-line"></span>
 				<?php esc_html_e( '文档', 'wpmind' ); ?>
 			</a>
-			<a href="https://github.com/WenPai-org/wpmind" target="_blank" class="wpmind-title-link">
+			<a href="https://github.com/WenPai-org/wpmind" target="_blank" rel="noopener noreferrer" class="wpmind-title-link">
 
 
 
@@ -758,7 +758,7 @@ defined( 'ABSPATH' ) || exit(); ?>
 				<span class="dashicons ri-github-line"></span>
 				<?php esc_html_e( 'GitHub', 'wpmind' ); ?>
 			</a>
-			<a href="https://wpcy.com/c/wpmind" target="_blank" class="wpmind-title-link">
+			<a href="https://wpcy.com/c/wpmind" target="_blank" rel="noopener noreferrer" class="wpmind-title-link">
 				<span class="dashicons ri-discuss-line"></span>
 				<?php esc_html_e( '支持', 'wpmind' ); ?>
 			</a>
