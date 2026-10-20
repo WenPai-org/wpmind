@@ -56,8 +56,6 @@ jobs:
     name: Playwright e2e（wp-env playground）
     runs-on: linux-arm64
     needs: unit
-    # 首推不阻塞，runner 连续两次绿后改为必过（主 bot 2026-10-20 定）。
-    continue-on-error: true
     env:
       WP_CORE_TAG: '7.1.3'
       WP_CORE_SHA: 'fc9832bef919c2a08541248db23af90d14ffb082'

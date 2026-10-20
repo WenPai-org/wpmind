@@ -64,6 +64,7 @@ function wpmind_cleanup_site_data(): void {
 		'wpmind_exact_cache_daily_stats',
 		// 激活标记
 		'wpmind_flush_rewrite_rules',
+		'wpmind_db_version',
 		// WordPress 7.0 Connector credential mirrors managed by WPMind.
 		'connectors_ai_deepseek_api_key',
 		'connectors_ai_qwen_api_key',
