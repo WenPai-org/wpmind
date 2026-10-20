@@ -14,6 +14,9 @@ test.afterAll(async () => {
 
 const moduleOption = (id) => `wpmind_module_${id}_enabled`;
 
+// 多站点下插件更新行只在网络后台显示，单站是普通后台。
+const pluginsPage = (p) => (p.multisite ? '/wp-admin/network/plugins.php' : '/wp-admin/plugins.php');
+
 test.describe('旧站升级迁移（maybe_upgrade_module_defaults）', () => {
 	test('没有 wpmind_installed_version 时：没设过的模块变 1，已设的保留，核心模块强开，写入版本号', async ({ page }) => {
 		const { version } = await pluginInfo();
@@ -76,7 +79,7 @@ test.describe('更新通知（WPMind_Updater，伪造 updates.wenpai.net）', ()
 		expect(check.hits).toContain('/api/v1/update-check');
 		expect(check.response[p.basename]).toBe('99.0.0');
 
-		await page.goto('/wp-admin/plugins.php');
+		await page.goto(pluginsPage(p));
 		const row = page.locator(`tr.plugin-update-tr[data-plugin="${p.basename}"]`);
 		await expect(row).toBeVisible();
 		await expect(row).toContainText('99.0.0');
@@ -101,7 +104,7 @@ test.describe('更新通知（WPMind_Updater，伪造 updates.wenpai.net）', ()
 		expect(check.hits).toEqual([]);
 		expect(check.response[p.basename]).toBeUndefined();
 
-		await page.goto('/wp-admin/plugins.php');
+		await page.goto(pluginsPage(p));
 		await expect(page.locator(`tr.plugin-update-tr[data-plugin="${p.basename}"]`)).toHaveCount(0);
 		expect((await getOptions(['wpmind_e2e_fake_update_hits'])).wpmind_e2e_fake_update_hits).toBe(null);
 	});

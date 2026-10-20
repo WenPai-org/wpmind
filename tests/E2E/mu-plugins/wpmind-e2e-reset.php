@@ -99,6 +99,8 @@ function wpmind_e2e_rest_info() {
 		'slug'     => $slug,
 		'override' => (bool) apply_filters( 'wenpai_updater_override', false, $slug ),
 		'mu'       => function_exists( 'wpmind_e2e_json' ),
+		// 多站点下插件更新行只出现在网络后台 plugins.php.
+		'multisite' => is_multisite(),
 	);
 }
 
