@@ -790,35 +790,16 @@ function activate(): void {
 }
 register_activation_hook( WPMIND_PLUGIN_FILE, __NAMESPACE__ . '\\activate' );
 
+require_once WPMIND_PLUGIN_DIR . 'includes/Core/SiteDefaults.php';
+
 /**
  * Preserve legacy module behavior once when upgrading from pre-0.12 releases.
- * New installations receive explicit defaults from each module manifest.
+ * Sites created while network-active are stamped as fresh installs.
  */
 function maybe_upgrade_module_defaults(): void {
-	if ( false !== get_option( 'wpmind_installed_version', false ) ) {
-		return;
-	}
-
-	$legacy_modules = [
-		'analytics',
-		'api-gateway',
-		'auto-meta',
-		'cost-control',
-		'exact-cache',
-		'geo',
-		'media-intelligence',
-	];
-
-	foreach ( $legacy_modules as $module_id ) {
-		$option = "wpmind_module_{$module_id}_enabled";
-		if ( false === get_option( $option, false ) ) {
-			add_option( $option, '1', '', false );
-		}
-	}
-
-	add_option( 'wpmind_installed_version', WPMIND_VERSION, '', false );
+	\WPMind\Core\SiteDefaults::maybe_upgrade_module_defaults();
 }
-add_action( 'plugins_loaded', __NAMESPACE__ . '\\maybe_upgrade_module_defaults', 1 );
+\WPMind\Core\SiteDefaults::register_hooks();
 
 /**
  * 插件停用钩子
