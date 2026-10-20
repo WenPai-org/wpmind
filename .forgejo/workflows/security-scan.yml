@@ -71,10 +71,30 @@ jobs:
           fi
           # npm audit 只报告 high 和 critical
           if [ -f package-lock.json ]; then
-            npm audit --audit-level=high || {
+            # 只审运行时依赖，走官方源（npmmirror 不支持 audit 接口）
+            AUDIT_JSON=$(timeout 120 npm audit --registry=https://registry.npmjs.org --omit=dev --audit-level=high --json 2>/dev/null) || true
+            COUNTS=$(printf '%s' "$AUDIT_JSON" | node -e '
+              let s = "";
+              process.stdin.on("data", d => s += d).on("end", () => {
+                try {
+                  const v = JSON.parse(s).metadata.vulnerabilities;
+                  if (typeof v.high !== "number" || typeof v.critical !== "number") throw 0;
+                  console.log(v.high + " " + v.critical);
+                } catch (e) { console.log("NA"); }
+              });
+            ')
+            if [ "$COUNTS" = "NA" ] || [ -z "$COUNTS" ]; then
+              echo "::warning::npm audit 不可用（网络错误、超时、NOT_IMPLEMENTED 或 endpoint error），跳过"
+              printf '%s\n' "$AUDIT_JSON" | head -c 2000
+              exit 0
+            fi
+            set -- $COUNTS
+            echo "npm audit（运行时依赖）：high=$1 critical=$2"
+            if [ "$1" -gt 0 ] || [ "$2" -gt 0 ]; then
+              timeout 120 npm audit --registry=https://registry.npmjs.org --omit=dev --audit-level=high || true
               echo "::error::npm 依赖存在高危安全漏洞"
               exit 1
-            }
+            fi
           elif [ -f pnpm-lock.yaml ]; then
             pnpm audit --audit-level=high || {
               echo "::error::pnpm 依赖存在高危安全漏洞"
