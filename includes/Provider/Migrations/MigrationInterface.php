@@ -28,7 +28,7 @@ interface MigrationInterface {
 	public function id(): string;
 
 	/**
-	 * 跑完以后的 wpmind_db_version。
+	 * 跑完以后的 wpmind_endpoint_schema_version。
 	 *
 	 * @return int
 	 */

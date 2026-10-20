@@ -33,7 +33,7 @@ function wpmind_cleanup_site_data(): void {
 		'wpmind_routing_settings',
 		'wpmind_installed_version',
 		// 0.13 端点 schema v2 迁移.
-		'wpmind_db_version',
+		'wpmind_endpoint_schema_version',
 		'wpmind_migration_log',
 		'wpmind_migration_lock',
 		'wpmind_custom_endpoints_v1_backup',

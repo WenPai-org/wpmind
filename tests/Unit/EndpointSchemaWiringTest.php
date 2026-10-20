@@ -172,6 +172,7 @@ final class EndpointSchemaWiringTest extends TestCase {
 		$source = (string) file_get_contents( dirname( __DIR__, 2 ) . '/uninstall.php' );
 		$expected = [
 			EndpointRepository::OPTION,
+			'wpmind_endpoint_schema_version',
 			'wpmind_db_version',
 			'wpmind_migration_log',
 			'wpmind_migration_lock',

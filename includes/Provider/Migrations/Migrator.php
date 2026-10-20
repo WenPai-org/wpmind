@@ -21,9 +21,16 @@ namespace WPMind\Provider\Migrations;
 final class Migrator {
 
 	/**
-	 * 数据版本 option（autoload=false）。
+	 * 端点 schema 版本 option（autoload=false）。
+	 *
+	 * 独立于 RewriteFlush 的 wpmind_db_version（F1：共用时 1300 会让 rewrite 重建被跳过）。
 	 */
-	public const DB_VERSION_OPTION = 'wpmind_db_version';
+	public const SCHEMA_VERSION_OPTION = 'wpmind_endpoint_schema_version';
+
+	/**
+	 * 兼容旧代码的别名，指向 SCHEMA_VERSION_OPTION。
+	 */
+	public const DB_VERSION_OPTION = self::SCHEMA_VERSION_OPTION;
 
 	/**
 	 * 迁移日志 option（autoload=false，最多 LOG_MAX 条，不含密钥和 URL）。

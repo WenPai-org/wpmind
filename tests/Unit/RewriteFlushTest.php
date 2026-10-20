@@ -116,6 +116,16 @@ final class RewriteFlushTest extends TestCase {
 		self::assertArrayNotHasKey( RewriteFlush::FLAG_OPTION, $GLOBALS['wpmind_test_options'] );
 	}
 
+	public function test_schema_version_1300_in_db_version_still_rebuilds_and_is_corrected(): void {
+		// F1: before the split the Migrator wrote 1300 into wpmind_db_version.
+		$GLOBALS['wpmind_test_options'][ RewriteFlush::DB_VERSION_OPTION ] = 1300;
+		for ( $i = 0; $i < 5; $i++ ) {
+			$this->simulate_request();
+		}
+		self::assertSame( 1, $this->generate_count() );
+		self::assertSame( self::DB_VERSION, $GLOBALS['wpmind_test_options'][ RewriteFlush::DB_VERSION_OPTION ] );
+	}
+
 	public function test_deactivation_clears_stored_rules_without_flushing(): void {
 		$GLOBALS['wpmind_test_options']['rewrite_rules'] = [ '^llms\.txt$' => 'index.php?wpmind_llms_txt=1' ];
 

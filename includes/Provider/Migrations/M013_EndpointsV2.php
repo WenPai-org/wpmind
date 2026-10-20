@@ -13,7 +13,7 @@
  *    ProviderDefinitions::LEGACY_BASE_URLS）在已配置 key 时标记 needs_reconfigure；
  * 5. 写之前存去掉 api_key 的备份；写完重读，按 enabled 和 key 指纹校验，
  *    不一致就把除 key 以外的字段回滚；
- * 6. 由 Migrator 写 wpmind_db_version=1300 和迁移日志、释放锁。
+ * 6. 由 Migrator 写 wpmind_endpoint_schema_version=1300 和迁移日志、释放锁。
  *
  * 迁移只读 key 是否为空、只算指纹，不复制、不记录 key 原文。
  *

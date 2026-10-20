@@ -10,6 +10,7 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
+use WPMind\Core\RewriteFlush;
 use WPMind\Provider\EndpointRepository;
 use WPMind\Provider\Migrations\M013_EndpointsV2;
 use WPMind\Provider\Migrations\Migrator;
@@ -349,6 +350,24 @@ final class MigrationEndpointsV2Test extends TestCase {
 		$log = Migrator::log();
 		self::assertCount( Migrator::LOG_MAX, $log );
 		self::assertSame( 'm013_endpoints_v2', end( $log )['id'] );
+	}
+
+	/**
+	 * F1：从 0.11.5/0.12.0 升级（两个版本号都没有），plugins_loaded:2 的 Migrator
+	 * 和 plugins_loaded:20 的 RewriteFlush 都要执行，版本号各写各的 option。
+	 */
+	public function test_upgrade_runs_both_migrator_and_rewrite_rebuild(): void {
+		require_once WPMIND_PLUGIN_DIR . 'includes/Core/RewriteFlush.php';
+		self::seed( self::v1_option( [ 'deepseek' => [ 'enabled' => true, 'api_key' => self::FAKE_DEEPSEEK_KEY ] ] ) );
+
+		Migrator::maybe_run();
+		self::assertTrue( \WPMind\Core\RewriteFlush::maybe_upgrade_db( 2 ), 'rewrite rebuild must not be skipped by the schema version' );
+
+		self::assertSame( 'wpmind_endpoint_schema_version', Migrator::SCHEMA_VERSION_OPTION );
+		self::assertSame( 1300, $GLOBALS['wpmind_test_options']['wpmind_endpoint_schema_version'] );
+		self::assertSame( 2, $GLOBALS['wpmind_test_options']['wpmind_db_version'] );
+		self::assertSame( '1', $GLOBALS['wpmind_test_options'][ \WPMind\Core\RewriteFlush::FLAG_OPTION ] );
+		self::assertFalse( $GLOBALS['wpmind_test_autoload']['wpmind_endpoint_schema_version'] ?? false );
 	}
 
 	public function test_historical_default_lists_cover_all_released_versions(): void {
