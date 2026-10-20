@@ -22,7 +22,6 @@
     "@wordpress/env": "^11.2.0"
   },
   "overrides": {
-    "@wp-playground/cli": "3.1.54",
-    "simple-git": "^4.0.2"
+    "@wp-playground/cli": "3.1.54"
   }
 }
