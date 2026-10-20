@@ -32,6 +32,11 @@ function wpmind_cleanup_site_data(): void {
 		'wpmind_budget_settings',
 		'wpmind_routing_settings',
 		'wpmind_installed_version',
+		// 0.13 端点 schema v2 迁移.
+		'wpmind_db_version',
+		'wpmind_migration_log',
+		'wpmind_migration_lock',
+		'wpmind_custom_endpoints_v1_backup',
 		'wenpai_license_key_wpmind',
 		'wenpai_license_wpmind_grace',
 		// GEO 模块设置
@@ -148,11 +153,24 @@ function wpmind_cleanup_site_data(): void {
 wpmind_cleanup_site_data();
 
 // 如果是多站点，清理所有站点的选项
+// get_sites() 默认只返回 100 个（B15），这里分批取完所有子站。
 if ( is_multisite() ) {
-	$sites = get_sites( [ 'fields' => 'ids' ] );
-	foreach ( $sites as $site_id ) {
-		switch_to_blog( $site_id );
-		wpmind_cleanup_site_data();
-		restore_current_blog();
-	}
+	$wpmind_batch  = 100;
+	$wpmind_offset = 0;
+	do {
+		$wpmind_sites = get_sites(
+			[
+				'fields' => 'ids',
+				'number' => $wpmind_batch,
+				'offset' => $wpmind_offset,
+			]
+		);
+		foreach ( $wpmind_sites as $wpmind_site_id ) {
+			switch_to_blog( (int) $wpmind_site_id );
+			wpmind_cleanup_site_data();
+			restore_current_blog();
+		}
+		$wpmind_got     = count( $wpmind_sites );
+		$wpmind_offset += $wpmind_batch;
+	} while ( $wpmind_got === $wpmind_batch );
 }

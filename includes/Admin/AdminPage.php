@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace WPMind\Admin;
 
+use WPMind\Provider\EndpointRepository;
+use WPMind\Provider\ProviderDefinitions;
 use WPMind\WPMind;
 
 /**
@@ -176,24 +178,82 @@ final class AdminPage {
 			return [];
 		}
 
-		$defaults  = WPMind::instance()->get_default_endpoints();
+		$existing  = get_option( EndpointRepository::OPTION, [] );
+		$existing  = is_array( $existing ) ? $existing : [];
 		$sanitized = [];
 
-		foreach ( $defaults as $key => $default ) {
-			// 强制使用默认的 name, base_url, models（忽略用户提交的值，防止篡改）
-			$sanitized[ $key ] = [
-				'name'     => $default['name'],
-				'base_url' => $default['base_url'],
-				'models'   => $default['models'],
-				'enabled'  => ! empty( $input[ $key ]['enabled'] ),
-				'api_key'  => $this->sanitize_api_key(
-					$input[ $key ] ?? [],
-					$key
-				),
+		// 和 get_default_endpoints() 的键相同，直接用元数据定义，避免依赖插件主类实例.
+		foreach ( ProviderDefinitions::ids() as $key ) {
+			$endpoint_input = is_array( $input[ $key ] ?? null ) ? $input[ $key ] : [];
+			$previous       = EndpointRepository::normalize_entry( $key, $existing[ $key ] ?? [] );
+
+			// v2：只保存用户的选择。name、base_url、models 默认值来自代码，不再写进 option（B2）.
+			$entry = [
+				'enabled'         => ! empty( $endpoint_input['enabled'] ),
+				'api_key'         => $this->sanitize_api_key( $endpoint_input, $key ),
+				'custom_base_url' => $this->sanitize_custom_base_url( $endpoint_input, $key, $previous['custom_base_url'] ),
+				// 模型选择 UI 在 PR2；这里沿用库里已有的用户选择（空 = 目录默认）.
+				'models'          => $previous['models'],
+				'default_model'   => $previous['default_model'],
 			];
+			if ( [] !== $previous['key_meta'] ) {
+				$entry['key_meta'] = $previous['key_meta'];
+			}
+
+			// 「需要重新配置」在管理员填了新 key、清除 key 或填了自定义地址后解除.
+			$new_key = '' !== trim( (string) ( $endpoint_input['api_key'] ?? '' ) );
+			if ( $previous['needs_reconfigure']
+				&& ! $new_key
+				&& empty( $endpoint_input['clear_api_key'] )
+				&& '' === $entry['custom_base_url'] ) {
+				$entry['needs_reconfigure'] = true;
+			}
+
+			$sanitized[ $key ] = $entry;
 		}
 
 		return $sanitized;
+	}
+
+	/**
+	 * 清理自定义 Base URL（B1）
+	 *
+	 * 只允许 https；http 需要 `wpmind_allow_http_base_url` 过滤器放开。
+	 * 提交了不合法的地址时提示错误，并保留原来保存的值。
+	 *
+	 * @param array  $endpoint_input 端点输入数据.
+	 * @param string $endpoint_key   端点标识.
+	 * @param string $previous       原来保存的值.
+	 * @return string
+	 * @since 0.13.0
+	 */
+	private function sanitize_custom_base_url( array $endpoint_input, string $endpoint_key, string $previous ): string {
+		if ( ! array_key_exists( 'custom_base_url', $endpoint_input ) ) {
+			return $previous;
+		}
+
+		$raw = trim( (string) $endpoint_input['custom_base_url'] );
+		if ( '' === $raw ) {
+			return '';
+		}
+
+		$valid = EndpointRepository::validate_base_url( $raw, $endpoint_key, true );
+		if ( '' === $valid ) {
+			if ( function_exists( 'add_settings_error' ) ) {
+				add_settings_error(
+					EndpointRepository::OPTION,
+					'wpmind_invalid_base_url_' . $endpoint_key,
+					sprintf(
+						/* translators: %s: provider id */
+						__( '%s 的自定义 Base URL 无效：只允许 https 地址，不能带账号、查询参数或锚点。已保留原来的设置。', 'wpmind' ),
+						$endpoint_key
+					)
+				);
+			}
+			return $previous;
+		}
+
+		return $valid;
 	}
 
 	/**

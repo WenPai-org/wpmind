@@ -260,7 +260,7 @@ class ChatService extends AbstractService {
 				$model = $endpoint['models'][0] ?? 'gpt-3.5-turbo';
 			}
 
-			$base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
+			$base_url = $this->resolve_base_url( $try_provider );
 			$api_url  = trailingslashit( $base_url ) . 'chat/completions';
 
 			$request_body = [
@@ -502,7 +502,7 @@ class ChatService extends AbstractService {
 			}
 		}
 
-		$base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
+		$base_url = $this->resolve_base_url( $provider );
 		$api_url  = trailingslashit( $base_url ) . 'chat/completions';
 
 		$start_time = microtime( true );

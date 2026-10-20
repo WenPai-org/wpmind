@@ -129,7 +129,7 @@ class AudioService extends AbstractService {
 			$context,
 			function ( string $try_provider, array $endpoint ) use ( $file_content, $options, $audio_file ) {
 				$api_key  = $endpoint['api_key'];
-				$base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
+				$base_url = $this->resolve_base_url( $try_provider );
 				$api_url  = trailingslashit( $base_url ) . 'audio/transcriptions';
 
 				$boundary = wp_generate_password( 24, false );
@@ -254,7 +254,7 @@ class AudioService extends AbstractService {
 			$context,
 			function ( string $try_provider, array $endpoint ) use ( $text, $options ) {
 				$api_key  = $endpoint['api_key'];
-				$base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
+				$base_url = $this->resolve_base_url( $try_provider );
 				$api_url  = trailingslashit( $base_url ) . 'audio/speech';
 
 				$start_time = microtime( true );

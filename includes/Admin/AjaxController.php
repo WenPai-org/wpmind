@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace WPMind\Admin;
 
+use WPMind\Provider\EndpointRepository;
+use WPMind\Provider\Secrets;
 use WPMind\WPMind;
 use WPMind\Core\ModuleLoader;
 use WPMind\ErrorHandler;
@@ -84,34 +86,22 @@ final class AjaxController {
 			wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
 		}
 
-		$provider   = sanitize_text_field( $_POST['provider'] ?? '' );
-		$api_key    = sanitize_text_field( $_POST['api_key'] ?? '' );
-		$custom_url = esc_url_raw( $_POST['custom_url'] ?? '' );
+		$provider   = sanitize_text_field( wp_unslash( $_POST['provider'] ?? '' ) );
+		$posted_key = sanitize_text_field( wp_unslash( $_POST['api_key'] ?? '' ) );
+		$custom_url = trim( (string) wp_unslash( $_POST['custom_url'] ?? '' ) );
 
 		if ( empty( $provider ) ) {
 			wp_send_json_error( [ 'message' => __( '缺少服务标识', 'wpmind' ) ] );
 		}
 
-		// 获取端点配置
-		$wpmind    = WPMind::instance();
-		$endpoints = $wpmind->get_custom_endpoints();
-		if ( ! isset( $endpoints[ $provider ] ) ) {
-			wp_send_json_error( [ 'message' => __( '服务不存在', 'wpmind' ) ] );
+		// B13：用已保存的 key 时只能测已保存的地址；POST 里的新地址必须和新 key 一起提交.
+		$target = ( new EndpointRepository() )->connection_test_target( $provider, $posted_key, $custom_url );
+		if ( is_wp_error( $target ) ) {
+			wp_send_json_error( [ 'message' => $target->get_error_message() ] );
 		}
 
-		$endpoint = $endpoints[ $provider ];
-
-		// 如果没有提供 API Key，尝试从已保存的配置中获取
-		if ( empty( $api_key ) ) {
-			$api_key = $wpmind->get_api_key( $provider );
-		}
-
-		if ( empty( $api_key ) ) {
-			wp_send_json_error( [ 'message' => __( '请先配置 API Key', 'wpmind' ) ] );
-		}
-
-		// 确定使用的 Base URL
-		$base_url = ! empty( $custom_url ) ? $custom_url : $endpoint['base_url'];
+		$api_key  = $target['api_key'];
+		$base_url = $target['base_url'];
 
 		// 测试连接（带重试）
 		$test_url         = trailingslashit( $base_url ) . 'models';
@@ -148,7 +138,7 @@ final class AjaxController {
 				wp_send_json_error(
 					[
 						'message' => ErrorHandler::get_wp_error_message( $response, $provider ),
-						'details' => $response->get_error_message(),
+						'details' => Secrets::redact( $response->get_error_message(), [ $api_key ] ),
 						'retried' => $attempt > 1,
 					]
 				);

@@ -172,141 +172,80 @@ final class WPMind {
 	}
 
 	/**
+	 * 当前推荐的默认模型（PR2 wpmind-model-catalog 会换成随包发布的目录）。
+	 *
+	 * 0.13 起这份列表不再写进 option；option 里的 models 只表示用户的选择。
+	 *
+	 * @var array<string, list<string>>
+	 */
+	private const DEFAULT_MODELS = [
+		'openai'      => [ 'gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-3.5-turbo' ],
+		'anthropic'   => [ 'claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022', 'claude-3-opus-20240229' ],
+		'google'      => [ 'gemini-2.0-flash-exp', 'gemini-1.5-pro', 'gemini-1.5-flash' ],
+		'deepseek'    => [ 'deepseek-chat', 'deepseek-coder', 'deepseek-reasoner' ],
+		'qwen'        => [ 'qwen-turbo', 'qwen-plus', 'qwen-max' ],
+		'zhipu'       => [ 'glm-4', 'glm-4-flash', 'glm-4-plus' ],
+		'moonshot'    => [ 'moonshot-v1-8k', 'moonshot-v1-32k', 'moonshot-v1-128k' ],
+		'doubao'      => [ 'doubao-pro-4k', 'doubao-pro-32k', 'doubao-pro-128k' ],
+		'siliconflow' => [ 'deepseek-ai/DeepSeek-V3', 'Qwen/Qwen2.5-72B-Instruct' ],
+		'baidu'       => [ 'ernie-4.0-8k', 'ernie-3.5-8k', 'ernie-speed-8k' ],
+		'minimax'     => [ 'abab6.5s-chat', 'abab6.5-chat', 'abab5.5-chat' ],
+	];
+
+	/**
 	 * 加载自定义端点配置
+	 *
+	 * 0.13 起通过 EndpointRepository 读取（兼容 v1/v2 两种形状），
+	 * 再和代码默认值拼成旧的数组结构，供模板、服务层和第三方继续使用。
 	 */
 	private function load_custom_endpoints(): void {
-		$saved    = get_option( 'wpmind_custom_endpoints', [] );
-		$defaults = $this->get_default_endpoints();
+		$repository = new Provider\EndpointRepository();
+		$defaults   = $this->get_default_endpoints();
 
-		// 合并默认配置和保存的配置
 		$this->custom_endpoints = [];
 		foreach ( $defaults as $key => $default ) {
-			$this->custom_endpoints[ $key ] = wp_parse_args(
-				$saved[ $key ] ?? [],
-				$default
-			);
-			// 确保 models 是数组
-			if ( ! is_array( $this->custom_endpoints[ $key ]['models'] ) ) {
-				$this->custom_endpoints[ $key ]['models'] = array_filter(
-					array_map( 'trim', explode( ',', (string) $this->custom_endpoints[ $key ]['models'] ) )
-				);
-			}
+			$endpoint = $repository->get( $key );
+
+			$merged                      = $default;
+			$merged['enabled']           = $endpoint->enabled;
+			$merged['api_key']           = $endpoint->api_key;
+			$merged['custom_base_url']   = $endpoint->custom_base_url;
+			$merged['models']            = [] !== $endpoint->models ? $endpoint->models : $default['models'];
+			$merged['default_model']     = $endpoint->default_model;
+			$merged['key_meta']          = $endpoint->key_meta;
+			$merged['needs_reconfigure'] = $endpoint->needs_reconfigure;
+			$merged['resolved_base_url'] = $repository->resolved_base_url( $key );
+
+			$this->custom_endpoints[ $key ] = $merged;
 		}
 	}
 
 	/**
 	 * 获取默认端点配置
 	 *
+	 * 兼容外壳：签名和返回结构保持 0.12 不变（模板、AdminPage 和第三方在调）。
+	 * 元数据来自 ProviderDefinitions，模型来自 DEFAULT_MODELS。
+	 *
 	 * @return array
 	 */
 	public function get_default_endpoints(): array {
-		return [
-			// WordPress 官方服务
-			'openai'      => [
-				'name'         => 'OpenAI',
-				'display_name' => 'ChatGPT',
-				'icon'         => 'openai',
-				'base_url'     => 'https://api.openai.com/v1',
-				'models'       => [ 'gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-3.5-turbo' ],
+		$endpoints = [];
+		foreach ( Provider\ProviderDefinitions::DEFINITIONS as $key => $definition ) {
+			$endpoint = [
+				'name'         => $definition['name'],
+				'display_name' => $definition['display_name'],
+				'icon'         => $definition['icon'],
+				'base_url'     => $definition['base_url'],
+				'models'       => self::DEFAULT_MODELS[ $key ],
 				'enabled'      => false,
 				'api_key'      => '',
-				'is_official'  => true,
-			],
-			'anthropic'   => [
-				'name'         => 'Anthropic',
-				'display_name' => 'Claude',
-				'icon'         => 'claude',
-				'base_url'     => 'https://api.anthropic.com/v1',
-				'models'       => [ 'claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022', 'claude-3-opus-20240229' ],
-				'enabled'      => false,
-				'api_key'      => '',
-				'is_official'  => true,
-			],
-			'google'      => [
-				'name'         => 'Google AI',
-				'display_name' => 'Gemini',
-				'icon'         => 'gemini',
-				'base_url'     => 'https://generativelanguage.googleapis.com/v1beta',
-				'models'       => [ 'gemini-2.0-flash-exp', 'gemini-1.5-pro', 'gemini-1.5-flash' ],
-				'enabled'      => false,
-				'api_key'      => '',
-				'is_official'  => true,
-			],
-
-			// 国内 AI 服务
-			'deepseek'    => [
-				'name'         => 'DeepSeek',
-				'display_name' => 'DeepSeek',
-				'icon'         => 'deepseek',
-				'base_url'     => 'https://api.deepseek.com/v1',
-				'models'       => [ 'deepseek-chat', 'deepseek-coder', 'deepseek-reasoner' ],
-				'enabled'      => false,
-				'api_key'      => '',
-			],
-			'qwen'        => [
-				'name'         => '通义千问',
-				'display_name' => 'Qwen',
-				'icon'         => 'qwen',
-				'base_url'     => 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-				'models'       => [ 'qwen-turbo', 'qwen-plus', 'qwen-max' ],
-				'enabled'      => false,
-				'api_key'      => '',
-			],
-			'zhipu'       => [
-				'name'         => '智谱 AI',
-				'display_name' => 'ChatGLM',
-				'icon'         => 'zhipu',
-				'base_url'     => 'https://open.bigmodel.cn/api/paas/v4',
-				'models'       => [ 'glm-4', 'glm-4-flash', 'glm-4-plus' ],
-				'enabled'      => false,
-				'api_key'      => '',
-			],
-			'moonshot'    => [
-				'name'         => 'Moonshot',
-				'display_name' => 'Kimi',
-				'icon'         => 'kimi',
-				'base_url'     => 'https://api.moonshot.cn/v1',
-				'models'       => [ 'moonshot-v1-8k', 'moonshot-v1-32k', 'moonshot-v1-128k' ],
-				'enabled'      => false,
-				'api_key'      => '',
-			],
-			'doubao'      => [
-				'name'         => '豆包',
-				'display_name' => 'Doubao',
-				'icon'         => 'doubao',
-				'base_url'     => 'https://ark.cn-beijing.volces.com/api/v3',
-				'models'       => [ 'doubao-pro-4k', 'doubao-pro-32k', 'doubao-pro-128k' ],
-				'enabled'      => false,
-				'api_key'      => '',
-			],
-			'siliconflow' => [
-				'name'         => '硅基流动',
-				'display_name' => 'SiliconFlow',
-				'icon'         => 'siliconcloud',
-				'base_url'     => 'https://api.siliconflow.cn/v1',
-				'models'       => [ 'deepseek-ai/DeepSeek-V3', 'Qwen/Qwen2.5-72B-Instruct' ],
-				'enabled'      => false,
-				'api_key'      => '',
-			],
-			'baidu'       => [
-				'name'         => '百度文心',
-				'display_name' => 'ERNIE',
-				'icon'         => 'wenxin',
-				'base_url'     => 'https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop',
-				'models'       => [ 'ernie-4.0-8k', 'ernie-3.5-8k', 'ernie-speed-8k' ],
-				'enabled'      => false,
-				'api_key'      => '',
-			],
-			'minimax'     => [
-				'name'         => 'MiniMax',
-				'display_name' => 'MiniMax',
-				'icon'         => 'minimax',
-				'base_url'     => 'https://api.minimax.chat/v1',
-				'models'       => [ 'abab6.5s-chat', 'abab6.5-chat', 'abab5.5-chat' ],
-				'enabled'      => false,
-				'api_key'      => '',
-			],
-		];
+			];
+			if ( ! empty( $definition['is_official'] ) ) {
+				$endpoint['is_official'] = true;
+			}
+			$endpoints[ $key ] = $endpoint;
+		}
+		return $endpoints;
 	}
 
 	/**
@@ -668,27 +607,19 @@ final class WPMind {
 			'moonshot'    => 'api.moonshot.cn',
 			'doubao'      => 'ark.cn-beijing.volces.com',
 			'siliconflow' => 'api.siliconflow.cn',
-			'baidu'       => 'aip.baidubce.com',
+			'baidu'       => 'baidubce.com',
 			'minimax'     => 'api.minimax.chat',
 		];
 
-		// 首先检查用户自定义的 base_url
+		// 首先检查实际使用的 base_url（自定义地址优先，统一由 EndpointRepository 解析）.
 		foreach ( $this->custom_endpoints as $provider => $config ) {
 			if ( empty( $config['enabled'] ) ) {
 				continue;
 			}
 
-			// Check custom URL.
-			if ( ! empty( $config['custom_base_url'] ) ) {
-				$host = wp_parse_url( $config['custom_base_url'], PHP_URL_HOST );
-				if ( is_string( $host ) && '' !== $host && str_contains( $url, $host ) ) {
-					return $provider;
-				}
-			}
-
-			// Check default base_url.
-			if ( ! empty( $config['base_url'] ) ) {
-				$host = wp_parse_url( $config['base_url'], PHP_URL_HOST );
+			$resolved = (string) ( $config['resolved_base_url'] ?? '' );
+			if ( '' !== $resolved ) {
+				$host = wp_parse_url( $resolved, PHP_URL_HOST );
 				if ( is_string( $host ) && '' !== $host && str_contains( $url, $host ) ) {
 					return $provider;
 				}
@@ -784,6 +715,9 @@ function activate(): void {
 		add_option( 'wpmind_request_timeout', 60, '', false ); // autoload = false
 	}
 
+	// 版本化数据迁移（自动更新不会走到这里，所以 plugins_loaded 上也挂了一份）.
+	Provider\Migrations\Migrator::maybe_run();
+
 	// Schedule rewrite rules flush for after plugin is fully loaded.
 	// This ensures module routes are registered before flushing.
 	\WPMind\Core\RewriteFlush::request_flush();
@@ -819,6 +753,19 @@ function maybe_upgrade_module_defaults(): void {
 	add_option( 'wpmind_installed_version', WPMIND_VERSION, '', false );
 }
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\maybe_upgrade_module_defaults', 1 );
+
+/**
+ * 版本化数据迁移（0.13 起）。
+ *
+ * 自动更新不触发激活钩子，所以在 plugins_loaded:2 懒执行：没有待办时只多一次
+ * get_option 比较；数据形状仍是旧版（比如降级到 0.12 又保存过）时会重新迁移。
+ *
+ * @since 0.13.0
+ */
+function maybe_run_migrations(): void {
+	Provider\Migrations\Migrator::maybe_run();
+}
+add_action( 'plugins_loaded', __NAMESPACE__ . '\\maybe_run_migrations', 2 );
 
 /**
  * 插件停用钩子

@@ -106,6 +106,11 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 						<?php esc_html_e( '已启用', 'wpmind' ); ?>
 					</span>
 				<?php endif; ?>
+				<?php if ( ! empty( $endpoint['needs_reconfigure'] ) ) : ?>
+					<span class="wpmind-status wpmind-status-warning" title="<?php esc_attr_e( '这家服务的默认接口地址已更换，旧 API Key 可能无法在新地址使用。请填写新的 API Key 或自定义 Base URL 后保存；保存前仍使用原来的地址。', 'wpmind' ); ?>">
+						<?php esc_html_e( '需要重新配置', 'wpmind' ); ?>
+					</span>
+				<?php endif; ?>
 			</div>
 
 			<div class="wpmind-endpoint-body">

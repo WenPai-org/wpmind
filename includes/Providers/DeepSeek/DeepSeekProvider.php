@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace WPMind\Providers\DeepSeek;
 
+use WPMind\Provider\EndpointRepository;
 use WPMind\Providers\AbstractOpenAiCompatibleProvider;
 use WordPress\AiClient\Providers\Contracts\ModelMetadataDirectoryInterface;
 
@@ -21,10 +22,12 @@ use WordPress\AiClient\Providers\Contracts\ModelMetadataDirectoryInterface;
 class DeepSeekProvider extends AbstractOpenAiCompatibleProvider {
 
 	/**
+	 * 实际 Base URL：自定义地址优先，取不到时用默认值（B1，SDK 路径也能用自定义地址）。
+	 *
 	 * {@inheritDoc}
 	 */
 	protected static function baseUrl(): string {
-		return 'https://api.deepseek.com/v1';
+		return EndpointRepository::resolve( static::providerId(), 'https://api.deepseek.com/v1' );
 	}
 
 	/**
