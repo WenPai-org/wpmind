@@ -13,6 +13,11 @@
 ### 修复
 
 - 后台外部链接加上 `rel="noopener noreferrer"`（#16）。
+- 修复 `/llms.txt` 和 `/ai-sitemap.xml` 返回 404：改为延迟刷新重写规则，并用 `WPMIND_DB_VERSION` 在升级后自动刷新（#24）。
+- `/llms.txt/` 带斜杠访问直接返回 200 并附 canonical Link 头，不再 301 跳转（#24）。
+- llms.txt 的 Content-Type 改为 `text/plain; charset=utf-8`（原为 `text/markdown`）（#24）。
+- 朴素固定链接下可通过 `?wpmind_llms_txt=1` 访问（#24）。
+- 检测到其他插件也提供 llms.txt 时只提示冲突，不覆盖（#24）。
 
 ### 翻译
 
@@ -28,8 +33,9 @@
 - gitleaks 白名单收录文档中的 `sk_mind` 占位符（#15）。
 - `composer check` 接入 PHPStan level 5 与 PHPCS 基线（#13）。
 - 安全扫描：Composer 审计前先安装依赖；npm 审计改走官方源，只审运行时依赖（`--omit=dev`），审计接口不可用时只给警告（#19）。开发依赖的漏洞另行跟进。
-- 新增模块开关、升级路径的 Playwright 端到端测试，并在 CI 中运行（目前为非阻塞）（#18、#20）。
+- 新增模块开关、升级路径的 Playwright 端到端测试，并在 CI 中运行（#18、#20）。
 - 开发依赖安全升级：`npm audit fix`（不含 `--force`），漏洞从 30 个降到 9 个；其余漏洞来自 `@wordpress/env`，等上游新版（#22）。
+- 端到端测试改为必过检查（#23）。
 
 ## [0.12.0] - 未发布
 
