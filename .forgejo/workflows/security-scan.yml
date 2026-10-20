@@ -48,6 +48,9 @@ jobs:
             echo "::warning::Dockerfile 存在规范问题，请检查上方输出"
           fi
 
+      - name: 安装 Composer 依赖
+        run: composer install --no-interaction --no-progress
+
       - name: PHP Composer 安全审计
         run: |
           if [ ! -f composer.lock ]; then
