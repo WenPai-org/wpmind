@@ -58,7 +58,36 @@ class AiSitemapGenerator {
 			}
 		);
 
-		add_action( 'template_redirect', [ $this, 'handle_request' ] );
+		// Before redirect_canonical (template_redirect/10), which would 301 to /ai-sitemap.xml/.
+		add_action( 'template_redirect', [ $this, 'handle_request' ], 1 );
+
+		// Fallback for code that runs redirect_canonical() earlier.
+		add_filter( 'redirect_canonical', [ $this, 'filter_redirect_canonical' ] );
+	}
+
+	/**
+	 * Never canonical-redirect an ai-sitemap.xml request.
+	 *
+	 * @param string|false $redirect_url Redirect target computed by core.
+	 * @return string|false False for ai-sitemap.xml requests, otherwise unchanged.
+	 */
+	public function filter_redirect_canonical( $redirect_url ) {
+		if ( get_query_var( 'wpmind_ai_sitemap' ) ) {
+			return false;
+		}
+		return $redirect_url;
+	}
+
+	/**
+	 * Public URL of ai-sitemap.xml for the current site.
+	 *
+	 * @return string URL.
+	 */
+	public static function get_public_url(): string {
+		if ( '' === (string) get_option( 'permalink_structure' ) ) {
+			return add_query_arg( 'wpmind_ai_sitemap', '1', home_url( '/' ) );
+		}
+		return home_url( '/ai-sitemap.xml' );
 	}
 
 	/**
@@ -77,8 +106,11 @@ class AiSitemapGenerator {
 	 * Render the AI sitemap XML.
 	 */
 	public function render(): void {
+		// Explicit 200; /ai-sitemap.xml/ is answered here too (no 301).
+		status_header( 200 );
 		header( 'Content-Type: application/xml; charset=utf-8' );
 		header( 'X-Robots-Tag: noindex' );
+		header( 'Link: <' . esc_url_raw( self::get_public_url() ) . '>; rel="canonical"' );
 
 		$content = $this->get_cached_content();
 
@@ -262,13 +294,13 @@ class AiSitemapGenerator {
 	public static function activate(): void {
 		$instance = new self();
 		$instance->register_routes();
-		flush_rewrite_rules();
+		flush_rewrite_rules( false );
 	}
 
 	/**
 	 * Flush rewrite rules on deactivation.
 	 */
 	public static function deactivate(): void {
-		flush_rewrite_rules();
+		flush_rewrite_rules( false );
 	}
 }
