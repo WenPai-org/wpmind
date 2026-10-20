@@ -193,7 +193,7 @@ if ( ! class_exists( 'WP_Error' ) ) {
 	}
 }
 
-// 0.13 端点 schema / 迁移相关的共享桩（PR1 wpmind-endpoint-schema）。
+// endpoint schema v2 / 迁移相关的共享桩（PR1 wpmind-endpoint-schema）。
 if ( ! function_exists( 'wp_set_option_autoload' ) ) {
 	function wp_set_option_autoload( string $option, $autoload ): bool {
 		$GLOBALS['wpmind_test_autoload'][ $option ] = (bool) $autoload;

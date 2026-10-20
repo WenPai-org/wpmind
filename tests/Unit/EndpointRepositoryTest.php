@@ -154,12 +154,18 @@ final class EndpointRepositoryTest extends TestCase {
 			]
 		);
 
-		self::assertArrayNotHasKey( 'name', $out['deepseek'] );
-		self::assertArrayNotHasKey( 'base_url', $out['deepseek'] );
-		self::assertSame( 'https://proxy.example.com/v1', $out['deepseek']['custom_base_url'] );
+		// 原 option 是回滚镜像：name/base_url 来自代码，提交的值被忽略.
+		self::assertSame( ProviderDefinitions::DEFINITIONS['deepseek']['name'], $out['deepseek']['name'] );
+		self::assertSame( ProviderDefinitions::default_base_url( 'deepseek' ), $out['deepseek']['base_url'] );
+		self::assertArrayNotHasKey( 'custom_base_url', $out['deepseek'], 'v2-only fields stay out of the mirror' );
 		self::assertTrue( $out['deepseek']['enabled'] );
 		self::assertSame( self::FAKE_KEY, $out['deepseek']['api_key'], 'blank input keeps the saved key' );
 		self::assertSame( [ 'my-finetune' ], $out['deepseek']['models'], 'submitted models are not stored' );
+
+		$v2 = $GLOBALS['wpmind_test_options'][ EndpointRepository::V2_OPTION ]['providers']['deepseek'];
+		self::assertSame( 'https://proxy.example.com/v1', $v2['custom_base_url'] );
+		self::assertSame( [ 'my-finetune' ], $v2['models'] );
+		self::assertArrayNotHasKey( 'api_key', $v2 );
 	}
 
 	public function test_sanitize_rejects_invalid_custom_base_url_and_keeps_previous(): void {
@@ -171,7 +177,8 @@ final class EndpointRepositoryTest extends TestCase {
 			[ 'qwen' => [ 'enabled' => '1', 'api_key' => '', 'custom_base_url' => 'http://plain.example.com/v1' ] ]
 		);
 
-		self::assertSame( 'https://old.example.com/v1', $out['qwen']['custom_base_url'] );
+		self::assertSame( 'https://old.example.com/v1', $GLOBALS['wpmind_test_options'][ EndpointRepository::V2_OPTION ]['providers']['qwen']['custom_base_url'] );
+		self::assertNotSame( [], $out['qwen']['models'], 'mirror gets the historical default list' );
 		self::assertNotEmpty( $GLOBALS['wpmind_test_settings_errors'] );
 		self::assertStringContainsString( 'qwen', $GLOBALS['wpmind_test_settings_errors'][0]['message'] );
 	}
@@ -188,11 +195,13 @@ final class EndpointRepositoryTest extends TestCase {
 		];
 
 		$kept = AdminPage::instance()->sanitize_endpoints( [ 'baidu' => [ 'enabled' => '1', 'api_key' => '' ] ] );
-		self::assertTrue( $kept['baidu']['needs_reconfigure'] );
+		self::assertTrue( $GLOBALS['wpmind_test_options'][ EndpointRepository::V2_OPTION ]['providers']['baidu']['needs_reconfigure'] );
+		self::assertSame( ProviderDefinitions::legacy_base_urls( 'baidu' )[0], $kept['baidu']['base_url'], 'mirror keeps the old address for the old version' );
+		$GLOBALS['wpmind_test_options'][ EndpointRepository::OPTION ] = $kept;
 
 		$cleared = AdminPage::instance()->sanitize_endpoints( [ 'baidu' => [ 'enabled' => '1', 'clear_api_key' => '1' ] ] );
 		self::assertSame( '', $cleared['baidu']['api_key'] );
-		self::assertArrayNotHasKey( 'needs_reconfigure', $cleared['baidu'] );
+		self::assertArrayNotHasKey( 'needs_reconfigure', $GLOBALS['wpmind_test_options'][ EndpointRepository::V2_OPTION ]['providers']['baidu'] );
 	}
 
 	public function test_connection_test_rejects_posted_url_with_saved_key(): void {

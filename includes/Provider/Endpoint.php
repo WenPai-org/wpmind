@@ -5,7 +5,7 @@
  * 只表达用户的选择；name、默认 base_url 等元数据见 ProviderDefinitions。
  *
  * @package WPMind
- * @since 0.13.0
+ * @since endpoint schema v2
  */
 
 declare(strict_types=1);
@@ -15,7 +15,7 @@ namespace WPMind\Provider;
 /**
  * 一家 Provider 的端点配置。
  *
- * @since 0.13.0
+ * @since endpoint schema v2
  */
 final class Endpoint {
 

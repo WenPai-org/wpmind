@@ -5,7 +5,7 @@
  * 任何日志、WP_Error 消息/数据、诊断导出、do_action 参数在输出前都要先过 redact()。
  *
  * @package WPMind
- * @since 0.13.0
+ * @since endpoint schema v2
  */
 
 declare(strict_types=1);
@@ -15,7 +15,7 @@ namespace WPMind\Provider;
 /**
  * 密钥工具。
  *
- * @since 0.13.0
+ * @since endpoint schema v2
  */
 final class Secrets {
 

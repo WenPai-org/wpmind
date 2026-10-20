@@ -6,7 +6,7 @@
  * 激活钩子里也会调一次。多站点下每个子站在自己的请求里各自迁移、各用各的锁。
  *
  * @package WPMind
- * @since 0.13.0
+ * @since endpoint schema v2
  */
 
 declare(strict_types=1);
@@ -16,7 +16,7 @@ namespace WPMind\Provider\Migrations;
 /**
  * 迁移调度器。
  *
- * @since 0.13.0
+ * @since endpoint schema v2
  */
 final class Migrator {
 
@@ -27,10 +27,6 @@ final class Migrator {
 	 */
 	public const SCHEMA_VERSION_OPTION = 'wpmind_endpoint_schema_version';
 
-	/**
-	 * 兼容旧代码的别名，指向 SCHEMA_VERSION_OPTION。
-	 */
-	public const DB_VERSION_OPTION = self::SCHEMA_VERSION_OPTION;
 
 	/**
 	 * 迁移日志 option（autoload=false，最多 LOG_MAX 条，不含密钥和 URL）。
@@ -79,14 +75,26 @@ final class Migrator {
 	}
 
 	/**
-	 * 有待执行的迁移就执行（plugins_loaded:2 和激活钩子调用）。
+	 * 升级检查（plugins_loaded:2 和激活钩子）：只比较版本号，不读旧字段、不算 hash。
 	 *
 	 * @return void
 	 */
 	public static function maybe_run(): void {
 		$migrator = new self();
-		if ( [] !== $migrator->pending() ) {
-			$migrator->run();
+		if ( [] !== $migrator->pending( false ) ) {
+			$migrator->run( false );
+		}
+	}
+
+	/**
+	 * 后台检查（admin_init）：除版本号外，还按数据（v2 是否存在、旧字段 hash）判断。
+	 *
+	 * @return void
+	 */
+	public static function maybe_run_admin(): void {
+		$migrator = new self();
+		if ( [] !== $migrator->pending( true ) ) {
+			$migrator->run( true );
 		}
 	}
 
@@ -96,19 +104,21 @@ final class Migrator {
 	 * @return int
 	 */
 	public static function db_version(): int {
-		return (int) get_option( self::DB_VERSION_OPTION, 0 );
+		return (int) get_option( self::SCHEMA_VERSION_OPTION, 0 );
 	}
 
 	/**
-	 * 需要执行的迁移：版本号比库里新，或者数据形状显示还需要跑。
+	 * 需要执行的迁移：版本号比库里新，或者（$check_data 时）数据显示还需要跑。
 	 *
+	 * @param bool $check_data 是否调用 is_needed()（会读旧字段算 hash，只在后台/升级时用）.
 	 * @return list<MigrationInterface>
 	 */
-	public function pending(): array {
+	public function pending( bool $check_data = true ): array {
 		$db_version = self::db_version();
 		$pending    = [];
 		foreach ( $this->migrations as $migration ) {
-			if ( $migration->version() <= $db_version && ! $migration->is_needed() ) {
+			$behind = $migration->version() > $db_version;
+			if ( ! $behind && ( ! $check_data || ! $migration->is_needed() ) ) {
 				continue;
 			}
 			if ( $this->in_backoff( $migration->id() ) ) {
@@ -122,10 +132,11 @@ final class Migrator {
 	/**
 	 * 抢锁并执行待执行的迁移。
 	 *
+	 * @param bool $check_data 见 pending().
 	 * @return list<array{id:string, at:int, result:string, notes:list<string>}> 本次写入的日志；没抢到锁返回空数组。
 	 */
-	public function run(): array {
-		$pending = $this->pending();
+	public function run( bool $check_data = true ): array {
+		$pending = $this->pending( $check_data );
 		if ( [] === $pending ) {
 			return [];
 		}
@@ -167,9 +178,9 @@ final class Migrator {
 			}
 
 			if ( $target > self::db_version() ) {
-				update_option( self::DB_VERSION_OPTION, $target, false );
-			} elseif ( $all_ok && false === get_option( self::DB_VERSION_OPTION, false ) ) {
-				update_option( self::DB_VERSION_OPTION, $target, false );
+				update_option( self::SCHEMA_VERSION_OPTION, $target, false );
+			} elseif ( $all_ok && false === get_option( self::SCHEMA_VERSION_OPTION, false ) ) {
+				update_option( self::SCHEMA_VERSION_OPTION, $target, false );
 			}
 		} finally {
 			$this->release_lock();

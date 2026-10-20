@@ -178,19 +178,27 @@ final class AdminPage {
 			return [];
 		}
 
-		$existing  = get_option( EndpointRepository::OPTION, [] );
-		$existing  = is_array( $existing ) ? $existing : [];
-		$sanitized = [];
+		$repository = new EndpointRepository();
+		$sanitized  = [];
+		$providers  = [];
 
 		// 和 get_default_endpoints() 的键相同，直接用元数据定义，避免依赖插件主类实例.
 		foreach ( ProviderDefinitions::ids() as $key ) {
 			$endpoint_input = is_array( $input[ $key ] ?? null ) ? $input[ $key ] : [];
-			$previous       = EndpointRepository::normalize_entry( $key, $existing[ $key ] ?? [] );
+			$current        = $repository->get( $key );
+			$previous       = [
+				'custom_base_url'   => $current->custom_base_url,
+				'models'            => $current->models,
+				'default_model'     => $current->default_model,
+				'key_meta'          => $current->key_meta,
+				'needs_reconfigure' => $current->needs_reconfigure,
+			];
+			$api_key        = $this->sanitize_api_key( $endpoint_input, $key );
 
-			// v2：只保存用户的选择。name、base_url、models 默认值来自代码，不再写进 option（B2）.
+			// v2 只保存用户的选择（写进 wpmind_custom_endpoints_v2，不含 key）；
+			// 原 option 写回滚镜像（name/base_url/models/enabled/api_key），旧版本能直接读.
 			$entry = [
 				'enabled'         => ! empty( $endpoint_input['enabled'] ),
-				'api_key'         => $this->sanitize_api_key( $endpoint_input, $key ),
 				'custom_base_url' => $this->sanitize_custom_base_url( $endpoint_input, $key, $previous['custom_base_url'] ),
 				// 模型选择 UI 在 PR2；这里沿用库里已有的用户选择（空 = 目录默认）.
 				'models'          => $previous['models'],
@@ -209,8 +217,12 @@ final class AdminPage {
 				$entry['needs_reconfigure'] = true;
 			}
 
-			$sanitized[ $key ] = $entry;
+			$providers[ $key ] = $entry;
+			$sanitized[ $key ] = EndpointRepository::mirror_entry( $key, $entry, $api_key );
 		}
+
+		// 自己写的镜像先记下 hash，admin_init 时就不会被当成「旧版本改过」而重新迁移.
+		$repository->save_v2( $providers, EndpointRepository::legacy_hash( $sanitized ) );
 
 		return $sanitized;
 	}
@@ -225,7 +237,7 @@ final class AdminPage {
 	 * @param string $endpoint_key   端点标识.
 	 * @param string $previous       原来保存的值.
 	 * @return string
-	 * @since 0.13.0
+	 * @since endpoint schema v2
 	 */
 	private function sanitize_custom_base_url( array $endpoint_input, string $endpoint_key, string $previous ): string {
 		if ( ! array_key_exists( 'custom_base_url', $endpoint_input ) ) {

@@ -3,7 +3,7 @@
  * 版本化数据迁移接口
  *
  * @package WPMind
- * @since 0.13.0
+ * @since endpoint schema v2
  */
 
 declare(strict_types=1);
@@ -16,7 +16,7 @@ namespace WPMind\Provider\Migrations;
  * 每个迁移都必须幂等，并且按数据的形状判断要不要跑（不只看版本号），
  * 这样降级再升级时能重新识别出旧形状。
  *
- * @since 0.13.0
+ * @since endpoint schema v2
  */
 interface MigrationInterface {
 

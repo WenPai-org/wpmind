@@ -6,7 +6,7 @@
  * 解析实际使用的 Base URL，以及校验自定义地址。
  *
  * @package WPMind
- * @since 0.13.0
+ * @since endpoint schema v2
  */
 
 declare(strict_types=1);
@@ -18,14 +18,29 @@ use WP_Error;
 /**
  * 端点配置仓库。
  *
- * @since 0.13.0
+ * @since endpoint schema v2
  */
 final class EndpointRepository {
 
 	/**
-	 * 主存储 option（api_key 唯一的明文位置）。
+	 * 原 option：回滚镜像（旧版本直接读它），也是 api_key 唯一的明文位置。
 	 */
 	public const OPTION = 'wpmind_custom_endpoints';
+
+	/**
+	 * Endpoint schema v2 的新结构（autoload=false，不含 api_key）。
+	 */
+	public const V2_OPTION = 'wpmind_custom_endpoints_v2';
+
+	/**
+	 * V2 结构版本。
+	 */
+	public const V2_SCHEMA = 2;
+
+	/**
+	 * 回滚镜像里 models 为空时写入的历史默认列表版本。
+	 */
+	public const MIRROR_DEFAULT_MODELS_FROM = '0.12.0';
 
 	/**
 	 * 旧版 v1（0.12 及以前）写进 option、v2 不再保存的元数据字段。
@@ -49,8 +64,132 @@ final class EndpointRepository {
 	 * @return Endpoint
 	 */
 	public function get( string $id ): Endpoint {
-		$raw = $this->raw();
-		return Endpoint::from_array( $id, self::normalize_entry( $id, $raw[ $id ] ?? [] ) );
+		return Endpoint::from_array( $id, $this->entry( $id, $this->raw(), $this->v2() ) );
+	}
+
+	/**
+	 * V2 option；不存在或结构不对时返回 null（还没迁移）。
+	 *
+	 * @return array<string, mixed>|null 含 schema、legacy_hash、providers。
+	 */
+	public function v2(): ?array {
+		$v2 = get_option( self::V2_OPTION, false );
+		return ( is_array( $v2 ) && is_array( $v2['providers'] ?? null ) ) ? $v2 : null;
+	}
+
+	/**
+	 * 一家的规范化配置：迁移后读 v2（api_key 取自原 option），迁移前按原 option 现场转换（不写库）。
+	 *
+	 * @param string                    $id  Provider ID.
+	 * @param array<string, mixed>      $raw 原 option.
+	 * @param array<string, mixed>|null $v2  v2 option.
+	 * @return array<string, mixed>
+	 */
+	private function entry( string $id, array $raw, ?array $v2 ): array {
+		$legacy = is_array( $raw[ $id ] ?? null ) ? $raw[ $id ] : [];
+		if ( null === $v2 ) {
+			return self::normalize_entry( $id, $legacy );
+		}
+		$entry            = is_array( $v2['providers'][ $id ] ?? null ) ? $v2['providers'][ $id ] : [];
+		$entry['api_key'] = $legacy['api_key'] ?? '';
+		return self::normalize_entry( $id, $entry );
+	}
+
+	/**
+	 * 写 v2（autoload=false）。任何 api_key 字段都会被去掉。
+	 *
+	 * @param array<string, mixed> $providers   每家的 v2 条目.
+	 * @param string               $legacy_hash 原 option 旧字段的 hash.
+	 * @return bool
+	 */
+	public function save_v2( array $providers, string $legacy_hash ): bool {
+		foreach ( $providers as $id => $entry ) {
+			if ( is_array( $entry ) ) {
+				unset( $entry['api_key'] );
+				$providers[ $id ] = $entry;
+			}
+		}
+		return update_option(
+			self::V2_OPTION,
+			[
+				'schema'      => self::V2_SCHEMA,
+				'legacy_hash' => $legacy_hash,
+				'providers'   => $providers,
+			],
+			false
+		);
+	}
+
+	/**
+	 * 规范化结果 → 存进 v2 的条目（去掉 api_key 和空的可选字段）。
+	 *
+	 * @param array<string, mixed> $normalized normalize_entry() 的结果.
+	 * @return array<string, mixed>
+	 */
+	public static function v2_entry( array $normalized ): array {
+		$out = [
+			'enabled'         => ! empty( $normalized['enabled'] ),
+			'custom_base_url' => (string) ( $normalized['custom_base_url'] ?? '' ),
+			'models'          => self::normalize_models( $normalized['models'] ?? [] ),
+			'default_model'   => (string) ( $normalized['default_model'] ?? '' ),
+		];
+		if ( is_array( $normalized['key_meta'] ?? null ) && [] !== $normalized['key_meta'] ) {
+			$out['key_meta'] = $normalized['key_meta'];
+		}
+		if ( ! empty( $normalized['needs_reconfigure'] ) ) {
+			$out['needs_reconfigure'] = true;
+		}
+		return $out;
+	}
+
+	/**
+	 * 回滚镜像条目：旧版本能直接读的 name/base_url/models/enabled/api_key。
+	 *
+	 * Models：用户配过就写用户的，没配过写历史默认列表（保证旧版本 models 非空）。
+	 *
+	 * @param string               $id       Provider ID.
+	 * @param array<string, mixed> $v2_entry v2 条目.
+	 * @param string               $api_key  API key（只在原 option 里保存）.
+	 * @return array{name:string, base_url:string, models:list<string>, enabled:bool, api_key:string}
+	 */
+	public static function mirror_entry( string $id, array $v2_entry, string $api_key ): array {
+		$definition = ProviderDefinitions::get( $id ) ?? [];
+		$models     = self::normalize_models( $v2_entry['models'] ?? [] );
+		if ( [] === $models ) {
+			$models = ProviderDefinitions::HISTORICAL_DEFAULT_MODELS[ self::MIRROR_DEFAULT_MODELS_FROM ][ $id ] ?? [];
+		}
+		$legacy   = ProviderDefinitions::legacy_base_urls( $id );
+		$base_url = ( ! empty( $v2_entry['needs_reconfigure'] ) && [] !== $legacy ) ? $legacy[0] : ProviderDefinitions::default_base_url( $id );
+
+		return [
+			'name'     => (string) ( $definition['name'] ?? $id ),
+			'base_url' => $base_url,
+			'models'   => $models,
+			'enabled'  => ! empty( $v2_entry['enabled'] ),
+			'api_key'  => $api_key,
+		];
+	}
+
+	/**
+	 * 原 option 旧字段的 hash：所有字段都参与，api_key 只按指纹参与。
+	 *
+	 * @param array<string, mixed> $legacy 原 option.
+	 * @return string
+	 */
+	public static function legacy_hash( array $legacy ): string {
+		$normalized = [];
+		foreach ( $legacy as $id => $entry ) {
+			if ( is_array( $entry ) ) {
+				if ( array_key_exists( 'api_key', $entry ) ) {
+					$key              = $entry['api_key'];
+					$entry['api_key'] = Secrets::fingerprint( is_scalar( $key ) ? (string) $key : '' );
+				}
+				ksort( $entry );
+			}
+			$normalized[ (string) $id ] = $entry;
+		}
+		ksort( $normalized );
+		return hash( 'sha256', (string) serialize( $normalized ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
 	}
 
 	/**
@@ -60,9 +199,10 @@ final class EndpointRepository {
 	 */
 	public function all(): array {
 		$raw = $this->raw();
+		$v2  = $this->v2();
 		$all = [];
 		foreach ( ProviderDefinitions::ids() as $id ) {
-			$all[ $id ] = Endpoint::from_array( $id, self::normalize_entry( $id, $raw[ $id ] ?? [] ) );
+			$all[ $id ] = Endpoint::from_array( $id, $this->entry( $id, $raw, $v2 ) );
 		}
 		return $all;
 	}
@@ -276,7 +416,7 @@ final class EndpointRepository {
 			 * 内网地址和非 80/443/8080 端口，需要配合 `http_request_host_is_external`
 			 * / `http_allowed_safe_ports` 过滤器。
 			 *
-			 * @since 0.13.0
+			 * @since endpoint schema v2
 			 *
 			 * @param bool   $allow 是否允许.
 			 * @param string $url   待校验地址.

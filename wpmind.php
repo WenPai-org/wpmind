@@ -174,7 +174,7 @@ final class WPMind {
 	/**
 	 * 当前推荐的默认模型（PR2 wpmind-model-catalog 会换成随包发布的目录）。
 	 *
-	 * 0.13 起这份列表不再写进 option；option 里的 models 只表示用户的选择。
+	 * Endpoint schema v2 起这份列表只作为回滚镜像写进旧 option（用户没选模型时），新代码读 v2 里的用户选择。
 	 *
 	 * @var array<string, list<string>>
 	 */
@@ -195,7 +195,7 @@ final class WPMind {
 	/**
 	 * 加载自定义端点配置
 	 *
-	 * 0.13 起通过 EndpointRepository 读取（兼容 v1/v2 两种形状），
+	 * Endpoint schema v2 起通过 EndpointRepository 读取（迁移后读 wpmind_custom_endpoints_v2，迁移前按旧 option 现场转换），
 	 * 再和代码默认值拼成旧的数组结构，供模板、服务层和第三方继续使用。
 	 */
 	private function load_custom_endpoints(): void {
@@ -755,17 +755,25 @@ function maybe_upgrade_module_defaults(): void {
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\maybe_upgrade_module_defaults', 1 );
 
 /**
- * 版本化数据迁移（0.13 起）。
+ * 版本化数据迁移（endpoint schema v2 起）。
  *
  * 自动更新不触发激活钩子，所以在 plugins_loaded:2 懒执行：没有待办时只多一次
  * get_option 比较；数据形状仍是旧版（比如降级到 0.12 又保存过）时会重新迁移。
  *
- * @since 0.13.0
+ * @since endpoint schema v2
  */
 function maybe_run_migrations(): void {
 	Provider\Migrations\Migrator::maybe_run();
 }
 add_action( 'plugins_loaded', __NAMESPACE__ . '\\maybe_run_migrations', 2 );
+
+/**
+ * 后台再按数据检查一次（回滚后在旧版本里改过设置 → 重新迁移）。
+ */
+function maybe_run_migrations_admin(): void {
+	Provider\Migrations\Migrator::maybe_run_admin();
+}
+add_action( 'admin_init', __NAMESPACE__ . '\\maybe_run_migrations_admin' );
 
 /**
  * 插件停用钩子

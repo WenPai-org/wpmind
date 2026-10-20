@@ -8,7 +8,7 @@
  * 用来识别 0.12 及以前强制写进 option 的默认副本。
  *
  * @package WPMind
- * @since 0.13.0
+ * @since endpoint schema v2
  */
 
 declare(strict_types=1);
@@ -18,7 +18,7 @@ namespace WPMind\Provider;
 /**
  * Provider 元数据定义。
  *
- * @since 0.13.0
+ * @since endpoint schema v2
  */
 final class ProviderDefinitions {
 
@@ -92,7 +92,7 @@ final class ProviderDefinitions {
 			'name'         => '百度文心',
 			'display_name' => 'ERNIE',
 			'icon'         => 'wenxin',
-			// D7：0.13 起默认使用千帆 v2 的 OpenAI 兼容地址.
+			// D7：endpoint schema v2 起默认使用千帆 v2 的 OpenAI 兼容地址.
 			'base_url'     => 'https://qianfan.baidubce.com/v2',
 		],
 		'minimax'     => [

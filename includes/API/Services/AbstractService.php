@@ -69,7 +69,7 @@ abstract class AbstractService {
 	 *
 	 * @param string $provider 服务商 ID.
 	 * @return string 不带结尾斜杠
-	 * @since 0.13.0
+	 * @since endpoint schema v2
 	 */
 	protected function resolve_base_url( string $provider ): string {
 		return ( new EndpointRepository() )->resolved_base_url( $provider );
