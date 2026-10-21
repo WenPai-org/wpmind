@@ -439,7 +439,13 @@ class SchemaGenerator {
 	private function get_image_schema( \WP_Post $post ): ?string {
 		// Try featured image first.
 		if ( has_post_thumbnail( $post ) ) {
-			return get_the_post_thumbnail_url( $post, 'large' );
+			// get_the_post_thumbnail_url() can return false (e.g. attachment missing the
+			// 'large' size metadata); the declared return type is ?string, so returning it
+			// verbatim triggers a TypeError fatal. Fall through to the content-image branch.
+			$thumb_url = get_the_post_thumbnail_url( $post, 'large' );
+			if ( $thumb_url ) {
+				return $thumb_url;
+			}
 		}
 
 		// Try to find first image in content.
