@@ -10,11 +10,12 @@ module.exports = async (config) => {
 
 	const browser = await chromium.launch(launchOptions || {});
 	const page = await browser.newPage({ baseURL });
-	await page.goto('/wp-login.php');
+	page.setDefaultNavigationTimeout(60_000);
+	await page.goto('/wp-login.php', { waitUntil: 'domcontentloaded' });
 	await page.fill('#user_login', user);
 	await page.fill('#user_pass', pass);
 	await Promise.all([
-		page.waitForURL(/\/wp-admin\//),
+		page.waitForURL(/\/wp-admin\//, { timeout: 60_000 }),
 		page.click('#wp-submit'),
 	]);
 	await page.context().storageState({ path: storageState });

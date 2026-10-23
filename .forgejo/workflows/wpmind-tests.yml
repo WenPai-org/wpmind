@@ -111,7 +111,7 @@ jobs:
       E2E_PORT_FIRST: '8946'
       E2E_PORT_LAST: '8949'
       # Host package puts the wrapper in /usr/bin (sbin path broke after runner re-register / package layout).
-      PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH: /usr/bin/chromium-browser
+      PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH: /snap/bin/chromium
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -123,7 +123,7 @@ jobs:
           npm --version
           jq --version
           if [ ! -x "${PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}" ]; then
-            for cand in /usr/bin/chromium-browser /usr/sbin/chromium-browser /usr/bin/chromium; do
+            for cand in /snap/bin/chromium /usr/bin/chromium-browser /usr/sbin/chromium-browser /usr/bin/chromium; do
               if [ -x "$cand" ]; then
                 echo "chromium fallback: $cand"
                 echo "PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=${cand}" >> "${GITHUB_ENV}"
