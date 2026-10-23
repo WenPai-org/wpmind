@@ -271,7 +271,7 @@ final class Gateway {
 				$providers[] = [
 					'id'          => $id,
 					'name'        => $endpoint['display_name'] ?? $endpoint['name'] ?? $id,
-					'base_url'    => $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '',
+					'base_url'    => \WPMind\Provider\EndpointRepository::resolve( (string) $id ),
 					'model_count' => is_array( $endpoint['models'] ?? null ) ? count( $endpoint['models'] ) : 0,
 					'is_official' => ! empty( $endpoint['is_official'] ),
 				];

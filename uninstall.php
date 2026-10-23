@@ -32,6 +32,13 @@ function wpmind_cleanup_site_data(): void {
 		'wpmind_budget_settings',
 		'wpmind_routing_settings',
 		'wpmind_installed_version',
+		// endpoint schema v2 迁移.
+		'wpmind_endpoint_schema_version',
+		'wpmind_migration_log',
+		'wpmind_migration_lock',
+		'wpmind_custom_endpoints_v1_backup',
+		'wpmind_custom_endpoints_v2',
+		'wpmind_custom_endpoints_backups',
 		'wenpai_license_key_wpmind',
 		'wenpai_license_wpmind_grace',
 		// GEO 模块设置
@@ -75,6 +82,14 @@ function wpmind_cleanup_site_data(): void {
 		'connectors_ai_baidu_api_key',
 		'connectors_ai_minimax_api_key',
 	];
+
+	// 带时间戳的端点配置备份（名字记在索引里，要在删索引之前读）.
+	$wpmind_backups = get_option( 'wpmind_custom_endpoints_backups', [] );
+	foreach ( is_array( $wpmind_backups ) ? $wpmind_backups : [] as $wpmind_backup ) {
+		if ( is_string( $wpmind_backup ) && 0 === strpos( $wpmind_backup, 'wpmind_custom_endpoints_backup_' ) ) {
+			delete_option( $wpmind_backup );
+		}
+	}
 
 	foreach ( $options as $option ) {
 		delete_option( $option );
@@ -148,11 +163,24 @@ function wpmind_cleanup_site_data(): void {
 wpmind_cleanup_site_data();
 
 // 如果是多站点，清理所有站点的选项
+// get_sites() 默认只返回 100 个（B15），这里分批取完所有子站。
 if ( is_multisite() ) {
-	$sites = get_sites( [ 'fields' => 'ids' ] );
-	foreach ( $sites as $site_id ) {
-		switch_to_blog( $site_id );
-		wpmind_cleanup_site_data();
-		restore_current_blog();
-	}
+	$wpmind_batch  = 100;
+	$wpmind_offset = 0;
+	do {
+		$wpmind_sites = get_sites(
+			[
+				'fields' => 'ids',
+				'number' => $wpmind_batch,
+				'offset' => $wpmind_offset,
+			]
+		);
+		foreach ( $wpmind_sites as $wpmind_site_id ) {
+			switch_to_blog( (int) $wpmind_site_id );
+			wpmind_cleanup_site_data();
+			restore_current_blog();
+		}
+		$wpmind_got     = count( $wpmind_sites );
+		$wpmind_offset += $wpmind_batch;
+	} while ( $wpmind_got === $wpmind_batch );
 }

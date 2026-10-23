@@ -67,7 +67,7 @@ class EmbeddingService extends AbstractService {
 				? ( self::EMBED_MODELS[ $try_provider ] ?? 'text-embedding-3-small' )
 				: $original_model;
 
-				$base_url = $endpoint['custom_base_url'] ?? $endpoint['base_url'] ?? '';
+				$base_url = $this->resolve_base_url( $try_provider );
 				$api_url  = trailingslashit( $base_url ) . 'embeddings';
 				$api_key  = $endpoint['api_key'];
 

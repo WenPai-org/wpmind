@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace WPMind\API\Services;
 
 use WP_Error;
+use WPMind\Provider\EndpointRepository;
 
 /**
  * Service 基类
@@ -61,6 +62,17 @@ abstract class AbstractService {
 			return [];
 		}
 		return \WPMind\WPMind::instance()->get_custom_endpoints();
+	}
+
+	/**
+	 * 实际使用的 Base URL（B19：统一由 EndpointRepository 解析，空的自定义地址会回退到默认值）
+	 *
+	 * @param string $provider 服务商 ID.
+	 * @return string 不带结尾斜杠
+	 * @since endpoint schema v2
+	 */
+	protected function resolve_base_url( string $provider ): string {
+		return ( new EndpointRepository() )->resolved_base_url( $provider );
 	}
 
 	/**

@@ -30,6 +30,11 @@ final class RewriteFlush {
 	public const DB_VERSION_OPTION = 'wpmind_db_version';
 
 	/**
+	 * Values at or above this were written by the endpoint-schema Migrator (e.g. 1300), not by us.
+	 */
+	public const LEGACY_SCHEMA_FLOOR = 1000;
+
+	/**
 	 * Options whose change adds, removes or alters a WPMind rewrite route.
 	 *
 	 * @var string[]
@@ -82,18 +87,23 @@ final class RewriteFlush {
 	 * Run per-site upgrade steps when the stored db_version is older.
 	 *
 	 * A missing option counts as version 1 (every release before 0.12.1).
+	 * A value >= LEGACY_SCHEMA_FLOOR was written by the endpoint-schema Migrator
+	 * while both shared this option (F1); treat it as 1 so the rebuild still runs.
 	 *
 	 * @param int $target Current WPMIND_DB_VERSION.
 	 * @return bool True when the stored version was upgraded.
 	 */
 	public static function maybe_upgrade_db( int $target ): bool {
 		$stored = (int) get_option( self::DB_VERSION_OPTION, 1 );
+		if ( $stored >= self::LEGACY_SCHEMA_FLOOR ) {
+			$stored = 1;
+		}
 		if ( $stored >= $target ) {
 			return false;
 		}
 
 		// Write the new version first so a failing step never loops.
-		update_option( self::DB_VERSION_OPTION, $target, true );
+		update_option( self::DB_VERSION_OPTION, $target, false );
 
 		if ( $stored < 2 ) {
 			// Step 2: rebuild rewrite rules once (B22: llms.txt / ai-sitemap.xml).

@@ -900,6 +900,11 @@
     color: var(--wpmind-success);
 }
 
+.wpmind-status-warning {
+    background: var(--wpmind-warning-light, #fcf9e8);
+    color: var(--wpmind-warning, #996800);
+}
+
 /* Form Table in Card */
 .wpmind-endpoint-card .form-table {
     margin: 0;
