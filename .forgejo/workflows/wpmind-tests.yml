@@ -17,6 +17,8 @@ jobs:
   unit:
     name: composer check
     runs-on: linux-arm64
+    # Host runner is shared; a stuck phpcs/phpstan must not sit forever.
+    timeout-minutes: 20
     env:
       COMPOSER_NO_INTERACTION: '1'
     steps:
@@ -40,8 +42,49 @@ jobs:
           done
           exit 1
 
-      - name: composer check（php-lint + phpunit + composer audit）
-        run: composer check
+      # Split former `composer check` so a hang shows which gate stalled (run 377
+      # logged only through phpunit, then silence for 10m+ with no phpstan/audit line).
+      - name: php-lint
+        run: |
+          echo "::group::composer lint"
+          composer lint
+          echo "::endgroup::"
+
+      - name: phpunit
+        run: |
+          echo "::group::composer test"
+          composer test
+          echo "::endgroup::"
+
+      - name: phpstan
+        timeout-minutes: 5
+        run: |
+          echo "::group::composer analyze"
+          composer analyze
+          echo "::endgroup::"
+
+      - name: phpcs baseline gate
+        timeout-minutes: 5
+        run: |
+          echo "::group::composer cs"
+          composer cs
+          echo "::endgroup::"
+
+      - name: composer audit（网络抖动重试 3 次）
+        timeout-minutes: 3
+        run: |
+          for attempt in 1 2 3; do
+            echo "::group::composer audit attempt ${attempt}"
+            if composer audit; then
+              echo "::endgroup::"
+              exit 0
+            fi
+            ec=$?
+            echo "::endgroup::"
+            echo "composer audit 失败（第 ${attempt} 次, exit=${ec}）"
+            sleep $(( attempt * 10 ))
+          done
+          exit 1
 
       - name: 跑完后工作区必须干净
         run: |

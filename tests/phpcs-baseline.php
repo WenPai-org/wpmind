@@ -35,6 +35,9 @@ $command = array_merge(
 		'--basepath=' . $root,
 		'--no-colors',
 		'-q',
+		// Shared linux-arm64 host runner: parallel workers can orphan at 100% CPU
+		// when the parent is killed (timeout / OOM). CLI overrides phpcs.xml.dist.
+		'--parallel=1',
 	]
 );
 

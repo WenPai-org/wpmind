@@ -14,6 +14,8 @@
     <exclude-pattern>*/assets/*</exclude-pattern>
     <exclude-pattern>*.min.js</exclude-pattern>
     <exclude-pattern>test-results/*</exclude-pattern>
+    <exclude-pattern>*/.qa/*</exclude-pattern>
+    <exclude-pattern>.qa/*</exclude-pattern>
 
     <!-- WordPress-Extra 已包含 WordPress-Core，无需重复引用 -->
     <rule ref="WordPress-Extra">
@@ -61,6 +63,6 @@
 
     <arg value="ps"/>
     <arg name="colors"/>
-    <arg name="parallel" value="8"/>
+    <arg name="parallel" value="2"/>
     <arg value="s"/>
 </ruleset>
