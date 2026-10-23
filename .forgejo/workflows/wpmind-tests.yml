@@ -110,7 +110,8 @@ jobs:
       # 端口改由 tests/E2E/ci-port.sh 在这个范围里占用（WP_ENV_PORT/WP_BASE_URL 在那一步写入）.
       E2E_PORT_FIRST: '8946'
       E2E_PORT_LAST: '8949'
-      PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH: /usr/sbin/chromium-browser
+      # Host package puts the wrapper in /usr/bin (sbin path broke after runner re-register / package layout).
+      PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH: /usr/bin/chromium-browser
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -121,6 +122,16 @@ jobs:
           node -e 'const [a,b]=process.versions.node.split(".").map(Number); process.exit(a>20||(a===20&&b>=10)?0:1)'
           npm --version
           jq --version
+          if [ ! -x "${PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}" ]; then
+            for cand in /usr/bin/chromium-browser /usr/sbin/chromium-browser /usr/bin/chromium; do
+              if [ -x "$cand" ]; then
+                echo "chromium fallback: $cand"
+                echo "PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=${cand}" >> "${GITHUB_ENV}"
+                PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=$cand
+                break
+              fi
+            done
+          fi
           test -x "${PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}"
           "${PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}" --version || true
 
