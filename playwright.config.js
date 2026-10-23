@@ -18,7 +18,14 @@ module.exports = defineConfig( {
 		baseURL,
 		headless: true,
 		storageState,
-		launchOptions: executablePath ? { executablePath } : {},
+		// System/snap Chromium needs --no-sandbox on this host runner; bundling
+		// Playwright's own browser is skipped (PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD).
+		launchOptions: executablePath
+			? {
+				executablePath,
+				args: [ '--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu' ],
+			}
+			: {},
 		trace: 'retain-on-failure',
 	},
 } );
