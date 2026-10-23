@@ -17,6 +17,8 @@ jobs:
   unit:
     name: composer check
     runs-on: linux-arm64
+    # Host runner is shared; a stuck phpcs/phpstan must not sit forever.
+    timeout-minutes: 20
     env:
       COMPOSER_NO_INTERACTION: '1'
     steps:
@@ -40,8 +42,49 @@ jobs:
           done
           exit 1
 
-      - name: composer check（php-lint + phpunit + composer audit）
-        run: composer check
+      # Split former `composer check` so a hang shows which gate stalled (run 377
+      # logged only through phpunit, then silence for 10m+ with no phpstan/audit line).
+      - name: php-lint
+        run: |
+          echo "::group::composer lint"
+          composer lint
+          echo "::endgroup::"
+
+      - name: phpunit
+        run: |
+          echo "::group::composer test"
+          composer test
+          echo "::endgroup::"
+
+      - name: phpstan
+        timeout-minutes: 5
+        run: |
+          echo "::group::composer analyze"
+          composer analyze
+          echo "::endgroup::"
+
+      - name: phpcs baseline gate
+        timeout-minutes: 5
+        run: |
+          echo "::group::composer cs"
+          composer cs
+          echo "::endgroup::"
+
+      - name: composer audit（网络抖动重试 3 次）
+        timeout-minutes: 3
+        run: |
+          for attempt in 1 2 3; do
+            echo "::group::composer audit attempt ${attempt}"
+            if composer audit; then
+              echo "::endgroup::"
+              exit 0
+            fi
+            ec=$?
+            echo "::endgroup::"
+            echo "composer audit 失败（第 ${attempt} 次, exit=${ec}）"
+            sleep $(( attempt * 10 ))
+          done
+          exit 1
 
       - name: 跑完后工作区必须干净
         run: |
@@ -56,13 +99,19 @@ jobs:
     name: Playwright e2e（wp-env playground）
     runs-on: linux-arm64
     needs: unit
+    # 同一台 runner 上多个 PR/push 的 e2e 排队串行，兜住端口锁过期后的 stale GEO 读和登录态串用。
+    concurrency:
+      group: wpmind-e2e
+      cancel-in-progress: false
     env:
       WP_CORE_TAG: '7.1.3'
       WP_CORE_SHA: 'fc9832bef919c2a08541248db23af90d14ffb082'
-      # 和同一台 runner 上 wpslug 的 8888 错开。
-      WP_ENV_PORT: '8946'
-      WP_BASE_URL: http://localhost:8946
-      PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH: /usr/sbin/chromium-browser
+      # 和同一台 runner 上 wpslug 的 8888 错开。同一台 runner 会并发跑多个 e2e job，固定端口会互相抢，
+      # 端口改由 tests/E2E/ci-port.sh 在这个范围里占用（WP_ENV_PORT/WP_BASE_URL 在那一步写入）.
+      E2E_PORT_FIRST: '8946'
+      E2E_PORT_LAST: '8949'
+      # Host package puts the wrapper in /usr/bin (sbin path broke after runner re-register / package layout).
+      PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH: /snap/bin/chromium
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -73,6 +122,16 @@ jobs:
           node -e 'const [a,b]=process.versions.node.split(".").map(Number); process.exit(a>20||(a===20&&b>=10)?0:1)'
           npm --version
           jq --version
+          if [ ! -x "${PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}" ]; then
+            for cand in /snap/bin/chromium /usr/bin/chromium-browser /usr/sbin/chromium-browser /usr/bin/chromium; do
+              if [ -x "$cand" ]; then
+                echo "chromium fallback: $cand"
+                echo "PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=${cand}" >> "${GITHUB_ENV}"
+                PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=$cand
+                break
+              fi
+            done
+          fi
           test -x "${PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}"
           "${PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}" --version || true
 
@@ -96,6 +155,17 @@ jobs:
           jq -e '.config.WPMIND_E2E_RESET == true' "${ASSET_DIR}/wp-env.json"
           echo "WPMIND_WP_ENV_CONFIG=${ASSET_DIR}/wp-env.json" >> "${GITHUB_ENV}"
           echo "WPMIND_WP_ENV_ASSETS=${ASSET_DIR}" >> "${GITHUB_ENV}"
+          # 登录态文件按 job 分开，并发 job 不共用 /tmp 下同一个文件.
+          echo "WPMIND_E2E_STORAGE_STATE=${ASSET_DIR}/admin-state.json" >> "${GITHUB_ENV}"
+
+      - name: 占用一个空闲端口
+        run: |
+          set -euo pipefail
+          PORT=$(tests/E2E/ci-port.sh claim)
+          echo "e2e 端口：${PORT}"
+          echo "WPMIND_E2E_PORT=${PORT}" >> "${GITHUB_ENV}"
+          echo "WP_ENV_PORT=${PORT}" >> "${GITHUB_ENV}"
+          echo "WP_BASE_URL=http://localhost:${PORT}" >> "${GITHUB_ENV}"
 
       - name: 启动 WordPress Playground
         run: npx wp-env start --runtime=playground --config "${WPMIND_WP_ENV_CONFIG}"
@@ -109,6 +179,10 @@ jobs:
           if [ -n "${WPMIND_WP_ENV_CONFIG:-}" ]; then
             npx wp-env stop --runtime=playground --config "${WPMIND_WP_ENV_CONFIG}" || true
           fi
+
+      - name: 释放端口
+        if: always()
+        run: tests/E2E/ci-port.sh release
 
       - name: 跑完后工作区必须干净
         if: always()

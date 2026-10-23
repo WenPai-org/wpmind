@@ -31,3 +31,6 @@ node_modules/
 # Playwright 产物
 /test-results/
 /playwright-report/
+
+# Local QA playground copies (wp-env / overlap probes); never scan or commit
+.qa/
