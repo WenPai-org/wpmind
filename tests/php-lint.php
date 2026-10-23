@@ -12,7 +12,7 @@ $iterator = new RecursiveIteratorIterator(
 	new RecursiveCallbackFilterIterator(
 		new RecursiveDirectoryIterator( $root, FilesystemIterator::SKIP_DOTS ),
 		static function ( SplFileInfo $file ): bool {
-			if ( $file->isDir() && in_array( $file->getFilename(), [ '.git', 'node_modules', 'vendor' ], true ) ) {
+			if ( $file->isDir() && in_array( $file->getFilename(), [ '.git', 'node_modules', 'vendor', '.qa', 'test-results', 'playwright-report' ], true ) ) {
 				return false;
 			}
 			return true;
