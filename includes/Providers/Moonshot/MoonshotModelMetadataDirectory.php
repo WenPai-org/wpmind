@@ -25,15 +25,4 @@ class MoonshotModelMetadataDirectory extends AbstractOpenAiCompatibleModelMetada
 	protected static function providerClass(): string {
 		return MoonshotProvider::class;
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function getStaticModels(): array {
-		return [
-			'moonshot-v1-8k'   => 'Moonshot v1 8K',
-			'moonshot-v1-32k'  => 'Moonshot v1 32K',
-			'moonshot-v1-128k' => 'Moonshot v1 128K',
-		];
-	}
 }

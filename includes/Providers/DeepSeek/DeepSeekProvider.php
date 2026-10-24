@@ -33,7 +33,7 @@ class DeepSeekProvider extends AbstractOpenAiCompatibleProvider {
 	/**
 	 * {@inheritDoc}
 	 */
-	protected static function providerId(): string {
+	public static function providerId(): string {
 		return 'deepseek';
 	}
 

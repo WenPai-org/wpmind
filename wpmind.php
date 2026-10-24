@@ -171,26 +171,7 @@ final class WPMind {
 		);
 	}
 
-	/**
-	 * 当前推荐的默认模型（PR2 wpmind-model-catalog 会换成随包发布的目录）。
-	 *
-	 * Endpoint schema v2 起这份列表只作为回滚镜像写进旧 option（用户没选模型时），新代码读 v2 里的用户选择。
-	 *
-	 * @var array<string, list<string>>
-	 */
-	private const DEFAULT_MODELS = [
-		'openai'      => [ 'gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-3.5-turbo' ],
-		'anthropic'   => [ 'claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022', 'claude-3-opus-20240229' ],
-		'google'      => [ 'gemini-2.0-flash-exp', 'gemini-1.5-pro', 'gemini-1.5-flash' ],
-		'deepseek'    => [ 'deepseek-chat', 'deepseek-coder', 'deepseek-reasoner' ],
-		'qwen'        => [ 'qwen-turbo', 'qwen-plus', 'qwen-max' ],
-		'zhipu'       => [ 'glm-4', 'glm-4-flash', 'glm-4-plus' ],
-		'moonshot'    => [ 'moonshot-v1-8k', 'moonshot-v1-32k', 'moonshot-v1-128k' ],
-		'doubao'      => [ 'doubao-pro-4k', 'doubao-pro-32k', 'doubao-pro-128k' ],
-		'siliconflow' => [ 'deepseek-ai/DeepSeek-V3', 'Qwen/Qwen2.5-72B-Instruct' ],
-		'baidu'       => [ 'ernie-4.0-8k', 'ernie-3.5-8k', 'ernie-speed-8k' ],
-		'minimax'     => [ 'abab6.5s-chat', 'abab6.5-chat', 'abab5.5-chat' ],
-	];
+	// Default models now come from Provider\Catalog\ModelCatalog (bundled models.json).
 
 	/**
 	 * 加载自定义端点配置
@@ -224,11 +205,12 @@ final class WPMind {
 	 * 获取默认端点配置
 	 *
 	 * 兼容外壳：签名和返回结构保持 0.12 不变（模板、AdminPage 和第三方在调）。
-	 * 元数据来自 ProviderDefinitions，模型来自 DEFAULT_MODELS。
+	 * 元数据来自 ProviderDefinitions，模型来自 ModelCatalog 推荐列表（不含 retired）。
 	 *
 	 * @return array
 	 */
 	public function get_default_endpoints(): array {
+		$catalog   = Provider\Catalog\ModelCatalog::instance();
 		$endpoints = [];
 		foreach ( Provider\ProviderDefinitions::DEFINITIONS as $key => $definition ) {
 			$endpoint = [
@@ -236,7 +218,7 @@ final class WPMind {
 				'display_name' => $definition['display_name'],
 				'icon'         => $definition['icon'],
 				'base_url'     => $definition['base_url'],
-				'models'       => self::DEFAULT_MODELS[ $key ],
+				'models'       => $catalog->recommended_ids( $key ),
 				'enabled'      => false,
 				'api_key'      => '',
 			];
@@ -313,11 +295,30 @@ final class WPMind {
 				continue;
 			}
 
-			foreach ( (array) $endpoint['models'] as $model ) {
-				$model = trim( $model );
-				if ( ! empty( $model ) ) {
-					$custom_models[] = [ $key, $model ];
+			$catalog   = Provider\Catalog\ModelCatalog::instance();
+			$model_ids = (array) $endpoint['models'];
+			if ( [] === $model_ids ) {
+				$default = $endpoint['default_model'] ?? '';
+				if ( is_string( $default ) && '' !== $default ) {
+					$model_ids = [ $default ];
+				} else {
+					$model_ids = $catalog->recommended_ids( $key );
 				}
+			}
+			foreach ( $model_ids as $model ) {
+				$model = trim( (string) $model );
+				if ( '' === $model ) {
+					continue;
+				}
+				$resolved = $catalog->resolve( $key, $model );
+				if ( '' === $resolved->model ) {
+					continue;
+				}
+				$meta = $catalog->model_meta( $key, $resolved->model );
+				if ( is_array( $meta ) && 'retired' === ( $meta['status'] ?? '' ) ) {
+					continue;
+				}
+				$custom_models[] = [ $key, $resolved->model ];
 			}
 		}
 

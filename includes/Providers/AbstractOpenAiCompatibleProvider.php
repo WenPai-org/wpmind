@@ -34,7 +34,7 @@ abstract class AbstractOpenAiCompatibleProvider extends AbstractApiProvider {
 	 *
 	 * @return string
 	 */
-	abstract protected static function providerId(): string;
+	abstract public static function providerId(): string;
 
 	/**
 	 * 获取 Provider 显示名称

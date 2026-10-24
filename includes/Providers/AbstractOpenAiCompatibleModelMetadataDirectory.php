@@ -38,11 +38,15 @@ abstract class AbstractOpenAiCompatibleModelMetadataDirectory extends BaseDirect
 	abstract protected static function providerClass(): string;
 
 	/**
-	 * 获取静态模型列表
+	 * 获取静态模型列表（默认从 ModelCatalog；子类可覆盖）
 	 *
 	 * @return array<string, string> 模型 ID => 显示名称
 	 */
-	abstract protected function getStaticModels(): array;
+	protected function getStaticModels(): array {
+		$provider_class = static::providerClass();
+		$provider_id    = $provider_class::providerId();
+		return \WPMind\Provider\Catalog\ModelCatalog::instance()->for_provider_map( $provider_id );
+	}
 
 	/**
 	 * {@inheritDoc}

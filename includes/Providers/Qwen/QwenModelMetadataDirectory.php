@@ -25,17 +25,4 @@ class QwenModelMetadataDirectory extends AbstractOpenAiCompatibleModelMetadataDi
 	protected static function providerClass(): string {
 		return QwenProvider::class;
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function getStaticModels(): array {
-		return [
-			'qwen-turbo'      => 'Qwen Turbo',
-			'qwen-plus'       => 'Qwen Plus',
-			'qwen-max'        => 'Qwen Max',
-			'qwen-max-latest' => 'Qwen Max (Latest)',
-			'qwen-long'       => 'Qwen Long',
-		];
-	}
 }

@@ -25,15 +25,4 @@ class DeepSeekModelMetadataDirectory extends AbstractOpenAiCompatibleModelMetada
 	protected static function providerClass(): string {
 		return DeepSeekProvider::class;
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function getStaticModels(): array {
-		return [
-			'deepseek-chat'     => 'DeepSeek Chat',
-			'deepseek-coder'    => 'DeepSeek Coder',
-			'deepseek-reasoner' => 'DeepSeek Reasoner (R1)',
-		];
-	}
 }

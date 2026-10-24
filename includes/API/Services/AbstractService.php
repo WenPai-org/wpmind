@@ -176,17 +176,26 @@ abstract class AbstractService {
 	 * @return string
 	 */
 	protected function get_current_model( string $provider ): string {
-		if ( ! class_exists( '\\WPMind\\WPMind' ) ) {
-			return 'default';
+		$catalog = \WPMind\Provider\Catalog\ModelCatalog::instance();
+
+		if ( class_exists( '\WPMind\WPMind' ) ) {
+			$endpoints = $this->get_endpoints();
+			if ( isset( $endpoints[ $provider ]['default_model'] )
+				&& is_string( $endpoints[ $provider ]['default_model'] )
+				&& '' !== $endpoints[ $provider ]['default_model']
+			) {
+				return $catalog->resolve( $provider, $endpoints[ $provider ]['default_model'] )->model;
+			}
+			if ( isset( $endpoints[ $provider ]['models'] ) && is_array( $endpoints[ $provider ]['models'] ) && [] !== $endpoints[ $provider ]['models'] ) {
+				$first = (string) ( $endpoints[ $provider ]['models'][0] ?? '' );
+				if ( '' !== $first ) {
+					return $catalog->resolve( $provider, $first )->model;
+				}
+			}
 		}
 
-		$endpoints = $this->get_endpoints();
-
-		if ( isset( $endpoints[ $provider ]['models'] ) && is_array( $endpoints[ $provider ]['models'] ) ) {
-			return $endpoints[ $provider ]['models'][0] ?? 'default';
-		}
-
-		return 'default';
+		$default = $catalog->default_model( $provider );
+		return '' !== $default ? $default : 'default';
 	}
 
 	/**

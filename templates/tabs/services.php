@@ -210,9 +210,17 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 				<tr>
 					<th scope="row"><?php esc_html_e( '支持的模型', 'wpmind' ); ?></th>
 					<td class="wpmind-models">
-						<?php foreach ( (array) $endpoint['models'] as $model ) : ?>
+						<?php
+						$wpmind_display_models = (array) $endpoint['models'];
+						if ( [] === $wpmind_display_models ) {
+							$wpmind_display_models = \WPMind\Provider\Catalog\ModelCatalog::instance()->recommended_ids( $key );
+						}
+						foreach ( $wpmind_display_models as $model ) :
+							?>
 							<code><?php echo esc_html( $model ); ?></code>
-						<?php endforeach; ?>
+							<?php
+						endforeach;
+						?>
 					</td>
 				</tr>
 			</table>

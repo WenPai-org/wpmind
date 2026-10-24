@@ -21,7 +21,8 @@ namespace WPMind\Modules\ApiGateway\Transform;
 final class ModelMapper {
 
 	/**
-	 * Default model mapping table.
+	 * Legacy external model names (D10: keep at least through 1.0).
+	 * Prefer ModelCatalog::gateway_alias_map(); this table remains for older OpenAI-style ids.
 	 *
 	 * @var array<string, array{provider: string, model: string}>
 	 */
@@ -130,7 +131,12 @@ final class ModelMapper {
 			}
 		}
 
-		return self::$default_map[ $model ] ?? null;
+		if ( isset( self::$default_map[ $model ] ) ) {
+			return self::$default_map[ $model ];
+		}
+
+		$catalog_map = self::catalog_map();
+		return $catalog_map[ $model ] ?? null;
 	}
 
 	/**
@@ -142,7 +148,7 @@ final class ModelMapper {
 	 */
 	public static function get_available_models(): array {
 		$aliases = get_option( 'wpmind_gateway_model_aliases', [] );
-		$models  = array_keys( self::$default_map );
+		$models  = array_keys( array_merge( self::catalog_map(), self::$default_map ) );
 
 		if ( is_array( $aliases ) ) {
 			$models = array_unique( array_merge( $models, array_keys( $aliases ) ) );
@@ -153,5 +159,17 @@ final class ModelMapper {
 		sort( $models );
 
 		return $models;
+	}
+
+	/**
+	 * Build map from bundled ModelCatalog (includes provider aliases).
+	 *
+	 * @return array<string, array{provider: string, model: string}>
+	 */
+	private static function catalog_map(): array {
+		if ( ! class_exists( \WPMind\Provider\Catalog\ModelCatalog::class ) ) {
+			return [];
+		}
+		return \WPMind\Provider\Catalog\ModelCatalog::instance()->gateway_alias_map();
 	}
 }

@@ -5,8 +5,8 @@
         "tests/phpcs-compat.xml"
     ],
     "totals": {
-        "errors": 2131,
-        "warnings": 61
+        "errors": 2130,
+        "warnings": 60
     },
     "files": {
         "includes/API/ErrorHandler.php": {
@@ -331,8 +331,6 @@
             "WordPress.PHP.DevelopmentFunctions.error_log_error_log": 1
         },
         "includes/Usage/Pricing.php": {
-            "Generic.Commenting.DocComment.LongNotCapital": 1,
-            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 1,
             "Squiz.Commenting.ClassComment.Missing": 1,
             "Squiz.Commenting.FunctionComment.MissingParamTag": 6
         },

@@ -2,8 +2,8 @@
 /**
  * AI Provider Pricing Data
  *
- * Centralized pricing constants shared between UsageTracker implementations.
- * Prices are per 1M tokens. Data source: provider official sites (2026-01).
+ * Legacy fallback pricing (per 1M tokens). Prefer ModelCatalog::pricing(); DATA kept when catalog price is null.
+ * Original snapshot: provider official sites (2026-01).
  *
  * @package WPMind\Usage
  * @since 3.2.1
@@ -17,6 +17,8 @@ class Pricing {
 
 	/**
 	 * Provider pricing data (per 1M tokens).
+	 *
+	 * @deprecated 0.13.0 Prefer catalog pricing; retained as fallback when catalog price is null.
 	 *
 	 * currency: USD or CNY
 	 */
@@ -243,11 +245,21 @@ class Pricing {
 		int $input_tokens,
 		int $output_tokens
 	): float {
-		$pricing      = self::DATA[ $provider ] ?? [];
-		$model_pricing = self::resolve_model_pricing( $pricing, $model );
+		$catalog_pricing = null;
+		if ( class_exists( \WPMind\Provider\Catalog\ModelCatalog::class ) ) {
+			$catalog_pricing = \WPMind\Provider\Catalog\ModelCatalog::instance()->pricing( $provider, $model );
+		}
+		if ( is_array( $catalog_pricing ) ) {
+			$model_pricing = $catalog_pricing;
+		} else {
+			$pricing       = self::DATA[ $provider ] ?? [];
+			$model_pricing = self::resolve_model_pricing( $pricing, $model );
+		}
 
-		$input_cost  = ( $input_tokens / 1_000_000 ) * ( $model_pricing['input'] ?? 0 );
-		$output_cost = ( $output_tokens / 1_000_000 ) * ( $model_pricing['output'] ?? 0 );
+		$input_rate  = (float) $model_pricing['input'];
+		$output_rate = (float) $model_pricing['output'];
+		$input_cost  = ( $input_tokens / 1_000_000 ) * $input_rate;
+		$output_cost = ( $output_tokens / 1_000_000 ) * $output_rate;
 
 		return round( $input_cost + $output_cost, 6 );
 	}
