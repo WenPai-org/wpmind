@@ -1,6 +1,6 @@
 <?php
 /**
- * Workflow AJAX handlers (unified tasks + Alt/Meta dry-run + Alt review/apply/undo).
+ * Workflow AJAX handlers (unified tasks + Alt/Meta dry-run + review/apply/undo).
  *
  * @package WPMind\Workflow
  * @since 0.14.0
@@ -31,6 +31,10 @@ final class WorkflowAjax {
 		add_action( 'wp_ajax_wpmind_workflow_alt_submit_review', array( self::class, 'ajax_alt_submit_review' ) );
 		add_action( 'wp_ajax_wpmind_workflow_meta_create', array( self::class, 'ajax_meta_create' ) );
 		add_action( 'wp_ajax_wpmind_workflow_meta_dry_run', array( self::class, 'ajax_meta_dry_run' ) );
+		add_action( 'wp_ajax_wpmind_workflow_meta_review', array( self::class, 'ajax_meta_review' ) );
+		add_action( 'wp_ajax_wpmind_workflow_meta_apply', array( self::class, 'ajax_meta_apply' ) );
+		add_action( 'wp_ajax_wpmind_workflow_meta_undo', array( self::class, 'ajax_meta_undo' ) );
+		add_action( 'wp_ajax_wpmind_workflow_meta_submit_review', array( self::class, 'ajax_meta_submit_review' ) );
 		add_action( 'wp_ajax_wpmind_workflow_task_get', array( self::class, 'ajax_task_get' ) );
 		add_action( 'wp_ajax_wpmind_workflow_task_list', array( self::class, 'ajax_task_list' ) );
 	}
@@ -261,6 +265,116 @@ final class WorkflowAjax {
 
 		$service = new MetaBulkService();
 		$result  = $service->dry_run_batch( $task_id );
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+		}
+
+		wp_send_json_success( $result );
+	}
+
+
+	/**
+	 * Submit meta dry_run task to pending_review.
+	 *
+	 * @return void
+	 */
+	public static function ajax_meta_submit_review(): void {
+		self::verify( true );
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified in verify().
+		$task_id = (int) ( $_POST['task_id'] ?? 0 );
+		if ( $task_id <= 0 ) {
+			wp_send_json_error( array( 'message' => __( '无效任务 ID', 'wpmind' ) ) );
+		}
+
+		$result = ( new MetaBulkService() )->mark_pending_review( $task_id );
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+		}
+
+		wp_send_json_success( array( 'task' => $result ) );
+	}
+
+	/**
+	 * Review (approve/reject) meta_bulk items.
+	 *
+	 * @return void
+	 */
+	public static function ajax_meta_review(): void {
+		self::verify( true );
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified in verify().
+		$task_id = (int) ( $_POST['task_id'] ?? 0 );
+		if ( $task_id <= 0 ) {
+			wp_send_json_error( array( 'message' => __( '无效任务 ID', 'wpmind' ) ) );
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified in verify().
+		$raw       = wp_unslash( (string) ( $_POST['decisions'] ?? '[]' ) );
+		$decisions = json_decode( $raw, true );
+		if ( ! is_array( $decisions ) ) {
+			wp_send_json_error( array( 'message' => __( '审核数据无效', 'wpmind' ) ) );
+		}
+
+		$result = ( new MetaBulkService() )->review_items( $task_id, $decisions );
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+		}
+
+		wp_send_json_success( array( 'task' => $result ) );
+	}
+
+	/**
+	 * Apply a batch of approved meta items.
+	 *
+	 * @return void
+	 */
+	public static function ajax_meta_apply(): void {
+		self::verify( true );
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified in verify().
+		$task_id = (int) ( $_POST['task_id'] ?? 0 );
+		if ( $task_id <= 0 ) {
+			wp_send_json_error( array( 'message' => __( '无效任务 ID', 'wpmind' ) ) );
+		}
+
+		$result = ( new MetaBulkService() )->apply_approved( $task_id );
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+		}
+
+		wp_send_json_success( $result );
+	}
+
+	/**
+	 * Undo applied meta items (optional object_ids subset).
+	 *
+	 * @return void
+	 */
+	public static function ajax_meta_undo(): void {
+		self::verify( true );
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified in verify().
+		$task_id = (int) ( $_POST['task_id'] ?? 0 );
+		if ( $task_id <= 0 ) {
+			wp_send_json_error( array( 'message' => __( '无效任务 ID', 'wpmind' ) ) );
+		}
+
+		$object_ids = null;
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified in verify().
+		if ( isset( $_POST['object_ids'] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified in verify().
+			$raw = wp_unslash( $_POST['object_ids'] );
+			if ( is_string( $raw ) ) {
+				$decoded = json_decode( $raw, true );
+				$raw     = is_array( $decoded ) ? $decoded : array();
+			}
+			if ( is_array( $raw ) ) {
+				$object_ids = array_map( 'intval', $raw );
+			}
+		}
+
+		$result = ( new MetaBulkService() )->undo_applied( $task_id, $object_ids );
 		if ( is_wp_error( $result ) ) {
 			wp_send_json_error( array( 'message' => $result->get_error_message() ) );
 		}
