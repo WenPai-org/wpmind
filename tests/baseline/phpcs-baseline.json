@@ -5,8 +5,8 @@
         "tests/phpcs-compat.xml"
     ],
     "totals": {
-        "errors": 2155,
-        "warnings": 65
+        "errors": 2131,
+        "warnings": 61
     },
     "files": {
         "includes/API/ErrorHandler.php": {
@@ -90,12 +90,12 @@
         },
         "includes/Admin/AdminPage.php": {
             "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 14,
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 9,
+            "Squiz.Commenting.InlineComment.InvalidEndChar": 8,
             "WordPress.PHP.YodaConditions.NotYoda": 3
         },
         "includes/Admin/AjaxController.php": {
             "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 2,
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 27,
+            "Squiz.Commenting.InlineComment.InvalidEndChar": 24,
             "WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase": 2,
             "WordPress.PHP.YodaConditions.NotYoda": 6
         },
@@ -581,15 +581,10 @@
             "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 8
         },
         "playwright.config.js": {
-            "Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed": 2,
-            "Generic.WhiteSpace.ScopeIndent.IncorrectExact": 6,
+            "Generic.WhiteSpace.ScopeIndent.IncorrectExact": 1,
             "PEAR.Functions.FunctionCallSignature.CloseBracketLine": 1,
             "PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket": 1,
-            "PEAR.Functions.FunctionCallSignature.Indent": 4,
-            "PEAR.Functions.FunctionCallSignature.SpaceAfterOpenBracket": 1,
-            "PEAR.Functions.FunctionCallSignature.SpaceBeforeCloseBracket": 1,
-            "Squiz.Commenting.FileComment.Missing": 1,
-            "Universal.WhiteSpace.PrecisionAlignment.Found": 4
+            "Squiz.Commenting.FileComment.Missing": 1
         },
         "templates/settings-page.php": {
             "Squiz.Commenting.InlineComment.InvalidEndChar": 1,
@@ -636,13 +631,12 @@
             "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 11
         },
         "uninstall.php": {
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 14,
-            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 2
+            "Squiz.Commenting.InlineComment.InvalidEndChar": 14
         },
         "wpmind.php": {
             "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 17,
             "Squiz.Commenting.FunctionComment.ThrowsNoFullStop": 1,
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 41,
+            "Squiz.Commenting.InlineComment.InvalidEndChar": 36,
             "Universal.Files.SeparateFunctionsFromOO.Mixed": 1,
             "Universal.NamingConventions.NoReservedKeywordParameterNames.classFound": 2,
             "WordPress.PHP.YodaConditions.NotYoda": 3

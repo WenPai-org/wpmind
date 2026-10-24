@@ -47,6 +47,8 @@
 - 新增模块开关、升级路径的 Playwright 端到端测试，并在 CI 中运行（#18、#20）。
 - 开发依赖安全升级：`npm audit fix`（不含 `--force`），漏洞从 30 个降到 9 个；其余漏洞来自 `@wordpress/env`，等上游新版（#22）。
 - 端到端测试改为必过检查（#23）。
+- 在 tip 上重跑并固化完整 PHPCS/PHPStan 基线（错误/警告数随代码收敛下调；PHPStan level 5 基线仍为 132 条）。
+- CI `composer check` 固定使用 PHP 8.3（避免 host runner 偶发切到 8.5 时 phpstan 挂死）。
 
 ## [0.12.0] - 未发布
 
