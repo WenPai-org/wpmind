@@ -182,6 +182,19 @@ function wpmind_cleanup_site_data(): void {
 		)
 	);
 
+	// Delete unified workflow task CPT posts.
+	$task_ids = get_posts(
+		[
+			'post_type'      => 'wpmind_task',
+			'post_status'    => 'any',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+		]
+	);
+	foreach ( $task_ids as $task_id ) {
+		wp_delete_post( (int) $task_id, true );
+	}
+
 	// 删除 API Gateway 模块的数据库表
 	$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wpmind_api_audit_log" );
 	$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}wpmind_api_key_usage" );

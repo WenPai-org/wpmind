@@ -21,9 +21,15 @@ namespace WPMind\Modules\MediaIntelligence;
 class AltTextGenerator {
 
 	/**
-	 * Constructor — register WordPress hooks.
+	 * Constructor — optionally register WordPress hooks.
+	 *
+	 * @param bool $register_hooks When false, use as a plain helper (workflow dry-run).
 	 */
-	public function __construct() {
+	public function __construct( bool $register_hooks = true ) {
+		if ( ! $register_hooks ) {
+			return;
+		}
+
 		// Schedule async generation on upload (priority 20, after core processing).
 		add_action( 'add_attachment', [ $this, 'schedule_generation' ], 20 );
 
@@ -32,6 +38,58 @@ class AltTextGenerator {
 
 		// Add "Regenerate" field in media edit screen.
 		add_filter( 'attachment_fields_to_edit', [ $this, 'add_regenerate_field' ], 10, 2 );
+	}
+
+	/**
+	 * Generate proposed alt text without writing attachment meta / title / caption.
+	 *
+	 * @param int $attachment_id Attachment post ID.
+	 * @return string|\WP_Error Proposed alt text or error.
+	 */
+	public function generate_proposed_alt( int $attachment_id ) {
+		$mocked = apply_filters( 'wpmind_alt_proposed_override', null, $attachment_id );
+		if ( is_string( $mocked ) ) {
+			$mocked = sanitize_text_field( trim( $mocked ) );
+			return '' !== $mocked ? $mocked : new \WP_Error( 'wpmind_alt_empty', __( '生成结果为空', 'wpmind' ) );
+		}
+		if ( is_wp_error( $mocked ) ) {
+			return $mocked;
+		}
+
+		if ( ! function_exists( 'wpmind_vision' ) ) {
+			return new \WP_Error( 'wpmind_vision_missing', __( 'Vision API 不可用', 'wpmind' ) );
+		}
+
+		$image_url = $this->get_optimized_url( $attachment_id );
+		if ( ! $image_url ) {
+			return new \WP_Error( 'wpmind_alt_no_url', __( '无法获取图片地址', 'wpmind' ) );
+		}
+
+		$lang = $this->get_language_label();
+
+		$result = wpmind_vision(
+			$image_url,
+			sprintf(
+				'为这张图片生成简洁的 alt text（%s），直接输出文本，不要引号或前缀。',
+				$lang
+			),
+			[
+				'max_tokens'  => 100,
+				'temperature' => 0.3,
+				'context'     => 'media_alt_text_preview',
+			]
+		);
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		$alt_text = sanitize_text_field( trim( $result['content'] ?? '' ) );
+		if ( empty( $alt_text ) ) {
+			return new \WP_Error( 'wpmind_alt_empty', __( '生成结果为空', 'wpmind' ) );
+		}
+
+		return $alt_text;
 	}
 
 	/**

@@ -833,6 +833,9 @@ defined( 'ABSPATH' ) || exit(); ?>
 			<?php esc_html_e( 'Auto-Meta', 'wpmind' ); ?>
 		</a>
 		<?php endif; ?>
+		<a href="#workflow" class="wpmind-tab" data-tab="workflow">
+			<?php esc_html_e( '任务', 'wpmind' ); ?>
+		</a>
 		<a href="#modules" class="wpmind-tab" data-tab="modules">
 			<?php esc_html_e( '模块管理', 'wpmind' ); ?>
 		</a>
@@ -915,6 +918,9 @@ defined( 'ABSPATH' ) || exit(); ?>
 				?>
 			</div>
 			<?php endif; ?>
+			<div id="workflow" class="wpmind-tab-pane">
+				<?php require WPMIND_PLUGIN_DIR . 'templates/tabs/workflow.php'; ?>
+			</div>
 			<div id="modules" class="wpmind-tab-pane">
 				<?php require WPMIND_PLUGIN_DIR . 'templates/tabs/modules.php'; ?>
 			</div>

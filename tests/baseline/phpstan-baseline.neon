@@ -31,6 +31,12 @@ parameters:
 			path: ../../includes/Admin/AdminAssets.php
 
 		-
+			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: ../../includes/Workflow/WorkflowBoot.php
+
+		-
 			message: '#^Constant WPMIND_PLUGIN_DIR not found\.$#'
 			identifier: constant.notFound
 			count: 1
@@ -449,7 +455,7 @@ parameters:
 		-
 			message: '#^Constant WPMIND_PLUGIN_DIR not found\.$#'
 			identifier: constant.notFound
-			count: 7
+			count: 8
 			path: ../../templates/settings-page.php
 
 		-

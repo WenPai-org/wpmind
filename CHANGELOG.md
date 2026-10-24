@@ -12,6 +12,7 @@
 
 ### 改进
 
+- 统一任务记录（CPT `wpmind_task`）与 Alt 批量 dry-run 预览壳：筛选缺 Alt 建任务、Vision 只写 proposed、不改附件 meta；任务页可查看 before/proposed。
 - Provider 错误诊断与配置导出导入：ErrorCatalog 中文说明/恢复建议、诊断包脱敏导出、端点配置无密钥迁移、Site Health「WPMind Provider」检测。
 - API Key 安全轮换：AJAX 先内存验证再原子替换，写入 key_meta 指纹；换钥后重置熔断与远程模型缓存，后台只展示指纹不露明文。
 - Provider 健康检查与明确顺序回退：错误分类、`wpmind_failover_order`、熔断加固（needs_attention / quota_exhausted / 半开探测锁）、统一 ProviderClient 出站记账；默认测试连接用 GET /models，深度测试才产生费用；cron `wpmind_health_check` 默认关闭。
