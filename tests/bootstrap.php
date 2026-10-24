@@ -370,6 +370,196 @@ if ( ! function_exists( 'wp_unschedule_event' ) ) {
 	}
 }
 
+// Post / postmeta stubs for Workflow TaskRepository unit tests.
+$GLOBALS['wpmind_test_posts'] = [];
+$GLOBALS['wpmind_test_postmeta'] = [];
+$GLOBALS['wpmind_test_post_autoinc'] = 1;
+
+if ( ! function_exists( 'get_current_user_id' ) ) {
+	function get_current_user_id(): int {
+		return (int) ( $GLOBALS['wpmind_test_user_id'] ?? 1 );
+	}
+}
+
+if ( ! function_exists( 'current_user_can' ) ) {
+	function current_user_can( string $cap ): bool {
+		return (bool) ( $GLOBALS['wpmind_test_can'][ $cap ] ?? true );
+	}
+}
+
+if ( ! class_exists( 'WP_Post' ) ) {
+	class WP_Post {
+		public $ID;
+		public $post_type = 'post';
+		public $post_status = 'publish';
+		public $post_title = '';
+		public $post_author = 0;
+		public $post_date_gmt = '';
+		public $post_modified_gmt = '';
+		public $post_excerpt = '';
+		public $post_mime_type = '';
+
+		public function __construct( $data = null ) {
+			if ( is_object( $data ) ) {
+				foreach ( get_object_vars( $data ) as $k => $v ) {
+					$this->$k = $v;
+				}
+			} elseif ( is_array( $data ) ) {
+				foreach ( $data as $k => $v ) {
+					$this->$k = $v;
+				}
+			}
+		}
+	}
+}
+
+if ( ! function_exists( 'wp_insert_post' ) ) {
+	function wp_insert_post( $postarr, bool $wp_error = false ) {
+		$postarr = (array) $postarr;
+		$id      = (int) ( $GLOBALS['wpmind_test_post_autoinc']++ );
+		$now     = gmdate( 'Y-m-d H:i:s' );
+		$post    = (object) [
+			'ID'                => $id,
+			'post_type'         => (string) ( $postarr['post_type'] ?? 'post' ),
+			'post_status'       => (string) ( $postarr['post_status'] ?? 'publish' ),
+			'post_title'        => (string) ( $postarr['post_title'] ?? '' ),
+			'post_author'       => (int) ( $postarr['post_author'] ?? 0 ),
+			'post_date_gmt'     => (string) ( $postarr['post_date_gmt'] ?? $now ),
+			'post_modified_gmt' => (string) ( $postarr['post_date_gmt'] ?? $now ),
+			'post_excerpt'      => (string) ( $postarr['post_excerpt'] ?? '' ),
+			'post_mime_type'    => (string) ( $postarr['post_mime_type'] ?? '' ),
+		];
+		$GLOBALS['wpmind_test_posts'][ $id ] = $post;
+		return $id;
+	}
+}
+
+if ( ! function_exists( 'wp_update_post' ) ) {
+	function wp_update_post( $postarr, bool $wp_error = false ) {
+		$postarr = (array) $postarr;
+		$id      = (int) ( $postarr['ID'] ?? 0 );
+		if ( $id <= 0 || ! isset( $GLOBALS['wpmind_test_posts'][ $id ] ) ) {
+			return $wp_error ? new WP_Error( 'invalid_post', 'invalid' ) : 0;
+		}
+		$post = $GLOBALS['wpmind_test_posts'][ $id ];
+		foreach ( [ 'post_title', 'post_status', 'post_excerpt', 'post_author' ] as $field ) {
+			if ( array_key_exists( $field, $postarr ) ) {
+				$post->$field = $postarr[ $field ];
+			}
+		}
+		$post->post_modified_gmt = gmdate( 'Y-m-d H:i:s' );
+		$GLOBALS['wpmind_test_posts'][ $id ] = $post;
+		return $id;
+	}
+}
+
+if ( ! function_exists( 'wp_delete_post' ) ) {
+	function wp_delete_post( int $post_id, bool $force = false ) {
+		unset( $GLOBALS['wpmind_test_posts'][ $post_id ], $GLOBALS['wpmind_test_postmeta'][ $post_id ] );
+		return true;
+	}
+}
+
+if ( ! function_exists( 'get_post' ) ) {
+	function get_post( $post = null, $output = OBJECT, $filter = 'raw' ) {
+		$id = is_object( $post ) ? (int) $post->ID : (int) $post;
+		if ( ! isset( $GLOBALS['wpmind_test_posts'][ $id ] ) ) {
+			return null;
+		}
+		return new WP_Post( $GLOBALS['wpmind_test_posts'][ $id ] );
+	}
+}
+
+if ( ! function_exists( 'get_posts' ) ) {
+	function get_posts( array $args = [] ) {
+		$type   = $args['post_type'] ?? 'post';
+		$status = $args['post_status'] ?? 'publish';
+		$limit  = (int) ( $args['posts_per_page'] ?? 5 );
+		$offset = (int) ( $args['offset'] ?? 0 );
+		$fields = $args['fields'] ?? 'all';
+		$meta_q = $args['meta_query'] ?? [];
+
+		$matched = [];
+		foreach ( $GLOBALS['wpmind_test_posts'] as $id => $post ) {
+			if ( $type && $post->post_type !== $type ) {
+				continue;
+			}
+			if ( 'any' !== $status && $post->post_status !== $status ) {
+				continue;
+			}
+			$ok = true;
+			foreach ( $meta_q as $mq ) {
+				if ( ! is_array( $mq ) || empty( $mq['key'] ) ) {
+					continue;
+				}
+				$val = get_post_meta( (int) $id, (string) $mq['key'], true );
+				if ( array_key_exists( 'value', $mq ) && (string) $val !== (string) $mq['value'] ) {
+					$ok = false;
+					break;
+				}
+			}
+			if ( $ok ) {
+				$matched[] = (int) $id;
+			}
+		}
+		rsort( $matched, SORT_NUMERIC );
+		if ( $limit >= 0 ) {
+			$matched = array_slice( $matched, $offset, $limit < 0 ? null : $limit );
+		}
+		if ( 'ids' === $fields ) {
+			return $matched;
+		}
+		return array_map(
+			static function ( int $id ) {
+				return get_post( $id );
+			},
+			$matched
+		);
+	}
+}
+
+if ( ! function_exists( 'update_post_meta' ) ) {
+	function update_post_meta( int $post_id, string $key, $value, $prev = '' ): bool {
+		if ( ! isset( $GLOBALS['wpmind_test_postmeta'][ $post_id ] ) ) {
+			$GLOBALS['wpmind_test_postmeta'][ $post_id ] = [];
+		}
+		$GLOBALS['wpmind_test_postmeta'][ $post_id ][ $key ] = $value;
+		return true;
+	}
+}
+
+if ( ! function_exists( 'get_post_meta' ) ) {
+	function get_post_meta( int $post_id, string $key = '', bool $single = false ) {
+		$all = $GLOBALS['wpmind_test_postmeta'][ $post_id ] ?? [];
+		if ( '' === $key ) {
+			return $all;
+		}
+		if ( ! array_key_exists( $key, $all ) ) {
+			return $single ? '' : [];
+		}
+		return $single ? $all[ $key ] : [ $all[ $key ] ];
+	}
+}
+
+if ( ! function_exists( 'delete_post_meta' ) ) {
+	function delete_post_meta( int $post_id, string $key, $value = '' ): bool {
+		unset( $GLOBALS['wpmind_test_postmeta'][ $post_id ][ $key ] );
+		return true;
+	}
+}
+
+if ( ! function_exists( 'register_post_type' ) ) {
+	function register_post_type( string $post_type, array $args = [] ) {
+		$GLOBALS['wpmind_test_post_types'][ $post_type ] = $args;
+		return $post_type;
+	}
+}
+
+if ( ! defined( 'OBJECT' ) ) {
+	define( 'OBJECT', 'OBJECT' );
+}
+
+
 // Autoload the plugin classes.
 require_once WPMIND_PLUGIN_DIR . 'includes/SDK/SDKAdapter.php';
 

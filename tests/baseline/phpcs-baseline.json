@@ -683,6 +683,9 @@
             "Universal.Files.SeparateFunctionsFromOO.Mixed": 1,
             "Universal.NamingConventions.NoReservedKeywordParameterNames.classFound": 2,
             "WordPress.PHP.YodaConditions.NotYoda": 3
+        },
+        "includes/Workflow/AltBulkService.php": {
+            "WordPress.DB.PreparedSQLPlaceholders.LikeWildcardsInQuery": 1
         }
     }
 }

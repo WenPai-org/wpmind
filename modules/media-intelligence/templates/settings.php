@@ -168,6 +168,24 @@ $month_gen = (int) ( $stats[ $month_key ] ?? 0 );
 			</div>
 			<span class="wpmind-media-progress-text">0%</span>
 		</div>
+
+		<hr />
+		<p class="wpmind-media-bulk-info">
+			<?php esc_html_e( '工作流 Dry-run：扫描缺 Alt 图片并创建统一任务，Vision 只写入任务预览，不会改附件 Alt / 标题 / 说明。单任务最多 50 张。', 'wpmind' ); ?>
+		</p>
+		<div class="wpmind-media-bulk-actions">
+			<button type="button" id="wpmind-media-workflow-create" class="button">
+				<span class="dashicons ri-add-line"></span>
+				<?php esc_html_e( '创建 Alt 预览任务', 'wpmind' ); ?>
+			</button>
+			<button type="button" id="wpmind-media-workflow-dryrun" class="button button-secondary" disabled>
+				<span class="dashicons ri-eye-line"></span>
+				<?php esc_html_e( 'Dry-run 预览', 'wpmind' ); ?>
+			</button>
+			<a class="button" href="#workflow" data-tab-link="workflow">
+				<?php esc_html_e( '打开任务页', 'wpmind' ); ?>
+			</a>
+		</div>
 	</div>
 
 	<!-- ========== Tab: Content Safety ========== -->

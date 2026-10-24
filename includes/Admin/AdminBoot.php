@@ -66,6 +66,8 @@ final class AdminBoot {
 
 		\WPMind\Provider\KeyRotation::register_hooks();
 
+		\WPMind\Workflow\WorkflowBoot::register_hooks();
+
 		add_filter(
 			'plugin_action_links_' . plugin_basename( WPMIND_PLUGIN_FILE ),
 			[ $page, 'plugin_action_links' ]
