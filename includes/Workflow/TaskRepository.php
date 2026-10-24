@@ -386,12 +386,12 @@ final class TaskRepository {
 			}
 			$row = array(
 				'object_id'   => $oid,
-				'before'      => isset( $item['before'] ) ? (string) $item['before'] : '',
-				'proposed'    => isset( $item['proposed'] ) ? (string) $item['proposed'] : '',
+				'before'      => $this->normalize_snapshot_value( $item['before'] ?? '' ),
+				'proposed'    => $this->normalize_snapshot_value( $item['proposed'] ?? '' ),
 				'item_status' => $status,
 			);
 			if ( array_key_exists( 'applied', $item ) ) {
-				$row['applied'] = (string) $item['applied'];
+				$row['applied'] = $this->normalize_snapshot_value( $item['applied'] );
 			}
 			if ( ! empty( $item['applied_at'] ) ) {
 				$row['applied_at'] = sanitize_text_field( (string) $item['applied_at'] );
@@ -402,6 +402,23 @@ final class TaskRepository {
 			$out[] = $row;
 		}
 		return $out;
+	}
+
+
+	/**
+	 * Keep string snapshots (Alt) or array snapshots (Meta); never cast array to "Array".
+	 *
+	 * @param mixed $value Raw before/proposed/applied.
+	 * @return string|array<string,mixed>
+	 */
+	private function normalize_snapshot_value( $value ) {
+		if ( is_array( $value ) ) {
+			return $value;
+		}
+		if ( null === $value ) {
+			return '';
+		}
+		return (string) $value;
 	}
 
 	/**
@@ -440,7 +457,7 @@ final class TaskRepository {
 				++$undone;
 			}
 		}
-		return array(
+		$out = array(
 			'candidates' => max( $candidates, count( $items ) ),
 			'previewed'  => $previewed,
 			'errors'     => $errors,
@@ -451,6 +468,13 @@ final class TaskRepository {
 			'capped'     => ! empty( $summary['capped'] ),
 			'limit'      => isset( $summary['limit'] ) ? (int) $summary['limit'] : null,
 		);
+		if ( isset( $summary['estimated_calls'] ) ) {
+			$out['estimated_calls'] = (int) $summary['estimated_calls'];
+		}
+		if ( isset( $summary['estimated_max_tokens'] ) ) {
+			$out['estimated_max_tokens'] = (int) $summary['estimated_max_tokens'];
+		}
+		return $out;
 	}
 
 	/**

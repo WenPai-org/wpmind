@@ -9,11 +9,13 @@
 defined( 'ABSPATH' ) || exit;
 
 use WPMind\Workflow\AltBulkService;
+use WPMind\Workflow\MetaBulkService;
 use WPMind\Workflow\TaskRepository;
 
-$wpmind_repo  = new TaskRepository();
-$wpmind_tasks = $wpmind_repo->list_tasks( array( 'limit' => 20 ) );
-$wpmind_limit = AltBulkService::MAX_CANDIDATES;
+$wpmind_repo       = new TaskRepository();
+$wpmind_tasks      = $wpmind_repo->list_tasks( array( 'limit' => 20 ) );
+$wpmind_limit      = AltBulkService::MAX_CANDIDATES;
+$wpmind_meta_limit = MetaBulkService::MAX_CANDIDATES;
 ?>
 <div class="wpmind-module-header">
 	<h2 class="wpmind-module-title">
@@ -27,9 +29,10 @@ $wpmind_limit = AltBulkService::MAX_CANDIDATES;
 		<?php
 		echo esc_html(
 			sprintf(
-				/* translators: %d: max candidates */
-				__( '统一任务记录。Alt 批量：dry-run 预览 → 审核通过/拒绝 → 写入 → 撤销。单任务最多 %d 张。', 'wpmind' ),
-				$wpmind_limit
+				/* translators: 1: alt max, 2: meta max */
+				__( '统一任务记录。Alt：dry-run → 审核 → 写入 → 撤销（最多 %1$d 张）。Meta：dry-run / 预览壳（最多 %2$d 篇；审核写入见后续）。', 'wpmind' ),
+				$wpmind_limit,
+				$wpmind_meta_limit
 			)
 		);
 		?>
@@ -55,6 +58,15 @@ $wpmind_limit = AltBulkService::MAX_CANDIDATES;
 		<button type="button" id="wpmind-workflow-alt-undo" class="button" disabled>
 			<span class="dashicons ri-arrow-go-back-line"></span>
 			<?php esc_html_e( '撤销已写入', 'wpmind' ); ?>
+		</button>
+		<span style="display:inline-block;width:12px;"></span>
+		<button type="button" id="wpmind-workflow-meta-create" class="button button-primary">
+			<span class="dashicons ri-add-line"></span>
+			<?php esc_html_e( '扫描并创建 Meta 任务', 'wpmind' ); ?>
+		</button>
+		<button type="button" id="wpmind-workflow-meta-dryrun" class="button" disabled>
+			<span class="dashicons ri-eye-line"></span>
+			<?php esc_html_e( '对当前 Meta 任务 Dry-run', 'wpmind' ); ?>
 		</button>
 		<button type="button" id="wpmind-workflow-refresh" class="button">
 			<span class="dashicons ri-refresh-line"></span>
@@ -119,7 +131,7 @@ $wpmind_limit = AltBulkService::MAX_CANDIDATES;
 		<table class="widefat striped">
 			<thead>
 				<tr>
-					<th><?php esc_html_e( '附件 ID', 'wpmind' ); ?></th>
+					<th><?php esc_html_e( '对象 ID', 'wpmind' ); ?></th>
 					<th><?php esc_html_e( 'Before', 'wpmind' ); ?></th>
 					<th><?php esc_html_e( 'Proposed', 'wpmind' ); ?></th>
 					<th><?php esc_html_e( 'Applied', 'wpmind' ); ?></th>
