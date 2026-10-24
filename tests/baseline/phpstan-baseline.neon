@@ -139,24 +139,6 @@ parameters:
 			path: ../../includes/Providers/register.php
 
 		-
-			message: '#^Constant WPMIND_PLUGIN_DIR not found\.$#'
-			identifier: constant.notFound
-			count: 1
-			path: ../../includes/Providers/register.php
-
-		-
-			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
-			identifier: constant.notFound
-			count: 1
-			path: ../../includes/Providers/register.php
-
-		-
-			message: '#^Offset ''credentials_url'' on array\{name\: string, description\: string, credentials_url\: string\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: ../../includes/Providers/register.php
-
-		-
 			message: '#^Right side of && is always true\.$#'
 			identifier: booleanAnd.rightAlwaysTrue
 			count: 1

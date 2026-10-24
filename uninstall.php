@@ -72,16 +72,36 @@ function wpmind_cleanup_site_data(): void {
 		// 激活标记
 		'wpmind_flush_rewrite_rules',
 		'wpmind_db_version',
-		// WordPress 7.0 Connector credential mirrors managed by WPMind.
-		'connectors_ai_deepseek_api_key',
-		'connectors_ai_qwen_api_key',
-		'connectors_ai_zhipu_api_key',
-		'connectors_ai_moonshot_api_key',
-		'connectors_ai_doubao_api_key',
-		'connectors_ai_siliconflow_api_key',
-		'connectors_ai_baidu_api_key',
-		'connectors_ai_minimax_api_key',
 	];
+
+	// Only delete connector mirrors whose value equals the WPMind key.
+	// Compare before deleting wpmind_custom_endpoints.
+	$wpmind_endpoints = get_option( 'wpmind_custom_endpoints', [] );
+	if ( ! is_array( $wpmind_endpoints ) ) {
+		$wpmind_endpoints = [];
+	}
+	$wpmind_connector_ids = [
+		'deepseek',
+		'qwen',
+		'zhipu',
+		'moonshot',
+		'doubao',
+		'siliconflow',
+		'baidu',
+		'minimax',
+	];
+	foreach ( $wpmind_connector_ids as $wpmind_provider_id ) {
+		$wpmind_option = 'connectors_ai_' . $wpmind_provider_id . '_api_key';
+		$wpmind_mirror = get_option( $wpmind_option, null );
+		if ( ! is_string( $wpmind_mirror ) || '' === $wpmind_mirror ) {
+			continue;
+		}
+		$wpmind_entry = $wpmind_endpoints[ $wpmind_provider_id ] ?? null;
+		$wpmind_key   = is_array( $wpmind_entry ) ? (string) ( $wpmind_entry['api_key'] ?? '' ) : '';
+		if ( '' !== $wpmind_key && $wpmind_mirror === $wpmind_key ) {
+			delete_option( $wpmind_option );
+		}
+	}
 
 	// 带时间戳的端点配置备份（名字记在索引里，要在删索引之前读）.
 	$wpmind_backups = get_option( 'wpmind_custom_endpoints_backups', [] );

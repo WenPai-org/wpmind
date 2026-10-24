@@ -20,6 +20,8 @@ declare(strict_types=1);
 
 namespace WPMind\SDK;
 
+use WPMind\Provider\Secrets;
+
 use WP_Error;
 
 /**
@@ -289,11 +291,28 @@ class SDKAdapter {
 	 * @return WP_Error
 	 */
 	private function convert_exception_to_wp_error( \Exception $e ): WP_Error {
-		$message = $e->getMessage();
-		$status  = 0;
+		$raw_message = $e->getMessage();
+		$message     = Secrets::redact( $raw_message );
+		$status      = 0;
 
-		// Try to extract HTTP status code from exception message.
-		if ( preg_match( '/\b(4\d{2}|5\d{2})\b/', $message, $matches ) ) {
+		// Prefer status from exception methods when the SDK exposes one.
+		foreach ( [ 'getStatusCode', 'getCode', 'getHttpStatusCode' ] as $method ) {
+			if ( ! method_exists( $e, $method ) ) {
+				continue;
+			}
+			$code = $e->{$method}();
+			if ( is_int( $code ) && $code >= 400 && $code < 600 ) {
+				$status = $code;
+				break;
+			}
+			if ( is_string( $code ) && preg_match( '/\b(4\d{2}|5\d{2})\b/', $code, $m ) ) {
+				$status = (int) $m[1];
+				break;
+			}
+		}
+
+		// Fallback: extract HTTP status code from exception message.
+		if ( 0 === $status && preg_match( '/\b(4\d{2}|5\d{2})\b/', $raw_message, $matches ) ) {
 			$status = (int) $matches[1];
 		}
 
@@ -302,7 +321,7 @@ class SDKAdapter {
 			$error_data['status'] = $status;
 		}
 
-		// Only log full exception details in debug mode.
+		// Only log redacted exception details in debug mode.
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			error_log( sprintf( '[WPMind SDK] Exception: %s', $message ) );
 		}
