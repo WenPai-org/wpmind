@@ -52,7 +52,7 @@ WPMind 是面向中国使用环境的 WordPress AI Provider Bridge：
 - [x] Connector 密钥同步与卸载清理
 - [x] 删除无实际功能约束的 Pro/Enterprise 授权入口
 - [x] 部署脚本默认 dry-run，排除开发依赖
-- [ ] 补齐后台模块开关与升级提示的浏览器验收
+- [x] 补齐后台模块开关与升级提示的浏览器验收（2026-10-24，8941 Playwright modules-toggle+upgrade 11/11；验收 tip `7983ebf`，main 已至 `83c02e0`）
 - [x] 完成完整 PHPCS/PHPStan 基线
 
 ### 0.13 Provider 兼容
