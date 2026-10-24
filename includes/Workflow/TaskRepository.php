@@ -32,6 +32,10 @@ final class TaskRepository {
 	public const ITEM_PREVIEWED = 'previewed';
 	public const ITEM_SKIPPED   = 'skipped';
 	public const ITEM_ERROR     = 'error';
+	public const ITEM_APPROVED  = 'approved';
+	public const ITEM_REJECTED  = 'rejected';
+	public const ITEM_APPLIED   = 'applied';
+	public const ITEM_UNDONE    = 'undone';
 
 	private const META_TYPE    = '_wpmind_task_type';
 	private const META_STATUS  = '_wpmind_task_status';
@@ -364,7 +368,20 @@ final class TaskRepository {
 				continue;
 			}
 			$status = sanitize_key( (string) ( $item['item_status'] ?? self::ITEM_PENDING ) );
-			if ( ! in_array( $status, array( self::ITEM_PENDING, self::ITEM_PREVIEWED, self::ITEM_SKIPPED, self::ITEM_ERROR ), true ) ) {
+			if ( ! in_array(
+				$status,
+				array(
+					self::ITEM_PENDING,
+					self::ITEM_PREVIEWED,
+					self::ITEM_SKIPPED,
+					self::ITEM_ERROR,
+					self::ITEM_APPROVED,
+					self::ITEM_REJECTED,
+					self::ITEM_APPLIED,
+					self::ITEM_UNDONE,
+				),
+				true
+			) ) {
 				$status = self::ITEM_PENDING;
 			}
 			$row = array(
@@ -373,6 +390,12 @@ final class TaskRepository {
 				'proposed'    => isset( $item['proposed'] ) ? (string) $item['proposed'] : '',
 				'item_status' => $status,
 			);
+			if ( array_key_exists( 'applied', $item ) ) {
+				$row['applied'] = (string) $item['applied'];
+			}
+			if ( ! empty( $item['applied_at'] ) ) {
+				$row['applied_at'] = sanitize_text_field( (string) $item['applied_at'] );
+			}
 			if ( ! empty( $item['error_message'] ) ) {
 				$row['error_message'] = sanitize_text_field( (string) $item['error_message'] );
 			}
@@ -392,18 +415,39 @@ final class TaskRepository {
 		$candidates = (int) ( $summary['candidates'] ?? count( $items ) );
 		$previewed  = 0;
 		$errors     = 0;
+		$approved   = 0;
+		$rejected   = 0;
+		$applied    = 0;
+		$undone     = 0;
 		foreach ( $items as $item ) {
-			if ( self::ITEM_PREVIEWED === ( $item['item_status'] ?? '' ) ) {
+			$status = (string) ( $item['item_status'] ?? '' );
+			if ( self::ITEM_PREVIEWED === $status ) {
 				++$previewed;
 			}
-			if ( self::ITEM_ERROR === ( $item['item_status'] ?? '' ) ) {
+			if ( self::ITEM_ERROR === $status ) {
 				++$errors;
+			}
+			if ( self::ITEM_APPROVED === $status ) {
+				++$approved;
+			}
+			if ( self::ITEM_REJECTED === $status ) {
+				++$rejected;
+			}
+			if ( self::ITEM_APPLIED === $status ) {
+				++$applied;
+			}
+			if ( self::ITEM_UNDONE === $status ) {
+				++$undone;
 			}
 		}
 		return array(
 			'candidates' => max( $candidates, count( $items ) ),
 			'previewed'  => $previewed,
 			'errors'     => $errors,
+			'approved'   => $approved,
+			'rejected'   => $rejected,
+			'applied'    => $applied,
+			'undone'     => $undone,
 			'capped'     => ! empty( $summary['capped'] ),
 			'limit'      => isset( $summary['limit'] ) ? (int) $summary['limit'] : null,
 		);

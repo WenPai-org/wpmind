@@ -28,7 +28,7 @@ $wpmind_limit = AltBulkService::MAX_CANDIDATES;
 		echo esc_html(
 			sprintf(
 				/* translators: %d: max candidates */
-				__( '统一任务记录。Alt 批量可先 dry-run 预览（不写附件 Alt）。单任务最多 %d 张。', 'wpmind' ),
+				__( '统一任务记录。Alt 批量：dry-run 预览 → 审核通过/拒绝 → 写入 → 撤销。单任务最多 %d 张。', 'wpmind' ),
 				$wpmind_limit
 			)
 		);
@@ -43,6 +43,18 @@ $wpmind_limit = AltBulkService::MAX_CANDIDATES;
 		<button type="button" id="wpmind-workflow-alt-dryrun" class="button" disabled>
 			<span class="dashicons ri-eye-line"></span>
 			<?php esc_html_e( '对当前任务 Dry-run', 'wpmind' ); ?>
+		</button>
+		<button type="button" id="wpmind-workflow-alt-submit-review" class="button" disabled>
+			<span class="dashicons ri-send-plane-line"></span>
+			<?php esc_html_e( '提交审核', 'wpmind' ); ?>
+		</button>
+		<button type="button" id="wpmind-workflow-alt-apply" class="button" disabled>
+			<span class="dashicons ri-save-line"></span>
+			<?php esc_html_e( '写入已通过项', 'wpmind' ); ?>
+		</button>
+		<button type="button" id="wpmind-workflow-alt-undo" class="button" disabled>
+			<span class="dashicons ri-arrow-go-back-line"></span>
+			<?php esc_html_e( '撤销已写入', 'wpmind' ); ?>
 		</button>
 		<button type="button" id="wpmind-workflow-refresh" class="button">
 			<span class="dashicons ri-refresh-line"></span>
@@ -77,10 +89,14 @@ $wpmind_limit = AltBulkService::MAX_CANDIDATES;
 						$wpmind_summary = is_array( $wpmind_task['summary'] ?? null ) ? $wpmind_task['summary'] : array();
 						echo esc_html(
 							sprintf(
-								/* translators: 1: candidates 2: previewed 3: errors */
-								__( '候选 %1$d / 已预览 %2$d / 错误 %3$d', 'wpmind' ),
+								/* translators: 1: candidates 2: previewed 3: approved 4: rejected 5: applied 6: undone 7: errors */
+								__( '候选 %1$d / 预览 %2$d / 通过 %3$d / 拒绝 %4$d / 已写 %5$d / 撤销 %6$d / 错 %7$d', 'wpmind' ),
 								(int) ( $wpmind_summary['candidates'] ?? 0 ),
 								(int) ( $wpmind_summary['previewed'] ?? 0 ),
+								(int) ( $wpmind_summary['approved'] ?? 0 ),
+								(int) ( $wpmind_summary['rejected'] ?? 0 ),
+								(int) ( $wpmind_summary['applied'] ?? 0 ),
+								(int) ( $wpmind_summary['undone'] ?? 0 ),
 								(int) ( $wpmind_summary['errors'] ?? 0 )
 							)
 						);
@@ -99,14 +115,16 @@ $wpmind_limit = AltBulkService::MAX_CANDIDATES;
 	</table>
 
 	<div id="wpmind-workflow-items" style="margin-top:16px;display:none;">
-		<h3><?php esc_html_e( '任务项（before / proposed）', 'wpmind' ); ?></h3>
+		<h3><?php esc_html_e( '任务项（before / proposed / applied）', 'wpmind' ); ?></h3>
 		<table class="widefat striped">
 			<thead>
 				<tr>
 					<th><?php esc_html_e( '附件 ID', 'wpmind' ); ?></th>
 					<th><?php esc_html_e( 'Before', 'wpmind' ); ?></th>
 					<th><?php esc_html_e( 'Proposed', 'wpmind' ); ?></th>
+					<th><?php esc_html_e( 'Applied', 'wpmind' ); ?></th>
 					<th><?php esc_html_e( '状态', 'wpmind' ); ?></th>
+					<th><?php esc_html_e( '操作', 'wpmind' ); ?></th>
 				</tr>
 			</thead>
 			<tbody id="wpmind-workflow-items-body"></tbody>

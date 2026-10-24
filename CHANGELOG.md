@@ -12,6 +12,7 @@
 
 ### 改进
 
+- Alt 工作流人工审核 / 写入 / 撤销：previewed 项可通过或拒绝，写入 `_wp_attachment_image_alt`，撤销恢复 before（空则删 meta）。
 - 统一任务记录（CPT `wpmind_task`）与 Alt 批量 dry-run 预览壳：筛选缺 Alt 建任务、Vision 只写 proposed、不改附件 meta；任务页可查看 before/proposed。
 - Provider 错误诊断与配置导出导入：ErrorCatalog 中文说明/恢复建议、诊断包脱敏导出、端点配置无密钥迁移、Site Health「WPMind Provider」检测。
 - API Key 安全轮换：AJAX 先内存验证再原子替换，写入 key_meta 指纹；换钥后重置熔断与远程模型缓存，后台只展示指纹不露明文。
