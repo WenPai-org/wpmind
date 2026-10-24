@@ -20,6 +20,27 @@
 		return $( '<div/>' ).text( s == null ? '' : String( s ) ).html();
 	}
 
+	function snapshotFmt( v ) {
+		if ( v == null || v === '' ) {
+			return '';
+		}
+		if ( typeof v === 'object' ) {
+			try {
+				var parts = [];
+				if ( v.excerpt ) { parts.push( '摘要:' + String( v.excerpt ).slice( 0, 40 ) ); }
+				if ( v.seo_description ) { parts.push( 'SEO:' + String( v.seo_description ).slice( 0, 40 ) ); }
+				if ( v.tags && v.tags.length ) { parts.push( '标签:' + v.tags.slice( 0, 3 ).join( ',' ) ); }
+				if ( v.category ) { parts.push( '分类:' + v.category ); }
+				if ( v.faq && v.faq.length ) { parts.push( 'FAQ×' + v.faq.length ); }
+				if ( v.source ) { parts.push( 'source:' + v.source ); }
+				return parts.length ? parts.join( ' | ' ) : JSON.stringify( v ).slice( 0, 120 );
+			} catch ( e ) {
+				return '[object]';
+			}
+		}
+		return String( v );
+	}
+
 	function summaryText( s ) {
 		s = s || {};
 		return '候选 ' + ( s.candidates || 0 ) +
@@ -40,8 +61,14 @@
 			$( '#wpmind-workflow-alt-create' ).on( 'click', function() {
 				self.createAltTask();
 			} );
+			$( '#wpmind-workflow-meta-create' ).on( 'click', function() {
+				self.createMetaTask();
+			} );
 			$( '#wpmind-workflow-alt-dryrun' ).on( 'click', function() {
 				self.dryRunLoop();
+			} );
+			$( '#wpmind-workflow-meta-dryrun' ).on( 'click', function() {
+				self.metaDryRunLoop();
 			} );
 			$( '#wpmind-workflow-alt-submit-review' ).on( 'click', function() {
 				self.submitReview();
@@ -78,27 +105,33 @@
 
 		setActionButtons: function( task ) {
 			var has = !! this.currentTaskId;
-			$( '#wpmind-workflow-alt-dryrun, #wpmind-media-workflow-dryrun' ).prop( 'disabled', ! has );
-			$( '#wpmind-workflow-alt-submit-review' ).prop( 'disabled', ! has );
-			$( '#wpmind-workflow-alt-apply' ).prop( 'disabled', ! has );
-			$( '#wpmind-workflow-alt-undo' ).prop( 'disabled', ! has );
+			var type = task && task.type ? task.type : '';
+			var isAlt = type === 'alt_bulk';
+			var isMeta = type === 'meta_bulk';
+			$( '#wpmind-workflow-alt-dryrun, #wpmind-media-workflow-dryrun' ).prop( 'disabled', ! ( has && isAlt ) );
+			$( '#wpmind-workflow-meta-dryrun' ).prop( 'disabled', ! ( has && isMeta ) );
+			$( '#wpmind-workflow-alt-submit-review' ).prop( 'disabled', ! ( has && isAlt ) );
+			$( '#wpmind-workflow-alt-apply' ).prop( 'disabled', ! ( has && isAlt ) );
+			$( '#wpmind-workflow-alt-undo' ).prop( 'disabled', ! ( has && isAlt ) );
 			if ( ! task ) {
 				return;
 			}
 			var status = task.status || '';
 			var s = task.summary || {};
-			$( '#wpmind-workflow-alt-submit-review' ).prop(
-				'disabled',
-				! ( status === 'dry_run' && ( s.previewed || 0 ) > 0 )
-			);
-			$( '#wpmind-workflow-alt-apply' ).prop(
-				'disabled',
-				! ( ( s.approved || 0 ) > 0 )
-			);
-			$( '#wpmind-workflow-alt-undo' ).prop(
-				'disabled',
-				! ( ( s.applied || 0 ) > 0 )
-			);
+			if ( isAlt ) {
+				$( '#wpmind-workflow-alt-submit-review' ).prop(
+					'disabled',
+					! ( status === 'dry_run' && ( s.previewed || 0 ) > 0 )
+				);
+				$( '#wpmind-workflow-alt-apply' ).prop(
+					'disabled',
+					! ( ( s.approved || 0 ) > 0 )
+				);
+				$( '#wpmind-workflow-alt-undo' ).prop(
+					'disabled',
+					! ( ( s.applied || 0 ) > 0 )
+				);
+			}
 		},
 
 		createAltTask: function() {
@@ -129,6 +162,73 @@
 			} );
 		},
 
+
+		createMetaTask: function() {
+			var self = this;
+			var $btn = $( '#wpmind-workflow-meta-create' );
+			$btn.prop( 'disabled', true );
+			$( '#wpmind-workflow-status' ).text( i18n.metaCreating || i18n.creating || '…' );
+
+			$.post( wpmindData.ajaxurl, {
+				action: 'wpmind_workflow_meta_create',
+				nonce: wpmindData.nonce
+			} ).done( function( res ) {
+				if ( ! res.success ) {
+					Toast.error( ( res.data && res.data.message ) || 'error' );
+					return;
+				}
+				self.currentTaskId = res.data.task.id;
+				self.currentTask = res.data.task;
+				self.setActionButtons( res.data.task );
+				Toast.success( res.data.message || 'ok' );
+				$( '#wpmind-workflow-status' ).text( res.data.message || '' );
+				self.refreshList();
+				self.renderItems( res.data.task );
+			} ).fail( function() {
+				Toast.error( 'network' );
+			} ).always( function() {
+				$btn.prop( 'disabled', false );
+			} );
+		},
+
+		metaDryRunLoop: function() {
+			var self = this;
+			if ( ! self.currentTaskId ) {
+				Toast.error( 'no task' );
+				return;
+			}
+			var $btn = $( '#wpmind-workflow-meta-dryrun' );
+			$btn.prop( 'disabled', true );
+			$( '#wpmind-workflow-status' ).text( i18n.metaDryRunning || i18n.dryRunning || '…' );
+
+			function round() {
+				$.post( wpmindData.ajaxurl, {
+					action: 'wpmind_workflow_meta_dry_run',
+					nonce: wpmindData.nonce,
+					task_id: self.currentTaskId
+				} ).done( function( res ) {
+					if ( ! res.success ) {
+						Toast.error( ( res.data && res.data.message ) || 'error' );
+						$btn.prop( 'disabled', false );
+						return;
+					}
+					self.renderItems( res.data.task );
+					self.refreshList();
+					if ( res.data.done ) {
+						Toast.success( i18n.metaDone || i18n.done || 'done' );
+						$( '#wpmind-workflow-status' ).text( i18n.metaDone || i18n.done || 'done' );
+						self.setActionButtons( res.data.task );
+						$btn.prop( 'disabled', false );
+					} else {
+						round();
+					}
+				} ).fail( function() {
+					Toast.error( 'network' );
+					$btn.prop( 'disabled', false );
+				} );
+			}
+			round();
+		},
 		dryRunLoop: function() {
 			var self = this;
 			if ( ! self.currentTaskId ) {
@@ -333,10 +433,11 @@
 			var $wrap = $( '#wpmind-workflow-items' );
 			var $body = $( '#wpmind-workflow-items-body' );
 			$body.empty();
+			var taskType = task.type || '';
 			( task.items || [] ).forEach( function( it ) {
 				var st = it.item_status || '';
 				var actions = '';
-				if ( st === 'previewed' || st === 'approved' ) {
+				if ( taskType === 'alt_bulk' && ( st === 'previewed' || st === 'approved' ) ) {
 					actions =
 						'<button type="button" class="button button-small wpmind-workflow-approve" data-object-id="' + it.object_id + '">通过</button> ' +
 						'<button type="button" class="button button-small wpmind-workflow-reject" data-object-id="' + it.object_id + '">拒绝</button>';
@@ -348,9 +449,9 @@
 				$body.append(
 					'<tr>' +
 					'<td>' + it.object_id + '</td>' +
-					'<td>' + esc( it.before || '' ) + '</td>' +
-					'<td>' + esc( it.proposed || '' ) + '</td>' +
-					'<td>' + esc( it.applied || '' ) + '</td>' +
+					'<td>' + esc( snapshotFmt( it.before ) ) + '</td>' +
+					'<td>' + esc( snapshotFmt( it.proposed ) ) + '</td>' +
+					'<td>' + esc( snapshotFmt( it.applied ) ) + '</td>' +
 					'<td>' + statusCell + '</td>' +
 					'<td>' + actions + '</td>' +
 					'</tr>'

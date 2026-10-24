@@ -97,13 +97,87 @@ final class MetaGenerator {
 	}
 
 	/**
+	 * Preview metadata for a post without writing anything.
+	 *
+	 * Aligns with process_single preflight; never calls save_meta, lock, stats, or actions.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return array{excerpt?:string,seo_description?:string,tags?:list<string>,category?:string,faq?:list<array<string,string>>}|\WP_Error
+	 */
+	public function preview_meta( int $post_id ) {
+		$mocked = apply_filters( 'wpmind_meta_proposed_override', null, $post_id );
+		if ( is_array( $mocked ) ) {
+			return $this->normalize_preview_payload( $mocked );
+		}
+		if ( is_wp_error( $mocked ) ) {
+			return $mocked;
+		}
+
+		$post = get_post( $post_id );
+		if ( ! $post || 'publish' !== $post->post_status ) {
+			return new WP_Error( 'wpmind_meta_preview_bad_post', __( '文章不可用或不在已发布状态', 'wpmind' ) );
+		}
+		if ( ! in_array( $post->post_type, $this->get_supported_types(), true ) ) {
+			return new WP_Error( 'wpmind_meta_preview_bad_type', __( '文章类型不在 Auto Meta 支持范围内', 'wpmind' ) );
+		}
+		if ( ! $this->has_enabled_features() ) {
+			return new WP_Error( 'wpmind_meta_preview_disabled', __( '未启用任何 Auto Meta 功能', 'wpmind' ) );
+		}
+
+		$content = $this->extract_content( $post );
+		$result  = $this->generate_all_meta( $post, $content );
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		$data = is_array( $result['data'] ?? null ) ? $result['data'] : [];
+		return $this->normalize_preview_payload( $data );
+	}
+
+	/**
+	 * Normalize preview payload shape.
+	 *
+	 * @param array<string,mixed> $data Raw structured data.
+	 * @return array{excerpt:string,seo_description:string,tags:list<string>,category:string,faq:list<array<string,string>>}
+	 */
+	private function normalize_preview_payload( array $data ): array {
+		$tags = [];
+		if ( ! empty( $data['tags'] ) && is_array( $data['tags'] ) ) {
+			foreach ( $data['tags'] as $tag ) {
+				$tags[] = sanitize_text_field( (string) $tag );
+			}
+		}
+
+		$faq = [];
+		if ( ! empty( $data['faq'] ) && is_array( $data['faq'] ) ) {
+			foreach ( $data['faq'] as $item ) {
+				if ( ! is_array( $item ) ) {
+					continue;
+				}
+				$faq[] = [
+					'question' => sanitize_text_field( (string) ( $item['question'] ?? '' ) ),
+					'answer'   => sanitize_text_field( (string) ( $item['answer'] ?? '' ) ),
+				];
+			}
+		}
+
+		return [
+			'excerpt'         => sanitize_text_field( (string) ( $data['excerpt'] ?? '' ) ),
+			'seo_description' => sanitize_text_field( (string) ( $data['seo_description'] ?? '' ) ),
+			'tags'            => $tags,
+			'category'        => sanitize_text_field( (string) ( $data['category'] ?? '' ) ),
+			'faq'             => $faq,
+		];
+	}
+
+	/**
 	 * Process a single post: generate and save all metadata.
 	 *
 	 * @param int $post_id Post ID.
 	 */
 	public function process_single( int $post_id ): void {
 		$post = get_post( $post_id );
-		if ( ! $post || $post->post_status !== 'publish' ) {
+		if ( ! $post || 'publish' !== $post->post_status ) {
 			return;
 		}
 

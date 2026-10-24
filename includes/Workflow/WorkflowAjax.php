@@ -1,6 +1,6 @@
 <?php
 /**
- * Workflow AJAX handlers (unified tasks + alt dry-run/review/apply/undo).
+ * Workflow AJAX handlers (unified tasks + Alt/Meta dry-run + Alt review/apply/undo).
  *
  * @package WPMind\Workflow
  * @since 0.14.0
@@ -29,6 +29,8 @@ final class WorkflowAjax {
 		add_action( 'wp_ajax_wpmind_workflow_alt_apply', array( self::class, 'ajax_alt_apply' ) );
 		add_action( 'wp_ajax_wpmind_workflow_alt_undo', array( self::class, 'ajax_alt_undo' ) );
 		add_action( 'wp_ajax_wpmind_workflow_alt_submit_review', array( self::class, 'ajax_alt_submit_review' ) );
+		add_action( 'wp_ajax_wpmind_workflow_meta_create', array( self::class, 'ajax_meta_create' ) );
+		add_action( 'wp_ajax_wpmind_workflow_meta_dry_run', array( self::class, 'ajax_meta_dry_run' ) );
 		add_action( 'wp_ajax_wpmind_workflow_task_get', array( self::class, 'ajax_task_get' ) );
 		add_action( 'wp_ajax_wpmind_workflow_task_list', array( self::class, 'ajax_task_list' ) );
 	}
@@ -202,6 +204,63 @@ final class WorkflowAjax {
 		}
 
 		$result = ( new AltBulkService() )->undo_applied( $task_id, $object_ids );
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+		}
+
+		wp_send_json_success( $result );
+	}
+
+
+	/**
+	 * Create meta_bulk task from missing-meta scan.
+	 *
+	 * @return void
+	 */
+	public static function ajax_meta_create(): void {
+		self::verify( true );
+
+		$service = new MetaBulkService();
+		$result  = $service->create_task_from_scan();
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( array( 'message' => $result->get_error_message() ) );
+		}
+
+		$calls  = (int) ( $result['summary']['estimated_calls'] ?? 0 );
+		$tokens = (int) ( $result['summary']['estimated_max_tokens'] ?? 0 );
+
+		wp_send_json_success(
+			array(
+				'task'    => $result,
+				'limit'   => MetaBulkService::MAX_CANDIDATES,
+				'message' => sprintf(
+					/* translators: 1: candidate count, 2: max candidates, 3: estimated calls, 4: estimated max tokens */
+					__( '已创建 Meta 任务，候选 %1$d 篇（上限 %2$d）；预估约 %3$d 次调用 / %4$d tokens（粗估）', 'wpmind' ),
+					(int) ( $result['summary']['candidates'] ?? 0 ),
+					MetaBulkService::MAX_CANDIDATES,
+					$calls,
+					$tokens
+				),
+			)
+		);
+	}
+
+	/**
+	 * Dry-run one batch of a meta_bulk task.
+	 *
+	 * @return void
+	 */
+	public static function ajax_meta_dry_run(): void {
+		self::verify( true );
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified in verify().
+		$task_id = (int) ( $_POST['task_id'] ?? 0 );
+		if ( $task_id <= 0 ) {
+			wp_send_json_error( array( 'message' => __( '无效任务 ID', 'wpmind' ) ) );
+		}
+
+		$service = new MetaBulkService();
+		$result  = $service->dry_run_batch( $task_id );
 		if ( is_wp_error( $result ) ) {
 			wp_send_json_error( array( 'message' => $result->get_error_message() ) );
 		}
