@@ -99,6 +99,7 @@
 			var apiKey = $apiKeyInput.val();
 			var $customUrlInput = $card.find( 'input[name*="[custom_base_url]"]' );
 			var customUrl = $customUrlInput.val();
+			var deep = $card.find( '.wpmind-deep-test' ).is( ':checked' ) ? 1 : 0;
 
 			// 设置加载状态
 			$button.addClass( 'is-testing' ).prop( 'disabled', true );
@@ -119,6 +120,7 @@
 					provider: provider,
 					api_key: apiKey,
 					custom_url: customUrl,
+					deep: deep,
 					nonce: wpmindData.nonce
 				},
 				timeout: 45000,

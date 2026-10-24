@@ -37,18 +37,6 @@ parameters:
 			path: ../../includes/Admin/AdminPage.php
 
 		-
-			message: '#^Comparison operation "\>" between 2 and 1 is always true\.$#'
-			identifier: greater.alwaysTrue
-			count: 2
-			path: ../../includes/Admin/AjaxController.php
-
-		-
-			message: '#^Ternary operator condition is always true\.$#'
-			identifier: ternary.alwaysTrue
-			count: 1
-			path: ../../includes/Admin/AjaxController.php
-
-		-
 			message: '#^Offset ''hits''\|''misses''\|''writes'' on array\{hits\: int, misses\: int, writes\: int, last_hit_at\: int, last_miss_at\: int, last_write_at\: int, last_key\: string\} in isset\(\) always exists and is not nullable\.$#'
 			identifier: isset.offset
 			count: 2

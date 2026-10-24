@@ -66,7 +66,7 @@ final class ConnectorMirrorCleanupTest extends TestCase {
 	}
 
 	public function test_migrator_includes_cleanup_at_1301(): void {
-		self::assertSame( 1301, Migrator::CURRENT_DB_VERSION );
+		self::assertGreaterThanOrEqual( 1301, Migrator::CURRENT_DB_VERSION );
 		$migration = new M013_ConnectorMirrorCleanup();
 		self::assertSame( 1301, $migration->version() );
 	}

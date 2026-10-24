@@ -14,6 +14,9 @@ declare(strict_types=1);
 namespace WPMind\API\Services;
 
 use WP_Error;
+use WPMind\Provider\Health\ErrorClass;
+use WPMind\Provider\Health\ErrorClassifier;
+use WPMind\Provider\ProviderClient;
 
 /**
  * Chat Service
@@ -94,7 +97,7 @@ class ChatService extends AbstractService {
 		}
 
 		if ( ! empty( $failover_chain ) && $failover_chain[0] !== $provider ) {
-			do_action( 'wpmind_provider_failover', $provider, $failover_chain[0], $context );
+			do_action( 'wpmind_provider_failover', $provider, $failover_chain[0], $context, 'preferred_unavailable' );
 		}
 
 		$cache_key    = $this->generate_cache_key( 'chat', $args, $provider, $model );
@@ -108,12 +111,18 @@ class ChatService extends AbstractService {
 		$result          = null;
 		$last_error      = null;
 		$tried_providers = [];
-		$failover_count  = count( $failover_chain );
+		$attempts        = [];
+		$budget_ms       = max( 1000, (int) get_option( 'wpmind_request_timeout', 60 ) * 1000 );
+		$deadline        = (int) ( microtime( true ) * 1000 ) + $budget_ms;
+		$hop_cap_ms      = 30000;
 
 		foreach ( $failover_chain as $index => $try_provider ) {
+			$remaining = $deadline - (int) ( microtime( true ) * 1000 );
+			if ( $remaining <= 0 ) {
+				break;
+			}
+
 			$tried_providers[] = $try_provider;
-			$is_last_provider  = ( $index === $failover_count - 1 );
-			$max_retries       = $is_last_provider ? 3 : 1;
 
 			if ( $model_is_auto ) {
 				$try_model = $this->get_current_model( $try_provider );
@@ -129,16 +138,29 @@ class ChatService extends AbstractService {
 			$resolution = \WPMind\Provider\Catalog\ModelCatalog::instance()->resolve( $try_provider, (string) $try_model );
 			$try_model  = $resolution->model;
 
-			for ( $attempt = 0; $attempt <= $max_retries; $attempt++ ) {
-				$result = $this->execute_chat_request( $args, $try_provider, $try_model );
+			$provider_attempts = 0;
+			$max_attempts      = 2; // 每家最多 2 次
+			$model_swapped     = false;
+
+			while ( $provider_attempts < $max_attempts ) {
+				$remaining = $deadline - (int) ( microtime( true ) * 1000 );
+				if ( $remaining <= 0 ) {
+					break 2;
+				}
+				$hop_timeout = max( 1, (int) floor( min( $remaining, $hop_cap_ms ) / 1000 ) );
+
+				++$provider_attempts;
+				$result = $this->execute_chat_request( $args, $try_provider, $try_model, $hop_timeout );
 
 				if ( ! is_wp_error( $result ) ) {
-					if ( $try_provider !== $provider ) {
-						$result['failover'] = [
-							'original_provider' => $provider,
-							'actual_provider'   => $try_provider,
-							'tried_providers'   => $tried_providers,
-						];
+					$failover_meta = [
+						'original_provider' => $provider,
+						'actual_provider'   => $try_provider,
+						'tried_providers'   => $tried_providers,
+						'attempts'          => $attempts,
+					];
+					if ( $try_provider !== $provider || count( $tried_providers ) > 1 || [] !== $attempts ) {
+						$result['failover'] = $failover_meta;
 					}
 
 					if ( $try_model !== $model ) {
@@ -149,25 +171,85 @@ class ChatService extends AbstractService {
 				}
 
 				$last_error = $result;
+				$error_data = $result->get_error_data();
+				$status     = is_array( $error_data ) && isset( $error_data['status'] ) ? (int) $error_data['status'] : 0;
+				$body       = is_array( $error_data ) ? (string) ( $error_data['body'] ?? '' ) : '';
+				$error_class_value = is_array( $error_data ) ? (string) ( $error_data['error_class'] ?? '' ) : '';
+				$retry_after = is_array( $error_data ) ? (int) ( $error_data['retry_after'] ?? 0 ) : 0;
+
+				if ( '' !== $error_class_value ) {
+					$error_class = ErrorClass::tryFrom( $error_class_value ) ?? ErrorClass::ServerError;
+				} else {
+					$classified  = ErrorClassifier::classify( $result, $status, $body );
+					$error_class = $classified['class'];
+					$retry_after = $classified['retry_after'];
+				}
+
+				$attempts[] = [
+					'provider'    => $try_provider,
+					'error_class' => $error_class->value,
+				];
 
 				$error_code = $result->get_error_code();
 				if ( in_array( $error_code, [ 'wpmind_api_key_missing', 'wpmind_provider_not_found' ], true ) ) {
 					break;
 				}
 
-				$error_data = $result->get_error_data();
-				$status     = is_array( $error_data ) && isset( $error_data['status'] ) ? (int) $error_data['status'] : 0;
-
-				if ( $status > 0 && ! \WPMind\ErrorHandler::should_retry( $status ) ) {
-					break;
+				if ( ! $error_class->should_failover() ) {
+					// bad_request：不回退
+					break 2;
 				}
 
-				if ( $attempt < $max_retries ) {
-					$delay_ms = \WPMind\ErrorHandler::get_retry_delay( $attempt + 1 );
-					do_action( 'wpmind_retry', $try_provider, $attempt + 1, $status );
-					sleep( (int) ( $delay_ms / 1000 ) );
+				// model_unavailable：同一家换 default_model 试 1 次
+				if ( ErrorClass::ModelUnavailable === $error_class && ! $model_swapped ) {
+					$default_model = $this->get_current_model( $try_provider );
+					if ( $default_model !== $try_model ) {
+						$try_model     = $default_model;
+						$model_swapped = true;
+						continue;
+					}
 				}
+
+				if ( ErrorClass::RateLimited === $error_class && $retry_after > 0 && $retry_after <= 2 && $provider_attempts < $max_attempts ) {
+					$remaining = $deadline - (int) ( microtime( true ) * 1000 );
+					$wait_ms   = min( $retry_after * 1000, max( 0, $remaining ) );
+					if ( $wait_ms > 0 ) {
+						usleep( $wait_ms * 1000 );
+					}
+					do_action( 'wpmind_retry', $try_provider, $provider_attempts, $status );
+					continue;
+				}
+
+				if ( ErrorClass::ServerError === $error_class && $provider_attempts < $max_attempts ) {
+					$remaining = $deadline - (int) ( microtime( true ) * 1000 );
+					if ( $remaining > 0 ) {
+						do_action( 'wpmind_retry', $try_provider, $provider_attempts, $status );
+						continue;
+					}
+				}
+
+				break; // 换下一家
 			}
+
+			// 准备跳到下一家
+			$next = $failover_chain[ $index + 1 ] ?? null;
+			if ( null !== $next ) {
+				$last_class = $attempts[ count( $attempts ) - 1 ]['error_class'] ?? 'server_error';
+				do_action( 'wpmind_provider_failover', $try_provider, $next, $context, $last_class );
+			}
+		}
+
+		if ( is_wp_error( $result ) && [] !== $attempts ) {
+			$data = $result->get_error_data();
+			if ( ! is_array( $data ) ) {
+				$data = [];
+			}
+			$data['failover'] = [
+				'original_provider' => $provider,
+				'tried_providers'   => $tried_providers,
+				'attempts'          => $attempts,
+			];
+			$result = new WP_Error( $result->get_error_code(), $result->get_error_message(), $data );
 		}
 
 		if ( is_wp_error( $result ) ) {
@@ -227,13 +309,14 @@ class ChatService extends AbstractService {
 		$failover_chain = $this->get_failover_chain( $provider );
 
 		if ( ! empty( $failover_chain ) && $failover_chain[0] !== $provider ) {
-			do_action( 'wpmind_provider_failover', $provider, $failover_chain[0], $context );
+			do_action( 'wpmind_provider_failover', $provider, $failover_chain[0], $context, 'preferred_unavailable' );
 		}
 
 		do_action( 'wpmind_before_request', 'stream', compact( 'messages', 'options' ), $context );
 
-		$endpoints  = $this->get_endpoints();
-		$last_error = null;
+		$endpoints             = $this->get_endpoints();
+		$last_error            = null;
+		$stream_output_started = false;
 
 		foreach ( $failover_chain as $index => $try_provider ) {
 			if ( ! isset( $endpoints[ $try_provider ] ) ) {
@@ -312,10 +395,11 @@ class ChatService extends AbstractService {
 					'wpmind_stream_failed',
 					sprintf( __( '服务商 %s 无法建立流式连接', 'wpmind' ), $try_provider )
 				);
-				continue;
+				continue; // 建连前可回退
 			}
 
-			$full_content = '';
+			$full_content     = '';
+			$content_started  = false;
 
 			while ( ! feof( $stream ) ) {
 				$line = fgets( $stream );
@@ -340,7 +424,9 @@ class ChatService extends AbstractService {
 
 				$delta = $json['choices'][0]['delta']['content'] ?? '';
 				if ( ! empty( $delta ) ) {
-					$full_content .= $delta;
+					$content_started        = true;
+					$stream_output_started  = true;
+					$full_content          .= $delta;
 					call_user_func( $callback, $delta, $json );
 				}
 			}
@@ -348,11 +434,20 @@ class ChatService extends AbstractService {
 			fclose( $stream );
 
 			$latency_ms = (int) ( ( microtime( true ) - $start_time ) * 1000 );
-			$this->record_result( $try_provider, true, $latency_ms );
 
-			do_action( 'wpmind_after_request', 'stream', [ 'content' => $full_content ], compact( 'messages', 'options' ), [] );
+			if ( $stream_output_started || '' !== $full_content ) {
+				$this->record_result( $try_provider, true, $latency_ms );
+				do_action( 'wpmind_after_request', 'stream', [ 'content' => $full_content ], compact( 'messages', 'options' ), [] );
+				return true;
+			}
 
-			return true;
+			// 已建连但未出字：记失败；若本家曾出字则不回退（上面已 return）。
+			$this->record_result( $try_provider, false, $latency_ms );
+			$last_error = new WP_Error(
+				'wpmind_stream_empty',
+				sprintf( __( '服务商 %s 流式响应为空', 'wpmind' ), $try_provider )
+			);
+			continue;
 		}
 
 		if ( $last_error ) {
@@ -430,7 +525,7 @@ class ChatService extends AbstractService {
 	 * @param string $model    模型
 	 * @return array|WP_Error
 	 */
-	private function execute_chat_request( array $args, string $provider, string $model ) {
+	private function execute_chat_request( array $args, string $provider, string $model, int $timeout = 0 ) {
 		if ( $this->should_use_sdk( $provider, $args ) ) {
 			$sdk        = new \WPMind\SDK\SDKAdapter();
 			$start_time = microtime( true );
@@ -452,7 +547,7 @@ class ChatService extends AbstractService {
 			}
 		}
 
-		return $this->execute_chat_request_native( $args, $provider, $model );
+		return $this->execute_chat_request_native( $args, $provider, $model, $timeout );
 	}
 
 	/**
@@ -464,7 +559,7 @@ class ChatService extends AbstractService {
 	 * @param string $model    模型
 	 * @return array|WP_Error
 	 */
-	private function execute_chat_request_native( array $args, string $provider, string $model ) {
+	private function execute_chat_request_native( array $args, string $provider, string $model, int $timeout = 0 ) {
 		$endpoints = $this->get_endpoints();
 
 		if ( ! isset( $endpoints[ $provider ] ) ) {
@@ -480,7 +575,8 @@ class ChatService extends AbstractService {
 		if ( empty( $api_key ) ) {
 			return new WP_Error(
 				'wpmind_api_key_missing',
-				sprintf( __( '服务商 %s 未配置 API Key', 'wpmind' ), $provider )
+				sprintf( __( '服务商 %s 未配置 API Key', 'wpmind' ), $provider ),
+				[ 'error_class' => ErrorClass::AuthFailed->value ]
 			);
 		}
 
@@ -507,78 +603,41 @@ class ChatService extends AbstractService {
 			}
 		}
 
-		$base_url = $this->resolve_base_url( $provider );
-		$api_url  = trailingslashit( $base_url ) . 'chat/completions';
+		if ( $timeout <= 0 ) {
+			$timeout = (int) get_option( 'wpmind_request_timeout', 60 );
+		}
 
-		$start_time = microtime( true );
-
-		$response = wp_remote_post(
-			$api_url,
+		$client = new ProviderClient();
+		$result = $client->request(
+			$provider,
+			'POST',
+			'chat/completions',
 			[
-				'headers' => [
-					'Authorization' => 'Bearer ' . $api_key,
-					'Content-Type'  => 'application/json',
-				],
-				'body'    => wp_json_encode( $request_body ),
-				'timeout' => 60,
+				'body'    => $request_body,
+				'timeout' => $timeout,
+				'model'   => $model,
 			]
 		);
 
-		$latency_ms = (int) ( ( microtime( true ) - $start_time ) * 1000 );
-
-		if ( is_wp_error( $response ) ) {
-			$this->record_result( $provider, false, $latency_ms );
-
-			return new WP_Error(
-				'wpmind_request_failed',
-				sprintf( __( '请求失败: %s', 'wpmind' ), $response->get_error_message() )
-			);
+		if ( ! $result['ok'] ) {
+			return $result['wp_error'];
 		}
 
-		$status_code = wp_remote_retrieve_response_code( $response );
-		$body        = wp_remote_retrieve_body( $response );
-		$data        = json_decode( $body, true );
-
-		if ( $status_code !== 200 ) {
-			$this->record_result( $provider, false, $latency_ms );
-
-			$error_message = $data['error']['message'] ?? __( '未知错误', 'wpmind' );
-			return new WP_Error(
-				'wpmind_api_error',
-				sprintf( __( 'API 错误 (%1$d): %2$s', 'wpmind' ), $status_code, $error_message ),
-				[
-					'status' => $status_code,
-					'body'   => substr( (string) $body, 0, 500 ),
-				]
-			);
-		}
-
-		if ( ! is_array( $data ) ) {
-			$this->record_result( $provider, false, $latency_ms );
-
+		if ( ! is_array( $result['data'] ) ) {
 			return new WP_Error(
 				'wpmind_invalid_response',
 				__( '服务商返回了无效的响应格式', 'wpmind' ),
 				[
-					'status' => $status_code,
-					'body'   => substr( (string) $body, 0, 500 ),
+					'status'      => $result['status'],
+					'body'        => ErrorClassifier::safe_body( (string) $result['body'] ),
+					'error_class' => ErrorClass::ServerError->value,
 				]
 			);
 		}
 
-		$this->record_result( $provider, true, $latency_ms );
-
-		return $this->parse_chat_response( $data, $provider, $model );
+		return $this->parse_chat_response( $result['data'], $provider, $model );
 	}
 
-	/**
-	 * 解析 Chat 响应
-	 *
-	 * @param array  $response 原始响应
-	 * @param string $provider 服务商
-	 * @param string $model    模型
-	 * @return array
-	 */
 	public function parse_chat_response( array $response, string $provider, string $model ): array {
 		$content       = '';
 		$tool_calls    = [];

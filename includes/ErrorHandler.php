@@ -213,8 +213,11 @@ class ErrorHandler {
 	 * @return bool 是否应该重试
 	 */
 	public static function should_retry( int $http_code ): bool {
-		// 可重试的状态码
-		$retryable_codes = [ 408, 429, 500, 502, 503, 504 ];
+		if ( class_exists( '\WPMind\Provider\Health\ErrorClassifier' ) ) {
+			return \WPMind\Provider\Health\ErrorClassifier::should_retry_status( $http_code );
+		}
+		// 可重试的状态码（兼容回退）
+		$retryable_codes = [ 408, 429, 500, 502, 503, 504, 529 ];
 		return in_array( $http_code, $retryable_codes, true );
 	}
 

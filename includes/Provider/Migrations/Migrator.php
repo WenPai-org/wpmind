@@ -56,7 +56,7 @@ final class Migrator {
 	/**
 	 * 当前代码对应的数据版本。
 	 */
-	public const CURRENT_DB_VERSION = 1301;
+	public const CURRENT_DB_VERSION = 1302;
 
 	/**
 	 * 迁移列表；为空时用默认列表。
@@ -74,6 +74,7 @@ final class Migrator {
 		$this->migrations = $migrations ?? [
 			new M013_EndpointsV2(),
 			new M013_ConnectorMirrorCleanup(),
+			new M013_FailoverOrder(),
 		];
 	}
 

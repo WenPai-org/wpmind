@@ -111,6 +111,24 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 						<?php esc_html_e( '需要重新配置', 'wpmind' ); ?>
 					</span>
 				<?php endif; ?>
+				<?php
+				$wpmind_cb_state = '';
+				if ( class_exists( '\\WPMind\\Failover\\FailoverManager' ) ) {
+					$wpmind_breaker = \WPMind\Failover\FailoverManager::instance()->get_circuit_breaker( $key );
+					if ( $wpmind_breaker ) {
+						$wpmind_cb_state = $wpmind_breaker->get_state();
+					}
+				}
+				if ( 'needs_attention' === $wpmind_cb_state ) :
+					?>
+					<span class="wpmind-status wpmind-status-warning" title="<?php esc_attr_e( 'API Key 无效或权限不足，请更新密钥后重新测试连接。', 'wpmind' ); ?>">
+						<?php esc_html_e( '需要处理：API Key 无效', 'wpmind' ); ?>
+					</span>
+				<?php elseif ( 'quota_exhausted' === $wpmind_cb_state ) : ?>
+					<span class="wpmind-status wpmind-status-warning" title="<?php esc_attr_e( '余额或额度不足，冷却结束后会自动探测，或使用深度测试验证。', 'wpmind' ); ?>">
+						<?php esc_html_e( '额度不足', 'wpmind' ); ?>
+					</span>
+				<?php endif; ?>
 			</div>
 
 			<div class="wpmind-endpoint-body">
@@ -177,6 +195,10 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 								<?php echo empty( $endpoint['enabled'] ) ? 'disabled' : ''; ?>>
 							<?php esc_html_e( '测试连接', 'wpmind' ); ?>
 						</button>
+						<label style="margin-left:8px;">
+							<input type="checkbox" class="wpmind-deep-test" value="1">
+							<?php esc_html_e( '深度测试（会产生少量费用）', 'wpmind' ); ?>
+						</label>
 						<span class="wpmind-test-result"></span>
 					</td>
 				</tr>

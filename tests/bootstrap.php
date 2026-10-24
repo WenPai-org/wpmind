@@ -32,6 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // WP function stubs.
 $GLOBALS['wpmind_test_options'] = [];
+$GLOBALS['wpmind_test_transients'] = [];
 $GLOBALS['wpmind_test_actions'] = [];
 $GLOBALS['wpmind_test_autoload'] = [];
 $GLOBALS['wpmind_test_filters']  = [];
@@ -190,6 +191,13 @@ if ( ! class_exists( 'WP_Error' ) ) {
 			}
 			return $this->errors[ $code ][0] ?? '';
 		}
+
+		public function get_error_data( string $code = '' ) {
+			if ( ! $code ) {
+				$code = $this->get_error_code();
+			}
+			return $this->error_data[ $code ] ?? null;
+		}
 	}
 }
 
@@ -271,6 +279,94 @@ if ( ! function_exists( 'add_settings_error' ) ) {
 if ( ! function_exists( 'sanitize_key' ) ) {
 	function sanitize_key( $key ): string {
 		return (string) preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $key ) );
+	}
+}
+
+
+if ( ! function_exists( 'get_transient' ) ) {
+	function get_transient( string $key ) {
+		$store = $GLOBALS['wpmind_test_transients'] ?? [];
+		return array_key_exists( $key, $store ) ? $store[ $key ] : false;
+	}
+}
+
+if ( ! function_exists( 'set_transient' ) ) {
+	function set_transient( string $key, $value, int $expiration = 0 ): bool {
+		$GLOBALS['wpmind_test_transients'][ $key ] = $value;
+		return true;
+	}
+}
+
+if ( ! function_exists( 'delete_transient' ) ) {
+	function delete_transient( string $key ): bool {
+		unset( $GLOBALS['wpmind_test_transients'][ $key ] );
+		return true;
+	}
+}
+
+if ( ! function_exists( 'do_action' ) ) {
+	function do_action( string $tag, ...$args ): void {
+		$GLOBALS['wpmind_test_actions'][ $tag ][] = $args;
+	}
+}
+
+if ( ! function_exists( 'wp_remote_retrieve_response_code' ) ) {
+	function wp_remote_retrieve_response_code( $response ): int {
+		if ( is_array( $response ) ) {
+			return (int) ( $response['response']['code'] ?? 0 );
+		}
+		return 0;
+	}
+}
+
+if ( ! function_exists( 'wp_remote_retrieve_body' ) ) {
+	function wp_remote_retrieve_body( $response ): string {
+		if ( is_array( $response ) ) {
+			return (string) ( $response['body'] ?? '' );
+		}
+		return '';
+	}
+}
+
+if ( ! function_exists( 'wp_remote_retrieve_headers' ) ) {
+	function wp_remote_retrieve_headers( $response ): array {
+		if ( is_array( $response ) ) {
+			return (array) ( $response['headers'] ?? [] );
+		}
+		return [];
+	}
+}
+
+if ( ! function_exists( 'wp_json_encode' ) ) {
+	function wp_json_encode( $data, int $options = 0, int $depth = 512 ) {
+		return json_encode( $data, $options, $depth );
+	}
+}
+
+if ( ! function_exists( 'wp_remote_request' ) ) {
+	function wp_remote_request( string $url, array $args = [] ) {
+		if ( isset( $GLOBALS['wpmind_test_http_handler'] ) && is_callable( $GLOBALS['wpmind_test_http_handler'] ) ) {
+			return ( $GLOBALS['wpmind_test_http_handler'] )( $url, $args );
+		}
+		return new WP_Error( 'http_request_failed', 'no test http handler' );
+	}
+}
+
+if ( ! function_exists( 'wp_next_scheduled' ) ) {
+	function wp_next_scheduled( string $hook, array $args = [] ) {
+		return false;
+	}
+}
+
+if ( ! function_exists( 'wp_schedule_event' ) ) {
+	function wp_schedule_event( $timestamp, string $recurrence, string $hook, array $args = [] ): bool {
+		return true;
+	}
+}
+
+if ( ! function_exists( 'wp_unschedule_event' ) ) {
+	function wp_unschedule_event( $timestamp, string $hook, array $args = [] ): bool {
+		return true;
 	}
 }
 

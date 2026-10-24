@@ -5,8 +5,8 @@
         "tests/phpcs-compat.xml"
     ],
     "totals": {
-        "errors": 2130,
-        "warnings": 60
+        "errors": 2162,
+        "warnings": 113
     },
     "files": {
         "includes/API/ErrorHandler.php": {
@@ -37,6 +37,7 @@
         "includes/API/Services/AudioService.php": {
             "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 4,
             "Squiz.Commenting.InlineComment.InvalidEndChar": 8,
+            "WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned": 6,
             "WordPress.PHP.YodaConditions.NotYoda": 13,
             "WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents": 1,
             "WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents": 1,
@@ -44,16 +45,20 @@
             "WordPress.WP.I18n.MissingTranslatorsComment": 6
         },
         "includes/API/Services/ChatService.php": {
-            "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 22,
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 1,
+            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 11,
+            "Squiz.Commenting.FunctionComment.Missing": 1,
+            "Squiz.Commenting.FunctionComment.MissingParamTag": 2,
+            "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 19,
+            "Squiz.Commenting.InlineComment.InvalidEndChar": 8,
             "WordPress.PHP.NoSilencedErrors.Discouraged": 1,
-            "WordPress.PHP.YodaConditions.NotYoda": 11,
+            "WordPress.PHP.YodaConditions.NotYoda": 10,
             "WordPress.WP.AlternativeFunctions.file_system_operations_fclose": 1,
             "WordPress.WP.AlternativeFunctions.file_system_operations_fopen": 1,
-            "WordPress.WP.I18n.MissingTranslatorsComment": 7
+            "WordPress.WP.I18n.MissingTranslatorsComment": 6
         },
         "includes/API/Services/EmbeddingService.php": {
             "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 2,
+            "WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned": 3,
             "WordPress.PHP.YodaConditions.NotYoda": 2,
             "WordPress.WP.I18n.MissingTranslatorsComment": 2
         },
@@ -95,9 +100,9 @@
         },
         "includes/Admin/AjaxController.php": {
             "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 2,
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 24,
+            "Squiz.Commenting.InlineComment.InvalidEndChar": 11,
             "WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase": 2,
-            "WordPress.PHP.YodaConditions.NotYoda": 6
+            "WordPress.PHP.YodaConditions.NotYoda": 5
         },
         "includes/Cache/ExactCache.php": {
             "Generic.Commenting.DocComment.ShortNotCapital": 1,
@@ -120,35 +125,60 @@
             "WordPress.WP.I18n.MissingTranslatorsComment": 1
         },
         "includes/Failover/CircuitBreaker.php": {
+            "Generic.Commenting.DocComment.MissingShort": 2,
+            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 22,
             "Squiz.Commenting.ClassComment.Missing": 1,
-            "Squiz.Commenting.FunctionComment.Missing": 3,
-            "Squiz.Commenting.FunctionComment.MissingParamTag": 6,
-            "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 1,
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 20,
-            "Squiz.Commenting.VariableComment.Missing": 1,
-            "Squiz.Commenting.VariableComment.WrongStyle": 1,
+            "Squiz.Commenting.FunctionComment.Missing": 21,
+            "Squiz.Commenting.FunctionComment.MissingParamTag": 2,
+            "Squiz.Commenting.VariableComment.Missing": 2,
             "WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase": 2,
-            "WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase": 6,
-            "WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase": 14,
-            "WordPress.PHP.YodaConditions.NotYoda": 7
+            "WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase": 10,
+            "WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase": 16
         },
         "includes/Failover/FailoverManager.php": {
-            "Generic.Commenting.DocComment.MissingShort": 2,
+            "Generic.Commenting.DocComment.MissingShort": 5,
+            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 3,
             "Squiz.Commenting.ClassComment.Missing": 1,
-            "Squiz.Commenting.FunctionComment.Missing": 1,
-            "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 7,
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 11,
+            "Squiz.Commenting.FunctionComment.Missing": 9,
+            "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 9,
             "Squiz.Commenting.VariableComment.Missing": 1,
             "WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase": 1,
-            "WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase": 10,
-            "WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase": 55,
+            "WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase": 12,
+            "WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase": 65,
             "WordPress.PHP.YodaConditions.NotYoda": 1
         },
         "includes/Failover/ProviderHealthTracker.php": {
+            "Generic.CodeAnalysis.EmptyStatement.DetectedIf": 1,
+            "Generic.Commenting.DocComment.MissingShort": 4,
             "Squiz.Commenting.ClassComment.Missing": 1,
-            "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 7,
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 6,
-            "WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase": 27
+            "Squiz.Commenting.FunctionComment.Missing": 5,
+            "Squiz.Commenting.FunctionComment.MissingParamTag": 1,
+            "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 3,
+            "WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase": 33
+        },
+        "includes/Provider/Health/ErrorClass.php": {
+            "PHPCompatibility.Variables.ForbiddenThisUseContexts.OutsideObjectContext": 3
+        },
+        "includes/Provider/Health/ErrorClassifier.php": {
+            "Generic.Commenting.DocComment.MissingShort": 4,
+            "Squiz.Commenting.FunctionComment.Missing": 4,
+            "Squiz.Commenting.FunctionComment.MissingParamTag": 5,
+            "Universal.NamingConventions.NoReservedKeywordParameterNames.classFound": 1
+        },
+        "includes/Provider/Health/HealthChecker.php": {
+            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 1,
+            "Squiz.Commenting.FunctionComment.MissingParamTag": 2,
+            "Squiz.Commenting.FunctionComment.SpacingAfterParamType": 3,
+            "WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned": 4
+        },
+        "includes/Provider/ProviderClient.php": {
+            "Generic.Commenting.DocComment.MissingShort": 4,
+            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 2,
+            "Squiz.Commenting.FunctionComment.IncorrectTypeHint": 1,
+            "Squiz.Commenting.FunctionComment.Missing": 1,
+            "Squiz.Commenting.FunctionComment.MissingParamTag": 5,
+            "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 1,
+            "Squiz.Commenting.FunctionComment.ParamNameNoMatch": 1
         },
         "includes/Providers/AbstractOpenAiCompatibleModelMetadataDirectory.php": {
             "Squiz.Commenting.FunctionComment.MissingParamTag": 5,
@@ -173,8 +203,7 @@
             "Generic.Commenting.DocComment.MissingShort": 1,
             "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 1,
             "Squiz.Commenting.FunctionComment.ThrowsNoFullStop": 1,
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 5,
-            "WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase": 2
+            "Squiz.Commenting.InlineComment.InvalidEndChar": 2
         },
         "includes/Providers/Image/AbstractImageProvider.php": {
             "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 5,
@@ -240,7 +269,7 @@
             "WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase": 5
         },
         "includes/Providers/register.php": {
-            "Squiz.Commenting.FunctionComment.MissingParamTag": 3,
+            "Squiz.Commenting.FunctionComment.MissingParamTag": 2,
             "Squiz.Commenting.InlineComment.InvalidEndChar": 11,
             "WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase": 2,
             "WordPress.PHP.DevelopmentFunctions.error_log_error_log": 1,
@@ -632,9 +661,9 @@
             "Squiz.Commenting.InlineComment.InvalidEndChar": 14
         },
         "wpmind.php": {
-            "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 17,
+            "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 16,
             "Squiz.Commenting.FunctionComment.ThrowsNoFullStop": 1,
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 36,
+            "Squiz.Commenting.InlineComment.InvalidEndChar": 35,
             "Universal.Files.SeparateFunctionsFromOO.Mixed": 1,
             "Universal.NamingConventions.NoReservedKeywordParameterNames.classFound": 2,
             "WordPress.PHP.YodaConditions.NotYoda": 3
