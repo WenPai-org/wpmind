@@ -12,6 +12,7 @@
 
 ### 改进
 
+- Provider 错误诊断与配置导出导入：ErrorCatalog 中文说明/恢复建议、诊断包脱敏导出、端点配置无密钥迁移、Site Health「WPMind Provider」检测。
 - API Key 安全轮换：AJAX 先内存验证再原子替换，写入 key_meta 指纹；换钥后重置熔断与远程模型缓存，后台只展示指纹不露明文。
 - Provider 健康检查与明确顺序回退：错误分类、`wpmind_failover_order`、熔断加固（needs_attention / quota_exhausted / 半开探测锁）、统一 ProviderClient 出站记账；默认测试连接用 GET /models，深度测试才产生费用；cron `wpmind_health_check` 默认关闭。
 - WordPress AI Client SDK 兼容：去掉全局 `prevent_prompt`、`isConfigured()` 不再发网、清理同值 connector 镜像；新增兼容矩阵与 Site Health 检测（#43）。

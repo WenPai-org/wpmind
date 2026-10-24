@@ -92,6 +92,14 @@ class ErrorHandler {
 	 * @return string 用户友好的错误消息
 	 */
 	public static function get_error_message( int $http_code, string $provider = '', ?string $raw_error = null ): string {
+		// PR6：先查 ErrorCatalog（ErrorClass → 中文说明）.
+		if ( class_exists( '\WPMind\Provider\Health\ErrorCatalog' ) ) {
+			$class = \WPMind\Provider\Health\ErrorCatalog::class_from_http( $http_code, $raw_error );
+			if ( null !== $class ) {
+				return \WPMind\Provider\Health\ErrorCatalog::message( $class, $provider );
+			}
+		}
+
 		// 检查 Provider 特定的错误消息
 		if ( ! empty( $provider ) && isset( self::PROVIDER_ERROR_HINTS[ $provider ][ $http_code ] ) ) {
 			return self::PROVIDER_ERROR_HINTS[ $provider ][ $http_code ];

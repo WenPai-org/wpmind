@@ -5,8 +5,8 @@
         "tests/phpcs-compat.xml"
     ],
     "totals": {
-        "errors": 2162,
-        "warnings": 113
+        "errors": 2177,
+        "warnings": 130
     },
     "files": {
         "includes/API/ErrorHandler.php": {
@@ -156,6 +156,23 @@
             "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 3,
             "WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase": 33
         },
+        "includes/Provider/Compat/SiteHealth.php": {
+            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 1
+        },
+        "includes/Provider/ConfigTransfer.php": {
+            "Generic.Commenting.DocComment.MissingShort": 2,
+            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 3
+        },
+        "includes/Provider/Diagnostics.php": {
+            "Generic.Commenting.DocComment.MissingShort": 2,
+            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 8,
+            "Squiz.Commenting.FunctionComment.Missing": 1,
+            "Squiz.Commenting.FunctionComment.MissingParamTag": 2
+        },
+        "includes/Provider/Health/ErrorCatalog.php": {
+            "Squiz.Commenting.FunctionComment.MissingParamTag": 9,
+            "Universal.NamingConventions.NoReservedKeywordParameterNames.classFound": 3
+        },
         "includes/Provider/Health/ErrorClass.php": {
             "PHPCompatibility.Variables.ForbiddenThisUseContexts.OutsideObjectContext": 3
         },
@@ -168,14 +185,12 @@
         "includes/Provider/Health/HealthChecker.php": {
             "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 1,
             "Squiz.Commenting.FunctionComment.MissingParamTag": 2,
-            "Squiz.Commenting.FunctionComment.SpacingAfterParamType": 3,
-            "WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned": 4
+            "Squiz.Commenting.FunctionComment.SpacingAfterParamType": 3
         },
         "includes/Provider/ProviderClient.php": {
             "Generic.Commenting.DocComment.MissingShort": 4,
             "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 2,
             "Squiz.Commenting.FunctionComment.IncorrectTypeHint": 1,
-            "Squiz.Commenting.FunctionComment.Missing": 1,
             "Squiz.Commenting.FunctionComment.MissingParamTag": 5,
             "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 1,
             "Squiz.Commenting.FunctionComment.ParamNameNoMatch": 1
@@ -654,6 +669,7 @@
             "WordPress.PHP.YodaConditions.NotYoda": 3
         },
         "templates/tabs/services.php": {
+            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 6,
             "Squiz.Commenting.InlineComment.InvalidEndChar": 2,
             "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 11
         },
