@@ -56,7 +56,7 @@ final class Migrator {
 	/**
 	 * 当前代码对应的数据版本。
 	 */
-	public const CURRENT_DB_VERSION = 1300;
+	public const CURRENT_DB_VERSION = 1301;
 
 	/**
 	 * 迁移列表；为空时用默认列表。
@@ -71,7 +71,10 @@ final class Migrator {
 	 * @param list<MigrationInterface>|null $migrations 测试时可以注入.
 	 */
 	public function __construct( ?array $migrations = null ) {
-		$this->migrations = $migrations ?? [ new M013_EndpointsV2() ];
+		$this->migrations = $migrations ?? [
+			new M013_EndpointsV2(),
+			new M013_ConnectorMirrorCleanup(),
+		];
 	}
 
 	/**

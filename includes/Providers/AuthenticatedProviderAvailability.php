@@ -10,17 +10,12 @@ declare(strict_types=1);
 
 namespace WPMind\Providers;
 
-use Exception;
-use WordPress\AiClient\Messages\DTO\Message;
-use WordPress\AiClient\Messages\DTO\MessagePart;
-use WordPress\AiClient\Messages\Enums\MessageRoleEnum;
 use WordPress\AiClient\Providers\Contracts\ProviderAvailabilityInterface;
 use WordPress\AiClient\Providers\Http\Contracts\WithHttpTransporterInterface;
 use WordPress\AiClient\Providers\Http\Contracts\WithRequestAuthenticationInterface;
 use WordPress\AiClient\Providers\Http\Traits\WithHttpTransporterTrait;
 use WordPress\AiClient\Providers\Http\Traits\WithRequestAuthenticationTrait;
 use WordPress\AiClient\Providers\Models\Contracts\ModelInterface;
-use WordPress\AiClient\Providers\Models\DTO\ModelConfig;
 use WordPress\AiClient\Providers\Models\TextGeneration\Contracts\TextGenerationModelInterface;
 
 /**
@@ -50,11 +45,11 @@ class AuthenticatedProviderAvailability implements
 	 * 构造函数
 	 *
 	 * @param ModelInterface $model 用于检查可用性的模型
-	 * @throws Exception 如果模型不实现 TextGenerationModelInterface
+	 * @throws \Exception 如果模型不实现 TextGenerationModelInterface
 	 */
 	public function __construct( ModelInterface $model ) {
 		if ( ! ( $model instanceof TextGenerationModelInterface ) ) {
-			throw new Exception(
+			throw new \Exception(
 				'The model class to check provider availability must implement TextGenerationModelInterface.'
 			);
 		}
@@ -62,43 +57,40 @@ class AuthenticatedProviderAvailability implements
 	}
 
 	/**
+	 * Model retained for registry wiring / future PR4 health probes.
+	 *
+	 * @return ModelInterface&TextGenerationModelInterface
+	 */
+	public function getModel(): ModelInterface {
+		return $this->model;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 *
 	 * @since 1.3.0
+	 * @since 0.13.0 改为本地检查，不再发付费探测请求。
 	 */
 	public function isConfigured(): bool {
-		// 将 HTTP transporter 传递给模型
-		if ( $this->model instanceof WithHttpTransporterInterface ) {
-			$this->model->setHttpTransporter( $this->getHttpTransporter() );
-		}
-
-		// 将认证传递给模型
-		if ( $this->model instanceof WithRequestAuthenticationInterface ) {
-			$this->model->setRequestAuthentication( $this->getRequestAuthentication() );
-		}
-
-		// 设置最小资源配置
-		$modelConfig = ModelConfig::fromArray(
-			[
-				ModelConfig::KEY_MAX_TOKENS => 1,
-			]
-		);
-		$this->model->setConfig( $modelConfig );
-
+		// 只看本地是否已配置认证，不发任何网络请求。
+		// （旧实现用 max_tokens=1 真打生成，打开连接器页/每次生成都会额外计费。）
 		try {
-			// 尝试生成文本以检查 Provider 是否可用
-			$this->model->generateTextResult(
-				[
-					new Message(
-						MessageRoleEnum::user(),
-						[ new MessagePart( 'a' ) ]
-					),
-				]
-			);
-			return true;
-		} catch ( Exception $e ) {
-			// 如果发生异常，Provider 不可用
+			$auth = $this->getRequestAuthentication();
+		} catch ( \Throwable $e ) {
 			return false;
 		}
+
+		if ( \method_exists( $auth, 'getApiKey' ) ) {
+			$key = (string) $auth->getApiKey();
+			return '' !== \trim( $key );
+		}
+
+		if ( \method_exists( $auth, 'getToken' ) ) {
+			$token = (string) $auth->getToken();
+			return '' !== \trim( $token );
+		}
+
+		// 有认证对象即视为已配置（PR4 合入后再叠加 auth_failed 状态）。
+		return true;
 	}
 }

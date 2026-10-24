@@ -243,9 +243,6 @@ final class WPMind {
 		add_filter( 'ai_experiments_preferred_models_for_text_generation', [ $this, 'filter_preferred_models' ] );
 		add_filter( 'wp_ai_client_default_request_timeout', [ $this, 'filter_request_timeout' ] );
 
-		// WP 7.0+ 全局熔断：所有 provider 都不可用时阻止 AI prompt
-		add_filter( 'wp_ai_client_prevent_prompt', [ $this, 'should_prevent_prompt' ] );
-
 		// WP 7.0+ core AI call token usage into Cost Control.
 		add_action( 'wp_ai_client_after_generate_result', [ $this, 'capture_core_ai_usage' ] );
 
@@ -334,37 +331,6 @@ final class WPMind {
 	public function filter_request_timeout( int $timeout ): int {
 		$custom_timeout = get_option( 'wpmind_request_timeout' );
 		return ! empty( $custom_timeout ) ? (int) $custom_timeout : $timeout;
-	}
-
-	/**
-	 * WP 7.0+ 全局熔断检查
-	 *
-	 * 当所有 WPMind provider 都处于熔断状态时，阻止 AI prompt 执行。
-	 * 返回清晰错误而非逐个超时。
-	 *
-	 * @param bool $prevent 是否阻止 prompt
-	 * @return bool
-	 * @since 4.1.0
-	 */
-	public function should_prevent_prompt( bool $prevent ): bool {
-		if ( $prevent ) {
-			return true;
-		}
-
-		// Only check when at least one provider is enabled.
-		$has_enabled = false;
-		foreach ( $this->custom_endpoints as $endpoint ) {
-			if ( ! empty( $endpoint['enabled'] ) && ! empty( $endpoint['api_key'] ) ) {
-				$has_enabled = true;
-				break;
-			}
-		}
-
-		if ( ! $has_enabled ) {
-			return false;
-		}
-
-		return ! Failover\FailoverManager::instance()->has_available_provider();
 	}
 
 
@@ -756,6 +722,15 @@ function maybe_run_migrations_admin(): void {
 	Provider\Migrations\Migrator::maybe_run_admin();
 }
 add_action( 'admin_init', __NAMESPACE__ . '\\maybe_run_migrations_admin' );
+
+/**
+ * Register AI Client environment Site Health checks (no keys).
+ */
+function register_ai_client_site_health(): void {
+	Provider\Compat\SiteHealth::register();
+}
+add_action( 'plugins_loaded', __NAMESPACE__ . '\\register_ai_client_site_health', 30 );
+
 
 /**
  * 插件停用钩子

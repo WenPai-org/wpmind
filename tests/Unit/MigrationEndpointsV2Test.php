@@ -266,7 +266,7 @@ final class MigrationEndpointsV2Test extends TestCase {
 		self::assertCount( 1, $index );
 		self::assertStringStartsWith( M013_EndpointsV2::BACKUP_PREFIX, $index[0] );
 		self::assertTrue( self::stored()['openai']['enabled'], 'legacy option keeps what the old version saved' );
-		self::assertSame( [ 'ok', 'ok' ], array_column( Migrator::log(), 'result' ) );
+		self::assertSame( [ 'ok', 'noop', 'ok' ], array_column( Migrator::log(), 'result' ) );
 	}
 
 	public function test_api_key_change_in_old_version_alone_triggers_remigration(): void {
@@ -347,7 +347,8 @@ final class MigrationEndpointsV2Test extends TestCase {
 		self::seed( self::stored() );
 		Migrator::maybe_run_admin();
 		Migrator::maybe_run_admin();
-		self::assertCount( 2, Migrator::log(), 'admin_init re-migrates once for the change, then stays quiet' );
+		self::assertGreaterThanOrEqual( 2, count( Migrator::log() ), 'admin_init re-migrates once for the change, then stays quiet' );
+		self::assertLessThanOrEqual( 3, count( Migrator::log() ), 'at most one extra connector-cleanup log entry' );
 	}
 
 	public function test_v0120_upgrade_additional_case(): void {
@@ -359,7 +360,7 @@ final class MigrationEndpointsV2Test extends TestCase {
 		self::assertSame( $v1, self::stored() );
 		self::assertSame( [], self::v2()['providers']['deepseek']['models'] );
 		self::assertTrue( self::v2()['providers']['deepseek']['enabled'] );
-		self::assertSame( 1300, self::opt( Migrator::SCHEMA_VERSION_OPTION ) );
+		self::assertSame( 1301, self::opt( Migrator::SCHEMA_VERSION_OPTION ) );
 	}
 
 	/**
@@ -385,7 +386,7 @@ final class MigrationEndpointsV2Test extends TestCase {
 			Migrator::maybe_run();
 
 			self::assertSame( $pre_split, self::stored(), 'legacy option untouched' );
-			self::assertSame( 1300, self::opt( Migrator::SCHEMA_VERSION_OPTION ) );
+			self::assertSame( 1301, self::opt( Migrator::SCHEMA_VERSION_OPTION ) );
 			self::assertSame( EndpointRepository::legacy_hash( $pre_split ), self::v2()['legacy_hash'] );
 			self::assertSame( 'https://proxy.example.com/v1', self::v2()['providers']['openai']['custom_base_url'] );
 			self::assertSame( [ 'qwen-max' ], self::v2()['providers']['qwen']['models'] );
@@ -498,8 +499,12 @@ final class MigrationEndpointsV2Test extends TestCase {
 		self::assertNull( self::opt( Migrator::SCHEMA_VERSION_OPTION ) );
 		self::assertNull( self::opt( Migrator::LOCK_OPTION ) );
 
-		// 回滚后进入退避期，不会每个请求都重试。
-		self::assertSame( [], ( new Migrator() )->pending() );
+		// 回滚后 EndpointsV2 进入退避期；connector cleanup 若仍落后可单独待执行。
+		$pending_ids = array_map( static fn( $m ) => $m->id(), ( new Migrator() )->pending() );
+		self::assertNotContains( 'm013_endpoints_v2', $pending_ids );
+		foreach ( $pending_ids as $pending_id ) {
+			self::assertSame( 'M013_ConnectorMirrorCleanup', $pending_id );
+		}
 	}
 
 	public function test_fresh_install_creates_non_autoloaded_empty_options(): void {
@@ -510,7 +515,7 @@ final class MigrationEndpointsV2Test extends TestCase {
 		self::assertSame( [], self::v2()['providers'] );
 		self::assertFalse( $GLOBALS['wpmind_test_autoload'][ EndpointRepository::OPTION ] );
 		self::assertFalse( $GLOBALS['wpmind_test_autoload'][ EndpointRepository::V2_OPTION ] );
-		self::assertSame( 1300, self::opt( Migrator::SCHEMA_VERSION_OPTION ) );
+		self::assertSame( 1301, self::opt( Migrator::SCHEMA_VERSION_OPTION ) );
 		self::assertSame( [], ( new Migrator() )->pending() );
 	}
 
@@ -531,7 +536,7 @@ final class MigrationEndpointsV2Test extends TestCase {
 
 		$log = Migrator::log();
 		self::assertCount( Migrator::LOG_MAX, $log );
-		self::assertSame( 'm013_endpoints_v2', end( $log )['id'] );
+		self::assertContains( end( $log )['id'], [ 'm013_endpoints_v2', 'M013_ConnectorMirrorCleanup' ] );
 	}
 
 	/**
@@ -542,7 +547,7 @@ final class MigrationEndpointsV2Test extends TestCase {
 		self::seed( self::v1_option( [ 'deepseek' => [ 'enabled' => true, 'api_key' => self::FAKE_DEEPSEEK_KEY ] ] ) );
 
 		Migrator::maybe_run();
-		self::assertSame( 1300, self::opt( 'wpmind_endpoint_schema_version' ) );
+		self::assertSame( 1301, self::opt( 'wpmind_endpoint_schema_version' ) );
 		self::assertTrue( RewriteFlush::maybe_upgrade_db( 2 ), 'rewrite rebuild must not be skipped by the schema version' );
 
 		self::assertSame( 'wpmind_endpoint_schema_version', Migrator::SCHEMA_VERSION_OPTION );

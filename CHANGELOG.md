@@ -12,6 +12,7 @@
 
 ### 改进
 
+- WordPress AI Client SDK 兼容：去掉全局 `prevent_prompt`、`isConfigured()` 不再发网、清理同值 connector 镜像；新增兼容矩阵与 Site Health 检测（#43）。
 - 引入随包发布的动态模型能力目录（`includes/Provider/Catalog/`）：展示与路由默认模型由目录驱动，退役模型不再硬编码为默认，请求时按规则重映射（#42）。
 
 ### 修复
