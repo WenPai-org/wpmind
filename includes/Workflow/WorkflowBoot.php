@@ -65,11 +65,20 @@ final class WorkflowBoot {
 			array(
 				'maxCandidates' => AltBulkService::MAX_CANDIDATES,
 				'batchSize'     => AltBulkService::DRY_RUN_BATCH,
+				'applyBatch'    => AltBulkService::APPLY_BATCH,
 				'i18n'          => array(
 					'creating'   => __( '正在创建任务…', 'wpmind' ),
 					'dryRunning' => __( '预览生成中…', 'wpmind' ),
 					'done'       => __( 'Dry-run 完成', 'wpmind' ),
 					'empty'      => __( '没有缺少 Alt 的图片', 'wpmind' ),
+					'submitting' => __( '提交审核中…', 'wpmind' ),
+					'reviewing'  => __( '保存审核决定…', 'wpmind' ),
+					'applying'   => __( '写入已通过项…', 'wpmind' ),
+					'applyDone'  => __( '写入完成', 'wpmind' ),
+					'undoing'    => __( '撤销中…', 'wpmind' ),
+					'undoDone'   => __( '撤销完成', 'wpmind' ),
+					'approved'   => __( '已通过', 'wpmind' ),
+					'rejected'   => __( '已拒绝', 'wpmind' ),
 					'limitHint'  => sprintf(
 						/* translators: %d: max candidates */
 						__( '单任务最多 %d 张', 'wpmind' ),
