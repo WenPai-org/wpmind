@@ -13,6 +13,7 @@ namespace WPMind\Admin;
 use WPMind\Provider\EndpointRepository;
 use WPMind\Provider\Secrets;
 use WPMind\Provider\Health\HealthChecker;
+use WPMind\Provider\KeyRotation;
 use WPMind\WPMind;
 use WPMind\Core\ModuleLoader;
 use WPMind\ErrorHandler;
@@ -58,6 +59,7 @@ final class AjaxController {
 	 */
 	public function register_hooks(): void {
 		add_action( 'wp_ajax_wpmind_test_connection', [ $this, 'ajax_test_connection' ] );
+		add_action( 'wp_ajax_wpmind_rotate_key', [ $this, 'ajax_rotate_key' ] );
 		add_action( 'wp_ajax_wpmind_test_image_connection', [ $this, 'ajax_test_image_connection' ] );
 		add_action( 'wp_ajax_wpmind_get_provider_status', [ $this, 'ajax_get_provider_status' ] );
 		add_action( 'wp_ajax_wpmind_reset_circuit_breaker', [ $this, 'ajax_reset_circuit_breaker' ] );
@@ -125,6 +127,49 @@ final class AjaxController {
 				'message'     => Secrets::redact( $result['message'], [ $target['api_key'] ] ),
 				'error_class' => $result['error_class'],
 				'deep'        => $result['deep'],
+				'latency'     => $result['latency_ms'],
+			]
+		);
+	}
+
+
+	/**
+	 * AJAX：验证并替换 API Key（新 key 只在内存探测，成功后原子落库）.
+	 *
+	 * @since 0.13.0
+	 */
+	public function ajax_rotate_key(): void {
+		check_ajax_referer( 'wpmind_ajax', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+		}
+
+		$provider   = sanitize_text_field( wp_unslash( $_POST['provider'] ?? '' ) );
+		$posted_key = sanitize_text_field( wp_unslash( $_POST['api_key'] ?? '' ) );
+		$custom_url = trim( (string) wp_unslash( $_POST['custom_url'] ?? '' ) );
+
+		if ( '' === $provider ) {
+			wp_send_json_error( [ 'message' => __( '缺少服务标识', 'wpmind' ) ] );
+		}
+
+		$result = ( new KeyRotation() )->rotate( $provider, $posted_key, $custom_url );
+
+		if ( $result['ok'] ) {
+			wp_send_json_success(
+				[
+					'message'     => $result['message'],
+					'latency'     => $result['latency_ms'],
+					'fingerprint' => $result['fingerprint'] ?? '',
+					'set_at'      => $result['set_at'] ?? 0,
+				]
+			);
+		}
+
+		wp_send_json_error(
+			[
+				'message'     => $result['message'],
+				'error_class' => $result['error_class'],
 				'latency'     => $result['latency_ms'],
 			]
 		);

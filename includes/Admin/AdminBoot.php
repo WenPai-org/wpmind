@@ -64,6 +64,8 @@ final class AdminBoot {
 
 		$ajax->register_hooks();
 
+		\WPMind\Provider\KeyRotation::register_hooks();
+
 		add_filter(
 			'plugin_action_links_' . plugin_basename( WPMIND_PLUGIN_FILE ),
 			[ $page, 'plugin_action_links' ]
