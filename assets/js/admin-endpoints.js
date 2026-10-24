@@ -447,6 +447,152 @@
 		} );
 	}
 
+
+	/**
+	 * Reset circuit breaker for one provider
+	 */
+	function initResetBreaker() {
+		$( '.wpmind-reset-breaker' ).on( 'click', function( e ) {
+			e.preventDefault();
+			var $button = $( this );
+			var provider = $button.data( 'provider' );
+			var $result = $button.siblings( '.wpmind-test-result' );
+			if ( 'undefined' === typeof wpmindData ) {
+				return;
+			}
+			$button.prop( 'disabled', true );
+			$.ajax( {
+				url: wpmindData.ajaxurl || ajaxurl,
+				type: 'POST',
+				data: {
+					action: 'wpmind_reset_circuit_breaker',
+					provider: provider,
+					nonce: wpmindData.nonce
+				},
+				success: function( response ) {
+					var msg = ( response.data && response.data.message ) || ( response.success ? '已重置' : '重置失败' );
+					$result.text( msg ).removeClass( 'success error' ).addClass( response.success ? 'success' : 'error' );
+					if ( response.success && window.Toast ) {
+						Toast.success( provider + ': ' + msg );
+					}
+				},
+				complete: function() {
+					$button.prop( 'disabled', false );
+				}
+			} );
+		} );
+	}
+
+	function downloadJson( filename, data ) {
+		var blob = new Blob( [ JSON.stringify( data, null, 2 ) ], { type: 'application/json' } );
+		var url = URL.createObjectURL( blob );
+		var a = document.createElement( 'a' );
+		a.href = url;
+		a.download = filename || 'wpmind-export.json';
+		document.body.appendChild( a );
+		a.click();
+		document.body.removeChild( a );
+		URL.revokeObjectURL( url );
+	}
+
+	/**
+	 * Diagnostics / config transfer toolbar
+	 */
+	function initDiagnosticsTools() {
+		$( '#wpmind-export-diagnostics' ).on( 'click', function( e ) {
+			e.preventDefault();
+			if ( 'undefined' === typeof wpmindData ) {
+				return;
+			}
+			$.post( wpmindData.ajaxurl || ajaxurl, {
+				action: 'wpmind_export_diagnostics',
+				nonce: wpmindData.nonce
+			} ).done( function( response ) {
+				if ( response.success && response.data ) {
+					downloadJson( response.data.filename, response.data.data );
+					if ( window.Toast ) {
+						Toast.success( '诊断包已下载' );
+					}
+				} else if ( window.Toast ) {
+					Toast.error( ( response.data && response.data.message ) || '导出失败' );
+				}
+			} );
+		} );
+
+		$( '#wpmind-export-config' ).on( 'click', function( e ) {
+			e.preventDefault();
+			if ( 'undefined' === typeof wpmindData ) {
+				return;
+			}
+			$.post( wpmindData.ajaxurl || ajaxurl, {
+				action: 'wpmind_export_provider_config',
+				nonce: wpmindData.nonce
+			} ).done( function( response ) {
+				if ( response.success && response.data ) {
+					downloadJson( response.data.filename, response.data.data );
+					if ( window.Toast ) {
+						Toast.success( '端点配置已下载' );
+					}
+				} else if ( window.Toast ) {
+					Toast.error( ( response.data && response.data.message ) || '导出失败' );
+				}
+			} );
+		} );
+
+		$( '#wpmind-import-config' ).on( 'click', function( e ) {
+			e.preventDefault();
+			$( '#wpmind-import-config-file' ).trigger( 'click' );
+		} );
+
+		$( '#wpmind-import-config-file' ).on( 'change', function() {
+			var file = this.files && this.files[0];
+			this.value = '';
+			if ( ! file || 'undefined' === typeof wpmindData ) {
+				return;
+			}
+			var reader = new FileReader();
+			reader.onload = function() {
+				var text = String( reader.result || '' );
+				// dry-run first
+				$.post( wpmindData.ajaxurl || ajaxurl, {
+					action: 'wpmind_import_provider_config',
+					nonce: wpmindData.nonce,
+					config: text,
+					confirm: '0'
+				} ).done( function( response ) {
+					if ( ! response.success ) {
+						if ( window.Toast ) {
+							Toast.error( ( response.data && response.data.message ) || '预检失败' );
+						}
+						return;
+					}
+					var ok = window.confirm( ( response.data && response.data.message ) || '预检通过，确认导入？（本站 API Key 将保留）' );
+					if ( ! ok ) {
+						return;
+					}
+					$.post( wpmindData.ajaxurl || ajaxurl, {
+						action: 'wpmind_import_provider_config',
+						nonce: wpmindData.nonce,
+						config: text,
+						confirm: '1'
+					} ).done( function( resp2 ) {
+						if ( resp2.success ) {
+							if ( window.Toast ) {
+								Toast.success( ( resp2.data && resp2.data.message ) || '已导入' );
+							}
+							window.setTimeout( function() {
+								window.location.reload();
+							}, 800 );
+						} else if ( window.Toast ) {
+							Toast.error( ( resp2.data && resp2.data.message ) || '导入失败' );
+						}
+					} );
+				} );
+			};
+			reader.readAsText( file );
+		} );
+	}
+
 	/**
 	 * Initialize on document ready
 	 */
@@ -468,6 +614,8 @@
 		safeInit( 'endpoints:key-validation', initApiKeyValidation );
 		safeInit( 'endpoints:test-connection', initTestConnection );
 		safeInit( 'endpoints:rotate-key', initRotateKey );
+		safeInit( 'endpoints:reset-breaker', initResetBreaker );
+		safeInit( 'endpoints:diagnostics', initDiagnosticsTools );
 		safeInit( 'endpoints:test-image', initImageTestConnection );
 		safeInit( 'endpoints:status-update', initStatusUpdate );
 		safeInit( 'endpoints:clear-key', initClearKeyHandler );

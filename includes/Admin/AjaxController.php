@@ -14,6 +14,8 @@ use WPMind\Provider\EndpointRepository;
 use WPMind\Provider\Secrets;
 use WPMind\Provider\Health\HealthChecker;
 use WPMind\Provider\KeyRotation;
+use WPMind\Provider\Diagnostics;
+use WPMind\Provider\ConfigTransfer;
 use WPMind\WPMind;
 use WPMind\Core\ModuleLoader;
 use WPMind\ErrorHandler;
@@ -72,6 +74,9 @@ final class AjaxController {
 		add_action( 'wp_ajax_wpmind_set_routing_strategy', [ $this, 'ajax_set_routing_strategy' ] );
 		add_action( 'wp_ajax_wpmind_route_request', [ $this, 'ajax_route_request' ] );
 		add_action( 'wp_ajax_wpmind_set_provider_priority', [ $this, 'ajax_set_provider_priority' ] );
+		add_action( 'wp_ajax_wpmind_export_diagnostics', [ $this, 'ajax_export_diagnostics' ] );
+		add_action( 'wp_ajax_wpmind_export_provider_config', [ $this, 'ajax_export_provider_config' ] );
+		add_action( 'wp_ajax_wpmind_import_provider_config', [ $this, 'ajax_import_provider_config' ] );
 		// GEO settings are handled by GeoModule.
 	}
 
@@ -621,5 +626,84 @@ final class AjaxController {
 			'success' => false,
 			'message' => '连接失败 (HTTP ' . $status_code . ')',
 		];
+	}
+
+	/**
+	 * AJAX: export diagnostics JSON (redacted; no keys/fingerprints).
+	 *
+	 * @since 0.13.0
+	 */
+	public function ajax_export_diagnostics(): void {
+		check_ajax_referer( 'wpmind_ajax', 'nonce' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+		}
+		$payload = Diagnostics::export();
+		wp_send_json_success(
+			[
+				'filename' => 'wpmind-diagnostics-' . gmdate( 'Ymd-His' ) . '.json',
+				'data'     => $payload,
+			]
+		);
+	}
+
+	/**
+	 * AJAX: export provider config (no api_key / key_meta).
+	 *
+	 * @since 0.13.0
+	 */
+	public function ajax_export_provider_config(): void {
+		check_ajax_referer( 'wpmind_ajax', 'nonce' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+		}
+		wp_send_json_success(
+			[
+				'filename' => 'wpmind-provider-config-' . gmdate( 'Ymd-His' ) . '.json',
+				'data'     => ConfigTransfer::export(),
+			]
+		);
+	}
+
+	/**
+	 * AJAX: import provider config. Default dry-run; confirm=1 writes and keeps local keys.
+	 *
+	 * @since 0.13.0
+	 */
+	public function ajax_import_provider_config(): void {
+		check_ajax_referer( 'wpmind_ajax', 'nonce' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+		}
+
+		$raw = wp_unslash( $_POST['config'] ?? '' );
+		if ( is_array( $raw ) ) {
+			$payload = $raw;
+		} else {
+			$decoded = json_decode( (string) $raw, true );
+			if ( ! is_array( $decoded ) ) {
+				wp_send_json_error( [ 'message' => __( '配置 JSON 无效', 'wpmind' ) ] );
+			}
+			$payload = $decoded;
+		}
+
+		$confirm = ! empty( $_POST['confirm'] ) && ( '1' === (string) $_POST['confirm'] || 'true' === (string) $_POST['confirm'] );
+		$result  = ConfigTransfer::import( $payload, $confirm );
+		if ( ! $result['ok'] ) {
+			wp_send_json_error(
+				[
+					'message' => $result['message'],
+					'errors'  => $result['errors'],
+					'diff'    => $result['diff'],
+				]
+			);
+		}
+		wp_send_json_success(
+			[
+				'message' => $result['message'],
+				'diff'    => $result['diff'],
+				'applied' => $confirm,
+			]
+		);
 	}
 }

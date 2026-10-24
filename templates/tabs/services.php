@@ -29,6 +29,14 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 	<?php esc_html_e( '配置 AI 服务端点和 API 密钥，支持 OpenAI、Anthropic、Google 及国内主流 AI 服务。', 'wpmind' ); ?>
 </p>
 
+<div class="wpmind-diagnostics-toolbar" style="margin:12px 0 20px;">
+	<button type="button" class="button" id="wpmind-export-diagnostics"><?php esc_html_e( '导出诊断包', 'wpmind' ); ?></button>
+	<button type="button" class="button" id="wpmind-export-config"><?php esc_html_e( '导出端点配置', 'wpmind' ); ?></button>
+	<button type="button" class="button" id="wpmind-import-config"><?php esc_html_e( '导入端点配置', 'wpmind' ); ?></button>
+	<input type="file" id="wpmind-import-config-file" accept="application/json,.json" style="display:none;">
+	<span class="description"><?php esc_html_e( '诊断包与配置导出均不含 API Key / 指纹。导入会保留本站密钥。', 'wpmind' ); ?></span>
+</div>
+
 <form method="post" action="options.php" id="wpmind-settings-form">
 	<?php settings_fields( 'wpmind_settings' ); ?>
 
@@ -112,23 +120,31 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 					</span>
 				<?php endif; ?>
 				<?php
-				$wpmind_cb_state = '';
-				if ( class_exists( '\\WPMind\\Failover\\FailoverManager' ) ) {
+				$wpmind_cb_state   = '';
+				$wpmind_cb_details = array();
+				$wpmind_breaker    = null;
+				if ( class_exists( '\WPMind\Failover\FailoverManager' ) ) {
 					$wpmind_breaker = \WPMind\Failover\FailoverManager::instance()->get_circuit_breaker( $key );
 					if ( $wpmind_breaker ) {
-						$wpmind_cb_state = $wpmind_breaker->get_state();
+						$wpmind_cb_state   = $wpmind_breaker->get_state();
+						$wpmind_cb_details = $wpmind_breaker->get_status_details();
 					}
 				}
-				if ( 'needs_attention' === $wpmind_cb_state ) :
+				$wpmind_state_labels = array(
+					'closed'          => __( '正常', 'wpmind' ),
+					'open'            => __( '熔断中', 'wpmind' ),
+					'half_open'       => __( '恢复测试', 'wpmind' ),
+					'needs_attention' => __( '需要处理', 'wpmind' ),
+					'quota_exhausted' => __( '额度不足', 'wpmind' ),
+				);
+				if ( '' !== $wpmind_cb_state && 'closed' !== $wpmind_cb_state ) :
+					$wpmind_label = $wpmind_state_labels[ $wpmind_cb_state ] ?? $wpmind_cb_state;
 					?>
-					<span class="wpmind-status wpmind-status-warning" title="<?php esc_attr_e( 'API Key 无效或权限不足，请更新密钥后重新测试连接。', 'wpmind' ); ?>">
-						<?php esc_html_e( '需要处理：API Key 无效', 'wpmind' ); ?>
-					</span>
-				<?php elseif ( 'quota_exhausted' === $wpmind_cb_state ) : ?>
-					<span class="wpmind-status wpmind-status-warning" title="<?php esc_attr_e( '余额或额度不足，冷却结束后会自动探测，或使用深度测试验证。', 'wpmind' ); ?>">
-						<?php esc_html_e( '额度不足', 'wpmind' ); ?>
+					<span class="wpmind-status wpmind-status-warning">
+						<?php echo esc_html( $wpmind_label ); ?>
 					</span>
 				<?php endif; ?>
+
 			</div>
 
 			<div class="wpmind-endpoint-body">
@@ -232,6 +248,12 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 								title="<?php esc_attr_e( '用输入框中的新 Key 验证通过后替换已保存的 Key', 'wpmind' ); ?>">
 							<?php esc_html_e( '验证并替换', 'wpmind' ); ?>
 						</button>
+						<button type="button"
+								class="button wpmind-reset-breaker"
+								data-provider="<?php echo esc_attr( $key ); ?>"
+								title="<?php esc_attr_e( '清除熔断 / 需要处理 / 额度不足状态', 'wpmind' ); ?>">
+							<?php esc_html_e( '重置', 'wpmind' ); ?>
+						</button>
 						<label style="margin-left:8px;">
 							<input type="checkbox" class="wpmind-deep-test" value="1">
 							<?php esc_html_e( '深度测试（会产生少量费用）', 'wpmind' ); ?>
@@ -239,6 +261,47 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 						<span class="wpmind-test-result"></span>
 					</td>
 				</tr>
+				<?php
+				$wpmind_recovery = '';
+				$wpmind_err_time = '';
+				$wpmind_err_label = '';
+				$wpmind_reason = is_string( $wpmind_cb_details['reason'] ?? null ) ? (string) $wpmind_cb_details['reason'] : '';
+				$wpmind_since  = isset( $wpmind_cb_details['since'] ) ? (int) $wpmind_cb_details['since'] : ( isset( $wpmind_cb_details['last_failure'] ) ? (int) $wpmind_cb_details['last_failure'] : 0 );
+				if ( '' !== $wpmind_reason && class_exists( '\WPMind\Provider\Health\ErrorClass' ) && class_exists( '\WPMind\Provider\Health\ErrorCatalog' ) ) {
+					try {
+						$wpmind_ec = \WPMind\Provider\Health\ErrorClass::from( $wpmind_reason );
+						$wpmind_cat = \WPMind\Provider\Health\ErrorCatalog::entry( $wpmind_ec, $key );
+						$wpmind_err_label = $wpmind_cat['label'];
+						$wpmind_recovery  = $wpmind_cat['recovery'];
+						if ( '' !== $wpmind_cat['credentials_url'] ) {
+							$wpmind_recovery .= ' ' . $wpmind_cat['credentials_url'];
+						}
+					} catch ( \ValueError $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+						$wpmind_err_label = $wpmind_reason;
+					}
+				}
+				if ( $wpmind_since > 0 && class_exists( '\WPMind\Provider\Diagnostics' ) ) {
+					$wpmind_err_time = \WPMind\Provider\Diagnostics::format_shanghai( $wpmind_since );
+				}
+				if ( '' !== $wpmind_err_label || '' !== $wpmind_recovery ) :
+					?>
+				<tr class="wpmind-recovery-row">
+					<th scope="row"><?php esc_html_e( '最近错误', 'wpmind' ); ?></th>
+					<td>
+						<?php if ( '' !== $wpmind_err_label ) : ?>
+							<strong><?php echo esc_html( $wpmind_err_label ); ?></strong>
+							<?php if ( '' !== $wpmind_err_time ) : ?>
+								<span class="description"> · <?php echo esc_html( $wpmind_err_time ); ?></span>
+							<?php endif; ?>
+							<br>
+						<?php endif; ?>
+						<?php if ( '' !== $wpmind_recovery ) : ?>
+							<span class="description"><?php echo esc_html( $wpmind_recovery ); ?></span>
+						<?php endif; ?>
+					</td>
+				</tr>
+				<?php endif; ?>
+
 				<tr class="wpmind-advanced-row">
 					<td colspan="2">
 						<button type="button" class="button button-link wpmind-toggle-advanced">

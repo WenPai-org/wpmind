@@ -15,6 +15,7 @@ namespace WPMind\Provider;
 
 use WP_Error;
 use WPMind\Failover\FailoverManager;
+use WPMind\Provider\Diagnostics;
 use WPMind\Provider\Health\ErrorClass;
 use WPMind\Provider\Health\ErrorClassifier;
 
@@ -217,6 +218,18 @@ final class ProviderClient {
 		}
 		if ( class_exists( FailoverManager::class ) ) {
 			FailoverManager::instance()->record_result( $provider, $success, $latency, $error_class, $retry_after );
+		}
+		if ( ! $success && null !== $error_class && class_exists( Diagnostics::class ) ) {
+			$entry = \WPMind\Provider\Health\ErrorCatalog::entry( $error_class, $provider );
+			Diagnostics::push_error(
+				array(
+					'provider' => $provider,
+					'class'    => $error_class->value,
+					'status'   => 0,
+					'message'  => $entry['message'],
+					'at'       => time(),
+				)
+			);
 		}
 	}
 

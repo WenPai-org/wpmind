@@ -10,6 +10,11 @@ declare(strict_types=1);
 
 namespace WPMind\Provider\Compat;
 
+use WPMind\Failover\CircuitBreaker;
+use WPMind\Failover\FailoverManager;
+use WPMind\Provider\Health\ErrorCatalog;
+use WPMind\Provider\Health\ErrorClass;
+
 /**
  * Expose compatibility matrix results in Site Health (never includes keys).
  */
@@ -33,6 +38,10 @@ final class SiteHealth {
 		$tests['direct']['wpmind_ai_client_env'] = array(
 			'label' => __( 'WPMind AI Client environment', 'wpmind' ),
 			'test'  => array( self::class, 'test_environment' ),
+		);
+		$tests['direct']['wpmind_provider_health'] = array(
+			'label' => __( 'WPMind Provider', 'wpmind' ),
+			'test'  => array( self::class, 'test_provider_health' ),
 		);
 		return $tests;
 	}
@@ -74,6 +83,64 @@ final class SiteHealth {
 				$env['sdk_version'] ? $env['sdk_version'] : __( 'unknown', 'wpmind' )
 			)
 		) . '</p>';
+
+		return $result;
+	}
+
+	/**
+	 * Site Health: WPMind Provider 熔断 / 额度状态.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public static function test_provider_health(): array {
+		$result = array(
+			'label'       => __( 'WPMind Provider', 'wpmind' ),
+			'status'      => 'good',
+			'badge'       => array(
+				'label' => 'WPMind',
+				'color' => 'blue',
+			),
+			'description' => '<p>' . esc_html__( '所有已跟踪的 Provider 状态正常。', 'wpmind' ) . '</p>',
+			'actions'     => '',
+			'test'        => 'wpmind_provider_health',
+		);
+
+		if ( ! class_exists( FailoverManager::class ) ) {
+			return $result;
+		}
+
+		$issues = array();
+		$fm     = FailoverManager::instance();
+		foreach ( $fm->get_status_summary() as $id => $row ) {
+			$state = (string) ( $row['state'] ?? '' );
+			if ( ! in_array( $state, array( CircuitBreaker::STATE_NEEDS_ATTENTION, CircuitBreaker::STATE_QUOTA_EXHAUSTED ), true ) ) {
+				continue;
+			}
+			$name        = (string) ( $row['name'] ?? $id );
+			$class_value = (string) ( $row['reason'] ?? ( CircuitBreaker::STATE_QUOTA_EXHAUSTED === $state ? ErrorClass::QuotaExhausted->value : ErrorClass::AuthFailed->value ) );
+			try {
+				$ec = ErrorClass::from( $class_value );
+			} catch ( \ValueError $e ) {
+				$ec = CircuitBreaker::STATE_QUOTA_EXHAUSTED === $state ? ErrorClass::QuotaExhausted : ErrorClass::AuthFailed;
+			}
+			$entry     = ErrorCatalog::entry( $ec, (string) $id );
+			$cred_html = '';
+			if ( '' !== $entry['credentials_url'] ) {
+				$cred_html = ' <a href="' . esc_url( $entry['credentials_url'] ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( '获取密钥', 'wpmind' ) . '</a>';
+			}
+			$issues[] = sprintf(
+				'<li><strong>%1$s</strong>：%2$s — %3$s%4$s</li>',
+				esc_html( $name ),
+				esc_html( $entry['message'] ),
+				esc_html( $entry['recovery'] ),
+				$cred_html
+			);
+		}
+
+		if ( array() !== $issues ) {
+			$result['status']      = 'recommended';
+			$result['description'] = '<p>' . esc_html__( '以下 Provider 需要处理（密钥无效或额度不足）：', 'wpmind' ) . '</p><ul>' . implode( '', $issues ) . '</ul>';
+		}
 
 		return $result;
 	}
