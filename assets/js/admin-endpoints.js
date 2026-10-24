@@ -340,6 +340,113 @@
 		} );
 	}
 
+
+	/**
+	 * 验证并替换 API Key
+	 */
+	function initRotateKey() {
+		$( '.wpmind-rotate-key' ).on( 'click', function( e ) {
+			e.preventDefault();
+
+			var $button = $( this );
+			var provider = $button.data( 'provider' );
+			var $result = $button.siblings( '.wpmind-test-result' );
+			var $card = $button.closest( '.wpmind-endpoint-card' );
+			var $apiKeyInput = $card.find( 'input[name*="[api_key]"]' );
+			var apiKey = $apiKeyInput.val();
+			var $customUrlInput = $card.find( 'input[name*="[custom_base_url]"]' );
+			var customUrl = $customUrlInput.length ? $customUrlInput.val() : '';
+
+			if ( ! apiKey ) {
+				$result.text( '请先填写新的 API Key' ).removeClass( 'success error' ).addClass( 'error' );
+				Toast.warning( provider.toUpperCase() + ': 请先填写新的 API Key' );
+				return;
+			}
+
+			$button.addClass( 'is-testing' ).prop( 'disabled', true );
+			$button.data( 'orig-text', $button.text() );
+			$button.html( '<span class="dashicons ri-loader-4-line wpmind-spinning"></span> 验证中' );
+			$result.text( '' ).removeClass( 'success error warning' ).removeAttr( 'title' );
+
+			if ( 'undefined' === typeof wpmindData ) {
+				$result.text( '配置错误' ).addClass( 'error' );
+				$button.removeClass( 'is-testing' ).prop( 'disabled', false ).text( $button.data( 'orig-text' ) || '验证并替换' );
+				return;
+			}
+
+			$.ajax( {
+				url: wpmindData.ajaxurl || ajaxurl,
+				type: 'POST',
+				data: {
+					action: 'wpmind_rotate_key',
+					provider: provider,
+					api_key: apiKey,
+					custom_url: customUrl,
+					nonce: wpmindData.nonce
+				},
+				timeout: 45000,
+				success: function( response ) {
+					if ( response.success ) {
+						var message = ( response.data && response.data.message ) || '已替换';
+						var extra = '';
+						if ( response.data && response.data.latency ) {
+							extra += ' ' + response.data.latency + 'ms';
+						}
+						$result.html( '<span class="dashicons ri-checkbox-circle-line"></span> ' + escapeHtml( message ) + extra ).addClass( 'success' );
+						Toast.success( provider.toUpperCase() + ' ' + message );
+						$apiKeyInput.val( '' );
+						var fp = response.data && response.data.fingerprint ? String( response.data.fingerprint ) : '';
+						var setAt = response.data && response.data.set_at ? parseInt( response.data.set_at, 10 ) : 0;
+						var $meta = $card.find( '.wpmind-key-meta' );
+						if ( fp ) {
+							var when = '';
+							if ( setAt > 0 ) {
+								var d = new Date( setAt * 1000 );
+								when = d.getFullYear() + '-' +
+									String( d.getMonth() + 1 ).padStart( 2, '0' ) + '-' +
+									String( d.getDate() ).padStart( 2, '0' ) + ' ' +
+									String( d.getHours() ).padStart( 2, '0' ) + ':' +
+									String( d.getMinutes() ).padStart( 2, '0' );
+							}
+							var label = when
+								? ( '已配置 · 指纹 ' + fp + ' · ' + when + ' 设置' )
+								: ( '已配置 · 指纹 ' + fp );
+							if ( $meta.length ) {
+								$meta.text( label );
+							} else {
+								$card.find( '.wpmind-api-key-field' ).after(
+									$( '<p class="description wpmind-key-meta"></p>' ).attr( 'data-provider', provider ).text( label )
+								);
+							}
+						}
+					} else {
+						var errorMsg = ( response.data && response.data.message ) || '替换失败';
+						$result.html(
+							'<span class="dashicons ri-close-circle-line"></span> ' + escapeHtml( errorMsg )
+						).addClass( 'error' );
+						Toast.error( provider.toUpperCase() + ': ' + errorMsg );
+					}
+				},
+				error: function( xhr, status ) {
+					var message = '请求失败';
+					if ( 'timeout' === status ) {
+						message = '请求超时，请检查网络连接';
+					}
+					$result.html( '<span class="dashicons ri-close-circle-line"></span> ' + message ).addClass( 'error' );
+					Toast.error( provider.toUpperCase() + ': ' + message );
+				},
+				complete: function() {
+					$button.removeClass( 'is-testing' ).prop( 'disabled', false ).text( $button.data( 'orig-text' ) || '验证并替换' );
+					setTimeout( function() {
+						$result.fadeOut( 300, function() {
+							$( this ).text( '' ).removeClass( 'success error warning' ).removeAttr( 'title' ).show();
+						} );
+					}, 10000 );
+				}
+			} );
+		} );
+	}
+
 	/**
 	 * Initialize on document ready
 	 */
@@ -360,6 +467,7 @@
 		safeInit( 'endpoints:collapse', initEndpointCollapse );
 		safeInit( 'endpoints:key-validation', initApiKeyValidation );
 		safeInit( 'endpoints:test-connection', initTestConnection );
+		safeInit( 'endpoints:rotate-key', initRotateKey );
 		safeInit( 'endpoints:test-image', initImageTestConnection );
 		safeInit( 'endpoints:status-update', initStatusUpdate );
 		safeInit( 'endpoints:clear-key', initClearKeyHandler );

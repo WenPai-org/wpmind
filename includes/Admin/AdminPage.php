@@ -11,6 +11,8 @@ declare(strict_types=1);
 namespace WPMind\Admin;
 
 use WPMind\Provider\EndpointRepository;
+use WPMind\Provider\KeyRotation;
+use WPMind\Provider\Secrets;
 use WPMind\Provider\ProviderDefinitions;
 use WPMind\WPMind;
 
@@ -204,8 +206,15 @@ final class AdminPage {
 				'models'          => $previous['models'],
 				'default_model'   => $previous['default_model'],
 			];
-			if ( [] !== $previous['key_meta'] ) {
-				$entry['key_meta'] = $previous['key_meta'];
+			// key_meta: rewrite on fingerprint change; drop when cleared; else keep or lazy-fill.
+			$old_fp = Secrets::fingerprint( $current->api_key );
+			$new_fp = Secrets::fingerprint( $api_key );
+			if ( '' !== $api_key ) {
+				if ( $old_fp !== $new_fp || [] === $previous['key_meta'] ) {
+					$entry['key_meta'] = KeyRotation::make_meta( $api_key );
+				} else {
+					$entry['key_meta'] = $previous['key_meta'];
+				}
 			}
 
 			// 「需要重新配置」在管理员填了新 key、清除 key 或填了自定义地址后解除.

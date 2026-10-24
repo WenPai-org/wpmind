@@ -12,6 +12,7 @@
 
 ### 改进
 
+- API Key 安全轮换：AJAX 先内存验证再原子替换，写入 key_meta 指纹；换钥后重置熔断与远程模型缓存，后台只展示指纹不露明文。
 - Provider 健康检查与明确顺序回退：错误分类、`wpmind_failover_order`、熔断加固（needs_attention / quota_exhausted / 半开探测锁）、统一 ProviderClient 出站记账；默认测试连接用 GET /models，深度测试才产生费用；cron `wpmind_health_check` 默认关闭。
 - WordPress AI Client SDK 兼容：去掉全局 `prevent_prompt`、`isConfigured()` 不再发网、清理同值 connector 镜像；新增兼容矩阵与 Site Health 检测（#43）。
 - 引入随包发布的动态模型能力目录（`includes/Provider/Catalog/`）：展示与路由默认模型由目录驱动，退役模型不再硬编码为默认，请求时按规则重映射（#42）。

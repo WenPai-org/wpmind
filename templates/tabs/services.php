@@ -170,6 +170,37 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 								<span class="dashicons ri-eye-line"></span>
 							</button>
 						</div>
+						<?php
+						$wpmind_key_meta = is_array( $endpoint['key_meta'] ?? null ) ? $endpoint['key_meta'] : array();
+						if ( $has_api_key && ( empty( $wpmind_key_meta['fingerprint'] ) ) && class_exists( '\WPMind\Provider\KeyRotation' ) ) {
+							$wpmind_key_meta = \WPMind\Provider\KeyRotation::ensure_key_meta( $key );
+						}
+						$wpmind_fp     = is_string( $wpmind_key_meta['fingerprint'] ?? null ) ? (string) $wpmind_key_meta['fingerprint'] : '';
+						$wpmind_set_at = isset( $wpmind_key_meta['set_at'] ) ? (int) $wpmind_key_meta['set_at'] : 0;
+						if ( $has_api_key && '' !== $wpmind_fp ) :
+							$wpmind_when = $wpmind_set_at > 0
+								? ( function_exists( 'wp_date' ) ? wp_date( 'Y-m-d H:i', $wpmind_set_at ) : gmdate( 'Y-m-d H:i', $wpmind_set_at ) )
+								: '';
+							?>
+						<p class="description wpmind-key-meta" data-provider="<?php echo esc_attr( $key ); ?>">
+							<?php
+							if ( '' !== $wpmind_when ) {
+								printf(
+									/* translators: 1: key fingerprint, 2: datetime */
+									esc_html__( '已配置 · 指纹 %1$s · %2$s 设置', 'wpmind' ),
+									esc_html( $wpmind_fp ),
+									esc_html( $wpmind_when )
+								);
+							} else {
+								printf(
+									/* translators: %s: key fingerprint */
+									esc_html__( '已配置 · 指纹 %s', 'wpmind' ),
+									esc_html( $wpmind_fp )
+								);
+							}
+							?>
+						</p>
+						<?php endif; ?>
 						<?php if ( $has_api_key ) : ?>
 						<label class="wpmind-clear-key">
 							<input type="checkbox"
@@ -194,6 +225,12 @@ $request_timeout  = get_option( 'wpmind_request_timeout', 60 );
 								data-provider="<?php echo esc_attr( $key ); ?>"
 								<?php echo empty( $endpoint['enabled'] ) ? 'disabled' : ''; ?>>
 							<?php esc_html_e( '测试连接', 'wpmind' ); ?>
+						</button>
+						<button type="button"
+								class="button wpmind-rotate-key"
+								data-provider="<?php echo esc_attr( $key ); ?>"
+								title="<?php esc_attr_e( '用输入框中的新 Key 验证通过后替换已保存的 Key', 'wpmind' ); ?>">
+							<?php esc_html_e( '验证并替换', 'wpmind' ); ?>
 						</button>
 						<label style="margin-left:8px;">
 							<input type="checkbox" class="wpmind-deep-test" value="1">

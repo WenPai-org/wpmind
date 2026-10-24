@@ -34,6 +34,7 @@ final class ProviderClient {
 	 *     @type string|null       $api_key
 	 *     @type string|null       $base_url
 	 *     @type bool              $record_usage  Default true on success.
+	 *     @type bool              $skip_record   Skip FailoverManager recording (e.g. key rotation probe).
 	 *     @type string|null       $model         Hint for usage event.
 	 * }
 	 * @return array{ok:bool, status:int, body:string, data:?array, headers:array, latency_ms:int, error_class:?ErrorClass, retry_after:int, wp_error:?WP_Error, response:mixed}
@@ -56,6 +57,8 @@ final class ProviderClient {
 			);
 			return $this->error_result( $err, ErrorClass::AuthFailed );
 		}
+
+		$skip_record = ! empty( $args['skip_record'] );
 
 		$url = str_starts_with( $path, 'http://' ) || str_starts_with( $path, 'https://' )
 			? $path
@@ -104,7 +107,7 @@ final class ProviderClient {
 					'body'        => $error_classified['redacted_body'],
 				)
 			);
-			$this->record( $provider, false, $latency, $error_classified['class'], $error_classified['retry_after'] );
+			$this->record( $provider, false, $latency, $error_classified['class'], $error_classified['retry_after'], $skip_record );
 			return array(
 				'ok'          => false,
 				'status'      => 0,
@@ -159,7 +162,7 @@ final class ProviderClient {
 		}
 
 		$data = json_decode( $raw, true );
-		$this->record( $provider, true, $latency, null, 0 );
+		$this->record( $provider, true, $latency, null, 0, $skip_record );
 
 		$record_usage = ! isset( $args['record_usage'] ) || (bool) $args['record_usage'];
 		if ( $record_usage && is_array( $data ) ) {
@@ -198,7 +201,20 @@ final class ProviderClient {
 		);
 	}
 
-	private function record( string $provider, bool $success, int $latency, ?ErrorClass $error_class, int $retry_after ): void {
+	/**
+	 * Record success/failure into FailoverManager unless $skip is true.
+	 *
+	 * @param string          $provider    Provider id.
+	 * @param bool            $success     Whether the request succeeded.
+	 * @param int             $latency     Latency in ms.
+	 * @param ErrorClass|null $error_class Classified error or null.
+	 * @param int             $retry_after Retry-After seconds.
+	 * @param bool            $skip        When true, do not touch FailoverManager.
+	 */
+	private function record( string $provider, bool $success, int $latency, ?ErrorClass $error_class, int $retry_after, bool $skip = false ): void {
+		if ( $skip ) {
+			return;
+		}
 		if ( class_exists( FailoverManager::class ) ) {
 			FailoverManager::instance()->record_result( $provider, $success, $latency, $error_class, $retry_after );
 		}

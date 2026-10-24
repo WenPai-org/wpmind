@@ -44,16 +44,19 @@ final class HealthChecker {
 				'GET',
 				'models',
 				array(
-					'timeout'       => 15,
-					'api_key'       => $overrides['api_key'] ?? null,
-					'base_url'      => $overrides['base_url'] ?? null,
-					'record_usage'  => false,
+					'timeout'         => 15,
+					'api_key'         => $overrides['api_key'] ?? null,
+					'base_url'        => $overrides['base_url'] ?? null,
+					'record_usage'    => false,
+					'skip_record'     => ! empty( $overrides['skip_record'] ),
 					'allow_empty_key' => false,
 				)
 			);
 
 			if ( $result['ok'] ) {
-				$this->on_probe_success( $provider_id, false );
+				if ( empty( $overrides['skip_record'] ) ) {
+					$this->on_probe_success( $provider_id, false );
+				}
 				return array(
 					'ok'          => true,
 					'latency_ms'  => $result['latency_ms'],
@@ -91,11 +94,12 @@ final class HealthChecker {
 			'POST',
 			'chat/completions',
 			array(
-				'timeout'  => 30,
-				'api_key'  => $overrides['api_key'] ?? null,
-				'base_url' => $overrides['base_url'] ?? null,
-				'model'    => $model,
-				'body'     => array(
+				'timeout'     => 30,
+				'api_key'     => $overrides['api_key'] ?? null,
+				'base_url'    => $overrides['base_url'] ?? null,
+				'skip_record' => ! empty( $overrides['skip_record'] ),
+				'model'       => $model,
+				'body'        => array(
 					'model'      => $model,
 					'messages'   => array(
 						array(
@@ -109,7 +113,9 @@ final class HealthChecker {
 		);
 
 		if ( $result['ok'] ) {
-			$this->on_probe_success( $provider_id, true );
+			if ( empty( $overrides['skip_record'] ) ) {
+				$this->on_probe_success( $provider_id, true );
+			}
 			return array(
 				'ok'          => true,
 				'latency_ms'  => $result['latency_ms'],
