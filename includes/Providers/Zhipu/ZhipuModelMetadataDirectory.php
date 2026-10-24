@@ -25,17 +25,4 @@ class ZhipuModelMetadataDirectory extends AbstractOpenAiCompatibleModelMetadataD
 	protected static function providerClass(): string {
 		return ZhipuProvider::class;
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function getStaticModels(): array {
-		return [
-			'glm-4'       => 'GLM-4',
-			'glm-4-flash' => 'GLM-4 Flash',
-			'glm-4-plus'  => 'GLM-4 Plus',
-			'glm-4-air'   => 'GLM-4 Air',
-			'glm-4-long'  => 'GLM-4 Long',
-		];
-	}
 }

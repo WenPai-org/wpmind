@@ -1,0 +1,913 @@
+{
+  "catalog_version": "2026.10.1",
+  "generated_at": "2026-10-24",
+  "notes": "First ship with WPMind model catalog (0.13 P1). Prices unverified set to null; Pricing::DATA is fallback. Doubao often needs endpoint IDs as model field.",
+  "providers": {
+    "openai": {
+      "default_model": "gpt-4o",
+      "models": {
+        "gpt-4o": {
+          "name": "GPT-4o",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 128000,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "USD",
+            "input": 2.5,
+            "output": 10.0,
+            "as_of": "2026-01-01",
+            "source": "https://openai.com/api/pricing/"
+          }
+        },
+        "gpt-4o-mini": {
+          "name": "GPT-4o mini",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 128000,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "USD",
+            "input": 0.15,
+            "output": 0.6,
+            "as_of": "2026-01-01",
+            "source": "https://openai.com/api/pricing/"
+          }
+        },
+        "gpt-4-turbo": {
+          "name": "GPT-4 Turbo",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 128000,
+          "status": "deprecated",
+          "replaced_by": "gpt-4o",
+          "retire_after": null,
+          "pricing": {
+            "currency": "USD",
+            "input": 10.0,
+            "output": 30.0,
+            "as_of": "2026-01-01",
+            "source": "https://openai.com/api/pricing/"
+          }
+        },
+        "gpt-3.5-turbo": {
+          "name": "GPT-3.5 Turbo",
+          "capabilities": [
+            "text",
+            "chat"
+          ],
+          "context_window": 16385,
+          "status": "retired",
+          "replaced_by": "gpt-4o-mini",
+          "retire_after": null,
+          "pricing": {
+            "currency": "USD",
+            "input": 0.5,
+            "output": 1.5,
+            "as_of": "2026-01-01",
+            "source": "https://openai.com/api/pricing/"
+          }
+        }
+      },
+      "aliases": {
+        "gpt-3.5-turbo": "gpt-4o-mini",
+        "gpt-4-turbo": "gpt-4o"
+      }
+    },
+    "anthropic": {
+      "default_model": "claude-3-5-sonnet-20241022",
+      "models": {
+        "claude-3-5-sonnet-20241022": {
+          "name": "Claude 3.5 Sonnet",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 200000,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "USD",
+            "input": 3.0,
+            "output": 15.0,
+            "as_of": "2026-01-01",
+            "source": "https://www.anthropic.com/pricing"
+          }
+        },
+        "claude-3-5-haiku-20241022": {
+          "name": "Claude 3.5 Haiku",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 200000,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "USD",
+            "input": 0.25,
+            "output": 1.25,
+            "as_of": "2026-01-01",
+            "source": "https://www.anthropic.com/pricing"
+          }
+        },
+        "claude-3-opus-20240229": {
+          "name": "Claude 3 Opus",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 200000,
+          "status": "retired",
+          "replaced_by": "claude-3-5-sonnet-20241022",
+          "retire_after": null,
+          "pricing": {
+            "currency": "USD",
+            "input": 15.0,
+            "output": 75.0,
+            "as_of": "2026-01-01",
+            "source": "https://www.anthropic.com/pricing"
+          }
+        }
+      },
+      "aliases": {
+        "claude-3-opus": "claude-3-5-sonnet-20241022",
+        "claude-3-opus-20240229": "claude-3-5-sonnet-20241022"
+      }
+    },
+    "google": {
+      "default_model": "gemini-2.0-flash",
+      "models": {
+        "gemini-2.0-flash": {
+          "name": "Gemini 2.0 Flash",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json",
+            "vision"
+          ],
+          "context_window": 1000000,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "USD",
+            "input": 0.1,
+            "output": 0.4,
+            "as_of": "2026-01-01",
+            "source": "https://ai.google.dev/pricing"
+          }
+        },
+        "gemini-2.0-flash-exp": {
+          "name": "Gemini 2.0 Flash Exp",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json",
+            "vision"
+          ],
+          "context_window": 1000000,
+          "status": "retired",
+          "replaced_by": "gemini-2.0-flash",
+          "retire_after": null,
+          "pricing": null
+        },
+        "gemini-1.5-pro": {
+          "name": "Gemini 1.5 Pro",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json",
+            "vision"
+          ],
+          "context_window": 2000000,
+          "status": "deprecated",
+          "replaced_by": "gemini-2.0-flash",
+          "retire_after": null,
+          "pricing": {
+            "currency": "USD",
+            "input": 1.25,
+            "output": 5.0,
+            "as_of": "2026-01-01",
+            "source": "https://ai.google.dev/pricing"
+          }
+        },
+        "gemini-1.5-flash": {
+          "name": "Gemini 1.5 Flash",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json",
+            "vision"
+          ],
+          "context_window": 1000000,
+          "status": "deprecated",
+          "replaced_by": "gemini-2.0-flash",
+          "retire_after": null,
+          "pricing": {
+            "currency": "USD",
+            "input": 0.075,
+            "output": 0.3,
+            "as_of": "2026-01-01",
+            "source": "https://ai.google.dev/pricing"
+          }
+        }
+      },
+      "aliases": {
+        "gemini-2.0-flash-exp": "gemini-2.0-flash"
+      }
+    },
+    "deepseek": {
+      "default_model": "deepseek-chat",
+      "models": {
+        "deepseek-chat": {
+          "name": "DeepSeek Chat",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 64000,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 1.0,
+            "output": 2.0,
+            "as_of": "2026-01-01",
+            "source": "https://api-docs.deepseek.com/quick_start/pricing"
+          }
+        },
+        "deepseek-reasoner": {
+          "name": "DeepSeek Reasoner (R1)",
+          "capabilities": [
+            "text",
+            "chat",
+            "reasoning"
+          ],
+          "context_window": 64000,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 4.0,
+            "output": 16.0,
+            "as_of": "2026-01-01",
+            "source": "https://api-docs.deepseek.com/quick_start/pricing"
+          }
+        },
+        "deepseek-coder": {
+          "name": "DeepSeek Coder",
+          "capabilities": [
+            "text",
+            "chat"
+          ],
+          "context_window": 64000,
+          "status": "retired",
+          "replaced_by": "deepseek-chat",
+          "retire_after": null,
+          "pricing": null
+        }
+      },
+      "aliases": {
+        "deepseek-coder": "deepseek-chat"
+      }
+    },
+    "qwen": {
+      "default_model": "qwen-plus",
+      "models": {
+        "qwen-turbo": {
+          "name": "Qwen Turbo",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 131072,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 2.0,
+            "output": 6.0,
+            "as_of": "2026-01-01",
+            "source": "https://help.aliyun.com/zh/model-studio/billing-for-model-studio"
+          }
+        },
+        "qwen-plus": {
+          "name": "Qwen Plus",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 131072,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 4.0,
+            "output": 12.0,
+            "as_of": "2026-01-01",
+            "source": "https://help.aliyun.com/zh/model-studio/billing-for-model-studio"
+          }
+        },
+        "qwen-max": {
+          "name": "Qwen Max",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 32768,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 20.0,
+            "output": 60.0,
+            "as_of": "2026-01-01",
+            "source": "https://help.aliyun.com/zh/model-studio/billing-for-model-studio"
+          }
+        },
+        "qwen-max-latest": {
+          "name": "Qwen Max (Latest)",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 32768,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": null
+        },
+        "qwen-long": {
+          "name": "Qwen Long",
+          "capabilities": [
+            "text",
+            "chat"
+          ],
+          "context_window": 10000000,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": null
+        }
+      },
+      "aliases": {}
+    },
+    "zhipu": {
+      "default_model": "glm-4-flash",
+      "models": {
+        "glm-4": {
+          "name": "GLM-4",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 128000,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 100.0,
+            "output": 100.0,
+            "as_of": "2026-01-01",
+            "source": "https://open.bigmodel.cn/pricing"
+          }
+        },
+        "glm-4-flash": {
+          "name": "GLM-4 Flash",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 128000,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 1.0,
+            "output": 1.0,
+            "as_of": "2026-01-01",
+            "source": "https://open.bigmodel.cn/pricing"
+          }
+        },
+        "glm-4-plus": {
+          "name": "GLM-4 Plus",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 128000,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 50.0,
+            "output": 50.0,
+            "as_of": "2026-01-01",
+            "source": "https://open.bigmodel.cn/pricing"
+          }
+        },
+        "glm-4-air": {
+          "name": "GLM-4 Air",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 128000,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": null
+        },
+        "glm-4-long": {
+          "name": "GLM-4 Long",
+          "capabilities": [
+            "text",
+            "chat"
+          ],
+          "context_window": 1000000,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": null
+        }
+      },
+      "aliases": {}
+    },
+    "moonshot": {
+      "default_model": "moonshot-v1-8k",
+      "models": {
+        "moonshot-v1-8k": {
+          "name": "Moonshot v1 8K",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 8192,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 12.0,
+            "output": 12.0,
+            "as_of": "2026-01-01",
+            "source": "https://platform.moonshot.cn/docs/pricing"
+          }
+        },
+        "moonshot-v1-32k": {
+          "name": "Moonshot v1 32K",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 32768,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 24.0,
+            "output": 24.0,
+            "as_of": "2026-01-01",
+            "source": "https://platform.moonshot.cn/docs/pricing"
+          }
+        },
+        "moonshot-v1-128k": {
+          "name": "Moonshot v1 128K",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 131072,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 60.0,
+            "output": 60.0,
+            "as_of": "2026-01-01",
+            "source": "https://platform.moonshot.cn/docs/pricing"
+          }
+        }
+      },
+      "aliases": {}
+    },
+    "doubao": {
+      "default_model": "doubao-pro-32k",
+      "notes": "Volcengine Ark often expects an endpoint ID in the model field; users should prefer custom model ids.",
+      "models": {
+        "doubao-pro-4k": {
+          "name": "Doubao Pro 4K",
+          "capabilities": [
+            "text",
+            "chat"
+          ],
+          "context_window": 4096,
+          "status": "deprecated",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 0.8,
+            "output": 2.0,
+            "as_of": "2026-01-01",
+            "source": "https://www.volcengine.com/docs/82379"
+          }
+        },
+        "doubao-pro-32k": {
+          "name": "Doubao Pro 32K",
+          "capabilities": [
+            "text",
+            "chat"
+          ],
+          "context_window": 32768,
+          "status": "deprecated",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 0.8,
+            "output": 2.0,
+            "as_of": "2026-01-01",
+            "source": "https://www.volcengine.com/docs/82379"
+          }
+        },
+        "doubao-pro-128k": {
+          "name": "Doubao Pro 128K",
+          "capabilities": [
+            "text",
+            "chat"
+          ],
+          "context_window": 131072,
+          "status": "deprecated",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 5.0,
+            "output": 9.0,
+            "as_of": "2026-01-01",
+            "source": "https://www.volcengine.com/docs/82379"
+          }
+        },
+        "doubao-lite-4k": {
+          "name": "Doubao Lite 4K",
+          "capabilities": [
+            "text",
+            "chat"
+          ],
+          "context_window": 4096,
+          "status": "deprecated",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": null
+        },
+        "doubao-lite-32k": {
+          "name": "Doubao Lite 32K",
+          "capabilities": [
+            "text",
+            "chat"
+          ],
+          "context_window": 32768,
+          "status": "deprecated",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": null
+        }
+      },
+      "aliases": {}
+    },
+    "siliconflow": {
+      "default_model": "deepseek-ai/DeepSeek-V3",
+      "models": {
+        "deepseek-ai/DeepSeek-V3": {
+          "name": "DeepSeek V3",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 64000,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 1.0,
+            "output": 2.0,
+            "as_of": "2026-01-01",
+            "source": "https://siliconflow.cn/pricing"
+          }
+        },
+        "deepseek-ai/DeepSeek-R1": {
+          "name": "DeepSeek R1",
+          "capabilities": [
+            "text",
+            "chat",
+            "reasoning"
+          ],
+          "context_window": 64000,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": null
+        },
+        "Qwen/Qwen2.5-72B-Instruct": {
+          "name": "Qwen 2.5 72B",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 32768,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 4.0,
+            "output": 4.0,
+            "as_of": "2026-01-01",
+            "source": "https://siliconflow.cn/pricing"
+          }
+        },
+        "Qwen/Qwen2.5-32B-Instruct": {
+          "name": "Qwen 2.5 32B",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 32768,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": null
+        },
+        "Qwen/Qwen2.5-7B-Instruct": {
+          "name": "Qwen 2.5 7B",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 32768,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": null
+        },
+        "THUDM/glm-4-9b-chat": {
+          "name": "GLM-4 9B",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 128000,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": null
+        },
+        "meta-llama/Llama-3.3-70B-Instruct": {
+          "name": "Llama 3.3 70B",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 128000,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": null
+        }
+      },
+      "aliases": {}
+    },
+    "baidu": {
+      "default_model": "ernie-4.0-8k",
+      "models": {
+        "ernie-4.0-8k": {
+          "name": "ERNIE 4.0 8K",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 8192,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 30.0,
+            "output": 60.0,
+            "as_of": "2026-01-01",
+            "source": "https://cloud.baidu.com/doc/WENXINWORKSHOP/s/Wm3kh2rhm"
+          }
+        },
+        "ernie-3.5-8k": {
+          "name": "ERNIE 3.5 8K",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 8192,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 1.2,
+            "output": 1.2,
+            "as_of": "2026-01-01",
+            "source": "https://cloud.baidu.com/doc/WENXINWORKSHOP/s/Wm3kh2rhm"
+          }
+        },
+        "ernie-speed-8k": {
+          "name": "ERNIE Speed 8K",
+          "capabilities": [
+            "text",
+            "chat"
+          ],
+          "context_window": 8192,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": null
+        },
+        "ernie-lite-8k": {
+          "name": "ERNIE Lite 8K",
+          "capabilities": [
+            "text",
+            "chat"
+          ],
+          "context_window": 8192,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": null
+        },
+        "ernie-tiny-8k": {
+          "name": "ERNIE Tiny 8K",
+          "capabilities": [
+            "text",
+            "chat"
+          ],
+          "context_window": 8192,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": null
+        }
+      },
+      "aliases": {}
+    },
+    "minimax": {
+      "default_model": "abab6.5s-chat",
+      "models": {
+        "abab6.5s-chat": {
+          "name": "ABAB 6.5s Chat",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 245760,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 1.0,
+            "output": 1.0,
+            "as_of": "2026-01-01",
+            "source": "https://platform.minimaxi.com/document/Price"
+          }
+        },
+        "abab6.5-chat": {
+          "name": "ABAB 6.5 Chat",
+          "capabilities": [
+            "text",
+            "chat",
+            "tools",
+            "json"
+          ],
+          "context_window": 245760,
+          "status": "active",
+          "replaced_by": null,
+          "retire_after": null,
+          "pricing": {
+            "currency": "CNY",
+            "input": 30.0,
+            "output": 30.0,
+            "as_of": "2026-01-01",
+            "source": "https://platform.minimaxi.com/document/Price"
+          }
+        },
+        "abab5.5-chat": {
+          "name": "ABAB 5.5 Chat",
+          "capabilities": [
+            "text",
+            "chat"
+          ],
+          "context_window": 16384,
+          "status": "retired",
+          "replaced_by": "abab6.5s-chat",
+          "retire_after": null,
+          "pricing": null
+        },
+        "abab5.5s-chat": {
+          "name": "ABAB 5.5s Chat",
+          "capabilities": [
+            "text",
+            "chat"
+          ],
+          "context_window": 16384,
+          "status": "retired",
+          "replaced_by": "abab6.5s-chat",
+          "retire_after": null,
+          "pricing": null
+        }
+      },
+      "aliases": {
+        "abab5.5-chat": "abab6.5s-chat",
+        "abab5.5s-chat": "abab6.5s-chat"
+      }
+    }
+  }
+}

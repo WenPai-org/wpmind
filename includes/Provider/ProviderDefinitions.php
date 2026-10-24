@@ -3,9 +3,8 @@
  * 文本 Provider 的静态元数据
  *
  * 只放代码里固定的元数据（名称、图标、默认 Base URL），不放用户选择。
- * 当前推荐的模型列表在 PR2（wpmind-model-catalog）之前仍由
- * WPMind::get_default_endpoints() 提供；这里只保存「历史上发过的默认列表」，
- * 用来识别 0.12 及以前强制写进 option 的默认副本。
+ * 当前推荐模型由 Provider\Catalog\ModelCatalog（models.json）提供；
+ * 这里只保存「历史上发过的默认列表」，用来识别 0.12 及以前强制写进 option 的默认副本。
  *
  * @package WPMind
  * @since endpoint schema v2

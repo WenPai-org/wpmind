@@ -33,7 +33,7 @@ class MiniMaxProvider extends AbstractOpenAiCompatibleProvider {
 	/**
 	 * {@inheritDoc}
 	 */
-	protected static function providerId(): string {
+	public static function providerId(): string {
 		return 'minimax';
 	}
 

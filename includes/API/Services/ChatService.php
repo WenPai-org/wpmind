@@ -126,6 +126,9 @@ class ChatService extends AbstractService {
 				}
 			}
 
+			$resolution = \WPMind\Provider\Catalog\ModelCatalog::instance()->resolve( $try_provider, (string) $try_model );
+			$try_model  = $resolution->model;
+
 			for ( $attempt = 0; $attempt <= $max_retries; $attempt++ ) {
 				$result = $this->execute_chat_request( $args, $try_provider, $try_model );
 
@@ -257,8 +260,9 @@ class ChatService extends AbstractService {
 				: $original_model;
 
 			if ( $model === 'auto' || $model === 'default' ) {
-				$model = $endpoint['models'][0] ?? 'gpt-3.5-turbo';
+				$model = $this->get_current_model( $try_provider );
 			}
+			$model = \WPMind\Provider\Catalog\ModelCatalog::instance()->resolve( $try_provider, (string) $model )->model;
 
 			$base_url = $this->resolve_base_url( $try_provider );
 			$api_url  = trailingslashit( $base_url ) . 'chat/completions';
@@ -481,8 +485,9 @@ class ChatService extends AbstractService {
 		}
 
 		if ( $model === 'auto' || empty( $model ) || $model === 'default' ) {
-			$model = $endpoint['models'][0] ?? 'gpt-3.5-turbo';
+			$model = $this->get_current_model( $provider );
 		}
+		$model = \WPMind\Provider\Catalog\ModelCatalog::instance()->resolve( $provider, (string) $model )->model;
 
 		$request_body = [
 			'model'       => $model,
