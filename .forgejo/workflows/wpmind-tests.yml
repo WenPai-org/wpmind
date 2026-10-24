@@ -27,8 +27,22 @@ jobs:
 
       - name: 工具链与 PHP 最低版本
         run: |
+          # Host runner 上 /usr/bin/php 偶发切到 8.5（run 377 / 471），phpstan 会卡死无输出。
+          # 本 job 固定走 8.3，与日常绿跑一致。
+          SHIM="${RUNNER_TEMP:-/tmp}/wpmind-php-shim"
+          mkdir -p "$SHIM"
+          if [ -x /usr/bin/php8.3 ]; then
+            ln -sfn /usr/bin/php8.3 "$SHIM/php"
+          elif [ -x /www/server/php/83/bin/php ]; then
+            ln -sfn /www/server/php/83/bin/php "$SHIM/php"
+          fi
+          if [ -x "$SHIM/php" ]; then
+            echo "$SHIM" >> "$GITHUB_PATH"
+            export PATH="$SHIM:$PATH"
+          fi
           php -v | head -1
           php -r 'exit(version_compare(PHP_VERSION, "8.1", ">=") ? 0 : 1);'
+          php -r 'exit(version_compare(PHP_VERSION, "8.5", "<") ? 0 : 1);'             || { echo "PHP >= 8.5 在本 runner 上会挂死 phpstan，请改用 8.3"; exit 1; }
           composer --version
 
       - name: composer install（网络抖动重试 3 次）
