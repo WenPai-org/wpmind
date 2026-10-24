@@ -30,7 +30,7 @@ $wpmind_meta_limit = MetaBulkService::MAX_CANDIDATES;
 		echo esc_html(
 			sprintf(
 				/* translators: 1: alt max, 2: meta max */
-				__( '统一任务记录。Alt：dry-run → 审核 → 写入 → 撤销（最多 %1$d 张）。Meta：dry-run / 预览壳（最多 %2$d 篇；审核写入见后续）。', 'wpmind' ),
+				__( '统一任务记录。Alt：dry-run → 审核 → 写入 → 撤销（最多 %1$d 张）。Meta：dry-run → 审核 → 写入 → 撤销（最多 %2$d 篇）。', 'wpmind' ),
 				$wpmind_limit,
 				$wpmind_meta_limit
 			)
@@ -67,6 +67,18 @@ $wpmind_meta_limit = MetaBulkService::MAX_CANDIDATES;
 		<button type="button" id="wpmind-workflow-meta-dryrun" class="button" disabled>
 			<span class="dashicons ri-eye-line"></span>
 			<?php esc_html_e( '对当前 Meta 任务 Dry-run', 'wpmind' ); ?>
+		</button>
+		<button type="button" id="wpmind-workflow-meta-submit-review" class="button" disabled>
+			<span class="dashicons ri-send-plane-line"></span>
+			<?php esc_html_e( '提交 Meta 审核', 'wpmind' ); ?>
+		</button>
+		<button type="button" id="wpmind-workflow-meta-apply" class="button" disabled>
+			<span class="dashicons ri-save-line"></span>
+			<?php esc_html_e( '写入已通过 Meta 项', 'wpmind' ); ?>
+		</button>
+		<button type="button" id="wpmind-workflow-meta-undo" class="button" disabled>
+			<span class="dashicons ri-arrow-go-back-line"></span>
+			<?php esc_html_e( '撤销已写入 Meta', 'wpmind' ); ?>
 		</button>
 		<button type="button" id="wpmind-workflow-refresh" class="button">
 			<span class="dashicons ri-refresh-line"></span>

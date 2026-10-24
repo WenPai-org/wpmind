@@ -12,6 +12,7 @@
 
 ### 改进
 
+- Meta 工作流人工审核 / 写入 / 撤销：previewed 项可通过或拒绝，写入 excerpt/SEO/FAQ/标签，撤销恢复 before（空则清 meta）。
 - Meta 批量任务 dry-run / 预览壳：扫描缺 Meta 建 `meta_bulk` 任务，只写 proposed 快照，不改文章 excerpt/tags/SEO/FAQ。
 - Alt 工作流人工审核 / 写入 / 撤销：previewed 项可通过或拒绝，写入 `_wp_attachment_image_alt`，撤销恢复 before（空则删 meta）。
 - 统一任务记录（CPT `wpmind_task`）与 Alt 批量 dry-run 预览壳：筛选缺 Alt 建任务、Vision 只写 proposed、不改附件 meta；任务页可查看 before/proposed。

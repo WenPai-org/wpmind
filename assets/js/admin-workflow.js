@@ -70,6 +70,15 @@
 			$( '#wpmind-workflow-meta-dryrun' ).on( 'click', function() {
 				self.metaDryRunLoop();
 			} );
+			$( '#wpmind-workflow-meta-submit-review' ).on( 'click', function() {
+				self.metaSubmitReview();
+			} );
+			$( '#wpmind-workflow-meta-apply' ).on( 'click', function() {
+				self.metaApplyLoop();
+			} );
+			$( '#wpmind-workflow-meta-undo' ).on( 'click', function() {
+				self.metaUndoApplied();
+			} );
 			$( '#wpmind-workflow-alt-submit-review' ).on( 'click', function() {
 				self.submitReview();
 			} );
@@ -113,6 +122,9 @@
 			$( '#wpmind-workflow-alt-submit-review' ).prop( 'disabled', ! ( has && isAlt ) );
 			$( '#wpmind-workflow-alt-apply' ).prop( 'disabled', ! ( has && isAlt ) );
 			$( '#wpmind-workflow-alt-undo' ).prop( 'disabled', ! ( has && isAlt ) );
+			$( '#wpmind-workflow-meta-submit-review' ).prop( 'disabled', ! ( has && isMeta ) );
+			$( '#wpmind-workflow-meta-apply' ).prop( 'disabled', ! ( has && isMeta ) );
+			$( '#wpmind-workflow-meta-undo' ).prop( 'disabled', ! ( has && isMeta ) );
 			if ( ! task ) {
 				return;
 			}
@@ -128,6 +140,20 @@
 					! ( ( s.approved || 0 ) > 0 )
 				);
 				$( '#wpmind-workflow-alt-undo' ).prop(
+					'disabled',
+					! ( ( s.applied || 0 ) > 0 )
+				);
+			}
+			if ( isMeta ) {
+				$( '#wpmind-workflow-meta-submit-review' ).prop(
+					'disabled',
+					! ( status === 'dry_run' && ( s.previewed || 0 ) > 0 )
+				);
+				$( '#wpmind-workflow-meta-apply' ).prop(
+					'disabled',
+					! ( ( s.approved || 0 ) > 0 )
+				);
+				$( '#wpmind-workflow-meta-undo' ).prop(
 					'disabled',
 					! ( ( s.applied || 0 ) > 0 )
 				);
@@ -229,6 +255,91 @@
 			}
 			round();
 		},
+
+		metaSubmitReview: function() {
+			var self = this;
+			if ( ! self.currentTaskId ) {
+				return;
+			}
+			$( '#wpmind-workflow-status' ).text( i18n.submitting || '…' );
+			$.post( wpmindData.ajaxurl, {
+				action: 'wpmind_workflow_meta_submit_review',
+				nonce: wpmindData.nonce,
+				task_id: self.currentTaskId
+			} ).done( function( res ) {
+				if ( ! res.success ) {
+					Toast.error( ( res.data && res.data.message ) || 'error' );
+					return;
+				}
+				self.renderItems( res.data.task );
+				self.refreshList();
+				Toast.success( 'pending_review' );
+			} ).fail( function() {
+				Toast.error( 'network' );
+			} );
+		},
+
+		metaApplyLoop: function() {
+			var self = this;
+			if ( ! self.currentTaskId ) {
+				return;
+			}
+			var $btn = $( '#wpmind-workflow-meta-apply' );
+			$btn.prop( 'disabled', true );
+			$( '#wpmind-workflow-status' ).text( i18n.applying || '…' );
+
+			function round() {
+				$.post( wpmindData.ajaxurl, {
+					action: 'wpmind_workflow_meta_apply',
+					nonce: wpmindData.nonce,
+					task_id: self.currentTaskId
+				} ).done( function( res ) {
+					if ( ! res.success ) {
+						Toast.error( ( res.data && res.data.message ) || 'error' );
+						$btn.prop( 'disabled', false );
+						return;
+					}
+					self.renderItems( res.data.task );
+					self.refreshList();
+					if ( res.data.done ) {
+						Toast.success( i18n.applyDone || 'done' );
+						$( '#wpmind-workflow-status' ).text( i18n.applyDone || 'done' );
+						self.setActionButtons( res.data.task );
+					} else {
+						round();
+					}
+				} ).fail( function() {
+					Toast.error( 'network' );
+					$btn.prop( 'disabled', false );
+				} );
+			}
+			round();
+		},
+
+		metaUndoApplied: function() {
+			var self = this;
+			if ( ! self.currentTaskId ) {
+				return;
+			}
+			$( '#wpmind-workflow-status' ).text( i18n.undoing || '…' );
+			$.post( wpmindData.ajaxurl, {
+				action: 'wpmind_workflow_meta_undo',
+				nonce: wpmindData.nonce,
+				task_id: self.currentTaskId
+			} ).done( function( res ) {
+				if ( ! res.success ) {
+					Toast.error( ( res.data && res.data.message ) || 'error' );
+					return;
+				}
+				Toast.success( i18n.undoDone || 'done' );
+				$( '#wpmind-workflow-status' ).text( i18n.undoDone || 'done' );
+				self.renderItems( res.data.task );
+				self.refreshList();
+			} ).fail( function() {
+				Toast.error( 'network' );
+			} );
+		},
+
 		dryRunLoop: function() {
 			var self = this;
 			if ( ! self.currentTaskId ) {
@@ -296,9 +407,11 @@
 			if ( ! self.currentTaskId || ! objectId ) {
 				return;
 			}
+			var type = ( self.currentTask && self.currentTask.type ) || '';
+			var action = type === 'meta_bulk' ? 'wpmind_workflow_meta_review' : 'wpmind_workflow_alt_review';
 			$( '#wpmind-workflow-status' ).text( i18n.reviewing || '…' );
 			$.post( wpmindData.ajaxurl, {
-				action: 'wpmind_workflow_alt_review',
+				action: action,
 				nonce: wpmindData.nonce,
 				task_id: self.currentTaskId,
 				decisions: JSON.stringify( [ { object_id: objectId, decision: decision } ] )
@@ -437,7 +550,7 @@
 			( task.items || [] ).forEach( function( it ) {
 				var st = it.item_status || '';
 				var actions = '';
-				if ( taskType === 'alt_bulk' && ( st === 'previewed' || st === 'approved' ) ) {
+				if ( ( taskType === 'alt_bulk' || taskType === 'meta_bulk' ) && ( st === 'previewed' || st === 'approved' ) ) {
 					actions =
 						'<button type="button" class="button button-small wpmind-workflow-approve" data-object-id="' + it.object_id + '">通过</button> ' +
 						'<button type="button" class="button button-small wpmind-workflow-reject" data-object-id="' + it.object_id + '">拒绝</button>';
