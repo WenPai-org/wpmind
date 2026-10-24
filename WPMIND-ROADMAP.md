@@ -61,8 +61,8 @@ WPMind 是面向中国使用环境的 WordPress AI Provider Bridge：
 - [x] WordPress AI Client SDK 兼容矩阵（#43，main `2a62b6c`；含 compat-matrix / Site Health）
 - [x] Provider 健康检查和明确的顺序回退（#45，main `f7f508e`）
 - [x] API Key 安全轮换（#47，main `6977ece`）
-- [ ] 旧端点配置导入
-- [ ] 错误诊断
+- [x] 旧端点配置导入（#50，main `72e3401`；无密钥迁移）
+- [x] 错误诊断（#50，main `72e3401`；ErrorCatalog / 诊断包脱敏 / Site Health）
 
 ### 0.14 可见工作流
 
