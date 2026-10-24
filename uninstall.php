@@ -119,6 +119,8 @@ function wpmind_cleanup_site_data(): void {
 	$transients = [
 		'wpmind_budget_alerts_sent',
 		'wpmind_provider_health',
+		'wpmind_failover_order',
+		'wpmind_health_check_enabled',
 		'wpmind_budget_notices',
 		'wpmind_round_robin_index',
 		'wpmind_daily_stats_lock',
@@ -136,10 +138,17 @@ function wpmind_cleanup_site_data(): void {
 		$wpdb->prepare(
 			"DELETE FROM {$wpdb->options}
              WHERE option_name LIKE %s
+                OR option_name LIKE %s
+                OR option_name LIKE %s
                 OR option_name LIKE %s",
 			'_transient_wpmind_cb_%',
-			'_transient_timeout_wpmind_cb_%'
+			'_transient_timeout_wpmind_cb_%',
+			'_transient_wpmind_provider_health_%',
+			'_transient_timeout_wpmind_provider_health_%'
 		)
+	);
+	$wpdb->query(
+		"DELETE FROM {$wpdb->options} WHERE option_name LIKE 'wpmind_cb_probe_%' OR option_name LIKE 'wpmind_cb_wlock_%'"
 	);
 
 	// 删除 Exact Cache transient 缓存条目

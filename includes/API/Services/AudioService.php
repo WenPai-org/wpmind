@@ -173,6 +173,7 @@ class AudioService extends AbstractService {
 							'Content-Type'  => 'multipart/form-data; boundary=' . $boundary,
 						],
 						'body'    => $body,
+						'_wpmind_skip_tracking' => true,
 						'timeout' => 120,
 					]
 				);
@@ -275,6 +276,7 @@ class AudioService extends AbstractService {
 								'response_format' => $options['format'],
 							]
 						),
+						'_wpmind_skip_tracking' => true,
 						'timeout' => 60,
 					]
 				);

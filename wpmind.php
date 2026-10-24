@@ -724,13 +724,24 @@ function maybe_run_migrations_admin(): void {
 add_action( 'admin_init', __NAMESPACE__ . '\\maybe_run_migrations_admin' );
 
 /**
+ * Register provider health-check cron (disabled by default).
+ *
+ * @since 0.13.0
+ */
+function register_provider_health_cron(): void {
+	\WPMind\Provider\Health\HealthChecker::register_cron();
+}
+
+/**
  * Register AI Client environment Site Health checks (no keys).
  */
 function register_ai_client_site_health(): void {
 	Provider\Compat\SiteHealth::register();
 }
-add_action( 'plugins_loaded', __NAMESPACE__ . '\\register_ai_client_site_health', 30 );
-
+add_action( 'plugins_loaded', __NAMESPACE__ . '\register_ai_client_site_health', 30 );
+add_action( 'plugins_loaded', __NAMESPACE__ . '\register_provider_health_cron', 31 );
+// phpcs:ignore WordPress.WP.CronInterval.ChangeDetected -- interval defined in HealthChecker::cron_schedules.
+add_filter( 'cron_schedules', array( '\WPMind\Provider\Health\HealthChecker', 'cron_schedules' ) );
 
 /**
  * 插件停用钩子

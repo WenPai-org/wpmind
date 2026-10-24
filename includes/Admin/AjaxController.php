@@ -12,6 +12,7 @@ namespace WPMind\Admin;
 
 use WPMind\Provider\EndpointRepository;
 use WPMind\Provider\Secrets;
+use WPMind\Provider\Health\HealthChecker;
 use WPMind\WPMind;
 use WPMind\Core\ModuleLoader;
 use WPMind\ErrorHandler;
@@ -78,10 +79,8 @@ final class AjaxController {
 	 * @since 1.4.0
 	 */
 	public function ajax_test_connection(): void {
-		// 验证 nonce
 		check_ajax_referer( 'wpmind_ajax', 'nonce' );
 
-		// 验证权限
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
 		}
@@ -89,6 +88,7 @@ final class AjaxController {
 		$provider   = sanitize_text_field( wp_unslash( $_POST['provider'] ?? '' ) );
 		$posted_key = sanitize_text_field( wp_unslash( $_POST['api_key'] ?? '' ) );
 		$custom_url = trim( (string) wp_unslash( $_POST['custom_url'] ?? '' ) );
+		$deep       = ! empty( $_POST['deep'] ) && ( '1' === (string) $_POST['deep'] || 'true' === (string) $_POST['deep'] );
 
 		if ( empty( $provider ) ) {
 			wp_send_json_error( [ 'message' => __( '缺少服务标识', 'wpmind' ) ] );
@@ -100,90 +100,32 @@ final class AjaxController {
 			wp_send_json_error( [ 'message' => $target->get_error_message() ] );
 		}
 
-		$api_key  = $target['api_key'];
-		$base_url = $target['base_url'];
+		$checker = new HealthChecker();
+		$result  = $checker->probe(
+			$provider,
+			$deep,
+			[
+				'api_key'  => $target['api_key'],
+				'base_url' => $target['base_url'],
+			]
+		);
 
-		// 测试连接（带重试）
-		$test_url         = trailingslashit( $base_url ) . 'models';
-		$max_retries      = 2;
-		$last_status_code = 0;
-		$start_time       = microtime( true );
-		$response         = null;
-
-		for ( $attempt = 1; $attempt <= $max_retries; $attempt++ ) {
-			$response = wp_remote_get(
-				$test_url,
+		if ( $result['ok'] ) {
+			wp_send_json_success(
 				[
-					'headers'               => [
-						'Authorization' => 'Bearer ' . $api_key,
-						'Content-Type'  => 'application/json',
-					],
-					'timeout'               => 15,
-					'_wpmind_skip_tracking' => true, // 标记：跳过 http_api_debug 追踪，避免双重计数
+					'message' => $result['message'],
+					'latency' => $result['latency_ms'],
+					'deep'    => $result['deep'],
 				]
 			);
-
-			if ( is_wp_error( $response ) ) {
-				// 检查是否应该重试
-				if ( $attempt < $max_retries ) {
-					usleep( ErrorHandler::get_retry_delay( $attempt ) * 1000 );
-					continue;
-				}
-
-				// 记录失败到健康追踪
-				$latency_ms = (int) ( ( microtime( true ) - $start_time ) * 1000 );
-				FailoverManager::instance()->record_result( $provider, false, $latency_ms );
-
-				// 使用 ErrorHandler 获取友好的错误消息
-				wp_send_json_error(
-					[
-						'message' => ErrorHandler::get_wp_error_message( $response, $provider ),
-						'details' => Secrets::redact( $response->get_error_message(), [ $api_key ] ),
-						'retried' => $attempt > 1,
-					]
-				);
-			}
-
-			$last_status_code = wp_remote_retrieve_response_code( $response );
-			$latency_ms       = (int) ( ( microtime( true ) - $start_time ) * 1000 );
-
-			// 成功
-			if ( $last_status_code === 200 ) {
-				// 记录成功到健康追踪
-				FailoverManager::instance()->record_result( $provider, true, $latency_ms );
-
-				wp_send_json_success(
-					[
-						'message' => __( '连接成功', 'wpmind' ),
-						'retried' => $attempt > 1,
-						'latency' => $latency_ms,
-					]
-				);
-			}
-
-			// 不可重试的错误
-			if ( ! ErrorHandler::should_retry( $last_status_code ) ) {
-				break;
-			}
-
-			// 可重试的错误，等待后重试
-			if ( $attempt < $max_retries ) {
-				usleep( ErrorHandler::get_retry_delay( $attempt ) * 1000 );
-			}
 		}
-
-		// 记录失败到健康追踪
-		$latency_ms = (int) ( ( microtime( true ) - $start_time ) * 1000 );
-		FailoverManager::instance()->record_result( $provider, false, $latency_ms );
-
-		// 获取响应体以提取更详细的错误信息
-		$response_body = $response ? wp_remote_retrieve_body( $response ) : '';
 
 		wp_send_json_error(
 			[
-				'message' => ErrorHandler::get_error_message( $last_status_code, $provider, $response_body ),
-				'code'    => $last_status_code,
-				'retried' => $max_retries > 1,
+				'message'     => Secrets::redact( $result['message'], [ $target['api_key'] ] ),
+				'error_class' => $result['error_class'],
+				'deep'        => $result['deep'],
+				'latency'     => $result['latency_ms'],
 			]
 		);
 	}

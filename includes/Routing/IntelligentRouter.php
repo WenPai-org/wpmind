@@ -299,6 +299,10 @@ class IntelligentRouter {
 	 * @return array<string> Provider ID 列表，按优先级排序
 	 */
 	public function get_manual_priority(): array {
+		$order = get_option( 'wpmind_failover_order', null );
+		if ( is_array( $order ) && [] !== $order ) {
+			return array_values( array_filter( $order, 'is_string' ) );
+		}
 		$settings = get_option( 'wpmind_routing_settings', [] );
 		return $settings['provider_priority'] ?? [];
 	}
@@ -312,10 +316,13 @@ class IntelligentRouter {
 	public function set_manual_priority( array $priority ): bool {
 		// 验证所有 Provider ID 都有效
 		$valid_providers = array_keys( $this->providers );
-		$priority        = array_filter( $priority, fn( $id ) => in_array( $id, $valid_providers, true ) );
+		$priority        = array_values( array_filter( $priority, fn( $id ) => in_array( $id, $valid_providers, true ) ) );
+
+		// 0.13：明确顺序写入 wpmind_failover_order；同时回写 routing_settings 以便降级。
+		update_option( 'wpmind_failover_order', $priority, false );
 
 		$settings                      = get_option( 'wpmind_routing_settings', [] );
-		$settings['provider_priority'] = array_values( $priority );
+		$settings['provider_priority'] = $priority;
 
 		return update_option( 'wpmind_routing_settings', $settings );
 	}
@@ -326,6 +333,7 @@ class IntelligentRouter {
 	 * @return bool 是否清除成功
 	 */
 	public function clear_manual_priority(): bool {
+		delete_option( 'wpmind_failover_order' );
 		$settings = get_option( 'wpmind_routing_settings', [] );
 		unset( $settings['provider_priority'] );
 

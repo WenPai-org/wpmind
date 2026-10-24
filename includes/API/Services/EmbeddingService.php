@@ -86,6 +86,7 @@ class EmbeddingService extends AbstractService {
 								'input' => $input_texts,
 							]
 						),
+						'_wpmind_skip_tracking' => true,
 						'timeout' => 60,
 					]
 				);
