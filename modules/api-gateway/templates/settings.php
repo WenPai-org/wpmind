@@ -59,6 +59,15 @@ $wpmind_num = static function ( string $id, $value, int $min, int $max, string $
 };
 ?>
 
+<div class="wenpai-subnav">
+	<div class="seg wpmind-module-subtabs">
+		<button type="button" class="wpmind-module-subtab active" data-tab="settings"><?php esc_html_e( '基础设置', 'wpmind' ); ?></button>
+		<button type="button" class="wpmind-module-subtab" data-tab="keys"><?php esc_html_e( 'API Key 管理', 'wpmind' ); ?></button>
+		<button type="button" class="wpmind-module-subtab" data-tab="docs"><?php esc_html_e( '接入文档', 'wpmind' ); ?></button>
+		<button type="button" class="wpmind-module-subtab" data-tab="logs"><?php esc_html_e( '请求日志', 'wpmind' ); ?></button>
+	</div>
+</div>
+
 <section class="card">
 	<div class="wpmind-statbar">
 	<div class="wpmind-statbar-item">
@@ -92,14 +101,6 @@ $wpmind_num = static function ( string $id, $value, int $min, int $max, string $
 </div>
 </section>
 
-<div class="wenpai-subnav">
-	<div class="seg wpmind-module-subtabs">
-		<button type="button" class="wpmind-module-subtab active" data-tab="settings"><?php esc_html_e( '基础设置', 'wpmind' ); ?></button>
-		<button type="button" class="wpmind-module-subtab" data-tab="keys"><?php esc_html_e( 'API Key 管理', 'wpmind' ); ?></button>
-		<button type="button" class="wpmind-module-subtab" data-tab="docs"><?php esc_html_e( '接入文档', 'wpmind' ); ?></button>
-		<button type="button" class="wpmind-module-subtab" data-tab="logs"><?php esc_html_e( '请求日志', 'wpmind' ); ?></button>
-	</div>
-</div>
 
 <div class="wenpai-stack">
 

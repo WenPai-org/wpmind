@@ -595,6 +595,7 @@ details.wpmind-fold[open] .wpmind-fold-chevron { transform: rotate(180deg); }
   display: flex; align-items: center; gap: var(--wenpai-space-3); flex-wrap: wrap;
   margin: 0 0 var(--wenpai-space-4); padding-right: 24px;
 }
+.wenpai-stack > .wpmind-route-bar { margin-bottom: 0; }
 .wpmind-route-bar-label { font-weight: var(--wenpai-weight-medium); font-size: var(--wenpai-text-sm); color: var(--wenpai-ink); white-space: nowrap; }
 .wpmind-route-bar-label { margin-left: auto; }
 .wpmind-route-bar .meta { margin: 0; }

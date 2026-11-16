@@ -47,7 +47,14 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 
 <div class="wpmind-auto-meta-panel">
 
-		<section class="card">
+	<div class="wenpai-subnav">
+		<div class="seg wpmind-module-subtabs">
+			<button type="button" class="wpmind-module-subtab active" data-tab="am-settings"><?php esc_html_e( '功能开关', 'wpmind' ); ?></button>
+			<button type="button" class="wpmind-module-subtab" data-tab="am-manual"><?php esc_html_e( '手动生成', 'wpmind' ); ?></button>
+		</div>
+	</div>
+
+			<section class="card">
 		<div class="wpmind-statbar">
 		<div class="wpmind-statbar-item">
 			<?php echo AdminIcons::svg( 'doc', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -66,14 +73,8 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 		</div>
 	</section>
 
-	<div class="wenpai-subnav">
-		<div class="seg wpmind-module-subtabs">
-			<button type="button" class="wpmind-module-subtab active" data-tab="am-settings"><?php esc_html_e( '功能开关', 'wpmind' ); ?></button>
-			<button type="button" class="wpmind-module-subtab" data-tab="am-manual"><?php esc_html_e( '手动生成', 'wpmind' ); ?></button>
-		</div>
-	</div>
 
-	<div class="wenpai-stack">
+<div class="wenpai-stack">
 
 		<div class="wpmind-module-tab-panel active" data-panel="am-settings">
 			<section class="card">

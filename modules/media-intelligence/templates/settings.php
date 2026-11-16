@@ -42,7 +42,15 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 
 <div class="wpmind-media-panel">
 
-		<section class="card">
+	<div class="wenpai-subnav">
+		<div class="seg wpmind-module-subtabs">
+			<button type="button" class="wpmind-module-subtab active" data-tab="settings"><?php esc_html_e( '基本设置', 'wpmind' ); ?></button>
+			<button type="button" class="wpmind-module-subtab" data-tab="batch"><?php esc_html_e( '批量处理', 'wpmind' ); ?></button>
+			<button type="button" class="wpmind-module-subtab" data-tab="safety"><?php esc_html_e( '内容安全', 'wpmind' ); ?></button>
+		</div>
+	</div>
+
+			<section class="card">
 		<div class="wpmind-statbar">
 		<div class="wpmind-statbar-item">
 			<?php echo AdminIcons::svg( 'image', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -68,15 +76,8 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 		</div>
 	</section>
 
-	<div class="wenpai-subnav">
-		<div class="seg wpmind-module-subtabs">
-			<button type="button" class="wpmind-module-subtab active" data-tab="settings"><?php esc_html_e( '基本设置', 'wpmind' ); ?></button>
-			<button type="button" class="wpmind-module-subtab" data-tab="batch"><?php esc_html_e( '批量处理', 'wpmind' ); ?></button>
-			<button type="button" class="wpmind-module-subtab" data-tab="safety"><?php esc_html_e( '内容安全', 'wpmind' ); ?></button>
-		</div>
-	</div>
 
-	<div class="wenpai-stack">
+<div class="wenpai-stack">
 
 		<div class="wpmind-module-tab-panel active" data-panel="settings">
 			<section class="card">
