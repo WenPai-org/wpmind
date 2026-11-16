@@ -29,14 +29,15 @@
 			var $button = $( this );
 			var targetId = $button.data( 'target' );
 			var $target = $( '#' + targetId );
-			var $icon = $button.find( '.dashicons' );
 
 			if ( 'password' === $target.attr( 'type' ) ) {
 				$target.attr( 'type', 'text' );
-				$icon.removeClass( 'ri-eye-line' ).addClass( 'ri-eye-off-line' );
+				$button.find( '.wpmind-eye-on' ).prop( 'hidden', true );
+				$button.find( '.wpmind-eye-off' ).prop( 'hidden', false );
 			} else {
 				$target.attr( 'type', 'password' );
-				$icon.removeClass( 'ri-eye-off-line' ).addClass( 'ri-eye-line' );
+				$button.find( '.wpmind-eye-on' ).prop( 'hidden', false );
+				$button.find( '.wpmind-eye-off' ).prop( 'hidden', true );
 			}
 		} );
 	}
@@ -103,7 +104,7 @@
 
 			// 设置加载状态
 			$button.addClass( 'is-testing' ).prop( 'disabled', true );
-			$button.html( '<span class="dashicons ri-loader-4-line wpmind-spinning"></span> 测试中' );
+			$button.text( '测试中…' );
 			$result.text( '' ).removeClass( 'success error warning' ).removeAttr( 'title' );
 
 			if ( 'undefined' === typeof wpmindData ) {
@@ -136,17 +137,14 @@
 								extra += ' ' + response.data.latency + 'ms';
 							}
 						}
-						$result.html( '<span class="dashicons ri-checkbox-circle-line"></span> ' + message + extra ).addClass( 'success' );
+						$result.text( message + extra ).addClass( 'success' );
 						Toast.success( provider.toUpperCase() + ' ' + message );
 					} else {
 						var errorMsg = ( response.data && response.data.message ) || '连接失败';
 						var errorCode = ( response.data && response.data.code ) ? ' [' + escapeHtml( String( response.data.code ) ) + ']' : '';
 						var retryInfo = ( response.data && response.data.retried ) ? ' (已重试)' : '';
 
-						$result.html(
-							'<span class="dashicons ri-close-circle-line"></span> ' +
-							escapeHtml( errorMsg ) + errorCode + retryInfo
-						).addClass( 'error' );
+						$result.text( errorMsg + ' ' + errorCode + retryInfo ).addClass( 'error' );
 
 						// 显示详细信息提示
 						if ( response.data && response.data.details ) {
@@ -164,7 +162,7 @@
 					} else if ( 'error' === status ) {
 						message = '网络错误，请检查连接';
 					}
-					$result.html( '<span class="dashicons ri-close-circle-line"></span> ' + message ).addClass( 'error' );
+					$result.text( message ).addClass( 'error' );
 					Toast.error( provider.toUpperCase() + ': ' + message );
 				},
 				complete: function() {
@@ -193,7 +191,7 @@
 
 			// 设置加载状态
 			$button.addClass( 'is-testing' ).prop( 'disabled', true );
-			$button.html( '<span class="dashicons ri-loader-4-line wpmind-spinning"></span> 测试中' );
+			$button.text( '测试中…' );
 			$result.text( '' ).removeClass( 'success error' );
 
 			if ( 'undefined' === typeof wpmindData ) {
@@ -213,18 +211,18 @@
 				timeout: 45000,
 				success: function( response ) {
 					if ( response.success ) {
-						$result.html( '<span class="dashicons ri-checkbox-circle-line"></span> 连接成功' ).addClass( 'success' );
+						$result.text( '连接成功' ).addClass( 'success' );
 						Toast.success( provider + ' 连接成功' );
 					} else {
 						var errorMsg = ( response.data && response.data.message ) || '连接失败';
 						var errorCode = ( response.data && response.data.code ) ? ' [' + response.data.code + ']' : '';
-						$result.html( '<span class="dashicons ri-close-circle-line"></span> ' + escapeHtml( errorMsg ) + errorCode ).addClass( 'error' );
+						$result.text( errorMsg + ' ' + errorCode ).addClass( 'error' );
 						Toast.error( provider + ': ' + errorMsg );
 					}
 				},
 				error: function( xhr, status ) {
 					var message = 'timeout' === status ? '请求超时，请检查网络连接' : '网络错误，请检查连接';
-					$result.html( '<span class="dashicons ri-close-circle-line"></span> ' + message ).addClass( 'error' );
+					$result.text( message ).addClass( 'error' );
 					Toast.error( provider + ': ' + message );
 				},
 				complete: function() {
@@ -243,16 +241,16 @@
 	 * Update card status when checkbox changes
 	 */
 	function initStatusUpdate() {
-		$( '.wpmind-endpoint-card input[type="checkbox"]' ).not( '.wpmind-clear-checkbox' ).on( 'change', function() {
+		$( '.wpmind-endpoint-card input[type="checkbox"]' ).not( '.wpmind-clear-checkbox' ).not( '.wpmind-deep-test' ).on( 'change', function() {
 			var $card = $( this ).closest( '.wpmind-endpoint-card' );
-			var $header = $card.find( '.wpmind-endpoint-header' );
-			var $status = $header.find( '.wpmind-status' ).not( '.wpmind-status-official' );
+			var $side = $card.find( '.wpmind-provider-side' );
+			var $status = $side.find( '.pill.wpmind-pill-enabled' );
 			var $apiKey = $card.find( 'input[type="password"], input[type="text"]' ).filter( '[id^="api_key_"]' );
-			var hasKey = $apiKey.attr( 'placeholder' ) && $apiKey.attr( 'placeholder' ).length > 0;
+			var hasKey = $apiKey.attr( 'placeholder' ) && $apiKey.attr( 'placeholder' ).indexOf( '•' ) !== -1;
 
 			if ( this.checked && ( hasKey || $apiKey.val() ) ) {
 				if ( ! $status.length ) {
-					$header.append( '<span class="wpmind-status wpmind-status-active">已启用</span>' );
+					$side.prepend( '<span class="pill ok wpmind-pill-enabled">已启用</span>' );
 				}
 			} else {
 				$status.remove();
@@ -286,7 +284,7 @@
 			var hasEnabledWithoutKey = false;
 			var $problemCard = null;
 
-			$( '.wpmind-endpoint-card' ).each( function() {
+			$( '#wpmind-settings-form .wpmind-endpoint-card' ).each( function() {
 				var $card = $( this );
 				var $checkbox = $card.find( 'input[type="checkbox"]' ).not( '.wpmind-clear-checkbox' );
 				var $apiKey = $card.find( 'input[type="password"], input[type="text"]' ).filter( '[id^="api_key_"]' );
@@ -319,29 +317,6 @@
 	}
 
 	/**
-	 * 折叠/展开高级设置
-	 */
-	function initAdvancedToggle() {
-		$( '.wpmind-toggle-advanced' ).on( 'click', function( e ) {
-			e.preventDefault();
-
-			var $button = $( this );
-			var $card = $button.closest( '.wpmind-endpoint-card' );
-			var $advanced = $card.find( '.wpmind-advanced-settings' );
-			var $icon = $button.find( '.dashicons' );
-
-			if ( $advanced.is( ':visible' ) ) {
-				$advanced.slideUp( 200 );
-				$icon.removeClass( 'ri-arrow-up-s-line' ).addClass( 'ri-arrow-down-s-line' );
-			} else {
-				$advanced.slideDown( 200 );
-				$icon.removeClass( 'ri-arrow-down-s-line' ).addClass( 'ri-arrow-up-s-line' );
-			}
-		} );
-	}
-
-
-	/**
 	 * 验证并替换 API Key
 	 */
 	function initRotateKey() {
@@ -365,7 +340,7 @@
 
 			$button.addClass( 'is-testing' ).prop( 'disabled', true );
 			$button.data( 'orig-text', $button.text() );
-			$button.html( '<span class="dashicons ri-loader-4-line wpmind-spinning"></span> 验证中' );
+			$button.text( '验证中…' );
 			$result.text( '' ).removeClass( 'success error warning' ).removeAttr( 'title' );
 
 			if ( 'undefined' === typeof wpmindData ) {
@@ -392,7 +367,7 @@
 						if ( response.data && response.data.latency ) {
 							extra += ' ' + response.data.latency + 'ms';
 						}
-						$result.html( '<span class="dashicons ri-checkbox-circle-line"></span> ' + escapeHtml( message ) + extra ).addClass( 'success' );
+						$result.text( message + extra ).addClass( 'success' );
 						Toast.success( provider.toUpperCase() + ' ' + message );
 						$apiKeyInput.val( '' );
 						var fp = response.data && response.data.fingerprint ? String( response.data.fingerprint ) : '';
@@ -421,9 +396,7 @@
 						}
 					} else {
 						var errorMsg = ( response.data && response.data.message ) || '替换失败';
-						$result.html(
-							'<span class="dashicons ri-close-circle-line"></span> ' + escapeHtml( errorMsg )
-						).addClass( 'error' );
+						$result.text( errorMsg ).addClass( 'error' );
 						Toast.error( provider.toUpperCase() + ': ' + errorMsg );
 					}
 				},
@@ -432,7 +405,7 @@
 					if ( 'timeout' === status ) {
 						message = '请求超时，请检查网络连接';
 					}
-					$result.html( '<span class="dashicons ri-close-circle-line"></span> ' + message ).addClass( 'error' );
+					$result.text( message ).addClass( 'error' );
 					Toast.error( provider.toUpperCase() + ': ' + message );
 				},
 				complete: function() {
@@ -620,6 +593,5 @@
 		safeInit( 'endpoints:status-update', initStatusUpdate );
 		safeInit( 'endpoints:clear-key', initClearKeyHandler );
 		safeInit( 'endpoints:form-validation', initFormValidation );
-		safeInit( 'endpoints:advanced-toggle', initAdvancedToggle );
 	} );
 } )( jQuery );

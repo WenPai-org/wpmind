@@ -95,6 +95,30 @@
 	}
 
 	/**
+	 * AI 服务页简单/高级模式：切换 .wenpai-app.mode-advanced，localStorage 记忆。
+	 */
+	function initModeSwitch() {
+		var $seg = $( '.wpmind-mode' );
+		if ( ! $seg.length ) {
+			return;
+		}
+		var $app = $( '.wenpai-app' );
+		var apply = function( mode ) {
+			$app.toggleClass( 'mode-advanced', 'advanced' === mode );
+			$seg.find( 'a' ).removeClass( 'on' ).filter( '[data-mode="' + mode + '"]' ).addClass( 'on' );
+		};
+		var saved = null;
+		try { saved = window.localStorage.getItem( 'wpmind_admin_mode' ); } catch ( e ) {}
+		apply( 'advanced' === saved ? 'advanced' : 'simple' );
+		$seg.on( 'click', 'a', function( e ) {
+			e.preventDefault();
+			var mode = $( this ).attr( 'data-mode' );
+			apply( mode );
+			try { window.localStorage.setItem( 'wpmind_admin_mode', mode ); } catch ( err ) {}
+		} );
+	}
+
+	/**
 	 * Initialize on document ready
 	 */
 	$( function() {
@@ -105,6 +129,7 @@
 		}
 
 		Admin.safeInit( 'tabs', initTabs );
+		Admin.safeInit( 'mode-switch', initModeSwitch );
 
 		// 图表懒加载：只在数据分析 Tab 激活时初始化
 		if ( $( '#analytics' ).hasClass( 'wpmind-tab-pane-active' ) ) {

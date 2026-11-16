@@ -385,6 +385,8 @@ details.wpmind-fold[open] .wpmind-fold-chevron { transform: rotate(180deg); }
 .wpmind-statbar-item + .wpmind-statbar-item { border-inline-start: 1px solid var(--wenpai-line-card); }
 .wpmind-statbar-ico {
   flex: none;
+  width: 22px;
+  height: 22px;
   align-self: flex-start;
   margin-top: 2px;
   font-size: 22px;
@@ -632,3 +634,117 @@ body.wenpai-ui-page .wenpai-app .wpmind-provider-body .wpmind-field--center .fie
 
 /* 工具页版本信息表：键列 */
 .wpmind-k { color: var(--wenpai-ink-3); width: 9em; }
+
+/* ---- 概览：卡头 / 分栏 / Provider 健康 / 活动流 logo ---- */
+.wpmind-card-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--wenpai-line-soft);
+  margin-bottom: 4px;
+}
+.wpmind-card-head-ico {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: var(--wenpai-radius-lg);
+  background: var(--wenpai-accent-soft, var(--wenpai-mute-soft));
+  color: var(--wenpai-accent);
+  display: grid;
+  place-items: center;
+}
+.wpmind-card-head-ico .wenpai-ico { width: 18px; height: 18px; }
+.wpmind-card-head-text { flex: 1 1 auto; min-width: 0; }
+.wpmind-card-head-text .meta { margin-top: 2px; }
+.wpmind-card-head > .btn { flex: none; }
+
+.wpmind-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0;
+  margin-top: 8px;
+}
+.wpmind-col { padding: 12px 24px 8px 0; min-width: 0; }
+.wpmind-col-right {
+  padding: 12px 0 8px 24px;
+  border-inline-start: 1px solid var(--wenpai-line-soft);
+}
+.wpmind-col-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--wenpai-text-meta);
+  font-weight: var(--wenpai-weight-regular);
+  color: var(--wenpai-ink-2);
+  margin-bottom: 8px;
+}
+.wpmind-col-title .wenpai-ico { width: 14px; height: 14px; color: var(--wenpai-ink-3); }
+.wpmind-col-more {
+  margin-inline-start: auto;
+  font-size: var(--wenpai-text-meta);
+  color: var(--wenpai-accent);
+  text-decoration: none;
+}
+.wpmind-col-more:hover { text-decoration: underline; }
+@media (max-width: 900px) {
+  .wpmind-split { grid-template-columns: 1fr; }
+  .wpmind-col { padding: 12px 0 8px; }
+  .wpmind-col-right { padding: 12px 0 8px; border-inline-start: 0; border-top: 1px solid var(--wenpai-line-soft); }
+}
+
+.wpmind-health { display: grid; }
+.wpmind-health-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+}
+.wpmind-health-row + .wpmind-health-row { border-top: 1px solid var(--wenpai-line-soft); }
+.wpmind-avatar {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: var(--wenpai-radius);
+  background: var(--wenpai-accent-soft, var(--wenpai-mute-soft));
+  color: var(--wenpai-accent);
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: var(--wenpai-weight-regular);
+}
+.wpmind-avatar:has(img) { background: var(--wenpai-card); }
+.wpmind-avatar img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+.wpmind-avatar .wenpai-ico { width: 16px; height: 16px; }
+.wpmind-health-main { flex: 1 1 auto; min-width: 0; }
+.wpmind-health-main .t { font-size: var(--wenpai-text-body); font-weight: var(--wenpai-weight-regular); }
+.wpmind-health-main .d { font-size: var(--wenpai-text-meta); color: var(--wenpai-ink-3); margin-top: 1px; }
+.wpmind-health-row .pill { flex: none; }
+.wpmind-feed-tag {
+  font-size: var(--wenpai-text-meta);
+  color: var(--wenpai-ink-3);
+  border: 1px solid var(--wenpai-line-card);
+  border-radius: 999px;
+  padding: 0 8px;
+  margin-inline-start: 8px;
+}
+.wpmind-feed-provider .wenpai-ico {
+  width: 14px; height: 14px; color: var(--wenpai-ink-3);
+  vertical-align: -2px; margin-inline-end: 6px;
+}
+.wpmind-feed-provider img { width: 14px; height: 14px; object-fit: contain; vertical-align: -2px; margin-inline-end: 6px; }
+
+/* ---- 服务页：连接测试结果 / Key 输入 / 摘要快捷测试 ---- */
+.wpmind-test-result { font-size: var(--wenpai-text-meta); color: var(--wenpai-ink-3); }
+.wpmind-test-result.success { color: var(--wenpai-ok-ink); }
+.wpmind-test-result.error { color: var(--wenpai-bad-ink); }
+.wpmind-test-result.warning { color: var(--wenpai-warn-ink); }
+.wenpai-actions .wpmind-test-result { align-self: center; }
+.wpmind-api-key-field { display: flex; align-items: center; gap: var(--wenpai-space-2); }
+.wpmind-api-key-field input { flex: 1 1 auto; min-width: 0; }
+.wpmind-toggle-key .wenpai-ico { width: 16px; height: 16px; }
+.wpmind-provider-side .wpmind-test-result { font-size: var(--wenpai-text-caption); }

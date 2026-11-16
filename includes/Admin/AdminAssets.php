@@ -20,7 +20,7 @@ final class AdminAssets {
 	 *
 	 * @var list<string>
 	 */
-	private const LEGACY_VIEWS = [ 'overview', 'services', 'routing', 'analytics', 'module' ];
+	private const LEGACY_VIEWS = [ 'routing', 'analytics', 'module' ];
 
 	/**
 	 * Singleton instance.
