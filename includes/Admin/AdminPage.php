@@ -63,23 +63,6 @@ final class AdminPage {
 	];
 
 	/**
-	 * 尚未 kit 化的模块 id（module 视图按模块门控 legacy 资产）。
-	 *
-	 * @var list<string>
-	 */
-	private const LEGACY_MODULES = [];
-
-	/**
-	 * 模块设置模板是否仍走 legacy 资产。
-	 *
-	 * @param string $module_id Module id.
-	 * @return bool
-	 */
-	public static function is_legacy_module( string $module_id ): bool {
-		return in_array( $module_id, self::LEGACY_MODULES, true );
-	}
-
-	/**
 	 * 旧 hash tab → 新视图（外部链接/书签兼容）。
 	 *
 	 * @var array<string, string>
@@ -112,7 +95,7 @@ final class AdminPage {
 		if ( class_exists( 'Wenpai_Admin_Menu', false ) ) {
 			return \Wenpai_Admin_Menu::url( 'wpmind', $args );
 		}
-		$base = menu_page_url( 'wpmind', '' );
+		$base = menu_page_url( 'wpmind', false );
 		return $base ? add_query_arg( $args, $base ) : '';
 	}
 

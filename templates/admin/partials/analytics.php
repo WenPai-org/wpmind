@@ -51,7 +51,7 @@ $wpmind_mark = static function ( string $pid ): string {
 					);
 				?></span>
 				<?php endif; ?>
-				<button type="button" class="btn btn-sm btn-ghost wpmind-refresh-usage"><?php echo AdminIcons::svg( 'refresh' ); ?><?php esc_html_e( '刷新', 'wpmind' ); ?></button>
+				<button type="button" class="btn btn-sm btn-ghost wpmind-refresh-usage"><?php echo AdminIcons::svg( 'refresh' ); ?><?php esc_html_e( '刷新', 'wpmind' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></button>
 				<button type="button" class="btn btn-sm wpmind-clear-usage"><?php esc_html_e( '清除', 'wpmind' ); ?></button>
 			</span>
 		</div>
@@ -104,7 +104,7 @@ $wpmind_mark = static function ( string $pid ): string {
 			<option value="7d"><?php esc_html_e( '最近 7 天', 'wpmind' ); ?></option>
 			<option value="30d"><?php esc_html_e( '最近 30 天', 'wpmind' ); ?></option>
 		</select>
-		<button type="button" class="btn btn-sm btn-ghost wpmind-refresh-analytics"><?php echo AdminIcons::svg( 'refresh' ); ?><?php esc_html_e( '刷新图表', 'wpmind' ); ?></button>
+		<button type="button" class="btn btn-sm btn-ghost wpmind-refresh-analytics"><?php echo AdminIcons::svg( 'refresh' ); ?><?php esc_html_e( '刷新图表', 'wpmind' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></button>
 		<span class="meta"><?php esc_html_e( '数据源：UsageTracker 聚合', 'wpmind' ); ?></span>
 	</div>
 

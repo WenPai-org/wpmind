@@ -105,7 +105,7 @@ $wpmind_num = static function ( string $id, $value, int $min, int $max, string $
 	<div class="wpmind-module-tab-panel active" data-panel="settings">
 		<section class="card">
 			<div class="card-head">
-				<span class="tile"><?php echo AdminIcons::svg( 'key' ); ?></span>
+				<span class="tile"><?php echo AdminIcons::svg( 'key' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 				<div>
 					<h2 class="card-title"><?php esc_html_e( '网关设置', 'wpmind' ); ?></h2>
 					<p class="card-sub"><?php esc_html_e( 'OpenAI 兼容的 API 网关：Bearer 鉴权、速率限制、预算控制和 SSE 流式输出。', 'wpmind' ); ?></p>
@@ -134,7 +134,7 @@ $wpmind_num = static function ( string $id, $value, int $min, int $max, string $
 	<div class="wpmind-module-tab-panel" data-panel="keys">
 		<section class="card">
 			<div class="card-head">
-				<span class="tile"><?php echo AdminIcons::svg( 'key' ); ?></span>
+				<span class="tile"><?php echo AdminIcons::svg( 'key' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 				<div>
 					<h2 class="card-title"><?php esc_html_e( 'API Key 管理', 'wpmind' ); ?></h2>
 					<p class="card-sub"><?php esc_html_e( '创建、编辑与吊销网关访问密钥。', 'wpmind' ); ?></p>
@@ -216,7 +216,7 @@ $wpmind_num = static function ( string $id, $value, int $min, int $max, string $
 	<div class="wpmind-module-tab-panel" data-panel="docs">
 		<section class="card">
 			<div class="card-head">
-				<span class="tile"><?php echo AdminIcons::svg( 'doc' ); ?></span>
+				<span class="tile"><?php echo AdminIcons::svg( 'doc' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 				<div>
 					<h2 class="card-title"><?php esc_html_e( '接入文档', 'wpmind' ); ?></h2>
 					<p class="card-sub"><?php esc_html_e( 'OpenAI 兼容端点与调用示例。', 'wpmind' ); ?></p>
@@ -269,7 +269,7 @@ $wpmind_num = static function ( string $id, $value, int $min, int $max, string $
 	<div class="wpmind-module-tab-panel" data-panel="logs">
 		<section class="card">
 			<div class="card-head">
-				<span class="tile"><?php echo AdminIcons::svg( 'doc' ); ?></span>
+				<span class="tile"><?php echo AdminIcons::svg( 'doc' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 				<div>
 					<h2 class="card-title"><?php esc_html_e( '请求日志', 'wpmind' ); ?></h2>
 					<p class="card-sub"><?php esc_html_e( '网关请求与 Key 生命周期审计。', 'wpmind' ); ?></p>

@@ -164,7 +164,7 @@ wpmind_page_head(
 			$has_api_key = $wpmind_instance->has_api_key( $key );
 			$enabled     = ! empty( $endpoint['enabled'] );
 			$open        = $enabled && $has_api_key;
-			$is_default  = (string) $default_provider === (string) $key;
+			$wpmind_is_default  = (string) $default_provider === (string) $key;
 
 			$wpmind_cb_state   = '';
 			$wpmind_cb_details = [];
@@ -213,7 +213,7 @@ wpmind_page_head(
 				<span class="prov"><?php echo esc_html( (string) ( $endpoint['display_name'] ?? $key ) ); ?></span>
 				<span class="wpmind-provider-side">
 					<?php if ( $has_api_key ) : ?><span class="pill ok"><?php esc_html_e( 'Key 已配置', 'wpmind' ); ?></span><?php endif; ?>
-					<?php if ( $is_default ) : ?><span class="pill"><?php esc_html_e( '默认', 'wpmind' ); ?></span><?php endif; ?>
+					<?php if ( $wpmind_is_default ) : ?><span class="pill"><?php esc_html_e( '默认', 'wpmind' ); ?></span><?php endif; ?>
 					<?php if ( ! empty( $endpoint['needs_reconfigure'] ) ) : ?><span class="pill warn" title="<?php esc_attr_e( '这家服务的默认接口地址已更换，旧 API Key 可能无法在新地址使用。请填写新的 API Key 或自定义 Base URL 后保存；保存前仍使用原来的地址。', 'wpmind' ); ?>"><?php esc_html_e( '需要重新配置', 'wpmind' ); ?></span><?php endif; ?>
 					<?php if ( '' !== $wpmind_cb_state && 'closed' !== $wpmind_cb_state ) : ?>
 						<span class="pill warn"><?php echo esc_html( $wpmind_state_labels[ $wpmind_cb_state ] ?? $wpmind_cb_state ); ?></span>
@@ -317,9 +317,9 @@ wpmind_page_head(
 								if ( [] === $wpmind_display_models ) {
 									$wpmind_display_models = \WPMind\Provider\Catalog\ModelCatalog::instance()->recommended_ids( $key );
 								}
-								foreach ( $wpmind_display_models as $model ) :
+								foreach ( $wpmind_display_models as $wpmind_model ) :
 									?>
-								<span class="prov"><?php echo esc_html( $model ); ?></span>
+								<span class="prov"><?php echo esc_html( $wpmind_model ); ?></span>
 								<?php endforeach; ?>
 							</div>
 						</div>
@@ -372,7 +372,7 @@ wpmind_page_head(
 			$is_enabled   = ! empty( $saved_config['enabled'] );
 			$has_api_key  = ! empty( $saved_config['api_key'] );
 			$open         = $is_enabled && $has_api_key;
-			$is_default   = (string) $default_image_provider === (string) $key;
+			$wpmind_is_default   = (string) $default_image_provider === (string) $key;
 			?>
 		<details class="wpmind-provider wpmind-endpoint-card" id="image-endpoint-<?php echo esc_attr( $key ); ?>" <?php echo $open ? 'open' : ''; ?>>
 			<summary>
@@ -382,7 +382,7 @@ wpmind_page_head(
 				<span class="prov"><?php echo esc_html( (string) $provider['display_name'] ); ?></span>
 				<span class="wpmind-provider-side">
 					<?php if ( $has_api_key ) : ?><span class="pill ok"><?php esc_html_e( 'Key 已配置', 'wpmind' ); ?></span><?php endif; ?>
-					<?php if ( $is_default ) : ?><span class="pill"><?php esc_html_e( '默认', 'wpmind' ); ?></span><?php endif; ?>
+					<?php if ( $wpmind_is_default ) : ?><span class="pill"><?php esc_html_e( '默认', 'wpmind' ); ?></span><?php endif; ?>
 					<button type="button" class="btn btn-ghost btn-sm wpmind-test-image-connection" data-provider="<?php echo esc_attr( $key ); ?>" <?php echo $is_enabled ? '' : 'disabled'; ?>><?php esc_html_e( '测试', 'wpmind' ); ?></button>
 					<span class="wpmind-test-result" aria-live="polite"></span>
 				</span>
@@ -426,8 +426,8 @@ wpmind_page_head(
 				<div class="wenpai-field field wenpai-field--row wpmind-field--center">
 					<div class="field-label"><span class="wenpai-field__label"><?php esc_html_e( '支持的模型', 'wpmind' ); ?></span></div>
 					<div class="field-ctl">
-						<?php foreach ( (array) $provider['models'] as $model ) : ?>
-							<span class="prov"><?php echo esc_html( $model ); ?></span>
+						<?php foreach ( (array) $provider['models'] as $wpmind_model ) : ?>
+							<span class="prov"><?php echo esc_html( $wpmind_model ); ?></span>
 						<?php endforeach; ?>
 					</div>
 				</div>

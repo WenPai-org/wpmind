@@ -69,7 +69,7 @@ wpmind_page_head(
 			<?php endforeach; ?>
 		</div>
 		<button type="button" class="btn btn-sm btn-ghost wpmind-refresh-routing">
-			<?php echo AdminIcons::svg( 'refresh' ); ?>
+			<?php echo AdminIcons::svg( 'refresh' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?>
 			<?php esc_html_e( '刷新路由状态', 'wpmind' ); ?>
 		</button>
 		<span class="meta"><?php esc_html_e( '点击即保存并实时生效', 'wpmind' ); ?></span>
@@ -85,7 +85,7 @@ wpmind_page_head(
 
 		<?php if ( '' !== $recommended_name ) : ?>
 		<div class="simple-row is-static">
-			<div class="tile ok"><?php echo AdminIcons::svg( 'route' ); ?></div>
+			<div class="tile ok"><?php echo AdminIcons::svg( 'route' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></div>
 			<div>
 				<div class="t"><?php echo $wpmind_mark( $recommended ); ?><?php echo esc_html( $recommended_name ); ?></div>
 				<div class="d"><?php esc_html_e( '综合得分', 'wpmind' ); ?> <span class="wpmind-routing-status-score-value"><?php echo esc_html( number_format( $recommended_score, 1 ) ); ?></span></div>
@@ -149,7 +149,7 @@ wpmind_page_head(
 				}
 				?>
 			<div class="wpmind-priority-item" data-provider="<?php echo esc_attr( $provider_id ); ?>">
-				<span class="wpmind-priority-handle"><?php echo AdminIcons::svg( 'grip' ); ?></span>
+				<span class="wpmind-priority-handle"><?php echo AdminIcons::svg( 'grip' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 				<span class="wpmind-priority-index"><?php echo esc_html( (string) $index++ ); ?></span>
 				<span class="wpmind-priority-name"><?php echo esc_html( $score_data['name'] ); ?></span>
 				<span class="wpmind-priority-score"><?php echo esc_html( number_format( (float) $score_data['score'], 1 ) ); ?></span>

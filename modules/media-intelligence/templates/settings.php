@@ -79,7 +79,7 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 		<div class="wpmind-module-tab-panel active" data-panel="settings">
 			<section class="card">
 				<div class="card-head">
-					<span class="tile"><?php echo AdminIcons::svg( 'image' ); ?></span>
+					<span class="tile"><?php echo AdminIcons::svg( 'image' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 					<div>
 						<h2 class="card-title"><?php esc_html_e( '自动生成', 'wpmind' ); ?></h2>
 						<p class="card-sub"><?php esc_html_e( 'AI 驱动的图片 Alt Text、标题、描述自动生成，提升 SEO 和无障碍访问。', 'wpmind' ); ?></p>
@@ -110,7 +110,7 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 		<div class="wpmind-module-tab-panel" data-panel="batch">
 			<section class="card">
 				<div class="card-head">
-					<span class="tile"><?php echo AdminIcons::svg( 'modules' ); ?></span>
+					<span class="tile"><?php echo AdminIcons::svg( 'modules' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 					<div>
 						<h2 class="card-title"><?php esc_html_e( '批量处理', 'wpmind' ); ?></h2>
 						<p class="card-sub"><?php esc_html_e( '扫描媒体库中缺少 Alt Text 的图片，并批量通过 AI 生成。每次处理 5 张，避免超时。', 'wpmind' ); ?></p>
@@ -127,7 +127,7 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 			</section>
 			<section class="card">
 				<div class="card-head">
-					<span class="tile"><?php echo AdminIcons::svg( 'workflow' ); ?></span>
+					<span class="tile"><?php echo AdminIcons::svg( 'workflow' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 					<div>
 						<h2 class="card-title"><?php esc_html_e( '工作流 Dry-run', 'wpmind' ); ?></h2>
 						<p class="card-sub"><?php esc_html_e( '扫描缺 Alt 图片并创建统一任务，Vision 只写入任务预览，不会改附件 Alt / 标题 / 说明。单任务最多 50 张。', 'wpmind' ); ?></p>
@@ -144,7 +144,7 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 		<div class="wpmind-module-tab-panel" data-panel="safety">
 			<section class="card">
 				<div class="card-head">
-					<span class="tile"><?php echo AdminIcons::svg( 'lock' ); ?></span>
+					<span class="tile"><?php echo AdminIcons::svg( 'lock' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 					<div>
 						<h2 class="card-title"><?php esc_html_e( '内容安全', 'wpmind' ); ?></h2>
 						<p class="card-sub"><?php esc_html_e( 'NSFW 内容检测与标记。', 'wpmind' ); ?></p>

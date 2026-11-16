@@ -911,3 +911,93 @@ body.wenpai-ui-page .wenpai-app .wpmind-provider-body .wpmind-field--center .fie
 	margin-top: var(--wenpai-space-3);
 	flex-wrap: wrap;
 }
+
+/* ========================================
+   Toast 通知容器（Admin.Toast，kit notice 皮）
+   ======================================== */
+.wpmind-notice-container {
+	margin-bottom: var(--wenpai-space-5);
+}
+.wpmind-notice-container .notice {
+	margin: var(--wenpai-space-1, 4px) 0;
+}
+.wpmind-notice-icon {
+	flex: none;
+	margin-top: 2px;
+}
+.wpmind-notice.notice-success .wpmind-notice-icon { color: var(--wenpai-ok); }
+.wpmind-notice.notice-error .wpmind-notice-icon { color: var(--wenpai-bad); }
+.wpmind-notice.notice-warning .wpmind-notice-icon { color: var(--wenpai-warn); }
+.wpmind-notice.notice-info .wpmind-notice-icon { color: var(--wenpai-accent); }
+
+/* ========================================
+   确认对话框（Admin.Dialog）
+   ======================================== */
+.wpmind-dialog-overlay {
+	position: fixed;
+	inset: 0;
+	background: var(--wenpai-ink);
+	opacity: 0;
+	z-index: 100200;
+	transition: opacity var(--wenpai-motion-base) var(--wenpai-motion-ease);
+}
+.wpmind-dialog-overlay.is-visible { opacity: 0.45; }
+
+.wpmind-dialog {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%) scale(0.96);
+	background: var(--wenpai-card);
+	border: 1px solid var(--wenpai-line-card);
+	border-radius: var(--wenpai-radius-lg);
+	box-shadow: var(--wenpai-shadow);
+	z-index: 100201;
+	min-width: 320px;
+	max-width: 480px;
+	width: calc(100% - 48px);
+	padding: var(--wenpai-space-5) var(--wenpai-space-6);
+	opacity: 0;
+	transition: opacity var(--wenpai-motion-base) var(--wenpai-motion-ease),
+		transform var(--wenpai-motion-base) var(--wenpai-motion-ease);
+}
+.wpmind-dialog.is-visible {
+	transform: translate(-50%, -50%) scale(1);
+	opacity: 1;
+}
+.wpmind-dialog-header {
+	display: flex;
+	align-items: center;
+	gap: var(--wenpai-space-3);
+	margin-bottom: var(--wenpai-space-3);
+}
+.wpmind-dialog-header .dashicons {
+	font-size: 22px;
+	width: 22px;
+	height: 22px;
+	flex: none;
+}
+.wpmind-dialog-title {
+	font-size: var(--wenpai-text-title);
+	line-height: var(--wenpai-leading-title);
+	font-weight: var(--wenpai-weight-regular);
+	color: var(--wenpai-ink);
+}
+.wpmind-dialog-body p {
+	margin: 0;
+	font-size: var(--wenpai-text-meta);
+	line-height: var(--wenpai-leading-meta);
+	color: var(--wenpai-ink-3);
+}
+.wpmind-dialog-footer {
+	display: flex;
+	justify-content: flex-end;
+	gap: var(--wenpai-space-3);
+	margin-top: var(--wenpai-space-5);
+}
+.wpmind-dialog-warning .wpmind-dialog-header .dashicons { color: var(--wenpai-warn); }
+.wpmind-dialog-danger .wpmind-dialog-header .dashicons { color: var(--wenpai-bad); }
+.wpmind-dialog-info .wpmind-dialog-header .dashicons { color: var(--wenpai-accent); }
+.wpmind-dialog-success .wpmind-dialog-header .dashicons { color: var(--wenpai-ok); }
+.wpmind-dialog-danger .wpmind-dialog-confirm { background: var(--wenpai-bad); }
+.wpmind-dialog-danger .wpmind-dialog-confirm:hover { background: var(--wenpai-bad-ink); }

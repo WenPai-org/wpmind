@@ -76,7 +76,7 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 		<div class="wpmind-module-tab-panel active" data-panel="am-settings">
 			<section class="card">
 				<div class="card-head">
-					<span class="tile"><?php echo AdminIcons::svg( 'doc' ); ?></span>
+					<span class="tile"><?php echo AdminIcons::svg( 'doc' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 					<div>
 						<h2 class="card-title"><?php esc_html_e( '元数据自动生成', 'wpmind' ); ?></h2>
 						<p class="card-sub"><?php esc_html_e( 'AI 驱动的文章元数据自动生成：摘要、标签、分类、FAQ Schema、SEO 描述。', 'wpmind' ); ?></p>
@@ -115,7 +115,7 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 		<div class="wpmind-module-tab-panel" data-panel="am-manual">
 			<section class="card">
 				<div class="card-head">
-					<span class="tile"><?php echo AdminIcons::svg( 'workflow' ); ?></span>
+					<span class="tile"><?php echo AdminIcons::svg( 'workflow' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 					<div>
 						<h2 class="card-title"><?php esc_html_e( '手动生成', 'wpmind' ); ?></h2>
 						<p class="card-sub"><?php esc_html_e( '输入文章 ID 手动触发元数据生成。生成结果将直接写入文章。', 'wpmind' ); ?></p>

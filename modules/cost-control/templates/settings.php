@@ -90,7 +90,7 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 
 	<section class="card">
 		<div class="card-head">
-			<span class="tile"><?php echo AdminIcons::svg( 'lock' ); ?></span>
+			<span class="tile"><?php echo AdminIcons::svg( 'lock' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 			<div>
 				<h2 class="card-title"><?php esc_html_e( '预算限额', 'wpmind' ); ?></h2>
 				<p class="card-sub"><?php esc_html_e( '监控 AI 服务费用，设置预算限额，接收告警通知。', 'wpmind' ); ?></p>
@@ -180,7 +180,7 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 	<div class="wenpai-stack">
 		<section class="card">
 			<div class="card-head">
-				<span class="tile"><?php echo AdminIcons::svg( 'analytics' ); ?></span>
+				<span class="tile"><?php echo AdminIcons::svg( 'analytics' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 				<div>
 					<h2 class="card-title"><?php esc_html_e( '服务商用量', 'wpmind' ); ?></h2>
 				</div>
@@ -225,7 +225,7 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 
 		<section class="card">
 			<div class="card-head">
-				<span class="tile"><?php echo AdminIcons::svg( 'help' ); ?></span>
+				<span class="tile"><?php echo AdminIcons::svg( 'help' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 				<div>
 					<h2 class="card-title"><?php esc_html_e( '费用说明', 'wpmind' ); ?></h2>
 				</div>

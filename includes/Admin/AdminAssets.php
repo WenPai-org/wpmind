@@ -16,13 +16,6 @@ namespace WPMind\Admin;
 final class AdminAssets {
 
 	/**
-	 * 尚未迁移到 kit 壳的视图（迁移完成后清空并删除旧 assets）。
-	 *
-	 * @var list<string>
-	 */
-private const LEGACY_VIEWS = [];
-
-	/**
 	 * Singleton instance.
 	 *
 	 * @var AdminAssets|null
@@ -79,63 +72,7 @@ private const LEGACY_VIEWS = [];
 			WPMIND_VERSION
 		);
 
-		// 未迁移视图继续使用旧版样式与图标字体；已迁移视图只走 kit + wpmind-admin.css。
-		// JS 行为层（admin-*.js）按元素 ID 绑定，迁移视图仍需要，暂全量加载。
-		$legacy_view = in_array( AdminPage::current_view(), self::LEGACY_VIEWS, true )
-			|| ( 'module' === AdminPage::current_view() && AdminPage::is_legacy_module( AdminPage::current_module() ) );
-		if ( $legacy_view ) {
-
-		// Remixicon 图标库（本地打包）
-		wp_enqueue_style(
-			'remixicon',
-			WPMIND_PLUGIN_URL . 'assets/vendor/remixicon/remixicon.css',
-			[],
-			'4.9.1'
-		);
-
-		wp_enqueue_style(
-			'wpmind-admin',
-			WPMIND_PLUGIN_URL . 'assets/css/admin.css',
-			[ 'remixicon' ],
-			WPMIND_VERSION
-		);
-
-		wp_enqueue_style(
-			'wpmind-modules',
-			WPMIND_PLUGIN_URL . 'assets/css/modules.css',
-			[ 'wpmind-admin' ],
-			WPMIND_VERSION
-		);
-
-		wp_enqueue_style(
-			'wpmind-overview',
-			WPMIND_PLUGIN_URL . 'assets/css/overview.css',
-			[ 'wpmind-admin' ],
-			WPMIND_VERSION
-		);
-
-		wp_enqueue_style(
-			'wpmind-panels',
-			WPMIND_PLUGIN_URL . 'assets/css/panels.css',
-			[ 'wpmind-admin' ],
-			WPMIND_VERSION
-		);
-
-		wp_enqueue_style(
-			'wpmind-module-layout',
-			WPMIND_PLUGIN_URL . 'assets/css/components/module-layout.css',
-			[ 'wpmind-admin' ],
-			WPMIND_VERSION
-		);
-
-		wp_enqueue_style(
-			'wpmind-responsive',
-			WPMIND_PLUGIN_URL . 'assets/css/responsive.css',
-			[ 'wpmind-panels' ],
-			WPMIND_VERSION
-		);
-
-		} // end legacy_view styles.
+		// JS 行为层（admin-*.js）按元素 ID 绑定，随视图加载。
 
 		// Chart.js 图表库（本地打包，无外部 CDN 依赖）
 		wp_register_script(

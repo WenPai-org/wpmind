@@ -28,9 +28,14 @@
 
 		init: function() {
 			if ( ! this.container ) {
-				// 在 wpmind-title 下方创建通知容器
+				// 通知容器挂在 kit 页头之后（页面顶部），兜底挂到 .wenpai-app 开头
 				this.container = $( '<div class="wpmind-notice-container"></div>' );
-				$( '.wpmind-title' ).after( this.container );
+				var $head = $( '.wenpai-page-head' ).first();
+				if ( $head.length ) {
+					$head.after( this.container );
+				} else {
+					$( '.wenpai-app' ).first().prepend( this.container );
+				}
 			}
 		},
 
@@ -39,20 +44,20 @@
 			type = type || 'info';
 			duration = duration || 3000;
 
-			// WordPress 原生 notice 类型映射
+			// WordPress 原生 notice 类型映射 + kit 色调类
 			var noticeType = {
-				success: 'notice-success',
-				error: 'notice-error',
-				warning: 'notice-warning',
-				info: 'notice-info'
+				success: 'notice-success ok',
+				error: 'notice-error bad',
+				warning: 'notice-warning warn',
+				info: 'notice-info info'
 			};
 
-			// 图标映射
+			// 图标映射（dashicons，wp-admin 自带字体）
 			var icons = {
-				success: 'ri-checkbox-circle-line',
-				error: 'ri-close-circle-line',
-				warning: 'ri-alert-line',
-				info: 'ri-information-line'
+				success: 'dashicons-yes-alt',
+				error: 'dashicons-no-alt',
+				warning: 'dashicons-warning',
+				info: 'dashicons-info'
 			};
 
 			var $notice = $( '<div class="notice ' + noticeType[ type ] + ' is-dismissible wpmind-notice">' +
@@ -127,10 +132,10 @@
 			var settings = $.extend( {}, defaults, options );
 
 			var icons = {
-				warning: 'ri-alert-line',
-				danger: 'ri-close-circle-line',
-				info: 'ri-information-line',
-				success: 'ri-checkbox-circle-line'
+				warning: 'dashicons-warning',
+				danger: 'dashicons-no-alt',
+				info: 'dashicons-info',
+				success: 'dashicons-yes-alt'
 			};
 
 			var $overlay = $( '<div class="wpmind-dialog-overlay"></div>' );
@@ -143,8 +148,8 @@
 				'<p>' + settings.message + '</p>' +
 				'</div>' +
 				'<div class="wpmind-dialog-footer">' +
-				'<button type="button" class="button wpmind-dialog-cancel">' + settings.cancelText + '</button>' +
-				'<button type="button" class="button button-primary wpmind-dialog-confirm">' + settings.confirmText + '</button>' +
+				'<button type="button" class="btn btn-ghost wpmind-dialog-cancel">' + settings.cancelText + '</button>' +
+				'<button type="button" class="btn btn-primary wpmind-dialog-confirm">' + settings.confirmText + '</button>' +
 				'</div>' +
 				'</div>' );
 

@@ -61,19 +61,19 @@ $savings = \WPMind\Modules\ExactCache\CostEstimator::get_estimated_savings();
 
 <section class="card">
 	<div class="card-head">
-		<span class="tile"><?php echo AdminIcons::svg( 'analytics' ); ?></span>
+		<span class="tile"><?php echo AdminIcons::svg( 'analytics' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 		<div>
 			<h2 class="card-title"><?php esc_html_e( '7 天趋势', 'wpmind' ); ?></h2>
 			<p class="card-sub"><?php esc_html_e( '缓存命中与写入走势', 'wpmind' ); ?></p>
 		</div>
-		<button type="button" class="btn btn-sm btn-ghost wpmind-refresh-cache-stats"><?php echo AdminIcons::svg( 'refresh' ); ?></button>
+		<button type="button" class="btn btn-sm btn-ghost wpmind-refresh-cache-stats"><?php echo AdminIcons::svg( 'refresh' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></button>
 	</div>
 	<div class="wpmind-chart is-live"><canvas id="wpmind-cache-trend-canvas"></canvas></div>
 </section>
 
 <section class="card">
 	<div class="card-head">
-		<span class="tile"><?php echo AdminIcons::svg( 'modules' ); ?></span>
+		<span class="tile"><?php echo AdminIcons::svg( 'modules' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 		<div>
 			<h2 class="card-title"><?php esc_html_e( '缓存设置', 'wpmind' ); ?></h2>
 			<p class="card-sub"><?php esc_html_e( '相同请求直接返回缓存结果，降低 API 成本、加速响应。', 'wpmind' ); ?></p>

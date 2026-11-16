@@ -106,7 +106,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 				<div class="wpmind-geo-main">
 					<section class="card">
 						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'robot' ); ?></span>
+							<span class="tile"><?php echo AdminIcons::svg( 'robot' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 							<div>
 								<h2 class="card-title"><?php esc_html_e( 'GEO 增强', 'wpmind' ); ?></h2>
 								<p class="card-sub"><?php esc_html_e( '优化内容结构，提高 AI 引用率。', 'wpmind' ); ?></p>
@@ -123,7 +123,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 				<div class="wpmind-geo-side">
 					<section class="card">
 						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'analytics' ); ?></span>
+							<span class="tile"><?php echo AdminIcons::svg( 'analytics' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 							<div>
 								<h2 class="card-title"><?php esc_html_e( 'AI 爬虫统计', 'wpmind' ); ?></h2>
 							</div>
@@ -134,7 +134,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 						<div class="wpmind-crawler-list">
 							<?php foreach ( $crawler_stats as $crawler => $data ) : ?>
 							<div class="simple-row is-static">
-								<div class="tile<?php echo $data['is_ai'] ? ' ok' : ''; ?>"><?php echo AdminIcons::svg( 'robot' ); ?></div>
+								<div class="tile<?php echo $data['is_ai'] ? ' ok' : ''; ?>"><?php echo AdminIcons::svg( 'robot' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></div>
 								<div>
 									<div class="t"><?php echo esc_html( $crawler ); ?> <?php if ( $data['is_ai'] ) : ?><span class="pill"><?php esc_html_e( 'AI', 'wpmind' ); ?></span><?php endif; ?></div>
 									<div class="d"><?php echo esc_html( $data['company'] ); ?></div>
@@ -167,7 +167,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 				<div class="wpmind-geo-main">
 					<section class="card">
 						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'doc' ); ?></span>
+							<span class="tile"><?php echo AdminIcons::svg( 'doc' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 							<div>
 								<h2 class="card-title"><?php esc_html_e( 'Markdown Feed', 'wpmind' ); ?></h2>
 								<p class="card-sub"><?php esc_html_e( '为 AI 爬虫提供结构化的 Markdown 格式内容。', 'wpmind' ); ?></p>
@@ -188,7 +188,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 
 					<section class="card">
 						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'doc' ); ?></span>
+							<span class="tile"><?php echo AdminIcons::svg( 'doc' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 							<div>
 								<h2 class="card-title">llms.txt</h2>
 								<p class="card-sub"><?php esc_html_e( '为 AI 爬虫提供站点导航和内容索引。', 'wpmind' ); ?></p>
@@ -209,7 +209,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 
 					<section class="card">
 						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'globe' ); ?></span>
+							<span class="tile"><?php echo AdminIcons::svg( 'globe' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 							<div>
 								<h2 class="card-title"><?php esc_html_e( 'AI Sitemap', 'wpmind' ); ?></h2>
 								<p class="card-sub"><?php esc_html_e( '为 AI 爬虫提供专属 XML Sitemap，包含内容声明和摘要等元数据。', 'wpmind' ); ?></p>
@@ -234,7 +234,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 
 					<section class="card">
 						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'help' ); ?></span>
+							<span class="tile"><?php echo AdminIcons::svg( 'help' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 							<div>
 								<h2 class="card-title"><?php esc_html_e( 'AI 摘要', 'wpmind' ); ?> <span class="pill"><?php esc_html_e( 'NEW', 'wpmind' ); ?></span></h2>
 								<p class="card-sub"><?php esc_html_e( '控制 AI 如何描述您的文章，而非让 AI 自行猜测。', 'wpmind' ); ?></p>
@@ -278,7 +278,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 				<div class="wpmind-geo-main">
 					<section class="card">
 						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'doc' ); ?></span>
+							<span class="tile"><?php echo AdminIcons::svg( 'doc' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 							<div>
 								<h2 class="card-title"><?php esc_html_e( 'Schema.org', 'wpmind' ); ?></h2>
 								<p class="card-sub"><?php esc_html_e( '为内容添加结构化数据，帮助 AI 理解语义。', 'wpmind' ); ?></p>
@@ -302,7 +302,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 					<?php if ( $schema_enabled ) : ?>
 					<section class="card">
 						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'doc' ); ?></span>
+							<span class="tile"><?php echo AdminIcons::svg( 'doc' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 							<div>
 								<h2 class="card-title"><?php esc_html_e( '输出属性一览', 'wpmind' ); ?></h2>
 								<p class="card-sub"><?php esc_html_e( '每篇文章自动输出的 JSON-LD 属性。', 'wpmind' ); ?></p>
@@ -332,7 +332,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 
 					<section class="card">
 						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'eye' ); ?></span>
+							<span class="tile"><?php echo AdminIcons::svg( 'eye' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 							<div>
 								<h2 class="card-title"><?php esc_html_e( 'JSON-LD 预览', 'wpmind' ); ?></h2>
 								<p class="card-sub"><?php esc_html_e( '基于当前设置生成的示例输出。', 'wpmind' ); ?></p>
@@ -439,7 +439,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 				<div class="wpmind-geo-main">
 					<section class="card">
 						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'lock' ); ?></span>
+							<span class="tile"><?php echo AdminIcons::svg( 'lock' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 							<div>
 								<h2 class="card-title"><?php esc_html_e( 'AI 索引指令', 'wpmind' ); ?></h2>
 								<p class="card-sub"><?php esc_html_e( '控制 AI 爬虫对内容的索引和训练权限。', 'wpmind' ); ?></p>
@@ -498,7 +498,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 				<div class="wpmind-geo-main">
 					<section class="card">
 						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'robot' ); ?></span>
+							<span class="tile"><?php echo AdminIcons::svg( 'robot' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 							<div>
 								<h2 class="card-title"><?php esc_html_e( 'robots.txt AI 管理', 'wpmind' ); ?> <span class="pill"><?php esc_html_e( 'NEW', 'wpmind' ); ?></span></h2>
 								<p class="card-sub"><?php esc_html_e( '通过 robots.txt 控制 AI 爬虫的访问权限，不修改物理文件。', 'wpmind' ); ?></p>
@@ -559,7 +559,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 				<div class="wpmind-geo-main">
 					<section class="card">
 						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'services' ); ?></span>
+							<span class="tile"><?php echo AdminIcons::svg( 'services' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 							<div>
 								<h2 class="card-title"><?php esc_html_e( '组织基础', 'wpmind' ); ?> <span class="pill"><?php esc_html_e( 'NEW', 'wpmind' ); ?></span></h2>
 								<p class="card-sub"><?php esc_html_e( '定义品牌实体信息，增强 publisher Schema 并在首页输出 Organization JSON-LD。', 'wpmind' ); ?></p>
@@ -611,7 +611,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 					<?php if ( $brand_entity_enabled ) : ?>
 					<section class="card">
 						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'external' ); ?></span>
+							<span class="tile"><?php echo AdminIcons::svg( 'external' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 							<div>
 								<h2 class="card-title"><?php esc_html_e( '社交档案', 'wpmind' ); ?></h2>
 								<p class="card-sub"><?php esc_html_e( '社交平台主页 URL，将作为 Schema.org sameAs 输出。', 'wpmind' ); ?></p>
@@ -642,7 +642,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 
 					<section class="card">
 						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'help' ); ?></span>
+							<span class="tile"><?php echo AdminIcons::svg( 'help' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 							<div>
 								<h2 class="card-title"><?php esc_html_e( '联系方式', 'wpmind' ); ?></h2>
 								<p class="card-sub"><?php esc_html_e( '可选的联系信息，将作为 Schema.org contactPoint 输出。', 'wpmind' ); ?></p>
@@ -664,7 +664,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 
 					<section class="card">
 						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'globe' ); ?></span>
+							<span class="tile"><?php echo AdminIcons::svg( 'globe' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 							<div>
 								<h2 class="card-title"><?php esc_html_e( 'Knowledge Graph', 'wpmind' ); ?></h2>
 								<p class="card-sub"><?php esc_html_e( '关联品牌的 Wikidata/Wikipedia 页面，强化知识图谱信号。', 'wpmind' ); ?></p>
@@ -686,7 +686,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 
 					<section class="card">
 						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'route' ); ?></span>
+							<span class="tile"><?php echo AdminIcons::svg( 'route' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 							<div>
 								<h2 class="card-title"><?php esc_html_e( '文章实体关联', 'wpmind' ); ?></h2>
 								<p class="card-sub"><?php esc_html_e( '将每篇文章关联到 Wikidata/Wikipedia 实体，帮助 AI 消除歧义并建立权威性。', 'wpmind' ); ?></p>

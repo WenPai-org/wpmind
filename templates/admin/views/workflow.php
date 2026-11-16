@@ -99,13 +99,13 @@ wpmind_page_head(
 
 		<?php if ( $wpmind_current ) : ?>
 		<div class="wpmind-flow" aria-label="<?php esc_attr_e( '任务状态机：创建 → 预演 → 审核 → 写入 → 撤销', 'wpmind' ); ?>">
-			<?php foreach ( $wpmind_flow as $i => [ $wpmind_step_key, $wpmind_step_label ] ) : ?>
-				<?php $wpmind_step_no = $i + 1; ?>
+			<?php foreach ( $wpmind_flow as $wpmind_i => [ $wpmind_step_key, $wpmind_step_label ] ) : ?>
+				<?php $wpmind_step_no = $wpmind_i + 1; ?>
 				<span class="wpmind-flow-step <?php echo $wpmind_step_no < $wpmind_stage ? 'is-done' : ( $wpmind_step_no === $wpmind_stage ? 'is-cur' : '' ); ?>">
-					<span class="wpmind-flow-dot"><?php echo $wpmind_step_no < $wpmind_stage ? '✓' : ( 'undo' === $wpmind_step_key ? '↩' : (string) $wpmind_step_no ); ?></span>
+					<span class="wpmind-flow-dot"><?php echo esc_html( $wpmind_step_no < $wpmind_stage ? '✓' : ( 'undo' === $wpmind_step_key ? '↩' : (string) $wpmind_step_no ) ); ?></span>
 					<span class="wpmind-flow-label"><?php echo esc_html( $wpmind_step_label . ' ' . $wpmind_step_key ); ?></span>
 				</span>
-				<?php if ( $i < count( $wpmind_flow ) - 1 ) : ?>
+				<?php if ( $wpmind_i < count( $wpmind_flow ) - 1 ) : ?>
 					<span class="wpmind-flow-arrow" aria-hidden="true">→</span>
 				<?php endif; ?>
 			<?php endforeach; ?>
@@ -210,7 +210,10 @@ wpmind_page_head(
 	<?php /* ---- 卡 3：任务项明细（fold，JS 载入后展开） ---- */ ?>
 	<details class="card wpmind-fold" id="wpmind-workflow-items" open style="display:none;">
 		<summary>
-			<span class="wpmind-fold-chevron" aria-hidden="true"><?php echo class_exists( 'Wenpai_Admin_Icons', false ) ? Wenpai_Admin_Icons::svg( 'chevron-down' ) : ''; ?></span>
+			<span class="wpmind-fold-chevron" aria-hidden="true"><?php
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 内联 SVG，无用户输入。
+			echo class_exists( 'Wenpai_Admin_Icons', false ) ? Wenpai_Admin_Icons::svg( 'chevron-down' ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。
+			?></span>
 			<span class="section-title"><?php esc_html_e( '任务项明细', 'wpmind' ); ?></span>
 			<span class="meta"><?php esc_html_e( 'before / proposed / applied · 批准的项才会写入', 'wpmind' ); ?></span>
 		</summary>

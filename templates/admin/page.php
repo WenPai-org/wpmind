@@ -90,7 +90,7 @@ if ( class_exists( 'Wenpai_Admin_Shell', false ) ) {
 			'home_url'   => $wpmind_url( 'overview' ),
 			'current'    => 'help' === $wpmind_view ? 'help' : $wpmind_current,
 			'tabs'       => array_map(
-				static function ( array $t ) use ( $wpmind_current, $wpmind_icon ): array {
+				static function ( array $t ) use ( $wpmind_icon ): array {
 					$t['icon_html'] = $wpmind_icon( $t['icon'] );
 					unset( $t['icon'] );
 					return $t;
