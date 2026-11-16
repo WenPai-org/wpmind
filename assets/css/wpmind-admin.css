@@ -789,3 +789,43 @@ body.wenpai-ui-page .wenpai-app .wpmind-provider-body .wpmind-field--center .fie
 .wpmind-chart.is-live { border: 0; background: transparent; }
 .wpmind-chart.is-live canvas { background: transparent; height: 260px; }
 .wpmind-chart-container.is-loading { opacity: .55; transition: opacity .15s ease; }
+
+/* ---- 模块设置：子页签 seg + 面板 ---- */
+.seg .wpmind-module-subtab {
+  appearance: none;
+  background: none;
+  border: 0;
+  border-left: 1px solid var(--wenpai-line-strong);
+  padding: 0 var(--wenpai-space-3);
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--wenpai-ink-2);
+  font-family: inherit;
+  font-size: var(--wenpai-text-body);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.seg .wpmind-module-subtab:first-child { border-inline-start: 0; }
+.seg .wpmind-module-subtab:hover { color: var(--wenpai-ink); background: var(--wenpai-line-soft); }
+.seg .wpmind-module-subtab.active { background: var(--wenpai-accent-soft); color: var(--wenpai-accent); font-weight: var(--wenpai-weight-regular); }
+.wpmind-module-tab-panel { display: none; }
+.wpmind-module-tab-panel.active { display: block; }
+
+/* ---- 模块设置：主栏 + 侧栏信息轨 ---- */
+.wpmind-geo-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: var(--wenpai-space-5);
+  align-items: start;
+}
+.wpmind-geo-main, .wpmind-geo-side { display: grid; gap: var(--wenpai-space-5); align-content: start; min-width: 0; }
+@media (max-width: 1100px) {
+  .wpmind-geo-grid { grid-template-columns: 1fr; }
+}
+.wpmind-geo-info-body { font-size: var(--wenpai-text-meta); color: var(--wenpai-ink-2); line-height: var(--wenpai-leading-meta); }
+.wpmind-geo-info-body p { margin: 0 0 var(--wenpai-space-3); }
+.wpmind-geo-info-body ul { margin: 0 0 var(--wenpai-space-3); padding-inline-start: var(--wenpai-space-5); }
+.wpmind-geo-info-body li { margin-bottom: 4px; }
+.wpmind-crawler-list { display: grid; }

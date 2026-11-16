@@ -135,7 +135,8 @@
 			} );
 
 			// Show loading state.
-			$button.html( '<span class="dashicons ri-loader-4-line"></span> 保存中...' ).prop( 'disabled', true );
+			var geoOriginalHtml = $button.html();
+			$button.addClass( 'is-busy' ).text( '保存中…' ).prop( 'disabled', true );
 
 			$.ajax( {
 				url: wpmindData.ajaxurl,
@@ -147,22 +148,22 @@
 				},
 				success: function( response ) {
 					if ( response.success ) {
-						$button.html( '<span class="dashicons ri-check-line"></span> 已保存' );
+						$button.removeClass( 'is-busy' ).text( '已保存' );
 						setTimeout( function() {
-							$button.html( originalText ).prop( 'disabled', false );
+							$button.html( geoOriginalHtml ).prop( 'disabled', false );
 							location.reload();
 						}, 1500 );
 					} else {
-						$button.html( '<span class="dashicons ri-error-warning-line"></span> 保存失败' );
+						$button.removeClass( 'is-busy' ).text( '保存失败' );
 						setTimeout( function() {
-							$button.html( originalText ).prop( 'disabled', false );
+							$button.html( geoOriginalHtml ).prop( 'disabled', false );
 						}, 2000 );
 					}
 				},
 				error: function() {
-					$button.html( '<span class="dashicons ri-error-warning-line"></span> 网络错误' );
+					$button.removeClass( 'is-busy' ).text( '网络错误' );
 					setTimeout( function() {
-						$button.html( originalText ).prop( 'disabled', false );
+						$button.html( geoOriginalHtml ).prop( 'disabled', false );
 					}, 2000 );
 				}
 			} );

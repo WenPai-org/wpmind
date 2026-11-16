@@ -20,7 +20,7 @@ final class AdminAssets {
 	 *
 	 * @var list<string>
 	 */
-	private const LEGACY_VIEWS = [ 'module' ];
+private const LEGACY_VIEWS = [];
 
 	/**
 	 * Singleton instance.
@@ -81,7 +81,8 @@ final class AdminAssets {
 
 		// 未迁移视图继续使用旧版样式与图标字体；已迁移视图只走 kit + wpmind-admin.css。
 		// JS 行为层（admin-*.js）按元素 ID 绑定，迁移视图仍需要，暂全量加载。
-		$legacy_view = in_array( AdminPage::current_view(), self::LEGACY_VIEWS, true );
+		$legacy_view = in_array( AdminPage::current_view(), self::LEGACY_VIEWS, true )
+			|| ( 'module' === AdminPage::current_view() && AdminPage::is_legacy_module( AdminPage::current_module() ) );
 		if ( $legacy_view ) {
 
 		// Remixicon 图标库（本地打包）
