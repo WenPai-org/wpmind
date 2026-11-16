@@ -124,19 +124,7 @@ class ChatService extends AbstractService {
 
 			$tried_providers[] = $try_provider;
 
-			if ( $model_is_auto ) {
-				$try_model = $this->get_current_model( $try_provider );
-			} else {
-				$try_model       = $model;
-				$endpoints       = $this->get_endpoints();
-				$provider_models = $endpoints[ $try_provider ]['models'] ?? [];
-				if ( ! empty( $provider_models ) && ! in_array( $try_model, $provider_models, true ) ) {
-					$try_model = $this->get_current_model( $try_provider );
-				}
-			}
-
-			$resolution = \WPMind\Provider\Catalog\ModelCatalog::instance()->resolve( $try_provider, (string) $try_model );
-			$try_model  = $resolution->model;
+			$try_model = $this->resolve_attempt_model( $try_provider, (string) $model, $model_is_auto );
 
 			$provider_attempts = 0;
 			$max_attempts      = 2; // 每家最多 2 次
@@ -338,14 +326,25 @@ class ChatService extends AbstractService {
 				continue;
 			}
 
-			$model = $model_is_auto
-				? $this->get_current_model( $try_provider )
-				: $original_model;
+			$custom_url = '' !== trim( (string) ( $endpoint['custom_base_url'] ?? '' ) );
+			if ( $custom_url ) {
+				// Custom endpoint: foreign model namespace, skip catalog resolution.
+				if ( $model_is_auto || 'default' === $original_model || '' === $original_model ) {
+					$endpoint_default = trim( (string) ( $endpoint['default_model'] ?? '' ) );
+					$model            = '' !== $endpoint_default ? $endpoint_default : 'auto';
+				} else {
+					$model = $original_model;
+				}
+			} else {
+				$model = $model_is_auto
+					? $this->get_current_model( $try_provider )
+					: $original_model;
 
-			if ( $model === 'auto' || $model === 'default' ) {
-				$model = $this->get_current_model( $try_provider );
+				if ( $model === 'auto' || $model === 'default' ) {
+					$model = $this->get_current_model( $try_provider );
+				}
+				$model = \WPMind\Provider\Catalog\ModelCatalog::instance()->resolve( $try_provider, (string) $model )->model;
 			}
-			$model = \WPMind\Provider\Catalog\ModelCatalog::instance()->resolve( $try_provider, (string) $model )->model;
 
 			$base_url = $this->resolve_base_url( $try_provider );
 			$api_url  = trailingslashit( $base_url ) . 'chat/completions';
@@ -580,10 +579,19 @@ class ChatService extends AbstractService {
 			);
 		}
 
-		if ( $model === 'auto' || empty( $model ) || $model === 'default' ) {
-			$model = $this->get_current_model( $provider );
+		$custom_url = '' !== trim( (string) ( $endpoint['custom_base_url'] ?? '' ) );
+		if ( $custom_url ) {
+			// Custom endpoint: foreign model namespace, skip catalog resolution.
+			if ( 'auto' === $model || empty( $model ) || 'default' === $model ) {
+				$endpoint_default = trim( (string) ( $endpoint['default_model'] ?? '' ) );
+				$model            = '' !== $endpoint_default ? $endpoint_default : 'auto';
+			}
+		} else {
+			if ( 'auto' === $model || empty( $model ) || 'default' === $model ) {
+				$model = $this->get_current_model( $provider );
+			}
+			$model = \WPMind\Provider\Catalog\ModelCatalog::instance()->resolve( $provider, (string) $model )->model;
 		}
-		$model = \WPMind\Provider\Catalog\ModelCatalog::instance()->resolve( $provider, (string) $model )->model;
 
 		$request_body = [
 			'model'       => $model,
@@ -703,6 +711,45 @@ class ChatService extends AbstractService {
 	 */
 	public function filter_chat_response( array $response, array $args, string $context ): array {
 		return $response;
+	}
+
+	/**
+	 * 解析一次尝试要发给 provider 的模型 ID。
+	 *
+	 * 配置了 custom_base_url 的端点不走静态模型目录：显式模型原样透传
+	 * （中转站/Token Plan 的模型命名与官方目录无关），auto/default 回落到
+	 * 端点自己配置的 default_model，未配置则传字面量 'auto' 由 provider 决定。
+	 * 官方端点维持原有行为：auto 取当前模型，显式模型不在已选列表时回落默认。
+	 *
+	 * @param string $provider  服务商
+	 * @param string $requested 请求的模型（可能是 'auto'/'default'）
+	 * @param bool   $is_auto   是否 auto 模式
+	 * @return string
+	 */
+	private function resolve_attempt_model( string $provider, string $requested, bool $is_auto ): string {
+		$endpoints = $this->get_endpoints();
+		$endpoint  = $endpoints[ $provider ] ?? [];
+		$custom    = '' !== trim( (string) ( $endpoint['custom_base_url'] ?? '' ) );
+
+		if ( $custom ) {
+			if ( $is_auto || 'auto' === $requested || 'default' === $requested || '' === $requested ) {
+				$default_model = trim( (string) ( $endpoint['default_model'] ?? '' ) );
+				return '' !== $default_model ? $default_model : 'auto';
+			}
+			return $requested;
+		}
+
+		if ( $is_auto ) {
+			$try_model = $this->get_current_model( $provider );
+		} else {
+			$try_model       = $requested;
+			$provider_models = $endpoint['models'] ?? [];
+			if ( is_array( $provider_models ) && [] !== $provider_models && ! in_array( $requested, $provider_models, true ) ) {
+				$try_model = $this->get_current_model( $provider );
+			}
+		}
+
+		return \WPMind\Provider\Catalog\ModelCatalog::instance()->resolve( $provider, (string) $try_model )->model;
 	}
 
 	/**

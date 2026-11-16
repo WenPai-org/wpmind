@@ -44,6 +44,13 @@ wpmind 在 init:5 已把自家 key 注进 SDK registry，WP7 下 SDK 路径本�
 
 - `wpmind_sdk_providers` 默认仍 `['anthropic','google']`。国产 provider 切 SDK 路径是行为变更（structured/json_mode、vision、tools 兼容性未逐一验证），需真 key 回归后再议；站点可用 `wpmind_sdk_providers` filter 提前启用。记入本文档「后续」。
 
+### D2. custom_base_url 端点的模型解析（2026-11-17 实测修复）
+
+- 实测发现：配置 custom_base_url 的端点（中转站、Token Plan、z.ai 等）模型命名与静态目录无关，原逻辑会把显式模型静默换成目录默认（`qwen-plus` 等）→ provider 报 Unknown Model，且不报模型被替换。
+- 修复：`ChatService::resolve_attempt_model()` 及 stream/native 路径——custom_base_url 端点跳过静态目录：显式模型透传，auto/default 回落端点 `default_model`，未配置传字面量 `'auto'`；非 custom 端点行为不变。
+- 已在 WP 7.1.4 实测：qwen(token-plan)+zhipu(z.ai) 显式与 auto 模式真实调用全部成功。
+- 遗留：模型选择 UI（PR2）落地后，`RemoteModelLister`（GET /models + transient 缓存）可用于端点模型下拉；在那之前 custom 端点用户需知晓模型名需与端点实际一致。
+
 ### E. 后续预案（不写码）
 
 - **Secrets API（7.1/7.2）**：connector option 落地后，wpmind 自有 key 存储是否换轨 Secrets API，等 API 稳定再评估；`pre_option` 桥（WP<7）届时可退役。
