@@ -121,6 +121,18 @@ function get_wpmind_credentials(): array {
 		}
 	}
 
+	// WP 7.x: fall back to the Connectors-stored key (read-only) when the
+	// wpmind option has no key for a provider.
+	foreach ( ProviderRegistrar::getSupportedProviderIds() as $provider_id ) {
+		if ( isset( $cache[ $provider_id ] ) && '' !== (string) $cache[ $provider_id ] ) {
+			continue;
+		}
+		$connector_key = \WPMind\Provider\ConnectorCredentials::key_for( $provider_id );
+		if ( '' !== $connector_key ) {
+			$cache[ $provider_id ] = $connector_key;
+		}
+	}
+
 	return $cache;
 }
 

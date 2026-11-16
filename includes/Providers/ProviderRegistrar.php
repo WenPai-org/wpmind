@@ -38,19 +38,43 @@ class ProviderRegistrar {
 		 */
 		$map = apply_filters( 'wpmind_provider_map', self::PROVIDER_MAP );
 
-		foreach ( $map as $key => $providerClass ) {
-			if ( empty( $endpoints[ $key ]['enabled'] ) || empty( $endpoints[ $key ]['api_key'] ) ) {
+		foreach ( $map as $key => $provider_class ) {
+			if ( empty( $endpoints[ $key ]['enabled'] ) ) {
 				continue;
 			}
 
-			// 注册 Provider
-			$registry->registerProvider( $providerClass );
+			// custom_base_url is only honored by the native HTTP path; SDK provider
+			// classes use vendor default endpoints. Skip SDK registration when a
+			// custom base URL is configured to avoid wrong-endpoint requests.
+			if ( ! empty( $endpoints[ $key ]['custom_base_url'] ) ) {
+				continue;
+			}
 
-			// 设置 API Key 认证
-			$registry->setProviderRequestAuthentication(
-				$providerClass,
-				new ApiKeyRequestAuthentication( $endpoints[ $key ]['api_key'] )
-			);
+			if ( ! class_exists( $provider_class ) ) {
+				continue;
+			}
+
+			// Register the provider even without a key so WP 7.x Connectors can
+			// discover and list it for credential setup.
+			$registry->registerProvider( $provider_class );
+
+			// Credential resolution: wpmind option first, then the WP 7.x
+			// Connectors option (read-only fallback).
+			$api_key = isset( $endpoints[ $key ]['api_key'] ) && is_string( $endpoints[ $key ]['api_key'] )
+				? trim( $endpoints[ $key ]['api_key'] )
+				: '';
+			if ( '' === $api_key ) {
+				$api_key = \WPMind\Provider\ConnectorCredentials::key_for( $key );
+			}
+
+			// Inject API key auth only when a key exists; otherwise Connectors UI
+			// or env vars can still supply credentials later.
+			if ( '' !== $api_key ) {
+				$registry->setProviderRequestAuthentication(
+					$provider_class,
+					new ApiKeyRequestAuthentication( $api_key )
+				);
+			}
 		}
 	}
 

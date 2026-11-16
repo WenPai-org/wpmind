@@ -225,6 +225,10 @@ final class Gateway {
 		$messages = $input['messages'] ?? ( $input['prompt'] ?? '' );
 		$options  = isset( $input['options'] ) && is_array( $input['options'] ) ? $input['options'] : [];
 
+		if ( isset( $input['model'] ) && is_string( $input['model'] ) && '' !== $input['model'] ) {
+			$options['model'] = $input['model'];
+		}
+
 		if ( '' === $messages || [] === $messages ) {
 			return $this->error_result(
 				'wpmind_mcp_chat_missing_prompt',
@@ -466,6 +470,10 @@ final class Gateway {
 						'prompt'   => [
 							'type'        => 'string',
 							'description' => __( 'Shortcut prompt string.', 'wpmind' ),
+						],
+						'model'    => [
+							'type'        => 'string',
+							'description' => __( 'Optional model override, forwarded to wpmind_chat() options.model.', 'wpmind' ),
 						],
 						'options'  => [
 							'type'        => 'object',

@@ -101,6 +101,10 @@ final class AutoMetaModule implements ModuleInterface {
 		$ajax = new AutoMetaAjaxController();
 		$ajax->register_hooks();
 
+		// Abilities API (read-only preview entry; writes stay in the admin review flow).
+		add_action( 'wp_abilities_api_categories_init', [ $this, 'register_ability_category' ] );
+		add_action( 'wp_abilities_api_init', [ $this, 'register_abilities' ] );
+
 		// Admin assets (only on WPMind settings page).
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
 
@@ -131,6 +135,109 @@ final class AutoMetaModule implements ModuleInterface {
 			WPMIND_VERSION,
 			true
 		);
+	}
+
+	/**
+	 * Register the content-abilities category.
+	 */
+	public function register_ability_category(): void {
+		if ( ! function_exists( 'wp_register_ability_category' ) ) {
+			return;
+		}
+		if ( function_exists( 'wp_has_ability_category' ) && wp_has_ability_category( 'wpmind-content' ) ) {
+			return;
+		}
+		wp_register_ability_category(
+			'wpmind-content',
+			[
+				'label'       => __( 'WPMind Content', 'wpmind' ),
+				'description' => __( 'Content automation preview abilities (auto meta, media).', 'wpmind' ),
+			]
+		);
+	}
+
+	/**
+	 * Register read-only preview abilities.
+	 */
+	public function register_abilities(): void {
+		if ( ! function_exists( 'wp_register_ability' ) || null === $this->generator ) {
+			return;
+		}
+
+		wp_register_ability(
+			'wpmind/auto-meta-preview',
+			[
+				'label'               => __( 'WPMind Auto Meta Preview', 'wpmind' ),
+				'description'         => __( 'Generate proposed excerpt, SEO description, tags, category and FAQ for a published post without writing anything.', 'wpmind' ),
+				'category'            => 'wpmind-content',
+				'input_schema'        => [
+					'type'       => 'object',
+					'required'   => [ 'post_id' ],
+					'properties' => [
+						'post_id' => [
+							'type'        => 'integer',
+							'description' => __( 'Published post ID.', 'wpmind' ),
+						],
+					],
+				],
+				'output_schema'       => [
+					'type'        => 'object',
+					'description' => __( 'Proposed meta fields payload.', 'wpmind' ),
+				],
+				'permission_callback' => static function (): bool {
+					return current_user_can( 'manage_options' );
+				},
+				'execute_callback'    => [ $this, 'execute_auto_meta_preview_ability' ],
+				'meta'                => [
+					'annotations'  => [
+						'readonly'    => true,
+						'destructive' => false,
+						'idempotent'  => true,
+					],
+					'show_in_rest' => true,
+					'mcp'          => [
+						'public' => true,
+					],
+				],
+			]
+		);
+	}
+
+	/**
+	 * Ability execute callback: preview auto-meta for a post.
+	 *
+	 * @param mixed ...$args Ability input.
+	 * @return array{success:bool, data?:mixed, error?:array{code:string,message:string}}
+	 */
+	public function execute_auto_meta_preview_ability( ...$args ): array {
+		$input   = is_array( $args[0] ?? null ) ? $args[0] : [];
+		$post_id = (int) ( $input['post_id'] ?? 0 );
+
+		if ( $post_id <= 0 || null === $this->generator ) {
+			return [
+				'success' => false,
+				'error'   => [
+					'code'    => 'wpmind_auto_meta_preview_bad_input',
+					'message' => __( 'Invalid post_id.', 'wpmind' ),
+				],
+			];
+		}
+
+		$result = $this->generator->preview_meta( $post_id );
+		if ( is_wp_error( $result ) ) {
+			return [
+				'success' => false,
+				'error'   => [
+					'code'    => $result->get_error_code(),
+					'message' => $result->get_error_message(),
+				],
+			];
+		}
+
+		return [
+			'success' => true,
+			'data'    => $result,
+		];
 	}
 
 	/**

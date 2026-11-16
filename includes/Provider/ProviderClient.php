@@ -50,6 +50,12 @@ final class ProviderClient {
 			? $args['api_key']
 			: (string) $repo->get( $provider )->api_key;
 
+		// Fall back to the WP 7.x Connectors-stored key (read-only) when the
+		// wpmind option has none; an explicitly passed api_key is never overridden.
+		if ( '' === $api_key && ! isset( $args['api_key'] ) ) {
+			$api_key = ConnectorCredentials::key_for( $provider );
+		}
+
 		if ( '' === $api_key && empty( $args['allow_empty_key'] ) ) {
 			$err = new WP_Error(
 				'wpmind_api_key_missing',
