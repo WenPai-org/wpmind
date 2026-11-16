@@ -28,7 +28,8 @@ $entries     = (int) ( $cache_stats['entries'] ?? 0 );
 $savings = \WPMind\Modules\ExactCache\CostEstimator::get_estimated_savings();
 ?>
 
-<div class="wpmind-statbar" style="margin-bottom:var(--wenpai-space-5);">
+<section class="card">
+	<div class="wpmind-statbar">
 	<div class="wpmind-statbar-item">
 		<?php echo AdminIcons::svg( 'analytics', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<div class="wpmind-statbar-text">
@@ -58,6 +59,7 @@ $savings = \WPMind\Modules\ExactCache\CostEstimator::get_estimated_savings();
 		</div>
 	</div>
 </div>
+</section>
 
 <section class="card">
 	<div class="card-head">

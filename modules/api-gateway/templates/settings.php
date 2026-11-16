@@ -59,7 +59,8 @@ $wpmind_num = static function ( string $id, $value, int $min, int $max, string $
 };
 ?>
 
-<div class="wpmind-statbar" style="margin-bottom:var(--wenpai-space-5);">
+<section class="card">
+	<div class="wpmind-statbar">
 	<div class="wpmind-statbar-item">
 		<?php echo AdminIcons::svg( 'key', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<div class="wpmind-statbar-text">
@@ -89,6 +90,7 @@ $wpmind_num = static function ( string $id, $value, int $min, int $max, string $
 		</div>
 	</div>
 </div>
+</section>
 
 <div class="wenpai-subnav">
 	<div class="seg wpmind-module-subtabs">

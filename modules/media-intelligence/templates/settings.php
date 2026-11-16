@@ -42,7 +42,8 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 
 <div class="wpmind-media-panel">
 
-	<div class="wpmind-statbar" style="margin-bottom:var(--wenpai-space-5);">
+		<section class="card">
+		<div class="wpmind-statbar">
 		<div class="wpmind-statbar-item">
 			<?php echo AdminIcons::svg( 'image', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<div class="wpmind-statbar-text">
@@ -64,7 +65,8 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 				<div class="v" id="wpmind-media-month-gen"><?php echo esc_html( (string) $month_gen ); ?></div>
 			</div>
 		</div>
-	</div>
+		</div>
+	</section>
 
 	<div class="wenpai-subnav">
 		<div class="seg wpmind-module-subtabs">

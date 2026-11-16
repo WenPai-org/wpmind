@@ -55,7 +55,8 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 };
 ?>
 
-<div class="wpmind-statbar" style="margin-bottom:var(--wenpai-space-5);">
+<section class="card">
+	<div class="wpmind-statbar">
 	<div class="wpmind-statbar-item">
 		<?php echo AdminIcons::svg( 'wallet', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<div class="wpmind-statbar-text">
@@ -85,6 +86,7 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 		</div>
 	</div>
 </div>
+</section>
 
 <div class="wenpai-grid-2">
 
