@@ -16,6 +16,8 @@
 .wenpai-app svg { max-width: 24px; max-height: 24px; }
 .wenpai-ico { display: inline-block; flex: none; vertical-align: -0.2em; }
 .wenpai-app svg.wenpai-ico { max-width: none; max-height: none; }
+/* 裸用兜底尺寸：1em 随父字号缩放；:where 零优先级，任何上下文规则（.tile svg 等）照常覆盖。 */
+.wenpai-app :where(svg.wenpai-ico) { width: 1em; height: 1em; }
 
 /* --- 壳 --- */
 
@@ -682,6 +684,9 @@ pre.wenpai-code code {
   .card, .field, .field-ctl, .wenpai-stack, .wenpai-main {
     overflow: visible;
   }
+  /* 卡头动作组在窄屏换行，避免按钮行撑破卡片。 */
+  .card-head { flex-wrap: wrap; }
+  .wenpai-actions { flex-wrap: wrap; }
 }
 
 

@@ -128,13 +128,13 @@ wpmind_page_head(
 		<div class="card-foot">
 			<span class="meta"><?php esc_html_e( '批准的项才会写入；每步有记录，可撤销。', 'wpmind' ); ?></span>
 			<span class="wenpai-actions">
-				<span class="wpmind-workflow-actset" data-type="alt_bulk">
+				<span class="wpmind-workflow-actset" data-type="alt_bulk" style="display:none;">
 					<button class="btn btn-ghost" type="button" id="wpmind-workflow-alt-dryrun" disabled><?php esc_html_e( 'Dry-run', 'wpmind' ); ?></button>
 					<button class="btn" type="button" id="wpmind-workflow-alt-submit-review" disabled><?php esc_html_e( '提交审核', 'wpmind' ); ?></button>
 					<button class="btn btn-primary" type="button" id="wpmind-workflow-alt-apply" disabled><?php esc_html_e( '写入已通过项', 'wpmind' ); ?></button>
 					<button class="btn btn-ghost" type="button" id="wpmind-workflow-alt-undo" disabled><?php esc_html_e( '撤销已写入', 'wpmind' ); ?></button>
 				</span>
-				<span class="wpmind-workflow-actset" data-type="meta_bulk">
+				<span class="wpmind-workflow-actset" data-type="meta_bulk" style="display:none;">
 					<button class="btn btn-ghost" type="button" id="wpmind-workflow-meta-dryrun" disabled><?php esc_html_e( 'Dry-run', 'wpmind' ); ?></button>
 					<button class="btn" type="button" id="wpmind-workflow-meta-submit-review" disabled><?php esc_html_e( '提交审核', 'wpmind' ); ?></button>
 					<button class="btn btn-primary" type="button" id="wpmind-workflow-meta-apply" disabled><?php esc_html_e( '写入已通过项', 'wpmind' ); ?></button>
