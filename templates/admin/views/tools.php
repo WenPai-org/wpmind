@@ -58,19 +58,17 @@ wpmind_page_head(
 				<p class="card-sub"><?php esc_html_e( '用之前导出的 JSON 恢复端点与模块配置。导入为两段确认：先校验预览差异，再确认才写入。导入会保留本站已保存的 API Key。', 'wpmind' ); ?></p>
 			</div>
 		</div>
-		<div class="wenpai-field wenpai-field--row field">
-			<div class="field-label"><label class="wenpai-field__label" for="wpmind-import-config-file"><?php esc_html_e( '配置文件', 'wpmind' ); ?></label></div>
-			<div class="field-ctl">
-				<span class="wenpai-file" data-wenpai-file data-wenpai-file-local data-multiple="0" data-name="wpmind_import_config_file">
-					<span class="wenpai-file__drop" role="button" tabindex="0" aria-label="<?php esc_attr_e( '选择配置文件', 'wpmind' ); ?>">
-						<?php echo AdminIcons::svg( 'upload' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-						<span><?php esc_html_e( '拖入 JSON 文件，或点击选择', 'wpmind' ); ?></span>
-						<input type="file" class="wenpai-file__input" id="wpmind-import-config-file" name="wpmind_import_config_file" accept="application/json,.json" hidden>
-					</span>
-					<span class="wenpai-file__list"></span>
+		<div class="wenpai-field">
+			<label class="wenpai-field__label" for="wpmind-import-config-file"><?php esc_html_e( '配置文件', 'wpmind' ); ?></label>
+			<span class="wenpai-file" data-wenpai-file data-wenpai-file-local data-multiple="0" data-name="wpmind_import_config_file">
+				<span class="wenpai-file__drop" role="button" tabindex="0" aria-label="<?php esc_attr_e( '选择配置文件', 'wpmind' ); ?>">
+					<?php echo AdminIcons::svg( 'upload' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<span><?php esc_html_e( '拖入 JSON 文件，或点击选择', 'wpmind' ); ?></span>
+					<input type="file" class="wenpai-file__input" id="wpmind-import-config-file" name="wpmind_import_config_file" accept="application/json,.json" hidden>
 				</span>
-				<p class="wenpai-field__desc"><?php esc_html_e( '选择 .json 文件后自动预检差异，确认无误才写入。', 'wpmind' ); ?></p>
-			</div>
+				<span class="wenpai-file__list"></span>
+			</span>
+			<p class="wenpai-field__desc"><?php esc_html_e( '选择 .json 文件后自动预检差异，确认无误才写入。', 'wpmind' ); ?></p>
 		</div>
 		<div class="card-foot">
 			<span class="meta"><?php esc_html_e( '两段确认：先 dry-run 预览差异，再确认写入。', 'wpmind' ); ?></span>
