@@ -313,9 +313,13 @@ final class AdminPage {
 			$entry = [
 				'enabled'         => ! empty( $endpoint_input['enabled'] ),
 				'custom_base_url' => $this->sanitize_custom_base_url( $endpoint_input, $key, $previous['custom_base_url'] ),
-				// 模型选择 UI 在 PR2；这里沿用库里已有的用户选择（空 = 目录默认）.
-				'models'          => $previous['models'],
-				'default_model'   => $previous['default_model'],
+				// models/default_model 由服务页高级设置表单提交；字段缺省时保留库中值.
+				'models'          => array_key_exists( 'models', $endpoint_input )
+					? EndpointRepository::normalize_models( $endpoint_input['models'] )
+					: $previous['models'],
+				'default_model'   => array_key_exists( 'default_model', $endpoint_input )
+					? trim( sanitize_text_field( (string) $endpoint_input['default_model'] ) )
+					: $previous['default_model'],
 			];
 			// key_meta: rewrite on fingerprint change; drop when cleared; else keep or lazy-fill.
 			$old_fp = Secrets::fingerprint( $current->api_key );

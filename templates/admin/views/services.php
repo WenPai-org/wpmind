@@ -299,6 +299,21 @@ wpmind_page_head(
 				</div>
 				<?php endif; ?>
 
+				<div class="wenpai-field field wenpai-field--row wpmind-field--center">
+					<div class="field-label"><label class="wenpai-field__label" for="models_<?php echo esc_attr( $key ); ?>"><?php esc_html_e( '支持的模型', 'wpmind' ); ?></label></div>
+					<div class="field-ctl">
+						<input type="text" id="models_<?php echo esc_attr( $key ); ?>" name="wpmind_custom_endpoints[<?php echo esc_attr( $key ); ?>][models]" value="<?php echo esc_attr( implode( ', ', (array) $endpoint['models'] ) ); ?>" placeholder="<?php esc_attr_e( '留空使用目录推荐模型', 'wpmind' ); ?>">
+						<p class="wenpai-field__desc"><?php esc_html_e( '多个模型用英文逗号分隔。官方端点留空使用目录默认列表；自定义 Base URL 端点请填写端点实际支持的模型 ID。', 'wpmind' ); ?></p>
+					</div>
+				</div>
+				<div class="wenpai-field field wenpai-field--row wpmind-field--center">
+					<div class="field-label"><label class="wenpai-field__label" for="default_model_<?php echo esc_attr( $key ); ?>"><?php esc_html_e( '默认模型', 'wpmind' ); ?></label></div>
+					<div class="field-ctl">
+						<input type="text" id="default_model_<?php echo esc_attr( $key ); ?>" name="wpmind_custom_endpoints[<?php echo esc_attr( $key ); ?>][default_model]" value="<?php echo esc_attr( (string) ( $endpoint['default_model'] ?? '' ) ); ?>" placeholder="auto">
+						<p class="wenpai-field__desc"><?php esc_html_e( '「auto」请求优先使用的模型；留空自动选择。自定义端点可配合「拉取远程模型」获取候选。', 'wpmind' ); ?></p>
+					</div>
+				</div>
+
 				<details class="wpmind-advanced">
 					<summary><?php echo class_exists( 'Wenpai_Admin_Icons', false ) ? Wenpai_Admin_Icons::svg( 'chevron-down' ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php esc_html_e( '高级设置', 'wpmind' ); ?></summary>
 					<div class="wpmind-advanced-body">
@@ -310,17 +325,12 @@ wpmind_page_head(
 							</div>
 						</div>
 						<div class="wenpai-field field wenpai-field--row wpmind-field--center">
-							<div class="field-label"><span class="wenpai-field__label"><?php esc_html_e( '支持的模型', 'wpmind' ); ?></span></div>
+							<div class="field-label"><span class="wenpai-field__label"><?php esc_html_e( '远程模型', 'wpmind' ); ?></span></div>
 							<div class="field-ctl">
-								<?php
-								$wpmind_display_models = (array) $endpoint['models'];
-								if ( [] === $wpmind_display_models ) {
-									$wpmind_display_models = \WPMind\Provider\Catalog\ModelCatalog::instance()->recommended_ids( $key );
-								}
-								foreach ( $wpmind_display_models as $wpmind_model ) :
-									?>
-								<span class="prov"><?php echo esc_html( $wpmind_model ); ?></span>
-								<?php endforeach; ?>
+								<div class="wenpai-actions">
+									<button type="button" class="btn btn-sm btn-ghost wpmind-fetch-models" data-provider="<?php echo esc_attr( $key ); ?>"><?php esc_html_e( '拉取远程模型', 'wpmind' ); ?></button>
+									<span class="meta wpmind-fetch-models-hint"><?php esc_html_e( '从端点 /models 获取可用模型（仅 chat 类），追加到上方列表', 'wpmind' ); ?></span>
+								</div>
 							</div>
 						</div>
 					</div>

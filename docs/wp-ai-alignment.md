@@ -49,7 +49,8 @@ wpmind 在 init:5 已把自家 key 注进 SDK registry，WP7 下 SDK 路径本�
 - 实测发现：配置 custom_base_url 的端点（中转站、Token Plan、z.ai 等）模型命名与静态目录无关，原逻辑会把显式模型静默换成目录默认（`qwen-plus` 等）→ provider 报 Unknown Model，且不报模型被替换。
 - 修复：`ChatService::resolve_attempt_model()` 及 stream/native 路径——custom_base_url 端点跳过静态目录：显式模型透传，auto/default 回落端点 `default_model`；未配置 default_model 时经 `RemoteModelLister` 查端点 `/models`（transient 缓存 12h、key/base_url 指纹校验，未命中实时拉一次 5s 超时）取第一个模型 ID，全部失败才传字面量 `'auto'`；非 custom 端点行为不变。
 - 已在 WP 7.1.4 实测：qwen(token-plan)+zhipu(z.ai) 显式与 auto 模式真实调用全部成功；auto 无 default_model 时自动落到 `/models` 首个模型（qwen3.7-max）真实完成。
-- `/models` 首个 ID 不一定是 chat 模型：已加 `RemoteModelLister::chat_candidates()` 启发式黑名单（image/audio/video/embedding/rerank/ocr 等模态词），auto 兜底取过滤后首个；PR2 模型选择 UI 落地后应改成按能力精确过滤。
+- `/models` 首个 ID 不一定是 chat 模型：已加 `RemoteModelLister::chat_candidates()` 启发式黑名单（image/audio/video/embedding/rerank/ocr 等模态词），auto 兜底取过滤后首个。
+- PR2 模型选择 UI（2026-11-17，原型已批）：服务页每个 Provider 新增「支持的模型」（逗号分隔，空=目录默认）与「默认模型」（auto 兜底）字段，`sanitize_endpoints` 真实落库 v2；高级设置内「拉取远程模型」按钮走 `wpmind_fetch_models` AJAX（复用 connection_test_target B13 规则，未保存地址需同时提交新 key），返回 chat 过滤后的 ID 并合并进输入框。启发式过滤仍是临时方案，能力级过滤等中心目录（RemoteCatalog）落地。
 
 ### E. 后续预案（不写码）
 

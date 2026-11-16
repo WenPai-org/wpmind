@@ -713,9 +713,9 @@ class ChatService extends AbstractService {
 	 * 端点自己配置的 default_model，未配置则传字面量 'auto' 由 provider 决定。
 	 * 官方端点维持原有行为：auto 取当前模型，显式模型不在已选列表时回落默认。
 	 *
-	 * @param string $provider  服务商
-	 * @param string $requested 请求的模型（可能是 'auto'/'default'）
-	 * @param bool   $is_auto   是否 auto 模式
+	 * @param string $provider  服务商.
+	 * @param string $requested 请求的模型（可能是 'auto'/'default'）.
+	 * @param bool   $is_auto   是否 auto 模式.
 	 * @return string
 	 */
 	private function resolve_attempt_model( string $provider, string $requested, bool $is_auto ): string {
@@ -776,7 +776,7 @@ class ChatService extends AbstractService {
 	/**
 	 * 公共访问器：获取当前模型（供 Facade 的 get_status() 使用）
 	 *
-	 * @param string $provider 服务商
+	 * @param string $provider 服务商.
 	 * @return string
 	 */
 	public function get_current_model_public( string $provider ): string {

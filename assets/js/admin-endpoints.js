@@ -567,6 +567,80 @@
 	}
 
 	/**
+	 * 拉取远程模型列表并追加到「支持的模型」输入框
+	 */
+	function initFetchModels() {
+		$( '.wpmind-fetch-models' ).on( 'click', function( e ) {
+			e.preventDefault();
+
+			var $button = $( this );
+			var provider = $button.data( 'provider' );
+			var $card = $button.closest( 'details.wpmind-provider' );
+			var apiKey = $card.find( 'input[name*="[api_key]"]' ).val() || '';
+			var customUrl = $card.find( 'input[name*="[custom_base_url]"]' ).val() || '';
+			var $modelsInput = $card.find( 'input[id^="models_"]' );
+			var $hint = $button.siblings( '.wpmind-fetch-models-hint' );
+			var origText = $button.text();
+
+			if ( 'undefined' === typeof wpmindData ) {
+				$hint.text( '配置错误' );
+				return;
+			}
+
+			$button.prop( 'disabled', true ).text( '拉取中…' );
+			$hint.text( '' );
+
+			$.ajax( {
+				url: wpmindData.ajaxurl || ajaxurl,
+				type: 'POST',
+				data: {
+					action: 'wpmind_fetch_models',
+					provider: provider,
+					api_key: apiKey,
+					custom_url: customUrl,
+					nonce: wpmindData.nonce
+				},
+				timeout: 30000,
+				success: function( response ) {
+					if ( response.success && response.data && response.data.ids ) {
+						var ids = response.data.ids;
+						var current = $modelsInput.val();
+						var merged = current ? current.split( ',' ).map( function( s ) { return s.trim(); } ).filter( Boolean ) : [];
+						ids.forEach( function( id ) {
+							if ( -1 === merged.indexOf( id ) ) {
+								merged.push( id );
+							}
+						} );
+						$modelsInput.val( merged.join( ', ' ) );
+
+						var parts = [ '已获取 ' + ids.length + ' 个 chat 模型' ];
+						if ( response.data.filtered ) {
+							parts.push( '过滤 ' + response.data.filtered + ' 个非 chat' );
+						}
+						if ( response.data.from_cache ) {
+							parts.push( '缓存' );
+						}
+						$hint.text( parts.join( '，' ) + '，已追加到上方列表' );
+						Toast.success( provider + ': ' + ids.length + ' 个模型' );
+					} else {
+						var msg = ( response.data && response.data.message ) || '拉取失败';
+						$hint.text( msg );
+						Toast.error( provider + ': ' + msg );
+					}
+				},
+				error: function( xhr, status ) {
+					var message = 'timeout' === status ? '请求超时，请检查网络连接' : '网络错误，请检查连接';
+					$hint.text( message );
+					Toast.error( provider + ': ' + message );
+				},
+				complete: function() {
+					$button.prop( 'disabled', false ).text( origText );
+				}
+			} );
+		} );
+	}
+
+	/**
 	 * Initialize on document ready
 	 */
 	$( function() {
@@ -593,5 +667,6 @@
 		safeInit( 'endpoints:status-update', initStatusUpdate );
 		safeInit( 'endpoints:clear-key', initClearKeyHandler );
 		safeInit( 'endpoints:form-validation', initFormValidation );
+		safeInit( 'endpoints:fetch-models', initFetchModels );
 	} );
 } )( jQuery );
