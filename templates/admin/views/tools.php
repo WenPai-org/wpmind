@@ -61,7 +61,14 @@ wpmind_page_head(
 		<div class="wenpai-field wenpai-field--row field">
 			<div class="field-label"><label class="wenpai-field__label" for="wpmind-import-config-file"><?php esc_html_e( '配置文件', 'wpmind' ); ?></label></div>
 			<div class="field-ctl">
-				<input type="file" id="wpmind-import-config-file" name="wpmind_import_config_file" accept="application/json,.json">
+				<span class="wenpai-file" data-wenpai-file data-wenpai-file-local data-multiple="0" data-name="wpmind_import_config_file">
+					<span class="wenpai-file__drop" role="button" tabindex="0" aria-label="<?php esc_attr_e( '选择配置文件', 'wpmind' ); ?>">
+						<?php echo AdminIcons::svg( 'upload' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<span><?php esc_html_e( '拖入 JSON 文件，或点击选择', 'wpmind' ); ?></span>
+						<input type="file" class="wenpai-file__input" id="wpmind-import-config-file" name="wpmind_import_config_file" accept="application/json,.json">
+					</span>
+					<span class="wenpai-file__list"></span>
+				</span>
 				<p class="wenpai-field__desc"><?php esc_html_e( '选择 .json 文件后自动预检差异，确认无误才写入。', 'wpmind' ); ?></p>
 			</div>
 		</div>
