@@ -1,24 +1,25 @@
 const { expect } = require('@playwright/test');
 
-/** 打开 WPMind 设置页并切到「模块管理」页签。 */
+/** 打开 WPMind 后台「模块」视图（4.0 壳：?page=wpmind&tab=modules）。 */
 async function openModulesTab(page) {
-	await page.goto('/wp-admin/admin.php?page=wpmind#modules');
-	const tab = page.locator('a.wpmind-tab[data-tab="modules"]');
-	await expect(tab).toBeVisible();
-	await tab.click();
-	await expect(page.locator('.wpmind-modules-grid')).toBeVisible();
+	await page.goto('/wp-admin/admin.php?page=wpmind&tab=modules');
+	await expect(page.locator('.wenpai-app .wpmind-module-list')).toBeVisible();
 }
 
 function card(page, id) {
-	return page.locator(`.wpmind-module-card[data-module-id="${id}"]`);
-}
-
-function navTab(page, tabId) {
-	return page.locator(`nav.wpmind-tab-list a.wpmind-tab[data-tab="${tabId}"]`);
+	return page.locator(`.wpmind-module-card:has(input.wpmind-module-switch[data-module-id="${id}"])`);
 }
 
 /**
- * 点模块开关（真实的 checkbox 被样式藏起来了，点它外面的 label）。
+ * 模块卡片里的「设置」入口：只在模块启用且有 settings_tab 时渲染，
+ * href 指向 ?page=wpmind&tab=module&module=<id>（templates/admin/views/modules.php）。
+ */
+function moduleLink(page, id) {
+	return card(page, id).locator(`a[href*="module=${id}"]`);
+}
+
+/**
+ * 点模块开关（kit .wenpai-switch：input 透明覆盖在 track 上，直接点 input）。
  * 成功后前端会 location.reload()，刷新会让浏览器丢掉 AJAX 响应体，
  * 所以用 route 先把响应取到手再原样交给页面。
  */
@@ -37,7 +38,7 @@ async function toggleModule(page, id) {
 	try {
 		await Promise.all([
 			page.waitForEvent('load'),
-			card(page, id).locator('label.wpmind-switch').click(),
+			card(page, id).locator(`input.wpmind-module-switch[data-module-id="${id}"]`).click(),
 		]);
 	} finally {
 		await page.unroute('**/wp-admin/admin-ajax.php', handler);
@@ -49,4 +50,4 @@ async function toggleModule(page, id) {
 	return captured;
 }
 
-module.exports = { openModulesTab, card, navTab, toggleModule };
+module.exports = { openModulesTab, card, moduleLink, toggleModule };
