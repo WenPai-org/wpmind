@@ -16,12 +16,24 @@ use WPMind\Provider\Secrets;
 /**
  * Fetches OpenAI-compatible model ids from a provider base URL.
  *
+ * refresh() is called lazily by the custom-endpoint auto-model fallback
+ * (ChatService) and can also be triggered manually; results are cached
+ * for 12h and validated by key/base_url fingerprint.
+ *
  * @since 0.13.0
  */
 final class RemoteModelLister {
 
 	private const TRANSIENT_PREFIX = 'wpmind_models_remote_';
 	private const TTL              = 43200;
+
+	/**
+	 * 模型 ID 中明显不是 chat/文本生成的模态标记（启发式黑名单）。
+	 *
+	 * /models 不返回能力标记，只能按命名排除：图像、音频、视频、embedding、
+	 * rerank、OCR、安全审核等。保守起见只列明确模态词，宁可漏过滤也不错杀。
+	 */
+	private const NON_CHAT_PATTERN = '/embed|image|audio|tts|asr|whisper|realtime|voice|video|veo|sora|kling|jimeng|wan\d|rerank|ocr|moderation|cosyvoice|sensevoice|document|3d|mesh/i';
 
 	/**
 	 * Read cached remote model list.
@@ -138,5 +150,26 @@ final class RemoteModelLister {
 			return [];
 		}
 		return $cached['ids'];
+	}
+
+	/**
+	 * Filter a model id list down to likely chat/text-generation models.
+	 *
+	 * Heuristic only: /models carries no capability flags, so ids matching
+	 * NON_CHAT_PATTERN (image/audio/video/embedding/rerank/...) are dropped.
+	 * Order is preserved; callers pick the first surviving id.
+	 *
+	 * @param list<string> $ids Raw model ids.
+	 * @return list<string>
+	 */
+	public function chat_candidates( array $ids ): array {
+		return array_values(
+			array_filter(
+				$ids,
+				static function ( $id ): bool {
+					return '' !== $id && 1 !== preg_match( self::NON_CHAT_PATTERN, $id );
+				}
+			)
+		);
 	}
 }
