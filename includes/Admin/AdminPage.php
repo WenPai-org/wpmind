@@ -72,8 +72,6 @@ final class AdminPage {
 		'api-gateway',
 		'auto-meta',
 		'cost-control',
-		'exact-cache',
-		'media-intelligence',
 	];
 
 	/**

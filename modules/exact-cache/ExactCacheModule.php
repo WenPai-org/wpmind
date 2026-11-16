@@ -131,7 +131,7 @@ final class ExactCacheModule implements ModuleInterface {
 	 * @param string $hook_suffix Current page hook suffix.
 	 */
 	public function enqueue_admin_assets( string $hook_suffix ): void {
-		if ( 'toplevel_page_wpmind' !== $hook_suffix ) {
+		if ( ! in_array( $hook_suffix, [ 'settings_page_wpmind', 'toplevel_page_wpmind' ], true ) ) {
 			return;
 		}
 		wp_enqueue_style(

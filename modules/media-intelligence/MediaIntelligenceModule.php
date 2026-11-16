@@ -148,15 +148,12 @@ final class MediaIntelligenceModule implements ModuleInterface {
 	 * @param string $hook_suffix Current page hook suffix.
 	 */
 	public function enqueue_admin_assets( string $hook_suffix ): void {
-		if ( 'toplevel_page_wpmind' !== $hook_suffix ) {
+		if ( ! in_array( $hook_suffix, [ 'settings_page_wpmind', 'toplevel_page_wpmind' ], true ) ) {
 			return;
 		}
-		wp_enqueue_style(
-			'wpmind-media-intelligence',
-			WPMIND_PLUGIN_URL . 'assets/css/pages/media-intelligence.css',
-			[ 'wpmind-admin' ],
-			WPMIND_VERSION
-		);
+		if ( 'module' !== \WPMind\Admin\AdminPage::current_view() || 'media-intelligence' !== \WPMind\Admin\AdminPage::current_module() ) {
+			return;
+		}
 		wp_enqueue_script(
 			'wpmind-admin-media-intelligence',
 			WPMIND_PLUGIN_URL . 'assets/js/admin-media-intelligence.js',

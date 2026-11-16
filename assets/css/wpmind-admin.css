@@ -829,3 +829,25 @@ body.wenpai-ui-page .wenpai-app .wpmind-provider-body .wpmind-field--center .fie
 .wpmind-geo-info-body ul { margin: 0 0 var(--wenpai-space-3); padding-inline-start: var(--wenpai-space-5); }
 .wpmind-geo-info-body li { margin-bottom: 4px; }
 .wpmind-crawler-list { display: grid; }
+
+/* 媒体智能：批量进度条（kit token 版，替代旧 pages/media-intelligence.css） */
+.wpmind-media-progress { margin-top: var(--wenpai-space-3); }
+.wpmind-media-progress-bar {
+	height: 8px;
+	background: var(--wenpai-mute-soft, var(--wenpai-line-soft));
+	border-radius: 999px;
+	overflow: hidden;
+}
+.wpmind-media-progress-fill {
+	height: 100%;
+	background: var(--wenpai-accent);
+	border-radius: inherit;
+	transition: width .3s ease;
+}
+.wpmind-media-progress-text {
+	display: block;
+	margin-top: var(--wenpai-space-1);
+	font-size: var(--wenpai-text-meta);
+	color: var(--wenpai-ink-3);
+	font-variant-numeric: tabular-nums;
+}

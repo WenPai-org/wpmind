@@ -185,7 +185,7 @@ class BudgetAlert {
 	 */
 	public function display_admin_notices(): void {
 		$screen = get_current_screen();
-		if ( ! $screen || $screen->id !== 'toplevel_page_wpmind' ) {
+		if ( ! $screen || ! in_array( $screen->id, [ 'settings_page_wpmind', 'toplevel_page_wpmind' ], true ) ) {
 			return;
 		}
 
