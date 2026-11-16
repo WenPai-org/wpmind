@@ -748,3 +748,39 @@ body.wenpai-ui-page .wenpai-app .wpmind-provider-body .wpmind-field--center .fie
 .wpmind-api-key-field input { flex: 1 1 auto; min-width: 0; }
 .wpmind-toggle-key .wenpai-ico { width: 16px; height: 16px; }
 .wpmind-provider-side .wpmind-test-result { font-size: var(--wenpai-text-caption); }
+
+/* ---- 智能路由：策略 seg（label 承载 radio，JS 契约 .wpmind-strategy-item） ---- */
+.seg .wpmind-strategy-item {
+  padding: 0 var(--wenpai-space-3);
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wenpai-space-2);
+  color: var(--wenpai-ink-2);
+  border-left: 1px solid var(--wenpai-line-strong);
+  font-size: var(--wenpai-text-body);
+  cursor: pointer;
+  user-select: none;
+}
+.seg .wpmind-strategy-item:first-child { border-inline-start: 0; }
+.seg .wpmind-strategy-item:hover { color: var(--wenpai-ink); background: var(--wenpai-line-soft); }
+.seg .wpmind-strategy-item.is-active,
+.seg .wpmind-strategy-item:has(input:checked) {
+  background: var(--wenpai-accent-soft);
+  color: var(--wenpai-accent);
+  font-weight: var(--wenpai-weight-regular);
+}
+.wpmind-strategy-item input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.wpmind-route-bar .wpmind-refresh-routing .wenpai-ico,
+.wpmind-route-bar .btn .wenpai-ico { width: 14px; height: 14px; }
+
+/* ---- 智能路由：优先级区 ---- */
+.wpmind-routing-section-desc { margin: 0 0 var(--wenpai-space-3); }
+.wpmind-priority-badge { margin-inline-start: var(--wenpai-space-2); }
+.wpmind-routing-priority-actions { flex: none; }
+.wpmind-routing-priority .wpmind-priority { margin-bottom: var(--wenpai-space-4); }
+.wpmind-priority-item.ui-sortable-helper { box-shadow: var(--wenpai-shadow-pop, 0 8px 24px rgba(0,0,0,.12)); }

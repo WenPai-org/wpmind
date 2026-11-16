@@ -37,8 +37,9 @@
 				self.setStrategy( strategy );
 			} );
 
-			// 策略卡片点击 - 备用方案
-			$( document ).on( 'click', '.wpmind-strategy-item', function() {
+			// 策略卡片点击 - 备用方案（preventDefault 阻断 label 原生二次 toggle）
+			$( document ).on( 'click', '.wpmind-strategy-item', function( e ) {
+				e.preventDefault();
 				var $radio = $( this ).find( 'input[type="radio"]' );
 				if ( ! $radio.prop( 'checked' ) ) {
 					$radio.prop( 'checked', true ).trigger( 'change' );
@@ -49,9 +50,9 @@
 			$( document ).on( 'click', '.wpmind-refresh-routing', function( e ) {
 				e.preventDefault();
 				var $btn = $( this );
-				$btn.find( '.dashicons' ).addClass( 'wpmind-spinning' );
+				$btn.addClass( 'is-busy' ).prop( 'disabled', true );
 				self.refreshStatus( function() {
-					$btn.find( '.dashicons' ).removeClass( 'wpmind-spinning' );
+					$btn.removeClass( 'is-busy' ).prop( 'disabled', false );
 				} );
 			} );
 
@@ -114,7 +115,7 @@
 			}
 
 			var $btn = $( '.wpmind-save-priority' );
-			$btn.prop( 'disabled', true ).find( '.dashicons' ).addClass( 'wpmind-spinning' );
+			$btn.prop( 'disabled', true ).addClass( 'is-busy' );
 
 			$.ajax( {
 				url: wpmindData.ajaxurl || ajaxurl,
@@ -130,8 +131,7 @@
 						// 显示清除按钮
 						if ( ! $( '.wpmind-clear-priority' ).length ) {
 							$( '.wpmind-routing-priority-actions' ).prepend(
-								'<button type="button" class="button button-small wpmind-clear-priority" title="清除手动优先级">' +
-								'<span class="dashicons ri-delete-bin-line"></span> 清除</button>'
+								'<button type="button" class="btn btn-sm btn-ghost wpmind-clear-priority">清除优先级</button>'
 							);
 						}
 						// 显示已启用标记
@@ -151,7 +151,7 @@
 					Toast.error( '保存失败，请重试' );
 				},
 				complete: function() {
-					$btn.prop( 'disabled', false ).find( '.dashicons' ).removeClass( 'wpmind-spinning' );
+					$btn.prop( 'disabled', false ).removeClass( 'is-busy' );
 				}
 			} );
 		},
@@ -171,7 +171,7 @@
 				cancelText: '取消',
 				onConfirm: function() {
 					var $btn = $( '.wpmind-clear-priority' );
-					$btn.prop( 'disabled', true ).find( '.dashicons' ).addClass( 'wpmind-spinning' );
+					$btn.prop( 'disabled', true ).addClass( 'is-busy' );
 
 					$.ajax( {
 						url: wpmindData.ajaxurl || ajaxurl,
@@ -199,7 +199,7 @@
 							Toast.error( '清除失败，请重试' );
 						},
 						complete: function() {
-							$btn.prop( 'disabled', false ).find( '.dashicons' ).removeClass( 'wpmind-spinning' );
+							$btn.prop( 'disabled', false ).removeClass( 'is-busy' );
 						}
 					} );
 				}
@@ -277,14 +277,14 @@
 				$scores.empty();
 				$.each( data.provider_scores, function( providerId, scoreData ) {
 					var isTop = 1 === scoreData.rank;
-					var $item = $( '<div class="wpmind-routing-score-item"></div>' );
+					var $item = $( '<div class="wpmind-score-row"></div>' );
 					if ( isTop ) $item.addClass( 'is-top' );
-					$item.append( $( '<span class="wpmind-routing-rank"></span>' ).text( scoreData.rank ) );
-					$item.append( $( '<span class="wpmind-routing-provider-name"></span>' ).text( scoreData.name ) );
-					var $bar = $( '<div class="wpmind-routing-score-bar"></div>' );
-					$bar.append( $( '<div class="wpmind-routing-score-fill"></div>' ).css( 'width', scoreData.score + '%' ) );
+					$item.append( $( '<span class="wpmind-score-rank"></span>' ).text( scoreData.rank ) );
+					$item.append( $( '<span class="wpmind-score-name"></span>' ).text( scoreData.name ) );
+					var $bar = $( '<span class="wpmind-score-bar"></span>' );
+					$bar.append( $( '<span class="wpmind-score-fill"></span>' ).css( 'width', scoreData.score + '%' ) );
 					$item.append( $bar );
-					$item.append( $( '<span class="wpmind-routing-score-value"></span>' ).text( scoreData.score.toFixed( 1 ) ) );
+					$item.append( $( '<span class="wpmind-score-value"></span>' ).text( scoreData.score.toFixed( 1 ) ) );
 					$scores.append( $item );
 				} );
 			}
@@ -303,18 +303,17 @@
 				$failoverChain.empty();
 				$.each( data.failover_chain, function( index, provider ) {
 					var isFirst = 0 === index;
-					var $node = $( '<div class="wpmind-routing-failover-node"></div>' );
-					if ( isFirst ) $node.addClass( 'is-active' );
-					$node.append( '<span class="wpmind-routing-failover-dot"></span>' );
-					$node.append( $( '<span class="wpmind-routing-failover-name"></span>' ).text( provider ) );
+					var $node = $( '<div class="wpmind-feed-item"></div>' );
+					$node.append( $( '<span class="wpmind-feed-time"></span>' ).text( String( index + 1 ) ) );
+					$node.append( $( '<span class="wpmind-feed-main"></span>' ).append(
+						$( '<span class="wpmind-feed-provider"></span>' ).text( provider )
+					) );
+					var $meta = $( '<span class="wpmind-feed-meta"></span>' );
 					if ( isFirst ) {
-						$node.append( '<span class="wpmind-routing-failover-badge">主</span>' );
+						$meta.append( '<span class="pill ok">主</span>' );
 					}
+					$node.append( $meta );
 					$failoverChain.append( $node );
-					// 添加连接线（除了最后一个）
-					if ( index < data.failover_chain.length - 1 ) {
-						$failoverChain.append( '<div class="wpmind-routing-failover-line"></div>' );
-					}
 				} );
 			}
 		}

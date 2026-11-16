@@ -20,7 +20,7 @@ final class AdminAssets {
 	 *
 	 * @var list<string>
 	 */
-	private const LEGACY_VIEWS = [ 'routing', 'analytics', 'module' ];
+	private const LEGACY_VIEWS = [ 'analytics', 'module' ];
 
 	/**
 	 * Singleton instance.
@@ -121,13 +121,6 @@ final class AdminAssets {
 		);
 
 		wp_enqueue_style(
-			'wpmind-routing',
-			WPMIND_PLUGIN_URL . 'assets/css/pages/routing.css',
-			[ 'wpmind-panels' ],
-			WPMIND_VERSION
-		);
-
-		wp_enqueue_style(
 			'wpmind-module-layout',
 			WPMIND_PLUGIN_URL . 'assets/css/components/module-layout.css',
 			[ 'wpmind-admin' ],
@@ -137,7 +130,7 @@ final class AdminAssets {
 		wp_enqueue_style(
 			'wpmind-responsive',
 			WPMIND_PLUGIN_URL . 'assets/css/responsive.css',
-			[ 'wpmind-panels', 'wpmind-routing' ],
+			[ 'wpmind-panels' ],
 			WPMIND_VERSION
 		);
 

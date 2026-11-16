@@ -86,7 +86,7 @@ final class AdminPage {
 	];
 
 	/**
-	 * 后台 URL（kit Menu 优先，退回 admin.php?page=）。
+	 * 后台 URL（kit Menu 优先，退回 options 页 slug）。
 	 *
 	 * @param array<string, string> $args Query args.
 	 * @return string
@@ -95,7 +95,8 @@ final class AdminPage {
 		if ( class_exists( 'Wenpai_Admin_Menu', false ) ) {
 			return Wenpai_Admin_Menu::url( 'wpmind', $args );
 		}
-		return add_query_arg( array_merge( [ 'page' => 'wpmind' ], $args ), admin_url( 'admin.php' ) );
+		$base = menu_page_url( 'wpmind', '' );
+		return $base ? add_query_arg( $args, $base ) : '';
 	}
 
 	/**
