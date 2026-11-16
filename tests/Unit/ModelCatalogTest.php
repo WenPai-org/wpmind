@@ -33,6 +33,34 @@ final class ModelCatalogTest extends TestCase {
 		$this->assertNotContains( 'abab5.5-chat', $catalog->recommended_ids( 'minimax' ) );
 	}
 
+	public function test_remote_catalog_merges_over_bundled(): void {
+		$GLOBALS['wpmind_test_transients']['wpmind_catalog_remote'] = [
+			'catalog_version' => 'remote-9.9',
+			'fetched_at'      => time(),
+			'providers'       => [
+				'qwen' => [
+					'default_model' => 'qwen3.8-flash',
+					'models'        => [
+						'qwen3.8-flash' => [ 'capabilities' => [ 'text', 'chat' ], 'status' => 'active' ],
+					],
+				],
+			],
+		];
+		ModelCatalog::reset_instance();
+
+		try {
+			$catalog = ModelCatalog::instance();
+			$this->assertSame( 'remote-9.9', $catalog->version() );
+			$this->assertSame( 'qwen3.8-flash', $catalog->default_model( 'qwen' ) );
+			$this->assertNotNull( $catalog->model_meta( 'qwen', 'qwen3.8-flash' ) );
+			// Bundled models survive the merge.
+			$this->assertNotNull( $catalog->model_meta( 'qwen', 'qwen-plus' ) );
+		} finally {
+			unset( $GLOBALS['wpmind_test_transients']['wpmind_catalog_remote'] );
+			ModelCatalog::reset_instance();
+		}
+	}
+
 	public function test_resolve_retired_with_replacement(): void {
 		$res = ModelCatalog::instance()->resolve( 'deepseek', 'deepseek-coder' );
 		$this->assertSame( 'deepseek-chat', $res->model );

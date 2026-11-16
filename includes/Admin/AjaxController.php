@@ -238,7 +238,7 @@ final class AjaxController {
 			$ids = $result['ids'];
 		}
 
-		$chat = $lister->chat_candidates( $ids );
+		$chat = $lister->chat_candidates( $ids, $provider );
 		if ( [] === $chat ) {
 			wp_send_json_error( [ 'message' => __( '未获取到可用的 chat 模型', 'wpmind' ) ] );
 		}

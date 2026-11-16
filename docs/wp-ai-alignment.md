@@ -52,6 +52,13 @@ wpmind 在 init:5 已把自家 key 注进 SDK registry，WP7 下 SDK 路径本�
 - `/models` 首个 ID 不一定是 chat 模型：已加 `RemoteModelLister::chat_candidates()` 启发式黑名单（image/audio/video/embedding/rerank/ocr 等模态词），auto 兜底取过滤后首个。
 - PR2 模型选择 UI（2026-11-17，原型已批）：服务页每个 Provider 新增「支持的模型」（逗号分隔，空=目录默认）与「默认模型」（auto 兜底）字段，`sanitize_endpoints` 真实落库 v2；高级设置内「拉取远程模型」按钮走 `wpmind_fetch_models` AJAX（复用 connection_test_target B13 规则，未保存地址需同时提交新 key），返回 chat 过滤后的 ID 并合并进输入框。启发式过滤仍是临时方案，能力级过滤等中心目录（RemoteCatalog）落地。
 
+### D3. 远程模型目录 RemoteCatalog（2026-11-17）
+
+- `includes/Provider/Catalog/RemoteCatalog.php`：`admin_init` 低频拉取 `https://updates.wenpai.net/wpmind/models.json`（`wpmind_remote_catalog_url` filter 可换址/禁用），transient 24h，前台零网络；`ModelCatalog::load()` 把远程 payload 按 provider/模型粒度合并到内置 models.json 之上（远程赢、缺项回落内置）。
+- `RemoteModelLister::chat_candidates($ids, $provider)`：目录已知模型优先按 `capabilities` 判定（须含 `chat`），未知 id 回落命名启发式——这就是「能力级过滤」的落点，remote catalog 给非 chat 模型补 capabilities 后自动生效。
+- 生成端：`tools/build-models-catalog.php`（`wp eval-file` 运行），env `WPMIND_CAT_KEY_<PROVIDER>` / `WPMIND_CAT_URL_<PROVIDER>`；只追加新模型 id（minimal meta，无 capabilities），不改 bundled meta 和 default_model。
+- **待办（基础设施）**：`updates.wenpai.net/wpmind/models.json` 端点尚未部署；聚合需要各 provider key，qwen/zhipu 可先用现有 key 验证，部署后 RemoteCatalog 自动生效，无需插件再发版。
+
 ### E. 后续预案（不写码）
 
 - **Secrets API（7.1/7.2）**：connector option 落地后，wpmind 自有 key 存储是否换轨 Secrets API，等 API 稳定再评估；`pre_option` 桥（WP<7）届时可退役。

@@ -164,15 +164,30 @@ final class RemoteModelLister {
 	 * NON_CHAT_PATTERN (image/audio/video/embedding/rerank/...) are dropped.
 	 * Order is preserved; callers pick the first surviving id.
 	 *
-	 * @param array<int, string> $ids Raw model ids.
+	 * @param array<int, string> $ids      Raw model ids.
+	 * @param string             $provider Provider id; when given, ids known to
+	 *                                     the model catalog are filtered by their
+	 *                                     declared capabilities ('chat' required)
+	 *                                     before falling back to the name heuristic.
 	 * @return list<string>
 	 */
-	public function chat_candidates( array $ids ): array {
+	public function chat_candidates( array $ids, string $provider = '' ): array {
+		$catalog = '' !== $provider ? ModelCatalog::instance() : null;
 		return array_values(
 			array_filter(
 				$ids,
-				static function ( $id ): bool {
-					return '' !== $id && 1 !== preg_match( self::NON_CHAT_PATTERN, $id );
+				static function ( $id ) use ( $catalog, $provider ): bool {
+					if ( '' === $id ) {
+						return false;
+					}
+					if ( null !== $catalog ) {
+						$meta       = $catalog->model_meta( $provider, $id );
+						$capability = is_array( $meta ) ? ( $meta['capabilities'] ?? null ) : null;
+						if ( is_array( $capability ) && [] !== $capability ) {
+							return in_array( 'chat', $capability, true );
+						}
+					}
+					return 1 !== preg_match( self::NON_CHAT_PATTERN, $id );
 				}
 			)
 		);

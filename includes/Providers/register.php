@@ -96,6 +96,9 @@ add_action(
 	5
 );
 
+// 远程模型目录：admin_init 低频刷新，transient 兜底，前台零网络开销.
+\WPMind\Provider\Catalog\RemoteCatalog::boot();
+
 /**
  * 获取 WPMind 配置的 API Key 凭据
  */

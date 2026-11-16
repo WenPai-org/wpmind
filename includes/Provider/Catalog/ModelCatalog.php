@@ -361,28 +361,69 @@ final class ModelCatalog {
 	 * @return void
 	 */
 	private function load(): void {
-		$path = self::catalog_path();
-		if ( ! is_readable( $path ) ) {
-			$this->data = [
-				'catalog_version' => '',
-				'providers'       => [],
-			];
-			return;
-		}
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local bundled JSON.
-		$json = file_get_contents( $path );
-		if ( false === $json ) {
-			$this->data = [
-				'catalog_version' => '',
-				'providers'       => [],
-			];
-			return;
-		}
-		$decoded    = json_decode( $json, true );
-		$this->data = is_array( $decoded ) ? $decoded : [
+		$empty = [
 			'catalog_version' => '',
 			'providers'       => [],
 		];
+		$path  = self::catalog_path();
+		if ( is_readable( $path ) ) {
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local bundled JSON.
+			$json = file_get_contents( $path );
+			if ( false !== $json ) {
+				$decoded = json_decode( $json, true );
+				if ( is_array( $decoded ) ) {
+					$empty = $decoded;
+				}
+			}
+		}
+		$this->data = $empty;
+		$this->merge_remote();
+	}
+
+	/**
+	 * Merge the cached remote catalog (RemoteCatalog transient) over the
+	 * bundled payload. Remote wins per provider key and per model id;
+	 * missing pieces fall back to the bundled data. No network here.
+	 */
+	private function merge_remote(): void {
+		$remote = ( new RemoteCatalog() )->data();
+		$blocks = $remote['providers'] ?? [];
+		if ( ! is_array( $blocks ) || [] === $blocks ) {
+			return;
+		}
+
+		if ( isset( $remote['catalog_version'] ) && is_string( $remote['catalog_version'] ) && '' !== $remote['catalog_version'] ) {
+			$this->data['catalog_version'] = $remote['catalog_version'];
+		}
+
+		foreach ( $blocks as $provider_id => $remote_block ) {
+			if ( ! is_string( $provider_id ) || ! is_array( $remote_block ) ) {
+				continue;
+			}
+			$existing = $this->data['providers'][ $provider_id ] ?? [];
+			if ( ! is_array( $existing ) ) {
+				$existing = [];
+			}
+
+			$merged = $existing;
+			foreach ( $remote_block as $key => $value ) {
+				if ( 'models' === $key ) {
+					continue;
+				}
+				$merged[ $key ] = $value;
+			}
+
+			$models        = is_array( $existing['models'] ?? null ) ? $existing['models'] : [];
+			$remote_models = is_array( $remote_block['models'] ?? null ) ? $remote_block['models'] : [];
+			foreach ( $remote_models as $model_id => $meta ) {
+				if ( is_string( $model_id ) && is_array( $meta ) ) {
+					$models[ $model_id ] = $meta;
+				}
+			}
+			$merged['models'] = $models;
+
+			$this->data['providers'][ $provider_id ] = $merged;
+		}
 	}
 
 	/**

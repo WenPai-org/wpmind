@@ -8,6 +8,7 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
+use WPMind\Provider\Catalog\ModelCatalog;
 use WPMind\Provider\Catalog\RemoteModelLister;
 
 /**
@@ -48,5 +49,34 @@ final class RemoteModelListerTest extends TestCase {
 		// Names merely containing letters from the blacklist must survive.
 		$ids = [ 'qwen3-vl-plus', 'glm-4v-flash', 'auto', 'step-3' ];
 		$this->assertSame( $ids, $lister->chat_candidates( $ids ) );
+	}
+
+	public function test_chat_candidates_use_catalog_capabilities_when_provider_given(): void {
+		// Remote catalog declares a model whose name passes the heuristic
+		// but whose capabilities exclude chat; it must be dropped.
+		$GLOBALS['wpmind_test_transients']['wpmind_catalog_remote'] = [
+			'catalog_version' => 'test-remote',
+			'fetched_at'      => time(),
+			'providers'       => [
+				'deepseek' => [
+					'models' => [
+						'deepseek-core'    => [ 'capabilities' => [ 'embedding' ] ],
+						'deepseek-v4-pro'  => [ 'capabilities' => [ 'text', 'chat' ] ],
+					],
+				],
+			],
+		];
+		ModelCatalog::reset_instance();
+
+		try {
+			$lister = new RemoteModelLister();
+			$this->assertSame(
+				[ 'deepseek-v4-pro' ],
+				$lister->chat_candidates( [ 'deepseek-core', 'wan2.7-image', 'deepseek-v4-pro' ], 'deepseek' )
+			);
+		} finally {
+			unset( $GLOBALS['wpmind_test_transients']['wpmind_catalog_remote'] );
+			ModelCatalog::reset_instance();
+		}
 	}
 }

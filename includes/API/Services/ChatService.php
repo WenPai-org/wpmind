@@ -764,10 +764,10 @@ class ChatService extends AbstractService {
 		}
 
 		$lister = new \WPMind\Provider\Catalog\RemoteModelLister();
-		$ids    = $lister->chat_candidates( $lister->ids_if_valid( $provider, $api_key ) );
+		$ids    = $lister->chat_candidates( $lister->ids_if_valid( $provider, $api_key ), $provider );
 		if ( [] === $ids ) {
 			$refresh = $lister->refresh( $provider, $api_key );
-			$ids     = ! empty( $refresh['ok'] ) ? $lister->chat_candidates( $refresh['ids'] ) : [];
+			$ids     = ! empty( $refresh['ok'] ) ? $lister->chat_candidates( $refresh['ids'], $provider ) : [];
 		}
 
 		return [] !== $ids ? (string) $ids[0] : 'auto';
