@@ -100,6 +100,39 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 
 	<div class="wpmind-geo-content">
 
+		<section class="card">
+			<div class="wpmind-statbar">
+				<div class="wpmind-statbar-item">
+					<?php echo AdminIcons::svg( 'robot', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<div class="wpmind-statbar-text">
+						<div class="k"><?php esc_html_e( 'AI 爬虫访问', 'wpmind' ); ?></div>
+						<div class="v"><?php echo esc_html( number_format_i18n( (int) ( $ai_summary_data['total_ai_hits'] ?? 0 ) ) ); ?></div>
+					</div>
+				</div>
+				<div class="wpmind-statbar-item">
+					<?php echo AdminIcons::svg( 'globe', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<div class="wpmind-statbar-text">
+						<div class="k"><?php esc_html_e( '搜索引擎访问', 'wpmind' ); ?></div>
+						<div class="v"><?php echo esc_html( number_format_i18n( (int) ( $ai_summary_data['total_search_hits'] ?? 0 ) ) ); ?></div>
+					</div>
+				</div>
+				<div class="wpmind-statbar-item">
+					<?php echo AdminIcons::svg( 'eye', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<div class="wpmind-statbar-text">
+						<div class="k"><?php esc_html_e( '已识别爬虫', 'wpmind' ); ?></div>
+						<div class="v"><?php echo esc_html( (string) count( (array) ( $ai_summary_data['ai_crawlers'] ?? [] ) ) ); ?></div>
+					</div>
+				</div>
+				<div class="wpmind-statbar-item">
+					<?php echo AdminIcons::svg( 'doc', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<div class="wpmind-statbar-text">
+						<div class="k"><?php esc_html_e( 'Markdown Feed', 'wpmind' ); ?></div>
+						<div class="v"><?php echo $standalone_feed || get_option( 'ai_experiments_markdown_feed_enabled', false ) ? esc_html__( '已启用', 'wpmind' ) : esc_html__( '未启用', 'wpmind' ); ?></div>
+					</div>
+				</div>
+			</div>
+		</section>
+
 		<!-- ========== 基础设置 ========== -->
 		<div class="wpmind-module-tab-panel active" data-panel="basics">
 			<div class="wpmind-geo-grid">

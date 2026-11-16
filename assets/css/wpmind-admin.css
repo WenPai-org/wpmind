@@ -812,6 +812,7 @@ body.wenpai-ui-page .wenpai-app .wpmind-provider-body .wpmind-field--center .fie
 .seg .wpmind-module-subtab.active { background: var(--wenpai-accent-soft); color: var(--wenpai-accent); font-weight: var(--wenpai-weight-regular); }
 .wpmind-module-tab-panel { display: none; }
 .wpmind-module-tab-panel.active { display: block; }
+.wpmind-geo-content { display: grid; gap: var(--wenpai-space-5); align-content: start; }
 
 /* ---- 模块设置：主栏 + 侧栏信息轨 ---- */
 .wpmind-geo-grid {
