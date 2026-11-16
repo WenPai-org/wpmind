@@ -851,3 +851,63 @@ body.wenpai-ui-page .wenpai-app .wpmind-provider-body .wpmind-field--center .fie
 	color: var(--wenpai-ink-3);
 	font-variant-numeric: tabular-nums;
 }
+
+/* API Gateway：内联编辑 / 创建表单 / 新 Key 提示 / 日志筛选（kit token 版） */
+.wpmind-gw-edit-panel {
+	margin: var(--wenpai-space-3) 0;
+	padding: var(--wenpai-space-4);
+	background: var(--wenpai-mute-soft, var(--wenpai-line-soft));
+	border: 1px solid var(--wenpai-line-soft);
+	border-radius: var(--wenpai-radius);
+}
+.wpmind-gw-edit-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+	gap: var(--wenpai-space-3) var(--wenpai-space-4);
+}
+.wpmind-gw-edit-field { display: grid; gap: 4px; min-width: 0; }
+.wpmind-gw-edit-field label {
+	font-size: var(--wenpai-text-meta);
+	color: var(--wenpai-ink-3);
+	line-height: var(--wenpai-leading-meta);
+}
+.wpmind-gw-edit-field input { width: 100%; }
+.wpmind-gw-edit-actions { display: flex; gap: var(--wenpai-space-2); margin-top: var(--wenpai-space-3); }
+.wpmind-gw-create-panel {
+	margin: var(--wenpai-space-4) 0;
+	padding: var(--wenpai-space-4);
+	border: 1px solid var(--wenpai-line-soft);
+	border-radius: var(--wenpai-radius);
+	background: var(--wenpai-mute-soft, var(--wenpai-line-soft));
+}
+.wpmind-gw-key-success {
+	margin: var(--wenpai-space-4) 0;
+	padding: var(--wenpai-space-4);
+	border: 1px solid var(--wenpai-accent-line, var(--wenpai-line));
+	border-radius: var(--wenpai-radius);
+	background: var(--wenpai-accent-soft);
+}
+.wpmind-gw-key-success strong { display: block; margin-bottom: var(--wenpai-space-2); }
+.wpmind-gw-key-display { display: flex; align-items: center; gap: var(--wenpai-space-3); flex-wrap: wrap; }
+.wpmind-gw-key-display code { word-break: break-all; }
+.wpmind-gw-log-filters {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--wenpai-space-3) var(--wenpai-space-4);
+	align-items: flex-end;
+	margin-bottom: var(--wenpai-space-4);
+}
+.wpmind-gw-filter-group { display: grid; gap: 4px; }
+.wpmind-gw-filter-group label {
+	font-size: var(--wenpai-text-meta);
+	color: var(--wenpai-ink-3);
+	line-height: var(--wenpai-leading-meta);
+}
+.wpmind-gw-pagination {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--wenpai-space-3);
+	margin-top: var(--wenpai-space-3);
+	flex-wrap: wrap;
+}

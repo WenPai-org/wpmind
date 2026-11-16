@@ -42,6 +42,30 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 
 <div class="wpmind-media-panel">
 
+	<div class="wpmind-statbar" style="margin-bottom:var(--wenpai-space-5);">
+		<div class="wpmind-statbar-item">
+			<?php echo AdminIcons::svg( 'image', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<div class="wpmind-statbar-text">
+				<div class="k"><?php esc_html_e( '已处理', 'wpmind' ); ?></div>
+				<div class="v" id="wpmind-media-total-gen"><?php echo esc_html( (string) $total_gen ); ?></div>
+			</div>
+		</div>
+		<div class="wpmind-statbar-item">
+			<?php echo AdminIcons::svg( 'eye', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<div class="wpmind-statbar-text">
+				<div class="k"><?php esc_html_e( '待处理', 'wpmind' ); ?></div>
+				<div class="v" id="wpmind-media-missing">--</div>
+			</div>
+		</div>
+		<div class="wpmind-statbar-item">
+			<?php echo AdminIcons::svg( 'analytics', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<div class="wpmind-statbar-text">
+				<div class="k"><?php esc_html_e( '本月生成', 'wpmind' ); ?></div>
+				<div class="v" id="wpmind-media-month-gen"><?php echo esc_html( (string) $month_gen ); ?></div>
+			</div>
+		</div>
+	</div>
+
 	<div class="wenpai-subnav">
 		<div class="seg wpmind-module-subtabs">
 			<button type="button" class="wpmind-module-subtab active" data-tab="settings"><?php esc_html_e( '基本设置', 'wpmind' ); ?></button>

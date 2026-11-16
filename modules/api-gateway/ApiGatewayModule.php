@@ -128,7 +128,6 @@ class ApiGatewayModule implements ModuleInterface {
 			$ajax_controller->register_hooks();
 
 			// Admin assets (only on WPMind settings page).
-			add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
 		}
 
 		if ( ! $this->is_gateway_enabled() ) {
@@ -146,23 +145,6 @@ class ApiGatewayModule implements ModuleInterface {
 		 * @param ApiGatewayModule $this Module instance.
 		 */
 		do_action( 'wpmind_api_gateway_init', $this );
-	}
-
-	/**
-	 * Enqueue admin assets for the API Gateway tab.
-	 *
-	 * @param string $hook_suffix Current page hook suffix.
-	 */
-	public function enqueue_admin_assets( string $hook_suffix ): void {
-		if ( ! in_array( $hook_suffix, [ 'settings_page_wpmind', 'toplevel_page_wpmind' ], true ) ) {
-			return;
-		}
-		wp_enqueue_style(
-			'wpmind-api-gateway',
-			WPMIND_PLUGIN_URL . 'assets/css/pages/api-gateway.css',
-			[ 'wpmind-admin' ],
-			WPMIND_VERSION
-		);
 	}
 
 	/**

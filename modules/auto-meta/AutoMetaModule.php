@@ -140,12 +140,9 @@ final class AutoMetaModule implements ModuleInterface {
 		if ( ! in_array( $hook_suffix, [ 'settings_page_wpmind', 'toplevel_page_wpmind' ], true ) ) {
 			return;
 		}
-		wp_enqueue_style(
-			'wpmind-auto-meta',
-			WPMIND_PLUGIN_URL . 'assets/css/pages/auto-meta.css',
-			[ 'wpmind-admin' ],
-			WPMIND_VERSION
-		);
+		if ( 'module' !== \WPMind\Admin\AdminPage::current_view() || 'auto-meta' !== \WPMind\Admin\AdminPage::current_module() ) {
+			return;
+		}
 		wp_enqueue_script(
 			'wpmind-admin-auto-meta',
 			WPMIND_PLUGIN_URL . 'assets/js/admin-auto-meta.js',

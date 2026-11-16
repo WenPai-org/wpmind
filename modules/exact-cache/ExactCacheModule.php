@@ -134,12 +134,9 @@ final class ExactCacheModule implements ModuleInterface {
 		if ( ! in_array( $hook_suffix, [ 'settings_page_wpmind', 'toplevel_page_wpmind' ], true ) ) {
 			return;
 		}
-		wp_enqueue_style(
-			'wpmind-exact-cache',
-			WPMIND_PLUGIN_URL . 'assets/css/pages/exact-cache.css',
-			[ 'wpmind-admin' ],
-			WPMIND_VERSION
-		);
+		if ( 'module' !== \WPMind\Admin\AdminPage::current_view() || 'exact-cache' !== \WPMind\Admin\AdminPage::current_module() ) {
+			return;
+		}
 		wp_enqueue_script(
 			'wpmind-admin-exact-cache',
 			WPMIND_PLUGIN_URL . 'assets/js/admin-exact-cache.js',

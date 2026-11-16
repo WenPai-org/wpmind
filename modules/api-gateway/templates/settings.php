@@ -1,15 +1,28 @@
 <?php
 /**
- * API Gateway Settings Tab
+ * API Gateway 模块设置（kit 化）。
+ * 页面内联脚本为唯一 JS 契约来源，以下钩子必须保留：
+ * .wpmind-module-subtab[data-tab] / .wpmind-module-tab-panel[data-panel] /
+ * #gw-enabled #gw-rpm #gw-tpm #gw-sse #gw-body-mb #gw-tokens-cap #gw-log-prompts /
+ * #gw-save-settings #gw-save-msg / #gw-show-create #gw-create-form /
+ * #ck-name #ck-rpm #ck-tpm #ck-concurrency #ck-budget #ck-ips #ck-expires /
+ * #gw-create-key #gw-cancel-create / #gw-new-key-box #gw-raw-key #gw-copy-key /
+ * #gw-keys-tbody / #log-filter-key #log-filter-event #log-filter-from
+ * #log-filter-to #log-filter-apply / #gw-logs-tbody #gw-logs-pagination
+ * #gw-logs-info #log-prev #log-next / .wpmind-gw-edit-row[data-edit-for] /
+ * .gw-edit-key .gw-save-edit .gw-cancel-edit .gw-revoke。
+ * AJAX：wpmind_save_gateway_settings / wpmind_create_api_key /
+ * wpmind_list_api_keys / wpmind_update_api_key / wpmind_revoke_api_key /
+ * wpmind_list_audit_logs（nonce: wpmind_ajax）。
  *
  * @package WPMind\Modules\ApiGateway
- * @since 1.0.0
  */
 
 declare(strict_types=1);
 
 defined( 'ABSPATH' ) || exit;
 
+use WPMind\Admin\AdminIcons;
 use WPMind\Modules\ApiGateway\Auth\ApiKeyRepository;
 
 $gateway_enabled  = get_option( 'wpmind_gateway_enabled', '0' ) === '1';
@@ -25,324 +38,300 @@ $active_keys    = ApiKeyRepository::count_active_keys();
 $month_requests = ApiKeyRepository::get_month_total_requests();
 
 $base_url = rest_url( 'mind/v1' );
+
+$wpmind_switch = static function ( string $id, bool $checked, string $label, string $desc = '' ): void {
+	echo '<div class="wenpai-field wenpai-field--toggle field wenpai-field--row">'
+		. '<div class="field-label"><label class="wenpai-field__label" for="' . esc_attr( $id ) . '">' . esc_html( $label ) . '</label></div>'
+		. '<div class="field-ctl">'
+		. '<span class="wenpai-switch">'
+		. '<input type="checkbox" role="switch" class="wenpai-switch__input" id="' . esc_attr( $id ) . '" value="1"' . ( $checked ? ' checked' : '' ) . '>'
+		. '<span class="wenpai-switch__track" aria-hidden="true"></span>'
+		. '<span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">' . esc_html__( '已开启', 'wpmind' ) . '</span><span class="wenpai-switch__off">' . esc_html__( '未开启', 'wpmind' ) . '</span></span>'
+		. '</span>'
+		. ( '' !== $desc ? '<p class="wenpai-field__desc">' . esc_html( $desc ) . '</p>' : '' )
+		. '</div></div>';
+};
+
+$wpmind_num = static function ( string $id, int $value, int $min, int $max, string $label ): void {
+	echo '<div class="wenpai-field field wenpai-field--row">'
+		. '<div class="field-label"><label class="wenpai-field__label" for="' . esc_attr( $id ) . '">' . esc_html( $label ) . '</label></div>'
+		. '<div class="field-ctl"><input type="number" id="' . esc_attr( $id ) . '" value="' . esc_attr( (string) $value ) . '" min="' . esc_attr( (string) $min ) . '" max="' . esc_attr( (string) $max ) . '" style="max-width:10rem"></div></div>';
+};
 ?>
 
-<!-- Header -->
-<div class="wpmind-module-header">
-	<h2 class="wpmind-module-title">
-		<span class="dashicons ri-server-line"></span>
-		<?php esc_html_e( 'API Gateway', 'wpmind' ); ?>
-	</h2>
-	<span class="wpmind-module-badge"><?php echo $gateway_enabled ? 'ON' : 'OFF'; ?></span>
-</div>
-
-<div class="wpmind-tab-pane-body">
-<p class="wpmind-module-desc">
-	<?php esc_html_e( 'OpenAI 兼容的 API 网关，提供 Bearer 鉴权、速率限制、预算控制和 SSE 流式输出。', 'wpmind' ); ?>
-</p>
-
-<!-- Stat Cards -->
-<div class="wpmind-gw-stats">
-	<div class="wpmind-stat-card">
-		<div class="wpmind-stat-icon">
-			<span class="dashicons ri-key-2-line"></span>
-		</div>
-		<div class="wpmind-stat-content">
-			<div class="wpmind-stat-value"><?php echo esc_html( (string) $total_keys ); ?></div>
-			<div class="wpmind-stat-label"><?php esc_html_e( 'API Keys', 'wpmind' ); ?></div>
+<div class="wpmind-statbar" style="margin-bottom:var(--wenpai-space-5);">
+	<div class="wpmind-statbar-item">
+		<?php echo AdminIcons::svg( 'key', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		<div class="wpmind-statbar-text">
+			<div class="k"><?php esc_html_e( 'API Keys', 'wpmind' ); ?></div>
+			<div class="v"><?php echo esc_html( (string) $total_keys ); ?></div>
 		</div>
 	</div>
-	<div class="wpmind-stat-card">
-		<div class="wpmind-stat-icon">
-			<span class="dashicons ri-checkbox-circle-line"></span>
-		</div>
-		<div class="wpmind-stat-content">
-			<div class="wpmind-stat-value"><?php echo esc_html( (string) $active_keys ); ?></div>
-			<div class="wpmind-stat-label"><?php esc_html_e( '活跃 Keys', 'wpmind' ); ?></div>
+	<div class="wpmind-statbar-item">
+		<?php echo AdminIcons::svg( 'modules', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		<div class="wpmind-statbar-text">
+			<div class="k"><?php esc_html_e( '活跃 Keys', 'wpmind' ); ?></div>
+			<div class="v"><?php echo esc_html( (string) $active_keys ); ?></div>
 		</div>
 	</div>
-	<div class="wpmind-stat-card">
-		<div class="wpmind-stat-icon">
-			<span class="dashicons ri-bar-chart-line"></span>
-		</div>
-		<div class="wpmind-stat-content">
-			<div class="wpmind-stat-value"><?php echo esc_html( number_format( $month_requests ) ); ?></div>
-			<div class="wpmind-stat-label"><?php esc_html_e( '本月请求', 'wpmind' ); ?></div>
+	<div class="wpmind-statbar-item">
+		<?php echo AdminIcons::svg( 'analytics', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		<div class="wpmind-statbar-text">
+			<div class="k"><?php esc_html_e( '本月请求', 'wpmind' ); ?></div>
+			<div class="v"><?php echo esc_html( number_format( $month_requests ) ); ?></div>
 		</div>
 	</div>
-	<div class="wpmind-stat-card">
-		<div class="wpmind-stat-icon">
-			<span class="dashicons ri-speed-line"></span>
-		</div>
-		<div class="wpmind-stat-content">
-			<div class="wpmind-stat-value"><?php echo esc_html( (string) $default_rpm ); ?></div>
-			<div class="wpmind-stat-label"><?php esc_html_e( '默认 RPM', 'wpmind' ); ?></div>
+	<div class="wpmind-statbar-item">
+		<?php echo AdminIcons::svg( 'zap', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		<div class="wpmind-statbar-text">
+			<div class="k"><?php esc_html_e( '默认 RPM', 'wpmind' ); ?></div>
+			<div class="v"><?php echo esc_html( (string) $default_rpm ); ?></div>
 		</div>
 	</div>
 </div>
 
-<!-- Sub-tab Navigation -->
-<div class="wpmind-gw-subtabs">
-	<button type="button" class="wpmind-gw-subtab active" data-tab="settings">
-		<span class="dashicons ri-settings-3-line"></span>
-		<?php esc_html_e( '基础设置', 'wpmind' ); ?>
-	</button>
-	<button type="button" class="wpmind-gw-subtab" data-tab="keys">
-		<span class="dashicons ri-key-2-line"></span>
-		<?php esc_html_e( 'API Key 管理', 'wpmind' ); ?>
-	</button>
-	<button type="button" class="wpmind-gw-subtab" data-tab="docs">
-		<span class="dashicons ri-book-open-line"></span>
-		<?php esc_html_e( '接入文档', 'wpmind' ); ?>
-	</button>
-	<button type="button" class="wpmind-gw-subtab" data-tab="logs">
-		<span class="dashicons ri-file-list-3-line"></span>
-		<?php esc_html_e( '请求日志', 'wpmind' ); ?>
-	</button>
-</div>
-
-<!-- Panel 1: Settings -->
-<div class="wpmind-gw-panel active" data-panel="settings">
-	<table class="wpmind-gw-form-table">
-		<tr>
-			<th><?php esc_html_e( '启用网关', 'wpmind' ); ?></th>
-			<td><input type="checkbox" id="gw-enabled" value="1" <?php checked( $gateway_enabled ); ?>></td>
-		</tr>
-		<tr>
-			<th><?php esc_html_e( '默认 RPM 限制', 'wpmind' ); ?></th>
-			<td><input type="number" id="gw-rpm" value="<?php echo esc_attr( (string) $default_rpm ); ?>" min="1" max="10000"></td>
-		</tr>
-		<tr>
-			<th><?php esc_html_e( '默认 TPM 限制', 'wpmind' ); ?></th>
-			<td><input type="number" id="gw-tpm" value="<?php echo esc_attr( (string) $default_tpm ); ?>" min="1000" max="10000000"></td>
-		</tr>
-		<tr>
-			<th><?php esc_html_e( 'SSE 全局并发', 'wpmind' ); ?></th>
-			<td><input type="number" id="gw-sse" value="<?php echo esc_attr( (string) $sse_global_limit ); ?>" min="1" max="200"></td>
-		</tr>
-		<tr>
-			<th><?php esc_html_e( '请求体上限 (MB)', 'wpmind' ); ?></th>
-			<td><input type="number" id="gw-body-mb" value="<?php echo esc_attr( (string) $max_body_mb ); ?>" min="1" max="100"></td>
-		</tr>
-		<tr>
-			<th><?php esc_html_e( 'Max Tokens 上限', 'wpmind' ); ?></th>
-			<td><input type="number" id="gw-tokens-cap" value="<?php echo esc_attr( (string) $max_tokens_cap ); ?>" min="256" max="1000000"></td>
-		</tr>
-		<tr>
-			<th><?php esc_html_e( '记录 Prompt 内容', 'wpmind' ); ?></th>
-			<td><input type="checkbox" id="gw-log-prompts" value="1" <?php checked( $log_prompts ); ?>></td>
-		</tr>
-	</table>
-	<div style="padding:var(--wpmind-space-4) 0">
-		<button type="button" class="wpmind-gw-btn" id="gw-save-settings"><?php esc_html_e( '保存设置', 'wpmind' ); ?></button>
-		<span id="gw-save-msg" class="wpmind-gw-save-msg" style="display:none"></span>
+<div class="wenpai-subnav">
+	<div class="seg wpmind-module-subtabs">
+		<button type="button" class="wpmind-module-subtab active" data-tab="settings"><?php esc_html_e( '基础设置', 'wpmind' ); ?></button>
+		<button type="button" class="wpmind-module-subtab" data-tab="keys"><?php esc_html_e( 'API Key 管理', 'wpmind' ); ?></button>
+		<button type="button" class="wpmind-module-subtab" data-tab="docs"><?php esc_html_e( '接入文档', 'wpmind' ); ?></button>
+		<button type="button" class="wpmind-module-subtab" data-tab="logs"><?php esc_html_e( '请求日志', 'wpmind' ); ?></button>
 	</div>
 </div>
 
-<!-- Panel 2: API Key Management -->
-<div class="wpmind-gw-panel" data-panel="keys">
-	<div style="margin-bottom:var(--wpmind-space-4)">
-		<button type="button" class="wpmind-gw-btn" id="gw-show-create">
-			<span class="dashicons ri-add-line" style="font-size:16px;width:16px;height:16px"></span>
-			<?php esc_html_e( '创建 API Key', 'wpmind' ); ?>
-		</button>
-	</div>
+<div class="wenpai-stack">
 
-	<!-- Create Key Form -->
-	<div id="gw-create-form" class="wpmind-gw-create-panel" style="display:none">
-		<h4><?php esc_html_e( '创建新 API Key', 'wpmind' ); ?></h4>
-		<div class="wpmind-gw-edit-grid">
-			<div class="wpmind-gw-edit-field">
-				<label><?php esc_html_e( '名称', 'wpmind' ); ?></label>
-				<input type="text" id="ck-name" placeholder="My App">
+	<!-- Panel 1: Settings -->
+	<div class="wpmind-module-tab-panel active" data-panel="settings">
+		<section class="card">
+			<div class="card-head">
+				<span class="tile"><?php echo AdminIcons::svg( 'key' ); ?></span>
+				<div>
+					<h2 class="card-title"><?php esc_html_e( '网关设置', 'wpmind' ); ?></h2>
+					<p class="card-sub"><?php esc_html_e( 'OpenAI 兼容的 API 网关：Bearer 鉴权、速率限制、预算控制和 SSE 流式输出。', 'wpmind' ); ?></p>
+				</div>
+				<?php if ( $gateway_enabled ) : ?><span class="pill ok"><?php esc_html_e( '已启用', 'wpmind' ); ?></span><?php endif; ?>
 			</div>
-			<div class="wpmind-gw-edit-field">
-				<label>RPM</label>
-				<input type="number" id="ck-rpm" value="<?php echo esc_attr( (string) $default_rpm ); ?>" min="1">
+			<?php
+			$wpmind_switch( 'gw-enabled', $gateway_enabled, __( '启用网关', 'wpmind' ), __( '关闭后 REST 端点不再响应。', 'wpmind' ) );
+			$wpmind_num( 'gw-rpm', $default_rpm, 1, 10000, __( '默认 RPM 限制', 'wpmind' ) );
+			$wpmind_num( 'gw-tpm', $default_tpm, 1000, 10000000, __( '默认 TPM 限制', 'wpmind' ) );
+			$wpmind_num( 'gw-sse', $sse_global_limit, 1, 200, __( 'SSE 全局并发', 'wpmind' ) );
+			$wpmind_num( 'gw-body-mb', $max_body_mb, 1, 100, __( '请求体上限 (MB)', 'wpmind' ) );
+			$wpmind_num( 'gw-tokens-cap', $max_tokens_cap, 256, 1000000, __( 'Max Tokens 上限', 'wpmind' ) );
+			$wpmind_switch( 'gw-log-prompts', $log_prompts, __( '记录 Prompt 内容', 'wpmind' ), __( '审计日志中保存请求 prompt 原文，注意隐私与存储成本。', 'wpmind' ) );
+			?>
+			<div class="card-foot">
+				<span class="wenpai-actions">
+					<button type="button" class="btn btn-primary" id="gw-save-settings"><?php esc_html_e( '保存设置', 'wpmind' ); ?></button>
+					<span id="gw-save-msg" class="pill" style="display:none"></span>
+				</span>
 			</div>
-			<div class="wpmind-gw-edit-field">
-				<label>TPM</label>
-				<input type="number" id="ck-tpm" value="<?php echo esc_attr( (string) $default_tpm ); ?>" min="1000">
+		</section>
+	</div>
+
+	<!-- Panel 2: API Key Management -->
+	<div class="wpmind-module-tab-panel" data-panel="keys">
+		<section class="card">
+			<div class="card-head">
+				<span class="tile"><?php echo AdminIcons::svg( 'key' ); ?></span>
+				<div>
+					<h2 class="card-title"><?php esc_html_e( 'API Key 管理', 'wpmind' ); ?></h2>
+					<p class="card-sub"><?php esc_html_e( '创建、编辑与吊销网关访问密钥。', 'wpmind' ); ?></p>
+				</div>
+				<span class="wenpai-actions">
+					<button type="button" class="btn btn-sm btn-primary" id="gw-show-create"><?php esc_html_e( '创建 API Key', 'wpmind' ); ?></button>
+				</span>
 			</div>
-			<div class="wpmind-gw-edit-field">
-				<label><?php esc_html_e( '并发限制', 'wpmind' ); ?></label>
-				<input type="number" id="ck-concurrency" value="2" min="1" max="100">
+
+			<div id="gw-create-form" class="wpmind-gw-create-panel" style="display:none">
+				<h3 class="card-title" style="margin:0 0 var(--wenpai-space-3);"><?php esc_html_e( '创建新 API Key', 'wpmind' ); ?></h3>
+				<div class="wpmind-gw-edit-grid">
+					<div class="wpmind-gw-edit-field">
+						<label for="ck-name"><?php esc_html_e( '名称', 'wpmind' ); ?></label>
+						<input type="text" id="ck-name" placeholder="My App">
+					</div>
+					<div class="wpmind-gw-edit-field">
+						<label for="ck-rpm">RPM</label>
+						<input type="number" id="ck-rpm" value="<?php echo esc_attr( (string) $default_rpm ); ?>" min="1">
+					</div>
+					<div class="wpmind-gw-edit-field">
+						<label for="ck-tpm">TPM</label>
+						<input type="number" id="ck-tpm" value="<?php echo esc_attr( (string) $default_tpm ); ?>" min="1000">
+					</div>
+					<div class="wpmind-gw-edit-field">
+						<label for="ck-concurrency"><?php esc_html_e( '并发限制', 'wpmind' ); ?></label>
+						<input type="number" id="ck-concurrency" value="2" min="1" max="100">
+					</div>
+					<div class="wpmind-gw-edit-field">
+						<label for="ck-budget"><?php esc_html_e( '月预算 (USD)', 'wpmind' ); ?></label>
+						<input type="number" id="ck-budget" value="0" min="0" step="0.01">
+					</div>
+					<div class="wpmind-gw-edit-field">
+						<label for="ck-ips"><?php esc_html_e( 'IP 白名单', 'wpmind' ); ?></label>
+						<input type="text" id="ck-ips" placeholder="1.2.3.4, 5.6.7.8">
+					</div>
+					<div class="wpmind-gw-edit-field">
+						<label for="ck-expires"><?php esc_html_e( '过期时间', 'wpmind' ); ?></label>
+						<input type="date" id="ck-expires">
+					</div>
+				</div>
+				<div class="wpmind-gw-edit-actions">
+					<button type="button" class="btn btn-sm btn-primary" id="gw-create-key"><?php esc_html_e( '创建', 'wpmind' ); ?></button>
+					<button type="button" class="btn btn-sm" id="gw-cancel-create"><?php esc_html_e( '取消', 'wpmind' ); ?></button>
+				</div>
 			</div>
-			<div class="wpmind-gw-edit-field">
-				<label><?php esc_html_e( '月预算 (USD)', 'wpmind' ); ?></label>
-				<input type="number" id="ck-budget" value="0" min="0" step="0.01">
+
+			<div id="gw-new-key-box" class="wpmind-gw-key-success" style="display:none">
+				<strong><?php esc_html_e( 'API Key 创建成功！请立即复制，此 Key 不会再次显示。', 'wpmind' ); ?></strong>
+				<div class="wpmind-gw-key-display">
+					<code class="wenpai-code" id="gw-raw-key"></code>
+					<button type="button" class="btn btn-sm" id="gw-copy-key"><?php esc_html_e( '复制', 'wpmind' ); ?></button>
+				</div>
 			</div>
-			<div class="wpmind-gw-edit-field">
-				<label><?php esc_html_e( 'IP 白名单', 'wpmind' ); ?></label>
-				<input type="text" id="ck-ips" placeholder="1.2.3.4, 5.6.7.8">
+
+			<div class="wenpai-table-wrap">
+				<table class="tbl">
+					<thead>
+						<tr>
+							<th>Key Prefix</th>
+							<th><?php esc_html_e( '名称', 'wpmind' ); ?></th>
+							<th><?php esc_html_e( '状态', 'wpmind' ); ?></th>
+							<th>RPM / TPM</th>
+							<th class="num"><?php esc_html_e( '本月请求', 'wpmind' ); ?></th>
+							<th class="num">Tokens</th>
+							<th><?php esc_html_e( '最后使用', 'wpmind' ); ?></th>
+							<th><?php esc_html_e( '操作', 'wpmind' ); ?></th>
+						</tr>
+					</thead>
+					<tbody id="gw-keys-tbody">
+						<tr><td colspan="8" class="meta" style="text-align:center"><?php esc_html_e( '加载中...', 'wpmind' ); ?></td></tr>
+					</tbody>
+				</table>
 			</div>
-			<div class="wpmind-gw-edit-field">
-				<label><?php esc_html_e( '过期时间', 'wpmind' ); ?></label>
-				<input type="date" id="ck-expires">
+		</section>
+	</div>
+
+	<!-- Panel 3: API Docs -->
+	<div class="wpmind-module-tab-panel" data-panel="docs">
+		<section class="card">
+			<div class="card-head">
+				<span class="tile"><?php echo AdminIcons::svg( 'doc' ); ?></span>
+				<div>
+					<h2 class="card-title"><?php esc_html_e( '接入文档', 'wpmind' ); ?></h2>
+					<p class="card-sub"><?php esc_html_e( 'OpenAI 兼容端点与调用示例。', 'wpmind' ); ?></p>
+				</div>
 			</div>
-		</div>
-		<div class="wpmind-gw-edit-actions">
-			<button type="button" class="wpmind-gw-btn" id="gw-create-key"><?php esc_html_e( '创建', 'wpmind' ); ?></button>
-			<button type="button" class="wpmind-gw-btn wpmind-gw-btn-secondary" id="gw-cancel-create"><?php esc_html_e( '取消', 'wpmind' ); ?></button>
-		</div>
+
+			<h3 class="card-title" style="margin:0 0 var(--wenpai-space-2);">Base URL</h3>
+			<?php echo Wenpai_Admin_UI::code_block_html( [ 'code' => $base_url, 'lang' => 'text' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+
+			<h3 class="card-title" style="margin:var(--wenpai-space-5) 0 var(--wenpai-space-2);"><?php esc_html_e( '可用端点', 'wpmind' ); ?></h3>
+			<div class="wenpai-table-wrap">
+				<table class="tbl">
+					<thead>
+						<tr>
+							<th><?php esc_html_e( '方法', 'wpmind' ); ?></th>
+							<th><?php esc_html_e( '路径', 'wpmind' ); ?></th>
+							<th><?php esc_html_e( '说明', 'wpmind' ); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr><td><code class="wenpai-code">POST</code></td><td><code class="wenpai-code">/chat/completions</code></td><td><?php esc_html_e( '聊天补全（兼容 OpenAI）', 'wpmind' ); ?></td></tr>
+						<tr><td><code class="wenpai-code">GET</code></td><td><code class="wenpai-code">/models</code></td><td><?php esc_html_e( '列出可用模型', 'wpmind' ); ?></td></tr>
+						<tr><td><code class="wenpai-code">POST</code></td><td><code class="wenpai-code">/embeddings</code></td><td><?php esc_html_e( '文本向量化', 'wpmind' ); ?></td></tr>
+						<tr><td><code class="wenpai-code">POST</code></td><td><code class="wenpai-code">/responses</code></td><td><?php esc_html_e( 'Responses API（兼容 OpenAI）', 'wpmind' ); ?></td></tr>
+						<tr><td><code class="wenpai-code">GET</code></td><td><code class="wenpai-code">/status</code></td><td><?php esc_html_e( '网关状态检查', 'wpmind' ); ?></td></tr>
+					</tbody>
+				</table>
+			</div>
+
+			<h3 class="card-title" style="margin:var(--wenpai-space-5) 0 var(--wenpai-space-2);"><?php esc_html_e( 'curl 示例', 'wpmind' ); ?></h3>
+			<?php
+			$wpmind_curl = 'curl ' . $base_url . "/chat/completions \\\n"
+				. '\t-H "Authorization: Bearer sk_mind_YOUR_KEY" \\\n'
+				. '\t-H "Content-Type: application/json" \\\n'
+				. "\t-d '{\n"
+				. '\t\t"model": "deepseek-chat",\n'
+				. '\t\t"messages": [{"role": "user", "content": "Hello"}],\n'
+				. '\t\t"stream": true\n'
+				. "\t}'";
+			echo Wenpai_Admin_UI::code_block_html( [ 'code' => $wpmind_curl, 'lang' => 'bash' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			?>
+
+			<p class="meta" style="margin-top:var(--wenpai-space-4);">
+				<?php esc_html_e( '认证方式：在请求头中添加 Authorization: Bearer sk_mind_YOUR_KEY。所有端点均需要有效的 API Key 认证。', 'wpmind' ); ?>
+			</p>
+		</section>
 	</div>
 
-	<!-- New Key Display -->
-	<div id="gw-new-key-box" class="wpmind-gw-key-success" style="display:none">
-		<strong><?php esc_html_e( 'API Key 创建成功！请立即复制，此 Key 不会再次显示。', 'wpmind' ); ?></strong>
-		<div class="wpmind-gw-key-display">
-			<code id="gw-raw-key"></code>
-			<button type="button" class="wpmind-gw-btn wpmind-gw-btn-sm" id="gw-copy-key"><?php esc_html_e( '复制', 'wpmind' ); ?></button>
-		</div>
+	<!-- Panel 4: Audit Logs -->
+	<div class="wpmind-module-tab-panel" data-panel="logs">
+		<section class="card">
+			<div class="card-head">
+				<span class="tile"><?php echo AdminIcons::svg( 'doc' ); ?></span>
+				<div>
+					<h2 class="card-title"><?php esc_html_e( '请求日志', 'wpmind' ); ?></h2>
+					<p class="card-sub"><?php esc_html_e( '网关请求与 Key 生命周期审计。', 'wpmind' ); ?></p>
+				</div>
+			</div>
+
+			<div class="wpmind-gw-log-filters">
+				<div class="wpmind-gw-filter-group">
+					<label for="log-filter-key">Key</label>
+					<select id="log-filter-key">
+						<option value=""><?php esc_html_e( '全部', 'wpmind' ); ?></option>
+					</select>
+					</div>
+				<div class="wpmind-gw-filter-group">
+					<label for="log-filter-event"><?php esc_html_e( '事件类型', 'wpmind' ); ?></label>
+					<select id="log-filter-event">
+						<option value=""><?php esc_html_e( '全部', 'wpmind' ); ?></option>
+						<option value="api_request">api_request</option>
+						<option value="api_stream_request">api_stream_request</option>
+						<option value="key_created">key_created</option>
+						<option value="key_revoked">key_revoked</option>
+					</select>
+				</div>
+				<div class="wpmind-gw-filter-group">
+					<label for="log-filter-from"><?php esc_html_e( '开始日期', 'wpmind' ); ?></label>
+					<input type="date" id="log-filter-from">
+				</div>
+				<div class="wpmind-gw-filter-group">
+					<label for="log-filter-to"><?php esc_html_e( '结束日期', 'wpmind' ); ?></label>
+					<input type="date" id="log-filter-to">
+				</div>
+				<div class="wpmind-gw-filter-group">
+					<button type="button" class="btn btn-sm btn-primary" id="log-filter-apply"><?php esc_html_e( '筛选', 'wpmind' ); ?></button>
+				</div>
+			</div>
+
+			<div class="wenpai-table-wrap">
+				<table class="tbl">
+					<thead>
+						<tr>
+							<th><?php esc_html_e( '时间', 'wpmind' ); ?></th>
+							<th>Key</th>
+							<th><?php esc_html_e( '事件', 'wpmind' ); ?></th>
+							<th><?php esc_html_e( '详情', 'wpmind' ); ?></th>
+						</tr>
+					</thead>
+					<tbody id="gw-logs-tbody">
+						<tr><td colspan="4" class="meta" style="text-align:center"><?php esc_html_e( '点击"筛选"加载日志', 'wpmind' ); ?></td></tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div class="wpmind-gw-pagination" id="gw-logs-pagination" style="display:none">
+				<span id="gw-logs-info" class="meta"></span>
+				<span class="wenpai-actions">
+					<button type="button" class="btn btn-sm" id="log-prev" disabled><?php esc_html_e( '上一页', 'wpmind' ); ?></button>
+					<button type="button" class="btn btn-sm" id="log-next" disabled><?php esc_html_e( '下一页', 'wpmind' ); ?></button>
+				</span>
+			</div>
+		</section>
 	</div>
 
-	<!-- Keys Table -->
-	<table class="wpmind-gw-keys-table widefat striped">
-		<thead>
-			<tr>
-				<th>Key Prefix</th>
-				<th><?php esc_html_e( '名称', 'wpmind' ); ?></th>
-				<th><?php esc_html_e( '状态', 'wpmind' ); ?></th>
-				<th>RPM / TPM</th>
-				<th><?php esc_html_e( '本月请求', 'wpmind' ); ?></th>
-				<th>Tokens</th>
-				<th><?php esc_html_e( '最后使用', 'wpmind' ); ?></th>
-				<th><?php esc_html_e( '操作', 'wpmind' ); ?></th>
-			</tr>
-		</thead>
-		<tbody id="gw-keys-tbody">
-			<tr><td colspan="8" style="text-align:center;color:var(--wpmind-gray-400)"><?php esc_html_e( '加载中...', 'wpmind' ); ?></td></tr>
-		</tbody>
-	</table>
-</div>
-
-<!-- Panel 3: API Docs -->
-<div class="wpmind-gw-panel" data-panel="docs">
-	<div class="wpmind-gw-docs-section">
-		<h4>Base URL</h4>
-		<div class="wpmind-gw-code-block">
-			<pre><?php echo esc_html( $base_url ); ?></pre>
-			<button type="button" class="wpmind-gw-copy-btn" data-copy="<?php echo esc_attr( $base_url ); ?>"><?php esc_html_e( '复制', 'wpmind' ); ?></button>
-		</div>
-	</div>
-
-	<div class="wpmind-gw-docs-section">
-		<h4><?php esc_html_e( '可用端点', 'wpmind' ); ?></h4>
-		<table class="wpmind-gw-endpoint-list widefat striped">
-			<thead>
-				<tr>
-					<th><?php esc_html_e( '方法', 'wpmind' ); ?></th>
-					<th><?php esc_html_e( '路径', 'wpmind' ); ?></th>
-					<th><?php esc_html_e( '说明', 'wpmind' ); ?></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td><code>POST</code></td>
-					<td><code>/chat/completions</code></td>
-					<td><?php esc_html_e( '聊天补全（兼容 OpenAI）', 'wpmind' ); ?></td>
-				</tr>
-				<tr>
-					<td><code>GET</code></td>
-					<td><code>/models</code></td>
-					<td><?php esc_html_e( '列出可用模型', 'wpmind' ); ?></td>
-				</tr>
-				<tr>
-					<td><code>POST</code></td>
-					<td><code>/embeddings</code></td>
-					<td><?php esc_html_e( '文本向量化', 'wpmind' ); ?></td>
-				</tr>
-				<tr>
-					<td><code>POST</code></td>
-					<td><code>/responses</code></td>
-					<td><?php esc_html_e( 'Responses API（兼容 OpenAI）', 'wpmind' ); ?></td>
-				</tr>
-				<tr>
-					<td><code>GET</code></td>
-					<td><code>/status</code></td>
-					<td><?php esc_html_e( '网关状态检查', 'wpmind' ); ?></td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-
-	<div class="wpmind-gw-docs-section">
-		<h4><?php esc_html_e( 'curl 示例', 'wpmind' ); ?></h4>
-		<div class="wpmind-gw-code-block">
-			<pre>curl <?php echo esc_html( $base_url ); ?>/chat/completions \
-	-H "Authorization: Bearer sk_mind_YOUR_KEY" \
-	-H "Content-Type: application/json" \
-	-d '{
-	"model": "deepseek-chat",
-	"messages": [{"role": "user", "content": "Hello"}],
-	"stream": true
-}'</pre>
-			<button type="button" class="wpmind-gw-copy-btn" data-copy-pre="1"><?php esc_html_e( '复制', 'wpmind' ); ?></button>
-		</div>
-	</div>
-
-	<div class="wpmind-gw-docs-section">
-		<h4><?php esc_html_e( '认证方式', 'wpmind' ); ?></h4>
-		<p style="color:var(--wpmind-gray-600);font-size:var(--wpmind-text-base)">
-			<?php esc_html_e( '在请求头中添加 Authorization: Bearer sk_mind_YOUR_KEY。所有端点均需要有效的 API Key 认证。', 'wpmind' ); ?>
-		</p>
-	</div>
-</div>
-
-<!-- Panel 4: Audit Logs -->
-<div class="wpmind-gw-panel" data-panel="logs">
-	<div class="wpmind-gw-log-filters">
-		<div class="wpmind-gw-filter-group">
-			<label>Key</label>
-			<select id="log-filter-key">
-				<option value=""><?php esc_html_e( '全部', 'wpmind' ); ?></option>
-			</select>
-		</div>
-		<div class="wpmind-gw-filter-group">
-			<label><?php esc_html_e( '事件类型', 'wpmind' ); ?></label>
-			<select id="log-filter-event">
-				<option value=""><?php esc_html_e( '全部', 'wpmind' ); ?></option>
-				<option value="api_request">api_request</option>
-				<option value="api_stream_request">api_stream_request</option>
-				<option value="key_created">key_created</option>
-				<option value="key_revoked">key_revoked</option>
-			</select>
-		</div>
-		<div class="wpmind-gw-filter-group">
-			<label><?php esc_html_e( '开始日期', 'wpmind' ); ?></label>
-			<input type="date" id="log-filter-from">
-		</div>
-		<div class="wpmind-gw-filter-group">
-			<label><?php esc_html_e( '结束日期', 'wpmind' ); ?></label>
-			<input type="date" id="log-filter-to">
-		</div>
-		<div class="wpmind-gw-filter-group">
-			<button type="button" class="wpmind-gw-btn wpmind-gw-btn-sm" id="log-filter-apply"><?php esc_html_e( '筛选', 'wpmind' ); ?></button>
-		</div>
-	</div>
-
-	<table class="widefat striped">
-		<thead>
-			<tr>
-				<th><?php esc_html_e( '时间', 'wpmind' ); ?></th>
-				<th>Key</th>
-				<th><?php esc_html_e( '事件', 'wpmind' ); ?></th>
-				<th><?php esc_html_e( '详情', 'wpmind' ); ?></th>
-			</tr>
-		</thead>
-		<tbody id="gw-logs-tbody">
-			<tr><td colspan="4" style="text-align:center;color:var(--wpmind-gray-400)"><?php esc_html_e( '点击"筛选"加载日志', 'wpmind' ); ?></td></tr>
-		</tbody>
-	</table>
-
-	<div class="wpmind-gw-pagination" id="gw-logs-pagination" style="display:none">
-		<span id="gw-logs-info"></span>
-		<div class="wpmind-gw-pagination-btns">
-			<button type="button" class="wpmind-gw-btn wpmind-gw-btn-sm wpmind-gw-btn-secondary" id="log-prev" disabled><?php esc_html_e( '上一页', 'wpmind' ); ?></button>
-			<button type="button" class="wpmind-gw-btn wpmind-gw-btn-sm wpmind-gw-btn-secondary" id="log-next" disabled><?php esc_html_e( '下一页', 'wpmind' ); ?></button>
-		</div>
-	</div>
-</div>
 </div>
 
 <script>
@@ -353,11 +342,11 @@ $base_url = rest_url( 'mind/v1' );
 	var logPage = 1;
 
 	/* ---- Tab switching ---- */
-	$( '.wpmind-gw-subtab' ).on( 'click', function() {
+	$( '.wpmind-module-subtab' ).on( 'click', function() {
 		var tab = $( this ).data( 'tab' );
-		$( '.wpmind-gw-subtab' ).removeClass( 'active' );
+		$( '.wpmind-module-subtab' ).removeClass( 'active' );
 		$( this ).addClass( 'active' );
-		$( '.wpmind-gw-panel' ).removeClass( 'active' );
+		$( '.wpmind-module-tab-panel' ).removeClass( 'active' );
 		$( '[data-panel="' + tab + '"]' ).addClass( 'active' );
 		if ( tab === 'keys' ) loadKeys();
 	} );
@@ -424,7 +413,7 @@ $base_url = rest_url( 'mind/v1' );
 			var $tb = $( '#gw-keys-tbody' );
 			$tb.empty();
 			if ( ! r.success || ! r.data || ! r.data.keys || ! r.data.keys.length ) {
-				$tb.html( '<tr><td colspan="8" style="text-align:center;color:var(--wpmind-gray-400)"><?php echo esc_js( __( '暂无 API Key', 'wpmind' ) ); ?></td></tr>' );
+				$tb.html( '<tr><td colspan="8" class="meta" style="text-align:center"><?php echo esc_js( __( '暂无 API Key', 'wpmind' ) ); ?></td></tr>' );
 				return;
 			}
 			// Also populate log filter dropdown.
@@ -433,13 +422,13 @@ $base_url = rest_url( 'mind/v1' );
 			$.each( r.data.keys, function( i, k ) {
 				$sel.append( '<option value="' + k.key_id + '">sk_mind_' + k.key_prefix + '... (' + ( k.name || '-' ) + ')</option>' );
 				var badge = k.status === 'active'
-					? '<span class="wpmind-gw-badge wpmind-gw-badge-active">Active</span>'
-					: '<span class="wpmind-gw-badge wpmind-gw-badge-revoked">' + k.status + '</span>';
+					? '<span class="pill ok">Active</span>'
+					: '<span class="pill">' + k.status + '</span>';
 				var lastUsed = k.last_used_at || '-';
 				var actions = '';
 				if ( k.status === 'active' ) {
-					actions = '<button class="wpmind-gw-btn wpmind-gw-btn-sm gw-edit-key" data-kid="' + k.key_id + '"><?php echo esc_js( __( '编辑', 'wpmind' ) ); ?></button> ';
-					actions += '<button class="wpmind-gw-btn wpmind-gw-btn-sm wpmind-gw-btn-danger gw-revoke" data-kid="' + k.key_id + '"><?php echo esc_js( __( '吊销', 'wpmind' ) ); ?></button>';
+					actions = '<button class="btn btn-sm gw-edit-key" data-kid="' + k.key_id + '"><?php echo esc_js( __( '编辑', 'wpmind' ) ); ?></button> ';
+					actions += '<button class="btn btn-sm btn-danger gw-revoke" data-kid="' + k.key_id + '"><?php echo esc_js( __( '吊销', 'wpmind' ) ); ?></button>';
 				} else {
 					actions = '-';
 				}
@@ -447,12 +436,12 @@ $base_url = rest_url( 'mind/v1' );
 				try { ipw = k.ip_whitelist ? ( typeof k.ip_whitelist === 'string' ? ( k.ip_whitelist.charAt(0) === '[' ? JSON.parse( k.ip_whitelist ).join( ', ' ) : k.ip_whitelist ) : '' ) : ''; } catch(e) { ipw = k.ip_whitelist || ''; }
 				$tb.append(
 					'<tr data-key-id="' + k.key_id + '">' +
-					'<td><code>sk_mind_' + k.key_prefix + '...</code></td>' +
+					'<td><code class="wenpai-code">sk_mind_' + k.key_prefix + '...</code></td>' +
 					'<td>' + ( k.name || '-' ) + '</td>' +
 					'<td>' + badge + '</td>' +
 					'<td>' + k.rpm_limit + ' / ' + k.tpm_limit + '</td>' +
-					'<td>' + ( k.usage_request_count || 0 ) + '</td>' +
-					'<td>' + Number( k.usage_total_tokens || 0 ).toLocaleString() + '</td>' +
+					'<td class="num">' + ( k.usage_request_count || 0 ) + '</td>' +
+					'<td class="num">' + Number( k.usage_total_tokens || 0 ).toLocaleString() + '</td>' +
 					'<td>' + lastUsed + '</td>' +
 					'<td>' + actions + '</td>' +
 					'</tr>'
@@ -472,8 +461,8 @@ $base_url = rest_url( 'mind/v1' );
 						editField( '<?php echo esc_js( __( '过期时间', 'wpmind' ) ); ?>', 'date', 'ek-exp-' + k.key_id, k.expires_at ? k.expires_at.substring( 0, 10 ) : '' ) +
 						'</div>' +
 						'<div class="wpmind-gw-edit-actions">' +
-						'<button class="wpmind-gw-btn wpmind-gw-btn-sm gw-save-edit" data-kid="' + k.key_id + '"><?php echo esc_js( __( '保存', 'wpmind' ) ); ?></button> ' +
-						'<button class="wpmind-gw-btn wpmind-gw-btn-sm wpmind-gw-btn-secondary gw-cancel-edit" data-kid="' + k.key_id + '"><?php echo esc_js( __( '取消', 'wpmind' ) ); ?></button>' +
+						'<button class="btn btn-sm btn-primary gw-save-edit" data-kid="' + k.key_id + '"><?php echo esc_js( __( '保存', 'wpmind' ) ); ?></button> ' +
+						'<button class="btn btn-sm gw-cancel-edit" data-kid="' + k.key_id + '"><?php echo esc_js( __( '取消', 'wpmind' ) ); ?></button>' +
 						'</div></div></td></tr>'
 					);
 				}
@@ -483,7 +472,7 @@ $base_url = rest_url( 'mind/v1' );
 
 	function editField( label, type, id, val ) {
 		var step = type === 'number' ? ' step="any"' : '';
-		return '<div class="wpmind-gw-edit-field"><label>' + label + '</label><input type="' + type + '" id="' + id + '" value="' + val + '"' + step + '></div>';
+		return '<div class="wpmind-gw-edit-field"><label for="' + id + '">' + label + '</label><input type="' + type + '" id="' + id + '" value="' + val + '"' + step + '></div>';
 	}
 
 	/* ---- Toggle inline edit ---- */
@@ -551,7 +540,7 @@ $base_url = rest_url( 'mind/v1' );
 			var $tb = $( '#gw-logs-tbody' );
 			$tb.empty();
 			if ( ! r.success || ! r.data || ! r.data.logs || ! r.data.logs.length ) {
-				$tb.html( '<tr><td colspan="4" style="text-align:center;color:var(--wpmind-gray-400)"><?php echo esc_js( __( '暂无日志', 'wpmind' ) ); ?></td></tr>' );
+				$tb.html( '<tr><td colspan="4" class="meta" style="text-align:center"><?php echo esc_js( __( '暂无日志', 'wpmind' ) ); ?></td></tr>' );
 				$( '#gw-logs-pagination' ).hide();
 				return;
 			}
@@ -569,7 +558,7 @@ $base_url = rest_url( 'mind/v1' );
 				$tb.append(
 					'<tr>' +
 					'<td>' + ( log.created_at || '-' ) + '</td>' +
-					'<td><code>' + ( log.key_id || '-' ) + '</code></td>' +
+					'<td><code class="wenpai-code">' + ( log.key_id || '-' ) + '</code></td>' +
 					'<td>' + ( log.event_type || '-' ) + '</td>' +
 					'<td>' + detail + '</td>' +
 					'</tr>'
@@ -593,12 +582,6 @@ $base_url = rest_url( 'mind/v1' );
 			} );
 		}
 	}
-
-	$( document ).on( 'click', '.wpmind-gw-copy-btn', function() {
-		var $btn = $( this );
-		var text = $btn.data( 'copy' ) || $btn.closest( '.wpmind-gw-code-block' ).find( 'pre' ).text();
-		copyText( text, $btn );
-	} );
 
 	/* ---- Auto-load keys ---- */
 	loadKeys();

@@ -206,12 +206,7 @@ class GeoModule implements ModuleInterface {
 		if ( ! in_array( $hook_suffix, [ 'settings_page_wpmind', 'toplevel_page_wpmind' ], true ) ) {
 			return;
 		}
-		wp_enqueue_style(
-			'wpmind-geo',
-			WPMIND_PLUGIN_URL . 'assets/css/pages/geo.css',
-			[ 'wpmind-admin' ],
-			WPMIND_VERSION
-		);
+
 	}
 
 	/**

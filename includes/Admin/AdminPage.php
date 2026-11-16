@@ -56,7 +56,6 @@ final class AdminPage {
 		'routing',
 		'modules',
 		'module',
-		'analytics',
 		'workflow',
 		'tools',
 		'help',
@@ -67,12 +66,7 @@ final class AdminPage {
 	 *
 	 * @var list<string>
 	 */
-	private const LEGACY_MODULES = [
-		'analytics',
-		'api-gateway',
-		'auto-meta',
-		'cost-control',
-	];
+	private const LEGACY_MODULES = [];
 
 	/**
 	 * 模块设置模板是否仍走 legacy 资产。

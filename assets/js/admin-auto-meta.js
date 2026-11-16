@@ -84,8 +84,8 @@
 		},
 
 		saveSettings: function( $button ) {
-			var originalText = $button.html();
-			$button.html( '<span class="dashicons ri-loader-4-line"></span> 保存中...' ).prop( 'disabled', true );
+			var originalHtml = $button.html();
+			$button.addClass( 'is-busy' ).text( '保存中…' ).prop( 'disabled', true );
 
 			var postTypes = [];
 			$( 'input[name="wpmind_auto_meta_post_types[]"]:checked' ).each( function() {
@@ -108,20 +108,20 @@
 				},
 				success: function( response ) {
 					if ( response.success ) {
-						$button.html( '<span class="dashicons ri-check-line"></span> 已保存' );
+						$button.removeClass( 'is-busy' ).text( '已保存' );
 						Toast.success( 'Auto-Meta 设置已保存' );
 					} else {
-						$button.html( '<span class="dashicons ri-error-warning-line"></span> 保存失败' );
+						$button.removeClass( 'is-busy' ).text( '保存失败' );
 						Toast.error( response.data && response.data.message || '保存失败' );
 					}
 					setTimeout( function() {
-						$button.html( originalText ).prop( 'disabled', false );
+						$button.html( originalHtml ).prop( 'disabled', false );
 					}, 1500 );
 				},
 				error: function() {
-					$button.html( '<span class="dashicons ri-error-warning-line"></span> 网络错误' );
+					$button.removeClass( 'is-busy' ).text( '网络错误' );
 					setTimeout( function() {
-						$button.html( originalText ).prop( 'disabled', false );
+						$button.html( originalHtml ).prop( 'disabled', false );
 					}, 2000 );
 				}
 			} );
@@ -135,8 +135,8 @@
 			}
 
 			var $button = $( '#wpmind-am-generate' );
-			var originalText = $button.html();
-			$button.html( '<span class="dashicons ri-loader-4-line"></span> 生成中...' ).prop( 'disabled', true );
+			var originalHtml = $button.html();
+			$button.addClass( 'is-busy' ).text( '生成中…' ).prop( 'disabled', true );
 
 			$.ajax( {
 				url: wpmindData.ajaxurl,
@@ -170,11 +170,11 @@
 					} else {
 						Toast.error( response.data && response.data.message || '生成失败' );
 					}
-					$button.html( originalText ).prop( 'disabled', false );
+					$button.html( originalHtml ).prop( 'disabled', false );
 				},
 				error: function() {
 					Toast.error( '网络错误' );
-					$button.html( originalText ).prop( 'disabled', false );
+					$button.html( originalHtml ).prop( 'disabled', false );
 				}
 			} );
 		}
