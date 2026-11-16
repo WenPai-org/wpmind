@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || exit();
 use WPMind\Admin\AdminIcons;
 use WPMind\Admin\AdminPage;
 
-Wenpai_Admin_Shell::page_head(
+wpmind_page_head(
 	__( '帮助', 'wpmind' ),
 	__( '先按顺序把 AI 服务配好，再按需开模块。', 'wpmind' )
 );

@@ -10,6 +10,50 @@ defined( 'ABSPATH' ) || exit();
 use WPMind\Admin\AdminIcons;
 use WPMind\Admin\AdminPage;
 
+// kit 缺席时的展示层兜底：壳/组件 helper 的等价纯 HTML 输出。
+if ( ! function_exists( 'wpmind_page_head' ) ) {
+	function wpmind_page_head( $title, $lede = '', $aside = '' ): void {
+		if ( class_exists( 'Wenpai_Admin_Shell', false ) ) {
+			Wenpai_Admin_Shell::page_head( $title, $lede, $aside );
+			return;
+		}
+		echo '<div class="wenpai-page-head"><div><h1 class="wenpai-h1">' . esc_html( $title ) . '</h1>';
+		if ( '' !== $lede ) {
+			echo '<p class="wenpai-lede">' . esc_html( $lede ) . '</p>';
+		}
+		echo '</div>';
+		if ( '' !== $aside ) {
+			echo '<div class="mode">' . $aside . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- caller HTML, same as kit.
+		}
+		echo '</div>';
+	}
+}
+if ( ! function_exists( 'wpmind_code_block_html' ) ) {
+	function wpmind_code_block_html( array $args ): string {
+		if ( class_exists( 'Wenpai_Admin_UI', false ) ) {
+			return Wenpai_Admin_UI::code_block_html( $args );
+		}
+		return '<pre class="wenpai-code"><code>' . esc_html( (string) ( $args['code'] ?? '' ) ) . '</code></pre>';
+	}
+}
+if ( ! function_exists( 'wpmind_code_inline_html' ) ) {
+	function wpmind_code_inline_html( array $args ): string {
+		if ( class_exists( 'Wenpai_Admin_UI', false ) ) {
+			return Wenpai_Admin_UI::code_inline_html( $args );
+		}
+		return '<code class="wenpai-code">' . esc_html( (string) ( $args['code'] ?? '' ) ) . '</code>';
+	}
+}
+if ( ! function_exists( 'wpmind_notice' ) ) {
+	function wpmind_notice( array $args ): void {
+		if ( class_exists( 'Wenpai_Admin_UI', false ) ) {
+			Wenpai_Admin_UI::notice( $args );
+			return;
+		}
+		echo '<div class="notice ' . esc_attr( (string) ( $args['level'] ?? 'info' ) ) . '"><p>' . esc_html( (string) ( $args['text'] ?? '' ) ) . '</p></div>';
+	}
+}
+
 $wpmind_view   = AdminPage::current_view();
 $wpmind_module = AdminPage::current_module();
 

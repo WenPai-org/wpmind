@@ -46,7 +46,7 @@ $wpmind_on   = ! empty( $wpmind_module['enabled'] );
 	</a>
 </p>
 <?php
-Wenpai_Admin_Shell::page_head(
+wpmind_page_head(
 	$wpmind_name,
 	$wpmind_desc,
 	'<span class="pill ' . ( $wpmind_on ? 'ok' : 'mute' ) . '">' . ( $wpmind_on ? esc_html__( '已启用', 'wpmind' ) : esc_html__( '未启用', 'wpmind' ) ) . '</span>'

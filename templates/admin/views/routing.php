@@ -41,7 +41,7 @@ $wpmind_mark = static function ( string $pid ): string {
 	return AdminIcons::svg( 'robot' );
 };
 
-Wenpai_Admin_Shell::page_head(
+wpmind_page_head(
 	__( '智能路由', 'wpmind' ),
 	__( '策略、优先级、故障转移一页管。状态随操作实时刷新，熔断中的 Provider 自动跳过。', 'wpmind' )
 );

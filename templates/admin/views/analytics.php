@@ -8,7 +8,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-Wenpai_Admin_Shell::page_head(
+wpmind_page_head(
 	__( '分析', 'wpmind' ),
 	__( 'Token 用量、费用与预算一页看。费用为估算值，按各服务商官方定价计算。', 'wpmind' )
 );

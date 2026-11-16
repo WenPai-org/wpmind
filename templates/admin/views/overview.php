@@ -96,7 +96,7 @@ if ( empty( $providers ) ) {
 	];
 }
 
-Wenpai_Admin_Shell::page_head(
+wpmind_page_head(
 	__( '概览', 'wpmind' ),
 	__( 'AI 服务中枢一页看状态：熔断、用量、缓存命中、模块健康。需要处理的事会出现在顶部提示里。', 'wpmind' )
 );

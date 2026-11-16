@@ -60,7 +60,7 @@ $wpmind_flow  = [
 	[ 'undo', '撤销' ],
 ];
 
-Wenpai_Admin_Shell::page_head(
+wpmind_page_head(
 	__( '任务', 'wpmind' ),
 	__( 'AI 批量工作流：Alt 标题 / Meta 元数据 统一走 dry-run → 审核 → 写入 → 撤销。', 'wpmind' )
 );

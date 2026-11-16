@@ -55,7 +55,7 @@ private const LEGACY_VIEWS = [];
 	public function enqueue_admin_assets( string $hook_suffix ): void {
 		// kit Settings 子菜单：settings_page_{slug}；旧顶级菜单兜底 toplevel_page_wpmind
 		$kit_hook = class_exists( 'Wenpai_Admin_Menu', false )
-			? Wenpai_Admin_Menu::hook( 'wpmind' )
+			? \Wenpai_Admin_Menu::hook( 'wpmind' )
 			: 'settings_page_wpmind';
 		if ( ! in_array( $hook_suffix, [ $kit_hook, 'toplevel_page_wpmind' ], true ) ) {
 			return;
@@ -63,7 +63,7 @@ private const LEGACY_VIEWS = [];
 
 		// wenpai-admin-ui kit（与其它文派插件共享同一份 CSS/JS，版本最高者生效）
 		if ( class_exists( 'Wenpai_Admin_Loader', false ) ) {
-			Wenpai_Admin_Loader::enqueue(
+			\Wenpai_Admin_Loader::enqueue(
 				[
 					'full' => true,
 					'body' => 'wpmind-admin',

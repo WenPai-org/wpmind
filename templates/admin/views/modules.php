@@ -26,7 +26,7 @@ $wpmind_mod_icons = [
 	'media-intelligence' => 'image',
 ];
 
-Wenpai_Admin_Shell::page_head(
+wpmind_page_head(
 	__( '模块', 'wpmind' ),
 	__( 'AI 能力开关。核心模块不可禁用；「设置」进模块设置页。', 'wpmind' )
 );

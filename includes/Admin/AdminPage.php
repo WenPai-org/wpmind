@@ -56,6 +56,7 @@ final class AdminPage {
 		'routing',
 		'modules',
 		'module',
+		'analytics',
 		'workflow',
 		'tools',
 		'help',
@@ -109,7 +110,7 @@ final class AdminPage {
 	 */
 	public static function url( array $args = [] ): string {
 		if ( class_exists( 'Wenpai_Admin_Menu', false ) ) {
-			return Wenpai_Admin_Menu::url( 'wpmind', $args );
+			return \Wenpai_Admin_Menu::url( 'wpmind', $args );
 		}
 		$base = menu_page_url( 'wpmind', '' );
 		return $base ? add_query_arg( $args, $base ) : '';
@@ -168,7 +169,7 @@ final class AdminPage {
 	 */
 	public function add_admin_menu(): void {
 		if ( class_exists( 'Wenpai_Admin_Menu', false ) ) {
-			Wenpai_Admin_Menu::register(
+			\Wenpai_Admin_Menu::register(
 				[
 					'slug'    => 'wpmind',
 					'label'   => __( '心思', 'wpmind' ),

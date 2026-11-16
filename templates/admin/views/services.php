@@ -97,7 +97,7 @@ $wpmind_mode_seg = '<div class="seg wpmind-mode" role="radiogroup" aria-label="'
 	. '<a href="#" data-mode="advanced">' . esc_html__( '高级', 'wpmind' ) . '</a>'
 	. '</div>';
 
-Wenpai_Admin_Shell::page_head(
+wpmind_page_head(
 	__( 'AI 服务', 'wpmind' ),
 	__( '配置文本与图像 Provider。简单模式只留启用、Key 与测试；高级模式展开全部配置。', 'wpmind' ),
 	$wpmind_mode_seg

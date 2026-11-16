@@ -52,7 +52,7 @@ $wpmind_switch = static function ( string $id, bool $checked, string $label, str
 		. '</div></div>';
 };
 
-$wpmind_num = static function ( string $id, int $value, int $min, int $max, string $label ): void {
+$wpmind_num = static function ( string $id, $value, int $min, int $max, string $label ): void {
 	echo '<div class="wenpai-field field wenpai-field--row">'
 		. '<div class="field-label"><label class="wenpai-field__label" for="' . esc_attr( $id ) . '">' . esc_html( $label ) . '</label></div>'
 		. '<div class="field-ctl"><input type="number" id="' . esc_attr( $id ) . '" value="' . esc_attr( (string) $value ) . '" min="' . esc_attr( (string) $min ) . '" max="' . esc_attr( (string) $max ) . '" style="max-width:10rem"></div></div>';
@@ -224,7 +224,7 @@ $wpmind_num = static function ( string $id, int $value, int $min, int $max, stri
 			</div>
 
 			<h3 class="card-title" style="margin:0 0 var(--wenpai-space-2);">Base URL</h3>
-			<?php echo Wenpai_Admin_UI::code_block_html( [ 'code' => $base_url, 'lang' => 'text' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php echo wpmind_code_block_html( [ 'code' => $base_url, 'lang' => 'text' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 
 			<h3 class="card-title" style="margin:var(--wenpai-space-5) 0 var(--wenpai-space-2);"><?php esc_html_e( '可用端点', 'wpmind' ); ?></h3>
 			<div class="wenpai-table-wrap">
@@ -256,7 +256,7 @@ $wpmind_num = static function ( string $id, int $value, int $min, int $max, stri
 				. '\t\t"messages": [{"role": "user", "content": "Hello"}],\n'
 				. '\t\t"stream": true\n'
 				. "\t}'";
-			echo Wenpai_Admin_UI::code_block_html( [ 'code' => $wpmind_curl, 'lang' => 'bash' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo wpmind_code_block_html( [ 'code' => $wpmind_curl, 'lang' => 'bash' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			?>
 
 			<p class="meta" style="margin-top:var(--wenpai-space-4);">

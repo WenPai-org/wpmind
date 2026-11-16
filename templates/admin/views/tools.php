@@ -11,7 +11,7 @@ defined( 'ABSPATH' ) || exit();
 use WPMind\Admin\AdminIcons;
 use WPMind\Admin\AdminPage;
 
-Wenpai_Admin_Shell::page_head(
+wpmind_page_head(
 	__( '工具', 'wpmind' ),
 	__( '诊断与迁移：导出诊断包排障、导出/导入端点配置（JSON，不含 API Key）。', 'wpmind' )
 );

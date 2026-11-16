@@ -180,8 +180,8 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 						<?php if ( $standalone_feed ) : ?>
 						<p class="wenpai-field__desc" style="margin-top:8px;"><?php esc_html_e( '访问方式：', 'wpmind' ); ?></p>
 						<p>
-							<?php echo Wenpai_Admin_UI::code_inline_html( [ 'code' => home_url( '/?feed=markdown' ) ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit helper escapes internally ?>
-							<?php echo Wenpai_Admin_UI::code_inline_html( [ 'code' => home_url( '/your-post-slug.md' ) ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit helper escapes internally ?>
+							<?php echo wpmind_code_inline_html( [ 'code' => home_url( '/?feed=markdown' ) ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit helper escapes internally ?>
+							<?php echo wpmind_code_inline_html( [ 'code' => home_url( '/your-post-slug.md' ) ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit helper escapes internally ?>
 						</p>
 						<?php endif; ?>
 					</section>
@@ -197,7 +197,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 						<?php $wpmind_switch( 'wpmind-llms-txt', 'wpmind_llms_txt_enabled', $llms_txt_enabled, __( '启用 llms.txt', 'wpmind' ), __( '在 /llms.txt 提供站点内容导航。', 'wpmind' ) ); ?>
 						<?php if ( $llms_txt_enabled ) : ?>
 						<p class="wenpai-field__desc" style="margin-top:8px;"><?php esc_html_e( '访问地址：', 'wpmind' ); ?></p>
-						<p><?php echo Wenpai_Admin_UI::code_inline_html( [ 'code' => \WPMind\Modules\Geo\LlmsTxtGenerator::get_public_url() ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit helper escapes internally ?></p>
+						<p><?php echo wpmind_code_inline_html( [ 'code' => \WPMind\Modules\Geo\LlmsTxtGenerator::get_public_url() ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit helper escapes internally ?></p>
 						<?php if ( '' === (string) get_option( 'permalink_structure' ) ) : ?>
 						<p class="meta"><?php esc_html_e( '当前是朴素固定链接，只能用上面这个带参数的地址。启用固定链接后才有 /llms.txt。', 'wpmind' ); ?></p>
 						<?php endif; ?>
@@ -228,7 +228,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 							</div>
 						</div>
 						<p class="wenpai-field__desc" style="margin-top:8px;"><?php esc_html_e( '访问地址：', 'wpmind' ); ?></p>
-						<p><?php echo Wenpai_Admin_UI::code_inline_html( [ 'code' => \WPMind\Modules\Geo\AiSitemapGenerator::get_public_url() ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit helper escapes internally ?></p>
+						<p><?php echo wpmind_code_inline_html( [ 'code' => \WPMind\Modules\Geo\AiSitemapGenerator::get_public_url() ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit helper escapes internally ?></p>
 						<?php endif; ?>
 					</section>
 
@@ -532,7 +532,7 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 							</tbody>
 						</table>
 						</div>
-						<p class="wenpai-field__desc" style="margin-top:var(--wenpai-space-3);"><?php esc_html_e( '预览地址：', 'wpmind' ); ?> <?php echo Wenpai_Admin_UI::code_inline_html( [ 'code' => home_url( '/robots.txt' ) ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit helper escapes internally ?></p>
+						<p class="wenpai-field__desc" style="margin-top:var(--wenpai-space-3);"><?php esc_html_e( '预览地址：', 'wpmind' ); ?> <?php echo wpmind_code_inline_html( [ 'code' => home_url( '/robots.txt' ) ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit helper escapes internally ?></p>
 						<?php endif; ?>
 					</section>
 				</div>
