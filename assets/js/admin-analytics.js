@@ -161,9 +161,9 @@
 			$( '.wpmind-refresh-analytics' ).on( 'click', function( e ) {
 				e.preventDefault();
 				var $btn = $( this );
-				$btn.find( '.dashicons' ).addClass( 'wpmind-spinning' );
+				$btn.addClass( 'is-busy' ).prop( 'disabled', true );
 				self.loadData( function() {
-					$btn.find( '.dashicons' ).removeClass( 'wpmind-spinning' );
+					$btn.removeClass( 'is-busy' ).prop( 'disabled', false );
 				} );
 			} );
 		},
@@ -541,7 +541,7 @@
 			}
 		};
 
-		if ( $( '#analytics' ).hasClass( 'wpmind-tab-pane-active' ) ) {
+		if ( $( '#wpmind-usage-trend-chart' ).length ) {
 			safeInit( 'analytics', Admin.ensureChartsInit || AnalyticsCharts.init.bind( AnalyticsCharts ) );
 		}
 	} );

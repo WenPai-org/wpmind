@@ -78,13 +78,11 @@
 				return;
 			}
 
-			$button.addClass( 'is-loading' );
-			$button.find( '.dashicons' ).addClass( 'wpmind-spinning' );
+			$button.addClass( 'is-loading is-busy' ).prop( 'disabled', true );
 
 			if ( 'undefined' === typeof wpmindData ) {
 				Toast.error( '配置错误' );
-				$button.removeClass( 'is-loading' );
-				$button.find( '.dashicons' ).removeClass( 'wpmind-spinning' );
+				$button.removeClass( 'is-loading is-busy' ).prop( 'disabled', false );
 				return;
 			}
 
@@ -105,8 +103,7 @@
 					Toast.error( '刷新失败' );
 				},
 				complete: function() {
-					$button.removeClass( 'is-loading' );
-					$button.find( '.dashicons' ).removeClass( 'wpmind-spinning' );
+					$button.removeClass( 'is-loading is-busy' ).prop( 'disabled', false );
 				}
 			} );
 		} );
@@ -130,11 +127,11 @@
 				cancelText: '取消',
 				onConfirm: function() {
 					var originalHtml = $button.html();
-					$button.prop( 'disabled', true ).html( '<span class="dashicons ri-loader-4-line wpmind-spinning"></span>' );
+					$button.prop( 'disabled', true ).addClass( 'is-busy' ).text( '处理中…' );
 
 					if ( 'undefined' === typeof wpmindData ) {
 						Toast.error( '配置错误' );
-						$button.prop( 'disabled', false ).html( originalHtml );
+						$button.prop( 'disabled', false ).removeClass( 'is-busy' ).html( originalHtml );
 						return;
 					}
 
@@ -162,7 +159,7 @@
 							Toast.error( '清除失败' );
 						},
 						complete: function() {
-							$button.prop( 'disabled', false ).html( originalHtml );
+							$button.prop( 'disabled', false ).removeClass( 'is-busy' ).html( originalHtml );
 						}
 					} );
 				}
@@ -194,7 +191,7 @@
 			}
 
 			var originalText = $button.text();
-			$button.prop( 'disabled', true ).html( '<span class="dashicons ri-loader-4-line wpmind-spinning"></span> 保存中' );
+			$button.prop( 'disabled', true ).addClass( 'is-busy' ).text( '保存中…' );
 
 			// 收集设置数据
 			var settings = {

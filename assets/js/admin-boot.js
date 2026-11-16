@@ -131,8 +131,8 @@
 		Admin.safeInit( 'tabs', initTabs );
 		Admin.safeInit( 'mode-switch', initModeSwitch );
 
-		// 图表懒加载：只在数据分析 Tab 激活时初始化
-		if ( $( '#analytics' ).hasClass( 'wpmind-tab-pane-active' ) ) {
+		// 图表初始化：分析视图存在 canvas 时加载
+		if ( $( '#wpmind-usage-trend-chart' ).length ) {
 			Admin.safeInit( 'analytics', Admin.ensureChartsInit );
 		}
 	} );

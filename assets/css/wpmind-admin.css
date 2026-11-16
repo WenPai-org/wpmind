@@ -784,3 +784,8 @@ body.wenpai-ui-page .wenpai-app .wpmind-provider-body .wpmind-field--center .fie
 .wpmind-routing-priority-actions { flex: none; }
 .wpmind-routing-priority .wpmind-priority { margin-bottom: var(--wenpai-space-4); }
 .wpmind-priority-item.ui-sortable-helper { box-shadow: var(--wenpai-shadow-pop, 0 8px 24px rgba(0,0,0,.12)); }
+
+/* ---- 分析视图：真实图表 ---- */
+.wpmind-chart.is-live { border: 0; background: transparent; }
+.wpmind-chart.is-live canvas { background: transparent; height: 260px; }
+.wpmind-chart-container.is-loading { opacity: .55; transition: opacity .15s ease; }
