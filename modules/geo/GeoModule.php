@@ -218,7 +218,7 @@ class GeoModule implements ModuleInterface {
 	public function register_settings_tab( array $tabs ): array {
 		$tabs['geo'] = array(
 			'title'    => __( 'GEO', 'wpmind' ),
-			'icon'     => 'ri-search-eye-line',
+			'icon'     => 'globe',
 			'template' => WPMIND_PATH . 'modules/geo/templates/settings.php',
 			'priority' => 30,
 		);

@@ -4,7 +4,7 @@
     "description": "AI 服务费用控制 - 用量追踪、预算限额、告警通知",
     "version": "1.0.0",
     "author": "WPMind",
-    "icon": "ri-money-cny-circle-line",
+    "icon": "wallet",
     "class": "WPMind\\Modules\\CostControl\\CostControlModule",
     "can_disable": false,
     "settings_tab": "cost-control",

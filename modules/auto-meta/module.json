@@ -4,7 +4,7 @@
     "description": "发布时自动生成摘要、标签、分类、FAQ Schema、SEO 描述",
     "version": "1.0.0",
     "author": "WPMind",
-    "icon": "ri-magic-line",
+    "icon": "doc",
     "class": "WPMind\\Modules\\AutoMeta\\AutoMetaModule",
     "can_disable": true,
     "settings_tab": "auto-meta",

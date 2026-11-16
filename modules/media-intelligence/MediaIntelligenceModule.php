@@ -135,7 +135,7 @@ final class MediaIntelligenceModule implements ModuleInterface {
 	public function register_settings_tab( array $tabs ): array {
 		$tabs['media-intelligence'] = [
 			'title'    => __( '媒体智能', 'wpmind' ),
-			'icon'     => 'ri-image-ai-line',
+			'icon'     => 'image',
 			'template' => __DIR__ . '/templates/settings.php',
 			'priority' => 25,
 		];

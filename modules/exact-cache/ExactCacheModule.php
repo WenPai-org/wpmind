@@ -118,7 +118,7 @@ final class ExactCacheModule implements ModuleInterface {
 	public function register_settings_tab( array $tabs ): array {
 		$tabs['exact-cache'] = [
 			'title'    => __( '精确缓存', 'wpmind' ),
-			'icon'     => 'ri-database-2-line',
+			'icon'     => 'zap',
 			'template' => __DIR__ . '/templates/settings.php',
 			'priority' => 20,
 		];

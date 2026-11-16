@@ -177,7 +177,7 @@ class ApiGatewayModule implements ModuleInterface {
 	public function register_settings_tab( array $tabs ): array {
 		$tabs['api-gateway'] = array(
 			'title'    => __( 'API Gateway', 'wpmind' ),
-			'icon'     => 'ri-server-line',
+			'icon'     => 'route',
 			'template' => WPMIND_PATH . 'modules/api-gateway/templates/settings.php',
 			'priority' => 35,
 		);

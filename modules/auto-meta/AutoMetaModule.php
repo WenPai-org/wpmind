@@ -124,7 +124,7 @@ final class AutoMetaModule implements ModuleInterface {
 	public function register_settings_tab( array $tabs ): array {
 		$tabs['auto-meta'] = [
 			'title'    => __( 'Auto-Meta', 'wpmind' ),
-			'icon'     => 'ri-magic-line',
+			'icon'     => 'doc',
 			'template' => __DIR__ . '/templates/settings.php',
 			'priority' => 30,
 		];

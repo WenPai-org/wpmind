@@ -142,7 +142,7 @@ class CostControlModule implements ModuleInterface {
 	public function register_settings_tab( array $tabs ): array {
 		$tabs['cost-control'] = array(
 			'title'    => __( 'Cost Control', 'wpmind' ),
-			'icon'     => 'ri-money-cny-circle-line',
+			'icon'     => 'wallet',
 			'template' => WPMIND_PATH . 'modules/cost-control/templates/settings.php',
 			'priority' => 25,
 		);

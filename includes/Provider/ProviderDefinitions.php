@@ -38,14 +38,14 @@ final class ProviderDefinitions {
 		'anthropic'   => [
 			'name'         => 'Anthropic',
 			'display_name' => 'Claude',
-			'icon'         => 'claude',
+			'icon'         => 'anthropic',
 			'base_url'     => 'https://api.anthropic.com/v1',
 			'is_official'  => true,
 		],
 		'google'      => [
 			'name'         => 'Google AI',
 			'display_name' => 'Gemini',
-			'icon'         => 'gemini',
+			'icon'         => 'google',
 			'base_url'     => 'https://generativelanguage.googleapis.com/v1beta',
 			'is_official'  => true,
 		],
@@ -72,7 +72,7 @@ final class ProviderDefinitions {
 		'moonshot'    => [
 			'name'         => 'Moonshot',
 			'display_name' => 'Kimi',
-			'icon'         => 'kimi',
+			'icon'         => 'moonshot',
 			'base_url'     => 'https://api.moonshot.cn/v1',
 		],
 		'doubao'      => [
@@ -84,13 +84,13 @@ final class ProviderDefinitions {
 		'siliconflow' => [
 			'name'         => '硅基流动',
 			'display_name' => 'SiliconFlow',
-			'icon'         => 'siliconcloud',
+			'icon'         => 'siliconflow',
 			'base_url'     => 'https://api.siliconflow.cn/v1',
 		],
 		'baidu'       => [
 			'name'         => '百度文心',
 			'display_name' => 'ERNIE',
-			'icon'         => 'wenxin',
+			'icon'         => 'baidu',
 			// D7：endpoint schema v2 起默认使用千帆 v2 的 OpenAI 兼容地址.
 			'base_url'     => 'https://qianfan.baidubce.com/v2',
 		],
