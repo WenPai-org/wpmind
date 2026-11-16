@@ -498,31 +498,5 @@ class UsageTracker {
 		return $names[ $provider ] ?? $provider;
 	}
 
-	/**
-	 * 获取 Provider 的 Remixicon 图标类
-	 */
-	public static function get_provider_icon( string $provider ): string {
-		$icons = [
-			'openai'      => 'ri-openai-line',
-			'anthropic'   => 'ri-claude-line',
-			'google'      => 'ri-gemini-line',
-			'deepseek'    => 'ri-deepseek-line',
-			'qwen'        => 'ri-qwen-ai-line',
-			'zhipu'       => 'ri-zhipu-ai-line',
-			'moonshot'    => 'ri-moon-line',
-			'doubao'      => 'ri-fire-line',
-			'siliconflow' => 'ri-cpu-line',
-			'baidu'       => 'ri-baidu-line',
-			'minimax'     => 'ri-sparkling-line',
-		];
-		return $icons[ $provider ] ?? 'ri-robot-line';
-	}
 
-	/**
-	 * 获取 Provider 的图标颜色
-	 */
-	public static function get_provider_color( string $provider ): string {
-		// 统一使用单色，与 WordPress 后台风格一致
-		return '#50575e';
-	}
 }

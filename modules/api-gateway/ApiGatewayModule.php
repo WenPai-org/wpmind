@@ -119,9 +119,6 @@ class ApiGatewayModule implements ModuleInterface {
 		// Register settings even while the gateway runtime is disabled.
 		// This lets administrators opt in without exposing public routes first.
 
-		// Register settings tab.
-		add_filter( 'wpmind_settings_tabs', array( $this, 'register_settings_tab' ) );
-
 		// Register admin AJAX handlers.
 		if ( is_admin() ) {
 			$ajax_controller = new Admin\GatewayAjaxController();
@@ -166,22 +163,6 @@ class ApiGatewayModule implements ModuleInterface {
 	 */
 	private function is_gateway_enabled(): bool {
 		return '1' === get_option( 'wpmind_gateway_enabled', '0' );
-	}
-
-	/**
-	 * Register settings tab.
-	 *
-	 * @param array $tabs Existing tabs.
-	 * @return array Modified tabs.
-	 */
-	public function register_settings_tab( array $tabs ): array {
-		$tabs['api-gateway'] = array(
-			'title'    => __( 'API Gateway', 'wpmind' ),
-			'icon'     => 'route',
-			'template' => WPMIND_PATH . 'modules/api-gateway/templates/settings.php',
-			'priority' => 35,
-		);
-		return $tabs;
 	}
 
 	/**

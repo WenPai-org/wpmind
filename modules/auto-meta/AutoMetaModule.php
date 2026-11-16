@@ -97,9 +97,6 @@ final class AutoMetaModule implements ModuleInterface {
 		$this->generator = new MetaGenerator();
 		$this->generator->register_hooks();
 
-		// Register settings tab.
-		add_filter( 'wpmind_settings_tabs', [ $this, 'register_settings_tab' ] );
-
 		// Register AJAX handlers.
 		$ajax = new AutoMetaAjaxController();
 		$ajax->register_hooks();
@@ -113,22 +110,6 @@ final class AutoMetaModule implements ModuleInterface {
 		 * @param AutoMetaModule $this Module instance.
 		 */
 		do_action( 'wpmind_auto_meta_init', $this );
-	}
-
-	/**
-	 * Register settings tab.
-	 *
-	 * @param array $tabs Existing tabs.
-	 * @return array Modified tabs.
-	 */
-	public function register_settings_tab( array $tabs ): array {
-		$tabs['auto-meta'] = [
-			'title'    => __( 'Auto-Meta', 'wpmind' ),
-			'icon'     => 'doc',
-			'template' => __DIR__ . '/templates/settings.php',
-			'priority' => 30,
-		];
-		return $tabs;
 	}
 
 	/**

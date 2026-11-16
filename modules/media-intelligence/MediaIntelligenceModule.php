@@ -93,9 +93,6 @@ final class MediaIntelligenceModule implements ModuleInterface {
 	public function init(): void {
 		$this->init_components();
 
-		// Register settings tab.
-		add_filter( 'wpmind_settings_tabs', [ $this, 'register_settings_tab' ] );
-
 		// Register AJAX handlers.
 		$ajax = new MediaAjaxController();
 		$ajax->register_hooks();
@@ -124,22 +121,6 @@ final class MediaIntelligenceModule implements ModuleInterface {
 		if ( get_option( 'wpmind_media_nsfw_enabled', '0' ) === '1' ) {
 			$this->components['nsfw'] = new NsfwDetector();
 		}
-	}
-
-	/**
-	 * Register settings tab.
-	 *
-	 * @param array $tabs Existing tabs.
-	 * @return array Modified tabs.
-	 */
-	public function register_settings_tab( array $tabs ): array {
-		$tabs['media-intelligence'] = [
-			'title'    => __( '媒体智能', 'wpmind' ),
-			'icon'     => 'image',
-			'template' => __DIR__ . '/templates/settings.php',
-			'priority' => 25,
-		];
-		return $tabs;
 	}
 
 	/**

@@ -84,8 +84,6 @@ final class ExactCacheModule implements ModuleInterface {
 	 * Initialize the module.
 	 */
 	public function init(): void {
-		// 1. Register settings tab (vestigial filter, actual tab rendered statically by settings-page.php).
-		add_filter( 'wpmind_settings_tabs', [ $this, 'register_settings_tab' ] );
 
 		// 2. Hook scope_mode option into ExactCache core filter.
 		// When module is disabled this filter won't fire, core falls back to default 'role'.
@@ -107,22 +105,6 @@ final class ExactCacheModule implements ModuleInterface {
 
 		// 5. Admin assets (only on WPMind settings page).
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
-	}
-
-	/**
-	 * Register settings tab.
-	 *
-	 * @param array $tabs Existing tabs.
-	 * @return array Modified tabs.
-	 */
-	public function register_settings_tab( array $tabs ): array {
-		$tabs['exact-cache'] = [
-			'title'    => __( '精确缓存', 'wpmind' ),
-			'icon'     => 'zap',
-			'template' => __DIR__ . '/templates/settings.php',
-			'priority' => 20,
-		];
-		return $tabs;
 	}
 
 	/**

@@ -115,9 +115,6 @@ class GeoModule implements ModuleInterface {
 		// Initialize components.
 		$this->init_components();
 
-		// Register settings tab.
-		add_filter( 'wpmind_settings_tabs', array( $this, 'register_settings_tab' ) );
-
 		// Register AJAX handlers.
 		add_action( 'wp_ajax_wpmind_save_geo_settings', array( $this, 'ajax_save_settings' ) );
 
@@ -207,22 +204,6 @@ class GeoModule implements ModuleInterface {
 			return;
 		}
 
-	}
-
-	/**
-	 * Register settings tab.
-	 *
-	 * @param array $tabs Existing tabs.
-	 * @return array Modified tabs.
-	 */
-	public function register_settings_tab( array $tabs ): array {
-		$tabs['geo'] = array(
-			'title'    => __( 'GEO', 'wpmind' ),
-			'icon'     => 'globe',
-			'template' => WPMIND_PATH . 'modules/geo/templates/settings.php',
-			'priority' => 30,
-		);
-		return $tabs;
 	}
 
 	/**

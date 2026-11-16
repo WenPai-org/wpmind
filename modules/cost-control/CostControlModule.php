@@ -96,9 +96,6 @@ class CostControlModule implements ModuleInterface {
 		// Initialize components.
 		$this->init_components();
 
-		// Register settings tab.
-		add_filter( 'wpmind_settings_tabs', array( $this, 'register_settings_tab' ) );
-
 		// Register AJAX handlers.
 		add_action( 'wp_ajax_wpmind_save_cost_control_settings', array( $this, 'ajax_save_settings' ) );
 		add_action( 'wp_ajax_wpmind_get_cost_control_status', array( $this, 'ajax_get_status' ) );
@@ -131,22 +128,6 @@ class CostControlModule implements ModuleInterface {
 		// Budget Alert (initialize to register hooks).
 		BudgetAlert::init();
 		$this->components['budget_alert'] = BudgetAlert::instance();
-	}
-
-	/**
-	 * Register settings tab.
-	 *
-	 * @param array $tabs Existing tabs.
-	 * @return array Modified tabs.
-	 */
-	public function register_settings_tab( array $tabs ): array {
-		$tabs['cost-control'] = array(
-			'title'    => __( 'Cost Control', 'wpmind' ),
-			'icon'     => 'wallet',
-			'template' => WPMIND_PATH . 'modules/cost-control/templates/settings.php',
-			'priority' => 25,
-		);
-		return $tabs;
 	}
 
 	/**
