@@ -329,12 +329,7 @@ class ChatService extends AbstractService {
 			$custom_url = '' !== trim( (string) ( $endpoint['custom_base_url'] ?? '' ) );
 			if ( $custom_url ) {
 				// Custom endpoint: foreign model namespace, skip catalog resolution.
-				if ( $model_is_auto || 'default' === $original_model || '' === $original_model ) {
-					$endpoint_default = trim( (string) ( $endpoint['default_model'] ?? '' ) );
-					$model            = '' !== $endpoint_default ? $endpoint_default : 'auto';
-				} else {
-					$model = $original_model;
-				}
+				$model = $this->resolve_attempt_model( $try_provider, (string) $original_model, $model_is_auto );
 			} else {
 				$model = $model_is_auto
 					? $this->get_current_model( $try_provider )
@@ -582,10 +577,7 @@ class ChatService extends AbstractService {
 		$custom_url = '' !== trim( (string) ( $endpoint['custom_base_url'] ?? '' ) );
 		if ( $custom_url ) {
 			// Custom endpoint: foreign model namespace, skip catalog resolution.
-			if ( 'auto' === $model || empty( $model ) || 'default' === $model ) {
-				$endpoint_default = trim( (string) ( $endpoint['default_model'] ?? '' ) );
-				$model            = '' !== $endpoint_default ? $endpoint_default : 'auto';
-			}
+			$model = $this->resolve_attempt_model( $provider, (string) $model, false );
 		} else {
 			if ( 'auto' === $model || empty( $model ) || 'default' === $model ) {
 				$model = $this->get_current_model( $provider );
@@ -734,7 +726,10 @@ class ChatService extends AbstractService {
 		if ( $custom ) {
 			if ( $is_auto || 'auto' === $requested || 'default' === $requested || '' === $requested ) {
 				$default_model = trim( (string) ( $endpoint['default_model'] ?? '' ) );
-				return '' !== $default_model ? $default_model : 'auto';
+				if ( '' !== $default_model ) {
+					return $default_model;
+				}
+				return $this->remote_fallback_model( $provider, (string) ( $endpoint['api_key'] ?? '' ) );
 			}
 			return $requested;
 		}
@@ -750,6 +745,32 @@ class ChatService extends AbstractService {
 		}
 
 		return \WPMind\Provider\Catalog\ModelCatalog::instance()->resolve( $provider, (string) $try_model )->model;
+	}
+
+	/**
+	 * Custom endpoint auto 模式的兜底模型：查远端 /models 列表取第一个可用 ID。
+	 *
+	 * 先读 transient 缓存（key/base_url 指纹校验），未命中时实时拉一次
+	 * （RemoteModelLister 内部 5s 超时、跳过用量记账，12h 缓存）。
+	 * 全部失败回落字面量 'auto'，由 provider 自行决定或报错。
+	 *
+	 * @param string $provider Provider id.
+	 * @param string $api_key  Endpoint API key.
+	 * @return string
+	 */
+	private function remote_fallback_model( string $provider, string $api_key ): string {
+		if ( '' === $api_key ) {
+			return 'auto';
+		}
+
+		$lister = new \WPMind\Provider\Catalog\RemoteModelLister();
+		$ids    = $lister->ids_if_valid( $provider, $api_key );
+		if ( [] === $ids ) {
+			$refresh = $lister->refresh( $provider, $api_key );
+			$ids     = ! empty( $refresh['ok'] ) ? $refresh['ids'] : [];
+		}
+
+		return [] !== $ids ? (string) $ids[0] : 'auto';
 	}
 
 	/**
