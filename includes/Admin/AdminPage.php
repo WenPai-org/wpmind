@@ -46,17 +46,127 @@ final class AdminPage {
 	private function __construct() {}
 
 	/**
-	 * 添加管理菜单
+	 * 一级视图（?page=wpmind&tab=）。模块设置走 tab=module&module=<id>。
+	 *
+	 * @var list<string>
+	 */
+	private const VIEWS = [
+		'overview',
+		'services',
+		'routing',
+		'modules',
+		'module',
+		'analytics',
+		'workflow',
+		'tools',
+		'help',
+	];
+
+	/**
+	 * 旧 hash tab → 新视图（外部链接/书签兼容）。
+	 *
+	 * @var array<string, string>
+	 */
+	private const LEGACY_TAB_MAP = [
+		'overview'          => 'overview',
+		'services'          => 'services',
+		'images'            => 'services',
+		'routing'           => 'routing',
+		'analytics'         => 'analytics',
+		'dashboard'         => 'analytics',
+		'budget'            => 'analytics',
+		'workflow'          => 'workflow',
+		'modules'           => 'modules',
+		'geo'               => 'module',
+		'api-gateway'       => 'module',
+		'exact-cache'       => 'module',
+		'media-intelligence'=> 'module',
+		'auto-meta'         => 'module',
+		'cost-control'      => 'module',
+	];
+
+	/**
+	 * 后台 URL（kit Menu 优先，退回 admin.php?page=）。
+	 *
+	 * @param array<string, string> $args Query args.
+	 * @return string
+	 */
+	public static function url( array $args = [] ): string {
+		if ( class_exists( 'Wenpai_Admin_Menu', false ) ) {
+			return Wenpai_Admin_Menu::url( 'wpmind', $args );
+		}
+		return add_query_arg( array_merge( [ 'page' => 'wpmind' ], $args ), admin_url( 'admin.php' ) );
+	}
+
+	/**
+	 * 当前请求解析出的视图 id。
+	 *
+	 * @return string
+	 */
+	public static function current_view(): string {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only view routing.
+		$raw = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'overview';
+		$view = self::LEGACY_TAB_MAP[ $raw ] ?? $raw;
+		if ( ! in_array( $view, self::VIEWS, true ) ) {
+			return 'overview';
+		}
+		if ( 'module' === $view ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$module = isset( $_GET['module'] ) ? sanitize_key( wp_unslash( $_GET['module'] ) ) : '';
+			if ( '' === $module && isset( self::LEGACY_TAB_MAP[ $raw ] ) && 'module' === self::LEGACY_TAB_MAP[ $raw ] ) {
+				$module = $raw; // 旧链接 ?tab=geo 直接当模块 id。
+			}
+			$loader  = \WPMind\Core\ModuleLoader::instance();
+			$modules = $loader->get_modules();
+			if ( '' === $module || ! isset( $modules[ $module ] ) ) {
+				return 'modules';
+			}
+		}
+		return $view;
+	}
+
+	/**
+	 * 当前模块设置视图的模块 id（tab=module&module=<id> 或旧 tab=<module-id>）。
+	 *
+	 * @return string
+	 */
+	public static function current_module(): string {
+		if ( 'module' !== self::current_view() ) {
+			return '';
+		}
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$module = isset( $_GET['module'] ) ? sanitize_key( wp_unslash( $_GET['module'] ) ) : '';
+		if ( '' === $module ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$raw = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : '';
+			if ( isset( self::LEGACY_TAB_MAP[ $raw ] ) && 'module' === self::LEGACY_TAB_MAP[ $raw ] ) {
+				$module = $raw;
+			}
+		}
+		return $module;
+	}
+
+	/**
+	 * 添加管理菜单（kit Settings 子菜单；kit 未加载时退回 options 页）
 	 */
 	public function add_admin_menu(): void {
-		add_menu_page(
-			__( '心思设置', 'wpmind' ),
+		if ( class_exists( 'Wenpai_Admin_Menu', false ) ) {
+			Wenpai_Admin_Menu::register(
+				[
+					'slug'    => 'wpmind',
+					'label'   => __( '心思', 'wpmind' ),
+					'title'   => __( '文派心思', 'wpmind' ),
+					'render'  => [ $this, 'render_settings_page' ],
+				]
+			);
+			return;
+		}
+		add_options_page(
+			__( '文派心思', 'wpmind' ),
 			__( '心思', 'wpmind' ),
 			'manage_options',
 			'wpmind',
-			[ $this, 'render_settings_page' ],
-			'dashicons-heart',
-			30
+			[ $this, 'render_settings_page' ]
 		);
 	}
 
@@ -421,7 +531,7 @@ final class AdminPage {
 	}
 
 	/**
-	 * 渲染设置页面
+	 * 渲染设置页面（kit 壳 + 视图路由）
 	 */
 	public function render_settings_page(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -431,7 +541,13 @@ final class AdminPage {
 		// 显示保存成功消息
 		settings_errors( 'wpmind_messages' );
 
-		include WPMIND_PLUGIN_DIR . 'templates/settings-page.php';
+		$view = self::current_view();
+		$template = WPMIND_PLUGIN_DIR . 'templates/admin/views/' . $view . '.php';
+		if ( ! file_exists( $template ) ) {
+			$template = WPMIND_PLUGIN_DIR . 'templates/admin/views/overview.php';
+		}
+
+		include WPMIND_PLUGIN_DIR . 'templates/admin/page.php';
 	}
 
 	/**
@@ -443,7 +559,7 @@ final class AdminPage {
 	public function plugin_action_links( array $links ): array {
 		$settings_link = sprintf(
 			'<a href="%s">%s</a>',
-			esc_url( admin_url( 'admin.php?page=wpmind' ) ),
+			esc_url( self::url() ),
 			esc_html__( '设置', 'wpmind' )
 		);
 		array_unshift( $links, $settings_link );

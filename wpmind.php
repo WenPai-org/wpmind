@@ -800,6 +800,11 @@ spl_autoload_register(
 
 // 加载 WenPai 更新器（跨插件共享组件，不走 PSR-4）
 require_once WPMIND_PLUGIN_DIR . 'includes/class-wenpai-updater.php';
+
+// wenpai-admin-ui kit（lib/ 回吃；load.php 只注册候选，plugins_loaded 取最高 VERSION）
+if ( file_exists( WPMIND_PLUGIN_DIR . 'lib/wenpai-admin-ui/php/load.php' ) ) {
+	require_once WPMIND_PLUGIN_DIR . 'lib/wenpai-admin-ui/php/load.php';
+}
 new \WPMind_Updater( WPMIND_PLUGIN_BASENAME, WPMIND_VERSION );
 
 // 加载 Provider 注册模块

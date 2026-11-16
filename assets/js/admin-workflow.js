@@ -52,6 +52,56 @@
 			' / 错 ' + ( s.errors || 0 );
 	}
 
+	// 任务状态 → kit pill（与 templates/admin/views/workflow.php 的 PHP 映射一致）。
+	var TASK_PILLS = {
+		draft:          [ '草稿', 'mute' ],
+		dry_run:        [ '预演完成', 'warn' ],
+		pending_review: [ '待审核', 'warn' ],
+		applied:        [ '已写入', 'ok' ],
+		cancelled:      [ '已取消', 'mute' ],
+		undone:         [ '已撤销', 'mute' ]
+	};
+	var ITEM_PILLS = {
+		pending:   [ '待处理', 'mute' ],
+		previewed: [ '待审核', 'warn' ],
+		approved:  [ '已批准', '' ],
+		rejected:  [ '已驳回', 'bad' ],
+		applied:   [ '已写入', 'ok' ],
+		undone:    [ '已撤销', 'mute' ],
+		skipped:   [ '已跳过', 'mute' ],
+		error:     [ '错误', 'bad' ]
+	};
+
+	function taskTypeLabel( type ) {
+		return type === 'meta_bulk' ? 'Meta 批量' : 'Alt 批量';
+	}
+
+	function taskPill( status ) {
+		var p = TASK_PILLS[ status ] || [ status || '', 'mute' ];
+		return '<span class="pill ' + p[1] + '">' + esc( p[0] ) + '</span>';
+	}
+
+	function itemPill( status, errorMessage ) {
+		var p = ITEM_PILLS[ status ] || [ status || '', 'mute' ];
+		var html = '<span class="pill ' + p[1] + '">' + esc( p[0] ) + '</span>';
+		if ( errorMessage ) {
+			html += ' <span class="meta">— ' + esc( errorMessage ) + '</span>';
+		}
+		return html;
+	}
+
+	// 列表「进度」列：草稿未开始；其余 通过 X/Y · 错 N。
+	function progressText( t ) {
+		var s = ( t && t.summary ) || {};
+		if ( t && t.status === 'draft' ) {
+			return '未开始';
+		}
+		if ( t && t.status === 'cancelled' ) {
+			return '已取消';
+		}
+		return '通过 ' + ( s.approved || 0 ) + '/' + ( s.candidates || 0 ) + ' · 错 ' + ( s.errors || 0 );
+	}
+
 	var Workflow = {
 		currentTaskId: 0,
 		currentTask: null,
@@ -110,6 +160,12 @@
 			$( '#wpmind-media-workflow-dryrun' ).on( 'click', function() {
 				self.dryRunLoop();
 			} );
+
+			// 载入最新一条任务作为「当前任务」（焦点卡 + 操作按钮联动）。
+			var $first = $( '#wpmind-workflow-task-table tbody tr[data-task-id]' ).first();
+			if ( $first.length ) {
+				self.loadTask( parseInt( $first.data( 'task-id' ), 10 ) || 0 );
+			}
 		},
 
 		setActionButtons: function( task ) {
@@ -158,6 +214,10 @@
 					! ( ( s.applied || 0 ) > 0 )
 				);
 			}
+			// 焦点卡操作组按任务类型显隐（alt_bulk / meta_bulk）。
+			$( '.wpmind-workflow-actset' ).each( function() {
+				$( this ).toggle( type !== '' && type === $( this ).data( 'type' ) );
+			} );
 		},
 
 		createAltTask: function() {
@@ -524,12 +584,12 @@
 				res.data.tasks.forEach( function( t ) {
 					$tb.append(
 						'<tr data-task-id="' + t.id + '">' +
-						'<td>' + t.id + '</td>' +
-						'<td>' + esc( t.type ) + '</td>' +
-						'<td>' + esc( t.status ) + '</td>' +
-						'<td>' + esc( summaryText( t.summary ) ) + '</td>' +
-						'<td>' + esc( t.created_at || '' ) + '</td>' +
-						'<td><button type="button" class="button button-small wpmind-workflow-view" data-task-id="' + t.id + '">查看</button></td>' +
+						'<td class="num">' + t.id + '</td>' +
+						'<td>' + esc( taskTypeLabel( t.type ) ) + '</td>' +
+						'<td>' + taskPill( t.status ) + '</td>' +
+						'<td>' + esc( progressText( t ) ) + '</td>' +
+						'<td class="mono">' + esc( t.created_at || '' ) + '</td>' +
+						'<td><span class="wenpai-actions"><button type="button" class="btn btn-sm btn-secondary wpmind-workflow-view" data-task-id="' + t.id + '">查看</button></span></td>' +
 						'</tr>'
 					);
 				} );
@@ -552,20 +612,18 @@
 				var actions = '';
 				if ( ( taskType === 'alt_bulk' || taskType === 'meta_bulk' ) && ( st === 'previewed' || st === 'approved' ) ) {
 					actions =
-						'<button type="button" class="button button-small wpmind-workflow-approve" data-object-id="' + it.object_id + '">通过</button> ' +
-						'<button type="button" class="button button-small wpmind-workflow-reject" data-object-id="' + it.object_id + '">拒绝</button>';
-				}
-				var statusCell = esc( st );
-				if ( it.error_message ) {
-					statusCell += ' — ' + esc( it.error_message );
+						'<span class="wenpai-actions">' +
+						'<button type="button" class="btn btn-sm btn-primary wpmind-workflow-approve" data-object-id="' + it.object_id + '">批准</button>' +
+						'<button type="button" class="btn btn-sm btn-danger wpmind-workflow-reject" data-object-id="' + it.object_id + '">驳回</button>' +
+						'</span>';
 				}
 				$body.append(
 					'<tr>' +
-					'<td>' + it.object_id + '</td>' +
-					'<td>' + esc( snapshotFmt( it.before ) ) + '</td>' +
-					'<td>' + esc( snapshotFmt( it.proposed ) ) + '</td>' +
-					'<td>' + esc( snapshotFmt( it.applied ) ) + '</td>' +
-					'<td>' + statusCell + '</td>' +
+					'<td class="num">' + it.object_id + '</td>' +
+					'<td class="mono">' + esc( snapshotFmt( it.before ) ) + '</td>' +
+					'<td class="mono">' + esc( snapshotFmt( it.proposed ) ) + '</td>' +
+					'<td class="mono">' + esc( snapshotFmt( it.applied ) ) + '</td>' +
+					'<td>' + itemPill( st, it.error_message ) + '</td>' +
 					'<td>' + actions + '</td>' +
 					'</tr>'
 				);

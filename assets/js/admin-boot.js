@@ -39,6 +39,15 @@
 		var $panes = $( '.wpmind-tab-pane' );
 
 		if ( ! $tabs.length ) {
+			// kit 壳页面没有 hash tab：旧模板遗留的 .wpmind-tab-link 改为跳 view 路由。
+			$( '.wpmind-tab-link' ).on( 'click', function( e ) {
+				var tabId = $( this ).attr( 'data-tab-link' );
+				if ( ! tabId ) {
+					return;
+				}
+				e.preventDefault();
+				window.location.href = window.location.pathname + '?page=wpmind&tab=' + encodeURIComponent( tabId );
+			} );
 			return;
 		}
 

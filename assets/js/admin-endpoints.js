@@ -597,7 +597,7 @@
 	 * Initialize on document ready
 	 */
 	$( function() {
-		if ( ! $( '.wpmind-endpoint-card' ).length && ! $( '#wpmind-settings-form' ).length ) {
+		if ( ! $( '.wpmind-endpoint-card' ).length && ! $( '#wpmind-settings-form' ).length && ! $( '#wpmind-export-diagnostics' ).length ) {
 			return;
 		}
 

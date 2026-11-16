@@ -16,6 +16,13 @@ namespace WPMind\Admin;
 final class AdminAssets {
 
 	/**
+	 * 尚未迁移到 kit 壳的视图（迁移完成后清空并删除旧 assets）。
+	 *
+	 * @var list<string>
+	 */
+	private const LEGACY_VIEWS = [ 'overview', 'services', 'routing', 'analytics', 'module' ];
+
+	/**
 	 * Singleton instance.
 	 *
 	 * @var AdminAssets|null
@@ -46,10 +53,36 @@ final class AdminAssets {
 	 * @since 1.1.0
 	 */
 	public function enqueue_admin_assets( string $hook_suffix ): void {
-		// 一级菜单的 hook suffix 是 toplevel_page_{menu_slug}
-		if ( 'toplevel_page_wpmind' !== $hook_suffix ) {
+		// kit Settings 子菜单：settings_page_{slug}；旧顶级菜单兜底 toplevel_page_wpmind
+		$kit_hook = class_exists( 'Wenpai_Admin_Menu', false )
+			? Wenpai_Admin_Menu::hook( 'wpmind' )
+			: 'settings_page_wpmind';
+		if ( ! in_array( $hook_suffix, [ $kit_hook, 'toplevel_page_wpmind' ], true ) ) {
 			return;
 		}
+
+		// wenpai-admin-ui kit（与其它文派插件共享同一份 CSS/JS，版本最高者生效）
+		if ( class_exists( 'Wenpai_Admin_Loader', false ) ) {
+			Wenpai_Admin_Loader::enqueue(
+				[
+					'full' => true,
+					'body' => 'wpmind-admin',
+				]
+			);
+		}
+
+		// 产品组件样式（kit 组件之上；.wpmind-* 控制台组件）
+		wp_enqueue_style(
+			'wpmind-admin-ui',
+			WPMIND_PLUGIN_URL . 'assets/css/wpmind-admin.css',
+			[],
+			WPMIND_VERSION
+		);
+
+		// 未迁移视图继续使用旧版样式与图标字体；已迁移视图只走 kit + wpmind-admin.css。
+		// JS 行为层（admin-*.js）按元素 ID 绑定，迁移视图仍需要，暂全量加载。
+		$legacy_view = in_array( AdminPage::current_view(), self::LEGACY_VIEWS, true );
+		if ( $legacy_view ) {
 
 		// Remixicon 图标库（本地打包）
 		wp_enqueue_style(
@@ -107,6 +140,8 @@ final class AdminAssets {
 			[ 'wpmind-panels', 'wpmind-routing' ],
 			WPMIND_VERSION
 		);
+
+		} // end legacy_view styles.
 
 		// Chart.js 图表库（本地打包，无外部 CDN 依赖）
 		wp_register_script(
