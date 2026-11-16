@@ -81,5 +81,9 @@ wpmind_page_head(
 			<div class="d"><?php esc_html_e( '暂无可用模块', 'wpmind' ); ?></div>
 		</div>
 		<?php endif; ?>
+
+		<div class="card-foot">
+			<span class="meta"><?php esc_html_e( '模块设置页与 GEO 同形态：页头返回 + 模块内分组 + kit 字段。', 'wpmind' ); ?></span>
+		</div>
 	</section>
 </div>

@@ -100,10 +100,16 @@ wpmind_page_head(
 		<h3 class="wpmind-sub"><?php esc_html_e( '故障转移链', 'wpmind' ); ?></h3>
 		<div class="wpmind-feed" id="wpmind-failover-chain">
 			<?php foreach ( $failover_chain as $index => $provider ) : ?>
+			<?php
+			$wpmind_pid   = (string) $provider;
+			$wpmind_pname = isset( $provider_scores[ $wpmind_pid ]['name'] )
+				? (string) $provider_scores[ $wpmind_pid ]['name']
+				: $wpmind_pid;
+			?>
 			<div class="wpmind-feed-item">
 				<span class="wpmind-feed-time"><?php echo esc_html( (string) ( $index + 1 ) ); ?></span>
 				<span class="wpmind-feed-main">
-					<span class="wpmind-feed-provider"><?php echo esc_html( $provider ); ?></span>
+					<span class="wpmind-feed-provider"><?php echo $wpmind_mark( $wpmind_pid ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php echo esc_html( $wpmind_pname ); ?></span>
 				</span>
 				<span class="wpmind-feed-meta">
 					<?php if ( 0 === $index ) : ?><span class="pill ok"><?php esc_html_e( '主', 'wpmind' ); ?></span><?php endif; ?>
