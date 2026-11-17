@@ -57,7 +57,7 @@ wpmind 在 init:5 已把自家 key 注进 SDK registry，WP7 下 SDK 路径本�
 - `includes/Provider/Catalog/RemoteCatalog.php`：`admin_init` 低频拉取 `https://updates.wenpai.net/wpmind/models.json`（`wpmind_remote_catalog_url` filter 可换址/禁用），transient 24h，前台零网络；`ModelCatalog::load()` 把远程 payload 按 provider/模型粒度合并到内置 models.json 之上（远程赢、缺项回落内置）。
 - `RemoteModelLister::chat_candidates($ids, $provider)`：目录已知模型优先按 `capabilities` 判定（须含 `chat`），未知 id 回落命名启发式——这就是「能力级过滤」的落点，remote catalog 给非 chat 模型补 capabilities 后自动生效。
 - 生成端：`tools/build-models-catalog.php`（`wp eval-file` 运行），env `WPMIND_CAT_KEY_<PROVIDER>` / `WPMIND_CAT_URL_<PROVIDER>`；只追加新模型 id（minimal meta，无 capabilities），不改 bundled meta 和 default_model。
-- **待办（基础设施）**：`updates.wenpai.net/wpmind/models.json` 端点尚未部署；聚合需要各 provider key，qwen/zhipu 可先用现有 key 验证，部署后 RemoteCatalog 自动生效，无需插件再发版。
+- **已部署（2026-11-17）**：`https://updates.wenpai.net/wpmind/models.json` 线上可用。实际服务路径是 openresty vhost 静态 docroot `/www/wwwroot/updates.wenpai.net/wpmind/models.json`（feicode-prod），不经 wenpai-bridge 容器；wenpai-bridge 另合入了 `/wpmind/*.json` 静态路由（`STATIC_DIR`，main `dfe7d40`）作为备选通道，容器未为此重建。回滚 = 删 docroot 文件。重新生成：在任一启用 wpmind 的 WP 站 `wp eval-file tools/build-models-catalog.php > models.json`（需去掉 `declare(strict_types=1)` 行，wp eval-file 是 eval 上下文）→ scp 到上述路径。当前 payload：bundled 全量 + qwen +23 / zhipu +12 远端模型（remote_seen，无 capabilities，过滤回落命名启发式）；其余 9 家 provider 无 key 未聚合。
 
 ### E. 后续预案（不写码）
 
