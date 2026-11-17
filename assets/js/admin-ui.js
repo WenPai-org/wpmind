@@ -21,6 +21,16 @@
 	};
 
 	/**
+	 * 内联 SVG 图标（stroke 风格，与 PHP AdminIcons / kit Wenpai_Admin_Icons 一致）。
+	 * path 为静态数据，直接拼接；class 由调用方给定。
+	 */
+	Admin.Icons = {
+		svg: function( path, className ) {
+			return '<svg class="' + ( className || 'wenpai-ico' ) + '" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + '</svg>';
+		}
+	};
+
+	/**
 	 * Toast 通知系统 - 使用 WordPress 原生 notice 样式
 	 */
 	Admin.Toast = {
@@ -52,16 +62,16 @@
 				info: 'notice-info info'
 			};
 
-			// 图标映射（dashicons，wp-admin 自带字体）
+			// 图标：内联 SVG（stroke 风格，与 AdminIcons / kit 一致，禁用图标字体）
 			var icons = {
-				success: 'dashicons-yes-alt',
-				error: 'dashicons-no-alt',
-				warning: 'dashicons-warning',
-				info: 'dashicons-info'
+				success: '<circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 5-5.5"/>',
+				error: '<circle cx="12" cy="12" r="9"/><path d="m9.5 9.5 5 5M14.5 9.5l-5 5"/>',
+				warning: '<path d="M12 3 2 20h20L12 3Z"/><path d="M12 10v4"/><circle cx="12" cy="17" r="0.5" fill="currentColor" stroke="none"/>',
+				info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r="0.5" fill="currentColor" stroke="none"/>'
 			};
 
 			var $notice = $( '<div class="notice ' + noticeType[ type ] + ' is-dismissible wpmind-notice">' +
-				'<p><span class="dashicons ' + icons[ type ] + ' wpmind-notice-icon"></span><span class="wpmind-notice-text"></span></p>' +
+				'<p>' + Admin.Icons.svg( icons[ type ], 'wenpai-ico wpmind-notice-icon' ) + '<span class="wpmind-notice-text"></span></p>' +
 				'</div>' );
 
 			// 使用 .text() 防止 XSS
@@ -132,16 +142,16 @@
 			var settings = $.extend( {}, defaults, options );
 
 			var icons = {
-				warning: 'dashicons-warning',
-				danger: 'dashicons-no-alt',
-				info: 'dashicons-info',
-				success: 'dashicons-yes-alt'
+				warning: '<path d="M12 3 2 20h20L12 3Z"/><path d="M12 10v4"/><circle cx="12" cy="17" r="0.5" fill="currentColor" stroke="none"/>',
+				danger: '<circle cx="12" cy="12" r="9"/><path d="m9.5 9.5 5 5M14.5 9.5l-5 5"/>',
+				info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r="0.5" fill="currentColor" stroke="none"/>',
+				success: '<circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 5-5.5"/>'
 			};
 
 			var $overlay = $( '<div class="wpmind-dialog-overlay"></div>' );
 			var $dialog = $( '<div class="wpmind-dialog wpmind-dialog-' + settings.type + '">' +
 				'<div class="wpmind-dialog-header">' +
-				'<span class="dashicons ' + icons[ settings.type ] + '"></span>' +
+				Admin.Icons.svg( icons[ settings.type ], 'wenpai-ico wpmind-dialog-icon' ) +
 				'<span class="wpmind-dialog-title">' + settings.title + '</span>' +
 				'</div>' +
 				'<div class="wpmind-dialog-body">' +

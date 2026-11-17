@@ -973,8 +973,7 @@ body.wenpai-ui-page .wenpai-app .wpmind-provider-body .wpmind-field--center .fie
 	gap: var(--wenpai-space-3);
 	margin-bottom: var(--wenpai-space-3);
 }
-.wpmind-dialog-header .dashicons {
-	font-size: 22px;
+.wpmind-dialog-header .wpmind-dialog-icon {
 	width: 22px;
 	height: 22px;
 	flex: none;
@@ -997,9 +996,9 @@ body.wenpai-ui-page .wenpai-app .wpmind-provider-body .wpmind-field--center .fie
 	gap: var(--wenpai-space-3);
 	margin-top: var(--wenpai-space-5);
 }
-.wpmind-dialog-warning .wpmind-dialog-header .dashicons { color: var(--wenpai-warn); }
-.wpmind-dialog-danger .wpmind-dialog-header .dashicons { color: var(--wenpai-bad); }
-.wpmind-dialog-info .wpmind-dialog-header .dashicons { color: var(--wenpai-accent); }
-.wpmind-dialog-success .wpmind-dialog-header .dashicons { color: var(--wenpai-ok); }
+.wpmind-dialog-warning .wpmind-dialog-header .wpmind-dialog-icon { color: var(--wenpai-warn); }
+.wpmind-dialog-danger .wpmind-dialog-header .wpmind-dialog-icon { color: var(--wenpai-bad); }
+.wpmind-dialog-info .wpmind-dialog-header .wpmind-dialog-icon { color: var(--wenpai-accent); }
+.wpmind-dialog-success .wpmind-dialog-header .wpmind-dialog-icon { color: var(--wenpai-ok); }
 .wpmind-dialog-danger .wpmind-dialog-confirm { background: var(--wenpai-bad); }
 .wpmind-dialog-danger .wpmind-dialog-confirm:hover { background: var(--wenpai-bad-ink); }

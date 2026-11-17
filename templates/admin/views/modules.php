@@ -15,17 +15,6 @@ $wpmind_modules = ModuleLoader::instance()->get_modules();
 $wpmind_enabled  = count( array_filter( $wpmind_modules, static fn( $m ) => $m['enabled'] ) );
 $wpmind_total    = count( $wpmind_modules );
 
-// 模块 id → 产品图标（AdminIcons）。
-$wpmind_mod_icons = [
-	'analytics'          => 'analytics',
-	'api-gateway'        => 'route',
-	'auto-meta'          => 'doc',
-	'cost-control'       => 'wallet',
-	'exact-cache'        => 'zap',
-	'geo'                => 'globe',
-	'media-intelligence' => 'image',
-];
-
 wpmind_page_head(
 	__( '模块', 'wpmind' ),
 	__( 'AI 能力开关。核心模块不可禁用；「设置」进模块设置页。', 'wpmind' )
@@ -44,7 +33,7 @@ wpmind_page_head(
 
 		<?php foreach ( $wpmind_modules as $wpmind_mod_id => $wpmind_mod ) : ?>
 		<div class="simple-row wpmind-module-card <?php echo $wpmind_mod['enabled'] ? 'is-enabled' : 'is-disabled'; ?>">
-			<span class="tile <?php echo $wpmind_mod['enabled'] ? 'ok' : ''; ?>"><?php echo AdminIcons::svg( $wpmind_mod_icons[ $wpmind_mod_id ] ?? 'modules' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+			<span class="tile <?php echo $wpmind_mod['enabled'] ? 'ok' : ''; ?>"><?php echo AdminIcons::svg( $wpmind_mod['icon'] ?? 'modules' ) ?: AdminIcons::svg( 'modules' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 			<div>
 				<div class="t">
 					<?php echo esc_html( $wpmind_mod['name'] ); ?>
