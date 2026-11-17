@@ -584,6 +584,16 @@ body.wenpai-ui-page .wenpai-app .wenpai-code code {
   box-shadow: none;
 }
 
+/* WP core pads <code>/<kbd> (padding/margin/13px); inline code.wenpai-code
+ * chips render flat like the prototype, so clear the admin chrome. */
+body.wenpai-ui-page .wenpai-app code.wenpai-code {
+  padding: 0;
+  margin: 0;
+  font-family: var(--wenpai-font-mono);
+  font-size: inherit;
+  line-height: inherit;
+}
+
 @media (max-width: 600px) {
   /* narrow: wp-admin layer. 600px matches the admin-bar switch. */
   body.wenpai-ui-page #wpcontent,

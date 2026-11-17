@@ -148,7 +148,7 @@ $wpmind_num = static function ( string $id, $value, int $min, int $max, string $
 			</div>
 
 			<div id="gw-create-form" class="wpmind-gw-create-panel" style="display:none">
-				<h3 class="card-title" style="margin:0 0 var(--wenpai-space-3);"><?php esc_html_e( '创建新 API Key', 'wpmind' ); ?></h3>
+				<h3 class="card-title" style="margin:0 0 var(--wenpai-space-3);font-size:var(--wenpai-text-body);"><?php esc_html_e( '创建新 API Key', 'wpmind' ); ?></h3>
 				<div class="wpmind-gw-edit-grid">
 					<div class="wpmind-gw-edit-field">
 						<label for="ck-name"><?php esc_html_e( '名称', 'wpmind' ); ?></label>
@@ -226,10 +226,10 @@ $wpmind_num = static function ( string $id, $value, int $min, int $max, string $
 				</div>
 			</div>
 
-			<h3 class="card-title" style="margin:0 0 var(--wenpai-space-2);">Base URL</h3>
+			<h3 class="card-title" style="margin:0 0 var(--wenpai-space-2);font-size:var(--wenpai-text-body);">Base URL</h3>
 			<?php echo wpmind_code_block_html( [ 'code' => $base_url, 'lang' => 'text' ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 
-			<h3 class="card-title" style="margin:var(--wenpai-space-5) 0 var(--wenpai-space-2);"><?php esc_html_e( '可用端点', 'wpmind' ); ?></h3>
+			<h3 class="card-title" style="margin:var(--wenpai-space-5) 0 var(--wenpai-space-2);font-size:var(--wenpai-text-body);"><?php esc_html_e( '可用端点', 'wpmind' ); ?></h3>
 			<div class="wenpai-table-wrap">
 				<table class="tbl">
 					<thead>
@@ -249,7 +249,7 @@ $wpmind_num = static function ( string $id, $value, int $min, int $max, string $
 				</table>
 			</div>
 
-			<h3 class="card-title" style="margin:var(--wenpai-space-5) 0 var(--wenpai-space-2);"><?php esc_html_e( 'curl 示例', 'wpmind' ); ?></h3>
+			<h3 class="card-title" style="margin:var(--wenpai-space-5) 0 var(--wenpai-space-2);font-size:var(--wenpai-text-body);"><?php esc_html_e( 'curl 示例', 'wpmind' ); ?></h3>
 			<?php
 			$wpmind_curl = 'curl ' . $base_url . "/chat/completions \\\n"
 				. '\t-H "Authorization: Bearer sk_mind_YOUR_KEY" \\\n'

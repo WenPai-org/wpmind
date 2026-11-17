@@ -134,7 +134,7 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 					</div>
 				</div>
 				<div class="wpmind-am-result" style="display:none;">
-					<h3 class="card-title" style="margin:var(--wenpai-space-4) 0 var(--wenpai-space-2);"><?php esc_html_e( '生成结果', 'wpmind' ); ?></h3>
+					<h3 class="card-title" style="margin:var(--wenpai-space-4) 0 var(--wenpai-space-2);font-size:var(--wenpai-text-body);"><?php esc_html_e( '生成结果', 'wpmind' ); ?></h3>
 					<div class="wenpai-table-wrap">
 						<table class="tbl wpmind-am-result-table">
 							<tbody>
