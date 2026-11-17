@@ -26,7 +26,7 @@ wpmind_page_head(
 <div class="wenpai-stack">
 	<section class="card">
 		<div class="card-head">
-			<span class="tile accent"><?php echo AdminIcons::svg( 'download' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+			<span class="tile accent"><?php echo AdminIcons::svg( 'tray' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 			<div>
 				<h2 class="card-title"><?php esc_html_e( '诊断包', 'wpmind' ); ?></h2>
 				<p class="card-sub"><?php esc_html_e( '环境、模块状态、用量统计的 JSON 快照；已脱敏，不含 API Key 与密钥指纹。反馈问题时附上它更快定位。', 'wpmind' ); ?></p>
@@ -83,7 +83,7 @@ wpmind_page_head(
 			</div>
 		</div>
 		<div class="simple-row is-static">
-			<span class="tile"><?php echo AdminIcons::svg( 'info' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+			<span class="tile"><?php echo AdminIcons::svg( 'package' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 			<div>
 				<div class="t"><?php echo esc_html( 'WPMind' ); ?></div>
 				<div class="d"><?php echo esc_html( sprintf( /* translators: 1: plugin version, 2: design system version */ __( '插件 v%1$s · 设计系统 %2$s', 'wpmind' ), WPMIND_VERSION, '' !== $wpmind_kit_version ? 'wenpai-admin-ui ' . $wpmind_kit_version : 'wenpai-admin-ui' ) ); ?></div>
@@ -91,7 +91,7 @@ wpmind_page_head(
 			<div class="r"><span class="pill ok"><?php esc_html_e( '正常', 'wpmind' ); ?></span></div>
 		</div>
 		<div class="simple-row is-static">
-			<span class="tile"><?php echo AdminIcons::svg( 'globe' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+			<span class="tile"><?php echo AdminIcons::svg( 'layers' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 			<div>
 				<div class="t"><?php esc_html_e( '运行环境', 'wpmind' ); ?></div>
 				<div class="d"><?php echo esc_html( sprintf( /* translators: 1: WordPress version, 2: PHP version */ __( 'WordPress %1$s · PHP %2$s', 'wpmind' ), get_bloginfo( 'version' ), PHP_VERSION ) ); ?></div>

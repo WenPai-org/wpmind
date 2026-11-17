@@ -83,6 +83,18 @@ final class AdminIcons {
 		'sparkle'  => '<path d="M12 4l1.9 4.6L18.5 10l-4.6 1.9L12 16.5l-1.9-4.6L5.5 10l4.6-1.4z"/><path d="M18.5 15.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/>',
 		// 云（API Gateway）
 		'cloud'    => '<path d="M7 18a4.5 4.5 0 0 1-.5-8.97A6 6 0 0 1 18.2 8.6 4.2 4.2 0 0 1 17.6 18z"/>',
+		// 趋势上升（周期费用/对比）
+		'trend-up' => '<path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/>',
+		// 搜索（搜索引擎类指标）
+		'search'   => '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+		// 靶心（已识别/命中目标）
+		'target'   => '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="M12 12l6-6"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/>',
+		// 收件盘（诊断包/导出快照）
+		'tray'     => '<rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9"/><path d="M10 13h4"/>',
+		// 包裹（版本/发布）
+		'package'  => '<path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.1"/>',
+		// 双卡片（运行环境/系统信息）
+		'layers'   => '<rect x="3" y="4" width="18" height="7" rx="1.5"/><rect x="3" y="13" width="18" height="7" rx="1.5"/><path d="M7 7.5h.01M7 16.5h.01"/>',
 	];
 
 	/**

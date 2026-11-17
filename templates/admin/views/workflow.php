@@ -8,6 +8,7 @@
 
 defined( 'ABSPATH' ) || exit();
 
+use WPMind\Admin\AdminIcons;
 use WPMind\Admin\AdminPage;
 use WPMind\Workflow\AltBulkService;
 use WPMind\Workflow\MetaBulkService;
@@ -106,7 +107,7 @@ wpmind_page_head(
 					<span class="wpmind-flow-label"><?php echo esc_html( $wpmind_step_label . ' ' . $wpmind_step_key ); ?></span>
 				</span>
 				<?php if ( $wpmind_i < count( $wpmind_flow ) - 1 ) : ?>
-					<span class="wpmind-flow-arrow" aria-hidden="true">→</span>
+					<span class="wpmind-flow-arrow" aria-hidden="true"><?php echo AdminIcons::svg( 'arrow-right' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 				<?php endif; ?>
 			<?php endforeach; ?>
 		</div>

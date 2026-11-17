@@ -57,28 +57,28 @@ if ( $wpmind_month_limit_usd > 0 ) {
 	<section class="card">
 		<div class="wpmind-statbar">
 			<div class="wpmind-statbar-item">
-				<?php echo AdminIcons::svg( 'analytics', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php echo AdminIcons::svg( 'pulse', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<div class="wpmind-statbar-text">
 					<div class="k"><?php esc_html_e( '今日 Tokens', 'wpmind' ); ?></div>
 					<div class="v"><?php echo esc_html( UsageTracker::format_tokens( ( $today_stats['input_tokens'] ?? 0 ) + ( $today_stats['output_tokens'] ?? 0 ) ) ); ?> <small><?php echo esc_html( sprintf( '%d 次 · %s', (int) ( $today_stats['requests'] ?? 0 ), UsageTracker::format_cost_by_currency( $today_stats['cost_usd'] ?? 0, $today_stats['cost_cny'] ?? 0 ) ) ); ?></small></div>
 				</div>
 			</div>
 			<div class="wpmind-statbar-item">
-				<?php echo AdminIcons::svg( 'wallet', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php echo AdminIcons::svg( 'trend-up', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<div class="wpmind-statbar-text">
 					<div class="k"><?php esc_html_e( '本周费用', 'wpmind' ); ?></div>
 					<div class="v"><?php echo esc_html( UsageTracker::format_cost_by_currency( $week_stats['cost_usd'] ?? 0, $week_stats['cost_cny'] ?? 0 ) ); ?> <small><?php echo esc_html( sprintf( '%d 次请求', (int) ( $week_stats['requests'] ?? 0 ) ) ); ?></small></div>
 				</div>
 			</div>
 			<div class="wpmind-statbar-item">
-				<?php echo AdminIcons::svg( 'wallet', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php echo AdminIcons::svg( 'dollar', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<div class="wpmind-statbar-text">
 					<div class="k"><?php esc_html_e( '本月费用', 'wpmind' ); ?></div>
 					<div class="v"><?php echo esc_html( UsageTracker::format_cost_by_currency( $month_stats['cost_usd'] ?? 0, $month_stats['cost_cny'] ?? 0 ) ); ?> <small><?php echo esc_html( $wpmind_budget_note ); ?></small></div>
 				</div>
 			</div>
 			<div class="wpmind-statbar-item">
-				<?php echo AdminIcons::svg( 'services', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php echo AdminIcons::svg( 'pulse', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<div class="wpmind-statbar-text">
 					<div class="k"><?php esc_html_e( '活跃服务商', 'wpmind' ); ?></div>
 					<div class="v"><?php echo esc_html( (string) $wpmind_active_providers ); ?> <small><?php echo esc_html( sprintf( '累计 %d 次请求', (int) ( $usage_stats['total']['requests'] ?? 0 ) ) ); ?></small></div>

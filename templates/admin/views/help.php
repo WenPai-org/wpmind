@@ -63,7 +63,7 @@ wpmind_page_head(
 			<div class="r"><a class="btn btn-ghost btn-sm" href="https://github.com/WenPai-org/wpmind" target="_blank" rel="noopener noreferrer"><?php esc_html_e( '打开 ↗', 'wpmind' ); ?></a></div>
 		</div>
 		<div class="simple-row is-static">
-			<span class="tile"><?php echo AdminIcons::svg( 'download' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+			<span class="tile"><?php echo AdminIcons::svg( 'package' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 			<div><div class="t"><?php esc_html_e( '版本发布', 'wpmind' ); ?></div><div class="d"><?php esc_html_e( '各版本变更与下载', 'wpmind' ); ?></div></div>
 			<div class="r"><a class="btn btn-ghost btn-sm" href="https://github.com/WenPai-org/wpmind/releases" target="_blank" rel="noopener noreferrer"><?php esc_html_e( '打开 ↗', 'wpmind' ); ?></a></div>
 		</div>

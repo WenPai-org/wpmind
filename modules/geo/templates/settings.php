@@ -110,14 +110,14 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 					</div>
 				</div>
 				<div class="wpmind-statbar-item">
-					<?php echo AdminIcons::svg( 'globe', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<?php echo AdminIcons::svg( 'search', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					<div class="wpmind-statbar-text">
 						<div class="k"><?php esc_html_e( '搜索引擎访问', 'wpmind' ); ?></div>
 						<div class="v"><?php echo esc_html( number_format_i18n( (int) ( $ai_summary_data['total_search_hits'] ?? 0 ) ) ); ?></div>
 					</div>
 				</div>
 				<div class="wpmind-statbar-item">
-					<?php echo AdminIcons::svg( 'eye', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<?php echo AdminIcons::svg( 'target', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					<div class="wpmind-statbar-text">
 						<div class="k"><?php esc_html_e( '已识别爬虫', 'wpmind' ); ?></div>
 						<div class="v"><?php echo esc_html( (string) count( (array) ( $ai_summary_data['ai_crawlers'] ?? [] ) ) ); ?></div>

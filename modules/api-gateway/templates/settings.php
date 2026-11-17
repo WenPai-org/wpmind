@@ -78,14 +78,14 @@ $wpmind_num = static function ( string $id, $value, int $min, int $max, string $
 		</div>
 	</div>
 	<div class="wpmind-statbar-item">
-		<?php echo AdminIcons::svg( 'modules', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		<?php echo AdminIcons::svg( 'pulse', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<div class="wpmind-statbar-text">
 			<div class="k"><?php esc_html_e( '活跃 Keys', 'wpmind' ); ?></div>
 			<div class="v"><?php echo esc_html( (string) $active_keys ); ?></div>
 		</div>
 	</div>
 	<div class="wpmind-statbar-item">
-		<?php echo AdminIcons::svg( 'analytics', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		<?php echo AdminIcons::svg( 'modules', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<div class="wpmind-statbar-text">
 			<div class="k"><?php esc_html_e( '本月请求', 'wpmind' ); ?></div>
 			<div class="v"><?php echo esc_html( number_format( $month_requests ) ); ?></div>
@@ -272,7 +272,7 @@ $wpmind_num = static function ( string $id, $value, int $min, int $max, string $
 	<div class="wpmind-module-tab-panel" data-panel="logs">
 		<section class="card">
 			<div class="card-head">
-				<span class="tile"><?php echo AdminIcons::svg( 'doc' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
+				<span class="tile"><?php echo AdminIcons::svg( 'workflow' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 				<div>
 					<h2 class="card-title"><?php esc_html_e( '请求日志', 'wpmind' ); ?></h2>
 					<p class="card-sub"><?php esc_html_e( '网关请求与 Key 生命周期审计。', 'wpmind' ); ?></p>
