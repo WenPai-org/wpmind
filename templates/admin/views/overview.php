@@ -123,28 +123,28 @@ wpmind_page_head(
 	<section class="card">
 		<div class="wpmind-statbar">
 			<div class="wpmind-statbar-item">
-				<?php echo AdminIcons::svg( 'services', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php echo AdminIcons::svg( 'pulse', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<div class="wpmind-statbar-text">
 					<div class="k"><?php esc_html_e( '今日请求', 'wpmind' ); ?></div>
 					<div class="v"><?php echo esc_html( number_format_i18n( (int) ( $today['requests'] ?? 0 ) ) ); ?> <small><?php echo esc_html( UsageTracker::format_tokens( (int) ( $today['input_tokens'] ?? 0 ) + (int) ( $today['output_tokens'] ?? 0 ) ) . ' tok' ); ?></small></div>
 				</div>
 			</div>
 			<div class="wpmind-statbar-item">
-				<?php echo AdminIcons::svg( 'services', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php echo AdminIcons::svg( 'pulse', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<div class="wpmind-statbar-text">
 					<div class="k"><?php esc_html_e( 'AI 服务健康度', 'wpmind' ); ?></div>
 					<div class="v"><?php echo esc_html( $healthy . '/' . count( $providers ) ); ?> <small><?php echo esc_html( $down > 0 ? sprintf( /* translators: %d: breakers */ __( '%d 熔断', 'wpmind' ), $down ) : __( '全部在线', 'wpmind' ) ); ?></small></div>
 				</div>
 			</div>
 			<div class="wpmind-statbar-item">
-				<?php echo AdminIcons::svg( 'wallet', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php echo AdminIcons::svg( 'dollar', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<div class="wpmind-statbar-text">
 					<div class="k"><?php esc_html_e( '本月费用', 'wpmind' ); ?></div>
 					<div class="v"><?php echo esc_html( UsageTracker::format_cost_by_currency( $month['cost_usd'] ?? 0, $month['cost_cny'] ?? 0 ) ); ?></div>
 				</div>
 			</div>
 			<div class="wpmind-statbar-item">
-				<?php echo AdminIcons::svg( 'modules', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php echo AdminIcons::svg( 'database', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<div class="wpmind-statbar-text">
 					<div class="k"><?php esc_html_e( '缓存命中率', 'wpmind' ); ?></div>
 					<div class="v"><?php echo $cache_enabled ? esc_html( number_format_i18n( $cache_hit_rate, 1 ) . '%' ) : '—'; ?> <small><?php echo $cache_enabled ? esc_html( number_format_i18n( $cache_total ) . ' ' . __( '查询', 'wpmind' ) ) : esc_html__( '未启用', 'wpmind' ); ?></small></div>
@@ -155,7 +155,7 @@ wpmind_page_head(
 
 	<section class="card">
 		<div class="wpmind-card-head">
-			<span class="wpmind-card-head-ico"><?php echo AdminIcons::svg( 'robot' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+			<span class="wpmind-card-head-ico"><?php echo AdminIcons::svg( 'sparkle' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 			<div class="wpmind-card-head-text">
 				<h2 class="section-title"><?php esc_html_e( 'AI 服务动态', 'wpmind' ); ?></h2>
 				<div class="meta">
@@ -176,7 +176,7 @@ wpmind_page_head(
 		</div>
 		<div class="wpmind-split">
 			<div class="wpmind-col">
-				<div class="wpmind-col-title"><?php echo AdminIcons::svg( 'services' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php esc_html_e( 'Provider 健康', 'wpmind' ); ?></div>
+				<div class="wpmind-col-title"><?php echo AdminIcons::svg( 'pulse' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php esc_html_e( 'Provider 健康', 'wpmind' ); ?></div>
 				<?php if ( empty( $providers ) ) : ?>
 					<div class="wpmind-feed-item">
 						<div class="t"><?php esc_html_e( '还没有配置 Provider', 'wpmind' ); ?></div>
@@ -206,7 +206,7 @@ wpmind_page_head(
 				<?php endif; ?>
 			</div>
 			<div class="wpmind-col wpmind-col-right">
-				<div class="wpmind-col-title"><?php echo AdminIcons::svg( 'workflow' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php esc_html_e( '最近活动', 'wpmind' ); ?><a class="wpmind-col-more" href="<?php echo esc_url( AdminPage::url( [ 'tab' => 'analytics' ] ) ); ?>"><?php esc_html_e( '查看全部', 'wpmind' ); ?></a></div>
+				<div class="wpmind-col-title"><?php echo AdminIcons::svg( 'pulse' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php esc_html_e( '最近活动', 'wpmind' ); ?><a class="wpmind-col-more" href="<?php echo esc_url( AdminPage::url( [ 'tab' => 'analytics' ] ) ); ?>"><?php esc_html_e( '查看全部', 'wpmind' ); ?></a></div>
 				<?php if ( empty( $recent_history ) ) : ?>
 					<div class="meta"><?php esc_html_e( '暂无 API 调用记录，使用 AI 功能后显示在这里。', 'wpmind' ); ?></div>
 				<?php else : ?>
@@ -242,20 +242,11 @@ wpmind_page_head(
 		<div class="wpmind-fold-body">
 			<div>
 				<?php
-				$wpmind_module_icons = [
-					'cost-control'       => 'wallet',
-					'analytics'          => 'analytics',
-					'exact-cache'        => 'zap',
-					'geo'                => 'globe',
-					'api-gateway'        => 'route',
-					'media-intelligence' => 'image',
-					'auto-meta'          => 'doc',
-				];
 				foreach ( $modules as $mid => $m ) :
 					$enabled = (bool) $m['enabled'];
 					?>
 				<div class="simple-row">
-					<span class="tile <?php echo $enabled ? 'ok' : ''; ?>"><?php echo AdminIcons::svg( $wpmind_module_icons[ $mid ] ?? 'modules' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+					<span class="tile <?php echo $enabled ? 'ok' : ''; ?>"><?php echo AdminIcons::svg( $m['icon'] ?? 'modules' ) ?: AdminIcons::svg( 'modules' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 					<div>
 						<div class="t"><?php echo esc_html( (string) $m['name'] ); ?><?php if ( empty( $m['can_disable'] ) ) : ?> <span class="pill mute"><?php esc_html_e( '核心', 'wpmind' ); ?></span><?php endif; ?></div>
 						<div class="d"><?php echo esc_html( (string) ( $m['description'] ?? '' ) ); ?></div>
