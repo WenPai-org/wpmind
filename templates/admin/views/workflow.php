@@ -116,13 +116,22 @@ wpmind_page_head(
 		$wpmind_cs = is_array( $wpmind_current['summary'] ?? null ) ? $wpmind_current['summary'] : [];
 		?>
 		<div class="wpmind-task-stats" aria-label="<?php esc_attr_e( '任务进度统计', 'wpmind' ); ?>">
-			<span>候选 <b><?php echo (int) ( $wpmind_cs['candidates'] ?? 0 ); ?></b></span>
-			<span>预览 <b><?php echo (int) ( $wpmind_cs['previewed'] ?? 0 ); ?></b></span>
-			<span>通过 <b><?php echo (int) ( $wpmind_cs['approved'] ?? 0 ); ?></b></span>
-			<span>拒绝 <b><?php echo (int) ( $wpmind_cs['rejected'] ?? 0 ); ?></b></span>
-			<span>已写 <b><?php echo (int) ( $wpmind_cs['applied'] ?? 0 ); ?></b></span>
-			<span>撤销 <b><?php echo (int) ( $wpmind_cs['undone'] ?? 0 ); ?></b></span>
-			<span>错误 <b><?php echo (int) ( $wpmind_cs['errors'] ?? 0 ); ?></b></span>
+			<?php
+			$wpmind_stat_parts = [
+				__( '候选', 'wpmind' )   => (int) ( $wpmind_cs['candidates'] ?? 0 ),
+				__( '预览', 'wpmind' )   => (int) ( $wpmind_cs['previewed'] ?? 0 ),
+				__( '通过', 'wpmind' )   => (int) ( $wpmind_cs['approved'] ?? 0 ),
+				__( '拒绝', 'wpmind' )   => (int) ( $wpmind_cs['rejected'] ?? 0 ),
+				__( '已写', 'wpmind' )   => (int) ( $wpmind_cs['applied'] ?? 0 ),
+				__( '撤销', 'wpmind' )   => (int) ( $wpmind_cs['undone'] ?? 0 ),
+				__( '错误', 'wpmind' )   => (int) ( $wpmind_cs['errors'] ?? 0 ),
+			];
+			$wpmind_stat_html = [];
+			foreach ( $wpmind_stat_parts as $wpmind_stat_label => $wpmind_stat_value ) {
+				$wpmind_stat_html[] = esc_html( $wpmind_stat_label ) . ' <b>' . (int) $wpmind_stat_value . '</b>';
+			}
+			echo wp_kses_post( implode( ' · ', $wpmind_stat_html ) );
+			?>
 		</div>
 		<?php endif; ?>
 
