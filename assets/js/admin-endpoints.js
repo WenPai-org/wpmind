@@ -535,11 +535,11 @@
 				} ).done( function( response ) {
 					if ( ! response.success ) {
 						if ( window.Toast ) {
-							Toast.error( ( response.data && response.data.message ) || '预检失败' );
+							Toast.error( ( response.data && response.data.message ) || '校验失败' );
 						}
 						return;
 					}
-					var ok = window.confirm( ( response.data && response.data.message ) || '预检通过，确认导入？（本站 API Key 将保留）' );
+					var ok = window.confirm( ( response.data && response.data.message ) || '校验通过，确认导入？（本站 API Key 将保留）' );
 					if ( ! ok ) {
 						return;
 					}
@@ -613,9 +613,9 @@
 						} );
 						$modelsInput.val( merged.join( ', ' ) );
 
-						var parts = [ '已获取 ' + ids.length + ' 个 chat 模型' ];
+						var parts = [ '已获取 ' + ids.length + ' 个对话模型' ];
 						if ( response.data.filtered ) {
-							parts.push( '过滤 ' + response.data.filtered + ' 个非 chat' );
+							parts.push( '过滤 ' + response.data.filtered + ' 个非对话模型' );
 						}
 						if ( response.data.from_cache ) {
 							parts.push( '缓存' );

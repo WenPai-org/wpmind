@@ -68,10 +68,10 @@ wpmind_page_head(
 				</span>
 				<span class="wenpai-file__list"></span>
 			</span>
-			<p class="wenpai-field__desc"><?php esc_html_e( '选择 .json 文件后自动预检差异，确认无误才写入。', 'wpmind' ); ?></p>
+			<p class="wenpai-field__desc"><?php esc_html_e( '选择 .json 文件后自动校验差异，确认无误才写入。', 'wpmind' ); ?></p>
 		</div>
 		<div class="card-foot">
-			<span class="meta"><?php esc_html_e( '两段确认：先 dry-run 预览差异，再确认写入。', 'wpmind' ); ?></span>
+			<span class="meta"><?php esc_html_e( '导入分两步：先校验并预览差异，确认后写入。', 'wpmind' ); ?></span>
 		</div>
 	</section>
 

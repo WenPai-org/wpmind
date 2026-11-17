@@ -175,7 +175,7 @@ wpmind_page_head(
 			<?php endforeach; ?>
 		</div>
 		<?php else : ?>
-		<p class="meta"><?php esc_html_e( '暂无 Provider 得分数据。', 'wpmind' ); ?></p>
+		<p class="meta"><?php esc_html_e( '暂无 Provider 得分数据，产生路由请求后按得分显示排名。', 'wpmind' ); ?></p>
 		<?php endif; ?>
 	</section>
 

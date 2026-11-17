@@ -265,7 +265,7 @@ final class AltBulkService {
 			return $task;
 		}
 		if ( TaskRepository::STATUS_DRY_RUN !== $status ) {
-			return new \WP_Error( 'wpmind_task_bad_status', __( '仅 dry_run 任务可提交审核', 'wpmind' ) );
+			return new \WP_Error( 'wpmind_task_bad_status', __( '仅预演完成的任务可提交审核', 'wpmind' ) );
 		}
 
 		foreach ( $task['items'] as $item ) {

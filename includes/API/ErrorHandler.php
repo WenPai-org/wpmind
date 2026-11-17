@@ -63,7 +63,7 @@ class ErrorHandler {
 		self::ERROR_API_ERROR               => 'API 调用失败',
 		self::ERROR_API_TIMEOUT             => 'API 请求超时',
 		self::ERROR_API_AUTH                => 'API 认证失败，请检查 API Key',
-		self::ERROR_API_QUOTA               => 'API 配额已用尽',
+		self::ERROR_API_QUOTA               => 'API 额度已用尽',
 		self::ERROR_PROVIDER_NOT_FOUND      => '找不到指定的服务商',
 		self::ERROR_PROVIDER_NOT_CONFIGURED => '服务商未配置',
 		self::ERROR_MODEL_NOT_SUPPORTED     => '不支持的模型',

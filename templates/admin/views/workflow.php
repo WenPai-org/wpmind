@@ -62,7 +62,7 @@ $wpmind_flow  = [
 
 wpmind_page_head(
 	__( '任务', 'wpmind' ),
-	__( 'AI 批量工作流：Alt 标题 / Meta 元数据 统一走 dry-run → 审核 → 写入 → 撤销。', 'wpmind' )
+	__( 'AI 批量工作流：Alt 标题 / Meta 元数据 统一走 预演 → 审核 → 写入 → 撤销。', 'wpmind' )
 );
 ?>
 
@@ -98,7 +98,7 @@ wpmind_page_head(
 		</div>
 
 		<?php if ( $wpmind_current ) : ?>
-		<div class="wpmind-flow" aria-label="<?php esc_attr_e( '任务状态机：创建 → 预演 → 审核 → 写入 → 撤销', 'wpmind' ); ?>">
+		<div class="wpmind-flow" aria-label="<?php esc_attr_e( '任务流程：创建 → 预演 → 审核 → 写入 → 撤销', 'wpmind' ); ?>">
 			<?php foreach ( $wpmind_flow as $wpmind_i => [ $wpmind_step_key, $wpmind_step_label ] ) : ?>
 				<?php $wpmind_step_no = $wpmind_i + 1; ?>
 				<span class="wpmind-flow-step <?php echo $wpmind_step_no < $wpmind_stage ? 'is-done' : ( $wpmind_step_no === $wpmind_stage ? 'is-cur' : '' ); ?>">
@@ -129,13 +129,13 @@ wpmind_page_head(
 			<span class="meta"><?php esc_html_e( '批准的项才会写入；每步有记录，可撤销。', 'wpmind' ); ?></span>
 			<span class="wenpai-actions">
 				<span class="wpmind-workflow-actset" data-type="alt_bulk" style="display:none;">
-					<button class="btn btn-ghost" type="button" id="wpmind-workflow-alt-dryrun" disabled><?php esc_html_e( 'Dry-run', 'wpmind' ); ?></button>
+					<button class="btn btn-ghost" type="button" id="wpmind-workflow-alt-dryrun" disabled><?php esc_html_e( '运行预演', 'wpmind' ); ?></button>
 					<button class="btn" type="button" id="wpmind-workflow-alt-submit-review" disabled><?php esc_html_e( '提交审核', 'wpmind' ); ?></button>
 					<button class="btn btn-primary" type="button" id="wpmind-workflow-alt-apply" disabled><?php esc_html_e( '写入已通过项', 'wpmind' ); ?></button>
 					<button class="btn btn-ghost" type="button" id="wpmind-workflow-alt-undo" disabled><?php esc_html_e( '撤销已写入', 'wpmind' ); ?></button>
 				</span>
 				<span class="wpmind-workflow-actset" data-type="meta_bulk" style="display:none;">
-					<button class="btn btn-ghost" type="button" id="wpmind-workflow-meta-dryrun" disabled><?php esc_html_e( 'Dry-run', 'wpmind' ); ?></button>
+					<button class="btn btn-ghost" type="button" id="wpmind-workflow-meta-dryrun" disabled><?php esc_html_e( '运行预演', 'wpmind' ); ?></button>
 					<button class="btn" type="button" id="wpmind-workflow-meta-submit-review" disabled><?php esc_html_e( '提交审核', 'wpmind' ); ?></button>
 					<button class="btn btn-primary" type="button" id="wpmind-workflow-meta-apply" disabled><?php esc_html_e( '写入已通过项', 'wpmind' ); ?></button>
 					<button class="btn btn-ghost" type="button" id="wpmind-workflow-meta-undo" disabled><?php esc_html_e( '撤销已写入', 'wpmind' ); ?></button>
@@ -172,7 +172,7 @@ wpmind_page_head(
 			</thead>
 			<tbody>
 			<?php if ( empty( $wpmind_tasks ) ) : ?>
-				<tr class="wpmind-workflow-empty"><td colspan="6"><?php esc_html_e( '暂无任务', 'wpmind' ); ?></td></tr>
+				<tr class="wpmind-workflow-empty"><td colspan="6"><?php esc_html_e( '暂无任务，点击右侧「扫描并创建」生成。', 'wpmind' ); ?></td></tr>
 			<?php else : ?>
 				<?php foreach ( $wpmind_tasks as $wpmind_task ) : ?>
 				<?php
@@ -215,7 +215,7 @@ wpmind_page_head(
 			echo class_exists( 'Wenpai_Admin_Icons', false ) ? Wenpai_Admin_Icons::svg( 'chevron-down' ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。
 			?></span>
 			<span class="section-title"><?php esc_html_e( '任务项明细', 'wpmind' ); ?></span>
-			<span class="meta"><?php esc_html_e( 'before / proposed / applied · 批准的项才会写入', 'wpmind' ); ?></span>
+			<span class="meta"><?php esc_html_e( '修改前 / 建议值 / 已写入值 · 批准的项才会写入', 'wpmind' ); ?></span>
 		</summary>
 		<div class="wpmind-fold-body">
 		<div class="wenpai-table-wrap">

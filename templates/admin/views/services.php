@@ -24,42 +24,42 @@ $available_image_providers = [
 	'openai_gpt_image'    => [
 		'name'         => 'DALL-E 3 / GPT-Image',
 		'display_name' => 'openai-image',
-		'description'  => __( 'OpenAI 图像生成，综合最均衡、文字渲染极强', 'wpmind' ),
+		'description'  => __( 'OpenAI 图像生成，综合能力均衡，文字渲染出色', 'wpmind' ),
 		'base_url'     => 'https://api.openai.com/v1/',
 		'models'       => [ 'dall-e-3', 'gpt-image-1.5' ],
 	],
 	'google_gemini_image' => [
 		'name'         => 'Imagen 3',
 		'display_name' => 'google-imagen',
-		'description'  => __( 'Google Imagen 图像生成，文字最稳、复杂构图极强', 'wpmind' ),
+		'description'  => __( 'Google Imagen 图像生成，文字稳定性高，复杂构图表现好', 'wpmind' ),
 		'base_url'     => 'https://generativelanguage.googleapis.com/v1beta/',
 		'models'       => [ 'imagen-3.0-generate-001' ],
 	],
 	'tencent_hunyuan'     => [
 		'name'         => '混元图像',
 		'display_name' => 'hunyuan-image',
-		'description'  => __( '腾讯混元，中文理解 & 文字渲染顶级（需 SDK 签名）', 'wpmind' ),
+		'description'  => __( '腾讯混元，中文理解与文字渲染出色（需专用签名）', 'wpmind' ),
 		'base_url'     => 'https://hunyuan.tencentcloudapi.com/',
 		'models'       => [ 'hunyuan-image-v3' ],
 	],
 	'bytedance_doubao'    => [
 		'name'         => 'Doubao Image / Seedream',
 		'display_name' => 'doubao-image',
-		'description'  => __( '火山引擎图像生成，性价比高、中文文化理解强', 'wpmind' ),
+		'description'  => __( '火山引擎图像生成，性价比高，中文文化理解好', 'wpmind' ),
 		'base_url'     => 'https://ark.cn-beijing.volces.com/api/v3/',
 		'models'       => [ 'doubao-image-v1', 'seedream-4.5' ],
 	],
 	'flux'                => [
 		'name'         => 'Flux (Fal.ai)',
 		'display_name' => 'flux',
-		'description'  => __( 'Black Forest Labs 开源天花板，手部/文字/遵循最强', 'wpmind' ),
+		'description'  => __( 'Black Forest Labs 开源模型，手部与文字细节出色', 'wpmind' ),
 		'base_url'     => 'https://fal.run/fal-ai/',
 		'models'       => [ 'flux/dev', 'flux/schnell', 'flux-pro-1.1' ],
 	],
 	'qwen_image'          => [
 		'name'         => '通义万相',
 		'display_name' => 'wanx',
-		'description'  => __( '阿里云通义万相，真实感极强，几乎无AI味', 'wpmind' ),
+		'description'  => __( '阿里云通义万相，真实感强', 'wpmind' ),
 		'base_url'     => 'https://dashscope.aliyuncs.com/api/v1/',
 		'models'       => [ 'wanx-v1', 'wanx-background-generation-v2' ],
 	],
@@ -218,7 +218,7 @@ wpmind_page_head(
 					<?php if ( '' !== $wpmind_cb_state && 'closed' !== $wpmind_cb_state ) : ?>
 						<span class="pill warn"><?php echo esc_html( $wpmind_state_labels[ $wpmind_cb_state ] ?? $wpmind_cb_state ); ?></span>
 					<?php endif; ?>
-					<button type="button" class="btn btn-ghost btn-sm wpmind-test-connection" data-provider="<?php echo esc_attr( $key ); ?>" <?php echo $enabled ? '' : 'disabled'; ?>><?php esc_html_e( '测试', 'wpmind' ); ?></button>
+					<button type="button" class="btn btn-ghost btn-sm wpmind-test-connection" data-provider="<?php echo esc_attr( $key ); ?>" <?php echo $enabled ? '' : 'disabled'; ?>><?php esc_html_e( '测试连接', 'wpmind' ); ?></button>
 					<span class="wpmind-test-result" aria-live="polite"></span>
 				</span>
 			</summary>
@@ -231,7 +231,7 @@ wpmind_page_head(
 							<input type="hidden" name="wpmind_custom_endpoints[<?php echo esc_attr( $key ); ?>][enabled]" value="0">
 							<input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-sw-<?php echo esc_attr( $key ); ?>" name="wpmind_custom_endpoints[<?php echo esc_attr( $key ); ?>][enabled]" value="1" <?php checked( $enabled ); ?>>
 							<span class="wenpai-switch__track" aria-hidden="true"></span>
-							<span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on"><?php esc_html_e( '已启用', 'wpmind' ); ?></span><span class="wenpai-switch__off"><?php esc_html_e( '已停用', 'wpmind' ); ?></span></span>
+							<span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on"><?php esc_html_e( '已开启', 'wpmind' ); ?></span><span class="wenpai-switch__off"><?php esc_html_e( '未开启', 'wpmind' ); ?></span></span>
 						</span>
 					</div>
 				</div>
@@ -277,7 +277,7 @@ wpmind_page_head(
 						<div class="wenpai-actions" style="margin-top:var(--wenpai-space-3)">
 							<button type="button" class="btn btn-sm btn-secondary wpmind-test-connection" data-provider="<?php echo esc_attr( $key ); ?>" <?php echo $enabled ? '' : 'disabled'; ?>><?php esc_html_e( '测试连接', 'wpmind' ); ?></button>
 							<button type="button" class="btn btn-sm btn-ghost wpmind-rotate-key" data-provider="<?php echo esc_attr( $key ); ?>" title="<?php esc_attr_e( '用输入框中的新 Key 验证通过后替换已保存的 Key', 'wpmind' ); ?>"><?php esc_html_e( '验证并替换', 'wpmind' ); ?></button>
-							<button type="button" class="btn btn-sm btn-ghost wpmind-reset-breaker" data-provider="<?php echo esc_attr( $key ); ?>" title="<?php esc_attr_e( '清除熔断 / 需要处理 / 额度不足状态', 'wpmind' ); ?>"><?php esc_html_e( '重置', 'wpmind' ); ?></button>
+							<button type="button" class="btn btn-sm btn-ghost wpmind-reset-breaker" data-provider="<?php echo esc_attr( $key ); ?>" title="<?php esc_attr_e( '清除熔断 / 需要处理 / 额度不足状态', 'wpmind' ); ?>"><?php esc_html_e( '重置状态', 'wpmind' ); ?></button>
 							<label class="chk"><input type="checkbox" class="wpmind-deep-test" value="1"> <?php esc_html_e( '深度测试（会产生少量费用）', 'wpmind' ); ?></label>
 							<span class="wpmind-test-result" aria-live="polite"></span>
 						</div>
@@ -406,7 +406,7 @@ wpmind_page_head(
 							<input type="hidden" name="wpmind_image_endpoints[<?php echo esc_attr( $key ); ?>][enabled]" value="0">
 							<input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-img-sw-<?php echo esc_attr( $key ); ?>" name="wpmind_image_endpoints[<?php echo esc_attr( $key ); ?>][enabled]" value="1" <?php checked( $is_enabled ); ?>>
 							<span class="wenpai-switch__track" aria-hidden="true"></span>
-							<span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on"><?php esc_html_e( '已启用', 'wpmind' ); ?></span><span class="wenpai-switch__off"><?php esc_html_e( '已停用', 'wpmind' ); ?></span></span>
+							<span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on"><?php esc_html_e( '已开启', 'wpmind' ); ?></span><span class="wenpai-switch__off"><?php esc_html_e( '未开启', 'wpmind' ); ?></span></span>
 						</span>
 						<p class="wenpai-field__desc"><?php echo esc_html( (string) $provider['description'] ); ?></p>
 					</div>

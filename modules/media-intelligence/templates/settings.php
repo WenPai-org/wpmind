@@ -132,12 +132,12 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 				<div class="card-head">
 					<span class="tile"><?php echo AdminIcons::svg( 'workflow' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 					<div>
-						<h2 class="card-title"><?php esc_html_e( '工作流 Dry-run', 'wpmind' ); ?></h2>
-						<p class="card-sub"><?php esc_html_e( '扫描缺 Alt 图片并创建统一任务，Vision 只写入任务预览，不会改附件 Alt / 标题 / 说明。单任务最多 50 张。', 'wpmind' ); ?></p>
+						<h2 class="card-title"><?php esc_html_e( '工作流预演', 'wpmind' ); ?></h2>
+						<p class="card-sub"><?php esc_html_e( '扫描缺 Alt 图片并创建统一任务，预演结果只进入任务预览，审核通过后才写入附件。单任务最多 50 张。', 'wpmind' ); ?></p>
 					</div>
 					<span class="wenpai-actions">
 						<button type="button" class="btn btn-sm" id="wpmind-media-workflow-create"><?php esc_html_e( '创建 Alt 预览任务', 'wpmind' ); ?></button>
-						<button type="button" class="btn btn-sm" id="wpmind-media-workflow-dryrun" disabled><?php esc_html_e( 'Dry-run 预览', 'wpmind' ); ?></button>
+						<button type="button" class="btn btn-sm" id="wpmind-media-workflow-dryrun" disabled><?php esc_html_e( '运行预演', 'wpmind' ); ?></button>
 						<a class="btn btn-sm btn-ghost" href="<?php echo esc_url( AdminPage::url( [ 'tab' => 'workflow' ] ) ); ?>"><?php esc_html_e( '打开任务页', 'wpmind' ); ?></a>
 					</span>
 				</div>

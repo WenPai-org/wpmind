@@ -104,7 +104,7 @@ if ( $wpmind_month_limit_usd > 0 ) {
 				?></span>
 				<?php endif; ?>
 				<button type="button" class="btn btn-sm btn-ghost wpmind-refresh-usage"><?php echo AdminIcons::svg( 'refresh' ); ?><?php esc_html_e( '刷新', 'wpmind' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></button>
-				<button type="button" class="btn btn-sm wpmind-clear-usage"><?php esc_html_e( '清除', 'wpmind' ); ?></button>
+				<button type="button" class="btn btn-sm wpmind-clear-usage"><?php esc_html_e( '清除统计', 'wpmind' ); ?></button>
 			</span>
 		</div>
 		<div class="wenpai-table-wrap">
@@ -157,7 +157,7 @@ if ( $wpmind_month_limit_usd > 0 ) {
 			<option value="30d"><?php esc_html_e( '最近 30 天', 'wpmind' ); ?></option>
 		</select>
 		<button type="button" class="btn btn-sm btn-ghost wpmind-refresh-analytics"><?php echo AdminIcons::svg( 'refresh' ); ?><?php esc_html_e( '刷新图表', 'wpmind' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></button>
-		<span class="meta"><?php esc_html_e( '数据源：UsageTracker 聚合', 'wpmind' ); ?></span>
+		<span class="meta"><?php esc_html_e( '数据按日聚合', 'wpmind' ); ?></span>
 	</div>
 
 	<div class="wpmind-chart-grid">

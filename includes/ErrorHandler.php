@@ -44,7 +44,7 @@ class ErrorHandler {
 		'dns_error'            => '无法解析域名，请检查 Base URL',
 		'invalid_response'     => '服务器返回了无效的响应',
 		'rate_limit'           => '已达到 API 调用限制',
-		'quota_exceeded'       => 'API 配额已用尽',
+		'quota_exceeded'       => 'API 额度已用尽',
 		'model_not_found'      => '指定的模型不存在',
 		'invalid_api_key'      => 'API Key 格式不正确',
 		'authentication_error' => '认证失败，请检查 API Key',
@@ -184,7 +184,7 @@ class ErrorHandler {
 	private static function translate_error_message( string $message ): string {
 		$translations = [
 			'invalid_api_key'         => 'API Key 无效',
-			'insufficient_quota'      => 'API 配额不足',
+			'insufficient_quota'      => 'API 额度不足',
 			'rate_limit_exceeded'     => '请求过于频繁',
 			'model_not_found'         => '模型不存在',
 			'context_length_exceeded' => '内容长度超出限制',

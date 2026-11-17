@@ -19,7 +19,7 @@ use WPMind\Modules\CostControl\BudgetChecker;
 use WPMind\Modules\CostControl\UsageTracker;
 
 if ( ! class_exists( BudgetManager::class ) || ! class_exists( BudgetChecker::class ) || ! class_exists( UsageTracker::class ) ) {
-	wpmind_notice( [ 'text' => __( 'Cost Control 模块未正确加载', 'wpmind' ), 'level' => 'bad' ] );
+	wpmind_notice( [ 'text' => __( '费用控制模块未加载，请到「模块」页重新启用。', 'wpmind' ), 'level' => 'bad' ] );
 	return;
 }
 

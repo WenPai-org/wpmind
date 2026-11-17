@@ -122,7 +122,7 @@ $wpmind_num = static function ( string $id, $value, int $min, int $max, string $
 			$wpmind_num( 'gw-sse', $sse_global_limit, 1, 200, __( 'SSE 全局并发', 'wpmind' ) );
 			$wpmind_num( 'gw-body-mb', $max_body_mb, 1, 100, __( '请求体上限 (MB)', 'wpmind' ) );
 			$wpmind_num( 'gw-tokens-cap', $max_tokens_cap, 256, 1000000, __( 'Max Tokens 上限', 'wpmind' ) );
-			$wpmind_switch( 'gw-log-prompts', $log_prompts, __( '记录 Prompt 内容', 'wpmind' ), __( '审计日志中保存请求 prompt 原文，注意隐私与存储成本。', 'wpmind' ) );
+			$wpmind_switch( 'gw-log-prompts', $log_prompts, __( '记录 Prompt 内容', 'wpmind' ), __( '审计日志中保存请求 prompt 原文，请只在需要排障时开启。', 'wpmind' ) );
 			?>
 			<div class="card-foot">
 				<span class="wenpai-actions">
@@ -180,7 +180,7 @@ $wpmind_num = static function ( string $id, $value, int $min, int $max, string $
 					</div>
 				</div>
 				<div class="wpmind-gw-edit-actions">
-					<button type="button" class="btn btn-sm btn-primary" id="gw-create-key"><?php esc_html_e( '创建', 'wpmind' ); ?></button>
+					<button type="button" class="btn btn-sm btn-primary" id="gw-create-key"><?php esc_html_e( '创建 Key', 'wpmind' ); ?></button>
 					<button type="button" class="btn btn-sm" id="gw-cancel-create"><?php esc_html_e( '取消', 'wpmind' ); ?></button>
 				</div>
 			</div>
@@ -416,7 +416,7 @@ $wpmind_num = static function ( string $id, $value, int $min, int $max, string $
 			var $tb = $( '#gw-keys-tbody' );
 			$tb.empty();
 			if ( ! r.success || ! r.data || ! r.data.keys || ! r.data.keys.length ) {
-				$tb.html( '<tr><td colspan="8" class="meta" style="text-align:center"><?php echo esc_js( __( '暂无 API Key', 'wpmind' ) ); ?></td></tr>' );
+				$tb.html( '<tr><td colspan="8" class="meta" style="text-align:center"><?php echo esc_js( __( '暂无 API Key，创建后供外部应用调用网关。', 'wpmind' ) ); ?></td></tr>' );
 				return;
 			}
 			// Also populate log filter dropdown.
@@ -464,7 +464,7 @@ $wpmind_num = static function ( string $id, $value, int $min, int $max, string $
 						editField( '<?php echo esc_js( __( '过期时间', 'wpmind' ) ); ?>', 'date', 'ek-exp-' + k.key_id, k.expires_at ? k.expires_at.substring( 0, 10 ) : '' ) +
 						'</div>' +
 						'<div class="wpmind-gw-edit-actions">' +
-						'<button class="btn btn-sm btn-primary gw-save-edit" data-kid="' + k.key_id + '"><?php echo esc_js( __( '保存', 'wpmind' ) ); ?></button> ' +
+						'<button class="btn btn-sm btn-primary gw-save-edit" data-kid="' + k.key_id + '"><?php echo esc_js( __( '保存修改', 'wpmind' ) ); ?></button> ' +
 						'<button class="btn btn-sm gw-cancel-edit" data-kid="' + k.key_id + '"><?php echo esc_js( __( '取消', 'wpmind' ) ); ?></button>' +
 						'</div></div></td></tr>'
 					);
@@ -543,7 +543,7 @@ $wpmind_num = static function ( string $id, $value, int $min, int $max, string $
 			var $tb = $( '#gw-logs-tbody' );
 			$tb.empty();
 			if ( ! r.success || ! r.data || ! r.data.logs || ! r.data.logs.length ) {
-				$tb.html( '<tr><td colspan="4" class="meta" style="text-align:center"><?php echo esc_js( __( '暂无日志', 'wpmind' ) ); ?></td></tr>' );
+				$tb.html( '<tr><td colspan="4" class="meta" style="text-align:center"><?php echo esc_js( __( '暂无请求日志，网关收到请求后记录在这里。', 'wpmind' ) ); ?></td></tr>' );
 				$( '#gw-logs-pagination' ).hide();
 				return;
 			}

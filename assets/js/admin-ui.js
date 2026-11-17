@@ -122,7 +122,7 @@
 			var defaults = {
 				title: '确认操作',
 				message: '确定要执行此操作吗？',
-				confirmText: '确定',
+				confirmText: '确认执行',
 				cancelText: '取消',
 				type: 'warning',
 				onConfirm: function() {},
