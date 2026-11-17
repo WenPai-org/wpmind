@@ -58,14 +58,14 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 <section class="card">
 	<div class="wpmind-statbar">
 	<div class="wpmind-statbar-item">
-		<?php echo AdminIcons::svg( 'wallet', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		<?php echo AdminIcons::svg( 'trend-up', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<div class="wpmind-statbar-text">
 			<div class="k"><?php esc_html_e( '今日费用', 'wpmind' ); ?></div>
 			<div class="v"><?php echo esc_html( UsageTracker::format_cost_by_currency( $get_value( $today_stats, 'cost_usd', 0 ), $get_value( $today_stats, 'cost_cny', 0 ) ) ); ?></div>
 		</div>
 	</div>
 	<div class="wpmind-statbar-item">
-		<?php echo AdminIcons::svg( 'analytics', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		<?php echo AdminIcons::svg( 'dollar', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<div class="wpmind-statbar-text">
 			<div class="k"><?php esc_html_e( '本月费用', 'wpmind' ); ?></div>
 			<div class="v"><?php echo esc_html( UsageTracker::format_cost_by_currency( $get_value( $month_stats, 'cost_usd', 0 ), $get_value( $month_stats, 'cost_cny', 0 ) ) ); ?></div>
@@ -79,7 +79,7 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 		</div>
 	</div>
 	<div class="wpmind-statbar-item">
-		<?php echo AdminIcons::svg( 'zap', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		<?php echo AdminIcons::svg( 'pulse', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<div class="wpmind-statbar-text">
 			<div class="k"><?php esc_html_e( '今日 Tokens', 'wpmind' ); ?></div>
 			<div class="v"><?php echo esc_html( UsageTracker::format_tokens( $get_value( $today_stats, 'input_tokens', 0 ) + $get_value( $today_stats, 'output_tokens', 0 ) ) ); ?></div>
@@ -92,7 +92,7 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 
 	<section class="card">
 		<div class="card-head">
-			<span class="tile"><?php echo AdminIcons::svg( 'lock' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
+			<span class="tile"><?php echo AdminIcons::svg( 'wallet' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 			<div>
 				<h2 class="card-title"><?php esc_html_e( '预算限额', 'wpmind' ); ?></h2>
 				<p class="card-sub"><?php esc_html_e( '监控 AI 服务费用，设置预算限额，接收告警通知。', 'wpmind' ); ?></p>
@@ -227,7 +227,7 @@ $wpmind_switch = static function ( string $id, string $name, bool $checked, stri
 
 		<section class="card">
 			<div class="card-head">
-				<span class="tile"><?php echo AdminIcons::svg( 'help' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
+				<span class="tile"><?php echo AdminIcons::svg( 'doc' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
 				<div>
 					<h2 class="card-title"><?php esc_html_e( '费用说明', 'wpmind' ); ?></h2>
 				</div>
