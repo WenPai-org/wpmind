@@ -141,14 +141,14 @@ wpmind_page_head(
 		<div class="wenpai-field wenpai-field--row field">
 			<div class="field-label"><label class="wenpai-field__label" for="wpmind_request_timeout"><?php esc_html_e( '请求超时', 'wpmind' ); ?></label></div>
 			<div class="field-ctl">
-				<input type="number" id="wpmind_request_timeout" name="wpmind_request_timeout" value="<?php echo esc_attr( $request_timeout ); ?>" min="10" max="300" step="1" style="max-width:120px">
+				<input type="number" id="wpmind_request_timeout" name="wpmind_request_timeout" value="<?php echo esc_attr( $request_timeout ); ?>" min="10" max="300" step="1">
 				<p class="wenpai-field__desc"><?php esc_html_e( '秒（建议 60-120），超时自动故障转移。', 'wpmind' ); ?></p>
 			</div>
 		</div>
 		<div class="wenpai-field wenpai-field--row field">
 			<div class="field-label"><label class="wenpai-field__label" for="wpmind_default_provider"><?php esc_html_e( '默认服务', 'wpmind' ); ?></label></div>
 			<div class="field-ctl">
-				<select id="wpmind_default_provider" name="wpmind_default_provider" style="max-width:280px">
+				<select id="wpmind_default_provider" name="wpmind_default_provider">
 					<option value=""><?php esc_html_e( '— 选择默认服务 —', 'wpmind' ); ?></option>
 					<?php foreach ( $endpoints as $key => $endpoint ) : ?>
 						<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $default_provider, $key ); ?>><?php echo esc_html( $endpoint['name'] ); ?></option>
@@ -274,7 +274,7 @@ wpmind_page_head(
 						<?php if ( ! empty( $endpoint['is_official'] ) ) : ?>
 						<p class="wenpai-field__desc"><?php esc_html_e( '此 API Key 将同步到 WordPress AI Client', 'wpmind' ); ?></p>
 						<?php endif; ?>
-						<div class="wenpai-actions" style="margin-top:var(--wenpai-space-3)">
+						<div class="wenpai-actions">
 							<button type="button" class="btn btn-sm btn-secondary wpmind-test-connection" data-provider="<?php echo esc_attr( $key ); ?>" <?php echo $enabled ? '' : 'disabled'; ?>><?php esc_html_e( '测试连接', 'wpmind' ); ?></button>
 							<button type="button" class="btn btn-sm btn-ghost wpmind-rotate-key" data-provider="<?php echo esc_attr( $key ); ?>" title="<?php esc_attr_e( '用输入框中的新 Key 验证通过后替换已保存的 Key', 'wpmind' ); ?>"><?php esc_html_e( '验证并替换', 'wpmind' ); ?></button>
 							<button type="button" class="btn btn-sm btn-ghost wpmind-reset-breaker" data-provider="<?php echo esc_attr( $key ); ?>" title="<?php esc_attr_e( '清除熔断 / 需要处理 / 额度不足状态', 'wpmind' ); ?>"><?php esc_html_e( '重置状态', 'wpmind' ); ?></button>
@@ -293,7 +293,7 @@ wpmind_page_head(
 								<strong><?php echo esc_html( $wpmind_err_label ); ?></strong>
 								<?php if ( '' !== $wpmind_err_time ) : ?> <span class="meta">· <?php echo esc_html( $wpmind_err_time ); ?></span><?php endif; ?>
 							<?php endif; ?>
-							<?php if ( '' !== $wpmind_recovery ) : ?><div class="meta" style="margin-top:4px"><?php echo esc_html( $wpmind_recovery ); ?></div><?php endif; ?>
+							<?php if ( '' !== $wpmind_recovery ) : ?><div class="meta"><?php echo esc_html( $wpmind_recovery ); ?></div><?php endif; ?>
 						</div>
 					</div>
 				</div>
@@ -365,7 +365,7 @@ wpmind_page_head(
 		<div class="wenpai-field wenpai-field--row field">
 			<div class="field-label"><label class="wenpai-field__label" for="wpmind_default_image_provider"><?php esc_html_e( '默认图像服务', 'wpmind' ); ?></label></div>
 			<div class="field-ctl">
-				<select id="wpmind_default_image_provider" name="wpmind_default_image_provider" style="max-width:280px">
+				<select id="wpmind_default_image_provider" name="wpmind_default_image_provider">
 					<option value=""><?php esc_html_e( '— 选择默认服务 —', 'wpmind' ); ?></option>
 					<?php foreach ( $available_image_providers as $key => $provider ) : ?>
 						<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $default_image_provider, $key ); ?>><?php echo esc_html( $provider['name'] ); ?></option>
@@ -426,7 +426,7 @@ wpmind_page_head(
 						<p class="wenpai-field__desc"><?php esc_html_e( '已配置。留空表示不修改已保存的 Key。', 'wpmind' ); ?></p>
 						<label class="chk wpmind-clear-key"><input type="checkbox" name="wpmind_image_endpoints[<?php echo esc_attr( $key ); ?>][clear_api_key]" value="1" class="wpmind-clear-checkbox"> <?php esc_html_e( '清除 API Key', 'wpmind' ); ?></label>
 						<?php endif; ?>
-						<div class="wenpai-actions" style="margin-top:var(--wenpai-space-3)">
+						<div class="wenpai-actions">
 							<button type="button" class="btn btn-sm btn-secondary wpmind-test-image-connection" data-provider="<?php echo esc_attr( $key ); ?>" <?php echo $is_enabled ? '' : 'disabled'; ?>><?php esc_html_e( '测试连接', 'wpmind' ); ?></button>
 							<span class="wpmind-test-result" aria-live="polite"></span>
 						</div>
