@@ -274,7 +274,7 @@ wpmind_page_head(
 	$module_rows_html .= Wenpai_Admin_UI::card_foot_html(
 		[
 			'start'   => true,
-			'note'    => __( '模块开关与设置在「模块」页。', 'wpmind' ),
+			'meta'    => __( '模块开关与设置在「模块」页。', 'wpmind' ),
 			'actions' => [
 				[ 'label' => __( '模块管理', 'wpmind' ), 'href' => AdminPage::url( [ 'tab' => 'modules' ] ), 'variant' => 'secondary' ],
 			],
