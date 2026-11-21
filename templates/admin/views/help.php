@@ -1,6 +1,6 @@
 <?php
 /**
- * 帮助视图：站内快速开始 + 外部资源。
+ * 帮助视图：快速开始指引 + 常见问题折叠问答 + 外部资源（遵守白标 display()）。
  *
  * @package WPMind
  */
@@ -9,63 +9,163 @@ defined( 'ABSPATH' ) || exit();
 
 use WPMind\Admin\AdminIcons;
 use WPMind\Admin\AdminPage;
+use WPMind\Admin\SuiteIntegration;
 
-wpmind_page_head(
-	__( '帮助', 'wpmind' ),
-	__( '先按顺序把 AI 服务配好，再按需开模块。', 'wpmind' )
-);
-?>
+( static function (): void {
+	$wpmind_display = SuiteIntegration::display();
+
+	wpmind_page_head(
+		__( '帮助', 'wpmind' ),
+		__( '先连接算力或密钥，再按需启用模块。', 'wpmind' )
+	);
+	?>
 
 <div class="wenpai-stack">
-	<section class="card">
-		<div class="card-head">
-			<div>
-				<h2 class="card-title"><?php esc_html_e( '快速开始', 'wpmind' ); ?></h2>
-				<p class="card-sub"><?php esc_html_e( '推荐顺序：服务 → 路由 → 模块 → 分析', 'wpmind' ); ?></p>
-			</div>
-		</div>
-		<a class="simple-row is-action" href="<?php echo esc_url( AdminPage::url( [ 'tab' => 'services' ] ) ); ?>">
-			<span class="tile accent"><?php echo AdminIcons::svg( 'key' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-			<div><div class="t"><?php esc_html_e( '配置 AI 服务', 'wpmind' ); ?></div><div class="d"><?php esc_html_e( '填 Provider 的 API Key，测一遍连接', 'wpmind' ); ?></div></div>
-			<span class="r"><?php echo AdminIcons::svg( 'arrow-right' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-		</a>
-		<a class="simple-row is-action" href="<?php echo esc_url( AdminPage::url( [ 'tab' => 'routing' ] ) ); ?>">
-			<span class="tile accent"><?php echo AdminIcons::svg( 'route' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-			<div><div class="t"><?php esc_html_e( '智能路由', 'wpmind' ); ?></div><div class="d"><?php esc_html_e( '选策略、排 Provider 优先级', 'wpmind' ); ?></div></div>
-			<span class="r"><?php echo AdminIcons::svg( 'arrow-right' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-		</a>
-		<a class="simple-row is-action" href="<?php echo esc_url( AdminPage::url( [ 'tab' => 'modules' ] ) ); ?>">
-			<span class="tile accent"><?php echo AdminIcons::svg( 'modules' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-			<div><div class="t"><?php esc_html_e( '启用模块', 'wpmind' ); ?></div><div class="d"><?php esc_html_e( '按需打开 GEO / 缓存 / 网关等能力', 'wpmind' ); ?></div></div>
-			<span class="r"><?php echo AdminIcons::svg( 'arrow-right' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-		</a>
-		<a class="simple-row is-action" href="<?php echo esc_url( AdminPage::url( [ 'tab' => 'analytics' ] ) ); ?>">
-			<span class="tile accent"><?php echo AdminIcons::svg( 'analytics' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-			<div><div class="t"><?php esc_html_e( '用量与预算', 'wpmind' ); ?></div><div class="d"><?php esc_html_e( '看消耗、设限额和告警', 'wpmind' ); ?></div></div>
-			<span class="r"><?php echo AdminIcons::svg( 'arrow-right' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-		</a>
-	</section>
+	<?php
+	Wenpai_Admin_UI::card_open(
+		[
+			'title' => __( '快速开始', 'wpmind' ),
+			'sub'   => __( '推荐顺序：AI 服务 → 智能路由 → 模块 → 分析', 'wpmind' ),
+			'tile'  => false,
+		]
+	);
+	Wenpai_Admin_UI::row(
+		[
+			'icon_html'  => AdminIcons::svg( 'key' ),
+			'state'      => 'accent',
+			'title'      => __( '配置 AI 服务', 'wpmind' ),
+			'desc'       => __( '开启官方算力或填入密钥并测试连接。', 'wpmind' ),
+			'href'       => AdminPage::url( [ 'tab' => 'services' ] ),
+			'right_html' => AdminIcons::svg( 'arrow-right' ),
+		]
+	);
+	Wenpai_Admin_UI::row(
+		[
+			'icon_html'  => AdminIcons::svg( 'route' ),
+			'state'      => 'accent',
+			'title'      => __( '智能路由', 'wpmind' ),
+			'desc'       => __( '选择路由策略与故障转移优先级。', 'wpmind' ),
+			'href'       => AdminPage::url( [ 'tab' => 'routing' ] ),
+			'right_html' => AdminIcons::svg( 'arrow-right' ),
+		]
+	);
+	Wenpai_Admin_UI::row(
+		[
+			'icon_html'  => AdminIcons::svg( 'modules' ),
+			'state'      => 'accent',
+			'title'      => __( '启用能力模块', 'wpmind' ),
+			'desc'       => __( '按需打开 GEO、精确缓存或 API 网关。', 'wpmind' ),
+			'href'       => AdminPage::url( [ 'tab' => 'modules' ] ),
+			'right_html' => AdminIcons::svg( 'arrow-right' ),
+		]
+	);
+	Wenpai_Admin_UI::row(
+		[
+			'icon_html'  => AdminIcons::svg( 'analytics' ),
+			'state'      => 'accent',
+			'title'      => __( '用量与预算', 'wpmind' ),
+			'desc'       => __( '查看调用统计并设置每日或每月预算。', 'wpmind' ),
+			'href'       => AdminPage::url( [ 'tab' => 'analytics' ] ),
+			'right_html' => AdminIcons::svg( 'arrow-right' ),
+		]
+	);
+	Wenpai_Admin_UI::card_close();
 
-	<section class="card">
-		<div class="card-head">
-			<div>
-				<h2 class="card-title"><?php esc_html_e( '外部资源', 'wpmind' ); ?></h2>
-			</div>
-		</div>
-		<div class="simple-row is-static">
-			<span class="tile"><?php echo AdminIcons::svg( 'doc' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-			<div><div class="t"><?php esc_html_e( '使用文档', 'wpmind' ); ?></div><div class="d"><?php esc_html_e( 'wpcy.com/mind —— 配置、模块、工作流说明', 'wpmind' ); ?></div></div>
-			<div class="r"><a class="btn btn-ghost btn-sm" href="https://wpcy.com/mind/" target="_blank" rel="noopener noreferrer"><?php esc_html_e( '打开 ↗', 'wpmind' ); ?></a></div>
-		</div>
-		<div class="simple-row is-static">
-			<span class="tile"><?php echo AdminIcons::svg( 'feedback' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-			<div><div class="t"><?php esc_html_e( 'GitHub 仓库', 'wpmind' ); ?></div><div class="d"><?php esc_html_e( '源码、更新日志、问题反馈（附诊断包更快定位）', 'wpmind' ); ?></div></div>
-			<div class="r"><a class="btn btn-ghost btn-sm" href="https://github.com/WenPai-org/wpmind" target="_blank" rel="noopener noreferrer"><?php esc_html_e( '打开 ↗', 'wpmind' ); ?></a></div>
-		</div>
-		<div class="simple-row is-static">
-			<span class="tile"><?php echo AdminIcons::svg( 'package' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-			<div><div class="t"><?php esc_html_e( '版本发布', 'wpmind' ); ?></div><div class="d"><?php esc_html_e( '各版本变更与下载', 'wpmind' ); ?></div></div>
-			<div class="r"><a class="btn btn-ghost btn-sm" href="https://github.com/WenPai-org/wpmind/releases" target="_blank" rel="noopener noreferrer"><?php esc_html_e( '打开 ↗', 'wpmind' ); ?></a></div>
-		</div>
-	</section>
+	Wenpai_Admin_UI::help(
+		[
+			'groups' => [
+				[
+					'title'       => __( '常见问题与部署说明', 'wpmind' ),
+					'icon'        => 'help',
+					'collapsible' => true,
+					'open'        => true,
+					'numbered'    => false,
+					'steps'       => [
+						[
+							'title' => __( '官方算力与自有 API Key 可以同时启用吗？', 'wpmind' ),
+							'body'  => __( '可以。启用后两者会一起参与智能路由，并可在「智能路由」页固定优先顺序。', 'wpmind' ),
+						],
+						[
+							'title' => __( '如何通过 wp-config.php 锁定服务商密钥？', 'wpmind' ),
+							'body'  => __( '定义 WPMIND_LOCKED_PROVIDERS 与 WPMIND_API_KEYS 常量后，对应服务商密钥由配置文件托管且后台隐藏输入框。', 'wpmind' ),
+						],
+						[
+							'title' => __( '如何排查某项服务熔断或连接失败？', 'wpmind' ),
+							'body'  => __( '在「AI 服务」页展开对应端点点击「测试连接」，或到「工具」页导出脱敏诊断包提交支持。', 'wpmind' ),
+						],
+					],
+				],
+			],
+		]
+	);
+
+	$has_ext = '' !== $wpmind_display['docs_url']
+		|| '' !== $wpmind_display['feedback_url']
+		|| '' !== $wpmind_display['github_url'];
+	if ( $has_ext ) {
+		Wenpai_Admin_UI::card_open(
+			[
+				'title' => __( '文档与支持', 'wpmind' ),
+				'tile'  => false,
+			]
+		);
+		if ( '' !== $wpmind_display['docs_url'] ) {
+			Wenpai_Admin_UI::row(
+				[
+					'icon_html'  => AdminIcons::svg( 'doc' ),
+					'title'      => __( '使用文档', 'wpmind' ),
+					'desc'       => __( '配置指引、模块说明与开发接口文档。', 'wpmind' ),
+					'right_html' => Wenpai_Admin_UI::button_html(
+						[
+							'label'   => __( '查看文档', 'wpmind' ),
+							'href'    => $wpmind_display['docs_url'],
+							'variant' => 'ghost',
+							'size'    => 'sm',
+							'target'  => '_blank',
+						]
+					),
+				]
+			);
+		}
+		if ( '' !== $wpmind_display['feedback_url'] ) {
+			Wenpai_Admin_UI::row(
+				[
+					'icon_html'  => AdminIcons::svg( 'feedback' ),
+					'title'      => __( '技术支持与反馈', 'wpmind' ),
+					'desc'       => __( '提交问题时建议附带脱敏诊断包。', 'wpmind' ),
+					'right_html' => Wenpai_Admin_UI::button_html(
+						[
+							'label'   => __( '提交反馈', 'wpmind' ),
+							'href'    => $wpmind_display['feedback_url'],
+							'variant' => 'ghost',
+							'size'    => 'sm',
+							'target'  => '_blank',
+						]
+					),
+				]
+			);
+		}
+		if ( '' !== $wpmind_display['github_url'] ) {
+			Wenpai_Admin_UI::row(
+				[
+					'icon_html'  => AdminIcons::svg( 'package' ),
+					'title'      => __( '开源仓库', 'wpmind' ),
+					'desc'       => __( '查看源代码与各版本更新记录。', 'wpmind' ),
+					'right_html' => Wenpai_Admin_UI::button_html(
+						[
+							'label'   => __( '访问仓库', 'wpmind' ),
+							'href'    => $wpmind_display['github_url'],
+							'variant' => 'ghost',
+							'size'    => 'sm',
+							'target'  => '_blank',
+						]
+					),
+				]
+			);
+		}
+		Wenpai_Admin_UI::card_close();
+	}
+	?>
 </div>
+	<?php
+} )();

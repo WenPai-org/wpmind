@@ -388,13 +388,19 @@ if ( ! function_exists( 'current_user_can' ) ) {
 }
 
 if ( ! class_exists( 'WP_Post' ) ) {
+	#[\AllowDynamicProperties]
 	class WP_Post {
 		public $ID;
 		public $post_type = 'post';
 		public $post_status = 'publish';
 		public $post_title = '';
+		public $post_content = '';
+		public $post_name = '';
+		public $post_parent = 0;
 		public $post_author = 0;
+		public $post_date = '';
 		public $post_date_gmt = '';
+		public $post_modified = '';
 		public $post_modified_gmt = '';
 		public $post_excerpt = '';
 		public $post_mime_type = '';
@@ -423,8 +429,13 @@ if ( ! function_exists( 'wp_insert_post' ) ) {
 			'post_type'         => (string) ( $postarr['post_type'] ?? 'post' ),
 			'post_status'       => (string) ( $postarr['post_status'] ?? 'publish' ),
 			'post_title'        => (string) ( $postarr['post_title'] ?? '' ),
+			'post_content'      => (string) ( $postarr['post_content'] ?? '' ),
+			'post_name'         => (string) ( $postarr['post_name'] ?? '' ),
+			'post_parent'       => (int) ( $postarr['post_parent'] ?? 0 ),
 			'post_author'       => (int) ( $postarr['post_author'] ?? 0 ),
+			'post_date'         => (string) ( $postarr['post_date'] ?? $now ),
 			'post_date_gmt'     => (string) ( $postarr['post_date_gmt'] ?? $now ),
+			'post_modified'     => (string) ( $postarr['post_modified'] ?? $now ),
 			'post_modified_gmt' => (string) ( $postarr['post_date_gmt'] ?? $now ),
 			'post_excerpt'      => (string) ( $postarr['post_excerpt'] ?? '' ),
 			'post_mime_type'    => (string) ( $postarr['post_mime_type'] ?? '' ),
@@ -442,7 +453,7 @@ if ( ! function_exists( 'wp_update_post' ) ) {
 			return $wp_error ? new WP_Error( 'invalid_post', 'invalid' ) : 0;
 		}
 		$post = $GLOBALS['wpmind_test_posts'][ $id ];
-		foreach ( [ 'post_title', 'post_status', 'post_excerpt', 'post_author' ] as $field ) {
+		foreach ( [ 'post_title', 'post_content', 'post_status', 'post_excerpt', 'post_author' ] as $field ) {
 			if ( array_key_exists( $field, $postarr ) ) {
 				$post->$field = $postarr[ $field ];
 			}
@@ -474,14 +485,18 @@ if ( ! function_exists( 'get_posts' ) ) {
 	function get_posts( array $args = [] ) {
 		$type   = $args['post_type'] ?? 'post';
 		$status = $args['post_status'] ?? 'publish';
-		$limit  = (int) ( $args['posts_per_page'] ?? 5 );
+		$limit  = (int) ( $args['posts_per_page'] ?? $args['numberposts'] ?? 5 );
 		$offset = (int) ( $args['offset'] ?? 0 );
 		$fields = $args['fields'] ?? 'all';
 		$meta_q = $args['meta_query'] ?? [];
 
 		$matched = [];
 		foreach ( $GLOBALS['wpmind_test_posts'] as $id => $post ) {
-			if ( $type && $post->post_type !== $type ) {
+			if ( is_array( $type ) ) {
+				if ( ! empty( $type ) && ! in_array( $post->post_type, $type, true ) ) {
+					continue;
+				}
+			} elseif ( $type && $post->post_type !== $type ) {
 				continue;
 			}
 			if ( 'any' !== $status && $post->post_status !== $status ) {

@@ -41,6 +41,10 @@ function wpmind_cleanup_site_data(): void {
 		'wpmind_custom_endpoints_backups',
 		'wenpai_license_key_wpmind',
 		'wenpai_license_wpmind_grace',
+		// 官方算力设置.
+		'wpmind_cloud_enabled',
+		'wpmind_cloud_token',
+		'wpmind_cloud_credits',
 		// GEO 模块设置
 		'wpmind_geo_enabled',
 		'wpmind_chinese_optimize',
@@ -163,11 +167,14 @@ function wpmind_cleanup_site_data(): void {
 		)
 	);
 
-	// 删除动态模块设置、网关/GEO 设置和 llms.txt 缓存。
+	// 删除动态模块设置、自动元数据、媒体智能、官方算力、网关/GEO 设置和 llms.txt 缓存。
 	$wpdb->query(
 		$wpdb->prepare(
 			"DELETE FROM {$wpdb->options}
              WHERE option_name LIKE %s
+                OR option_name LIKE %s
+                OR option_name LIKE %s
+                OR option_name LIKE %s
                 OR option_name LIKE %s
                 OR option_name LIKE %s
                 OR option_name LIKE %s
@@ -178,7 +185,10 @@ function wpmind_cleanup_site_data(): void {
 			'wpmind_gateway_%',
 			'wpmind_geo_%',
 			'wpmind_ai_%',
-			'wpmind_brand_%'
+			'wpmind_brand_%',
+			'wpmind_auto_meta_%',
+			'wpmind_media_%',
+			'wpmind_cloud_%'
 		)
 	);
 

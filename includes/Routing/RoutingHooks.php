@@ -98,8 +98,8 @@ class RoutingHooks {
 			return $selected;
 		}
 
-		// 路由失败，返回默认 Provider
-		return get_option( 'wpmind_default_provider', 'deepseek' );
+		// 路由失败，返回空交由 AbstractService::resolve_provider() 走默认与首个可用端点回退。
+		return (string) get_option( 'wpmind_default_provider', '' );
 	}
 
 	/**

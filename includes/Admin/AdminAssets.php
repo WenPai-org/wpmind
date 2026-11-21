@@ -46,15 +46,23 @@ final class AdminAssets {
 	 * @since 1.1.0
 	 */
 	public function enqueue_admin_assets( string $hook_suffix ): void {
-		// kit Settings 子菜单：settings_page_{slug}；旧顶级菜单兜底 toplevel_page_wpmind
-		$kit_hook = class_exists( 'Wenpai_Admin_Menu', false )
-			? \Wenpai_Admin_Menu::hook( 'wpmind' )
-			: 'settings_page_wpmind';
-		if ( ! in_array( $hook_suffix, [ $kit_hook, 'toplevel_page_wpmind' ], true ) ) {
-			return;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only admin page check.
+		$current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( (string) $_GET['page'] ) ) : '';
+		$owns_page    = 'wpmind' === $current_page
+			&& class_exists( 'Wenpai_Admin_Menu', false )
+			&& \Wenpai_Admin_Menu::owns_page( 'wpmind' );
+
+		if ( ! $owns_page ) {
+			$kit_hook = class_exists( 'Wenpai_Admin_Menu', false )
+				? \Wenpai_Admin_Menu::hook( 'wpmind' )
+				: 'toplevel_page_wpmind';
+			if ( ! in_array( $hook_suffix, [ $kit_hook, 'toplevel_page_wpmind', 'settings_page_wpmind' ], true ) ) {
+				return;
+			}
 		}
 
 		// wenpai-admin-ui kit（与其它文派插件共享同一份 CSS/JS，版本最高者生效）
+		$css_deps = [];
 		if ( class_exists( 'Wenpai_Admin_Loader', false ) ) {
 			\Wenpai_Admin_Loader::enqueue(
 				[
@@ -62,13 +70,14 @@ final class AdminAssets {
 					'body' => 'wpmind-admin',
 				]
 			);
+			$css_deps[] = \Wenpai_Admin_Loader::STYLE_HANDLE;
 		}
 
-		// 产品组件样式（kit 组件之上；.wpmind-* 控制台组件）
+		// 产品补充样式（在 kit 组件之上；仅保留产品专属轻量样式）
 		wp_enqueue_style(
 			'wpmind-admin-ui',
 			WPMIND_PLUGIN_URL . 'assets/css/wpmind-admin.css',
-			[],
+			$css_deps,
 			WPMIND_VERSION
 		);
 

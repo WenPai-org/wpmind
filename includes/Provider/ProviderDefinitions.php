@@ -58,7 +58,7 @@ final class ProviderDefinitions {
 			'base_url'     => 'https://api.deepseek.com/v1',
 		],
 		'qwen'        => [
-			'name'         => '通义千问',
+			'name'         => '千问',
 			'display_name' => 'Qwen',
 			'icon'         => 'qwen',
 			'base_url'     => 'https://dashscope.aliyuncs.com/compatible-mode/v1',
@@ -158,7 +158,36 @@ final class ProviderDefinitions {
 	];
 
 	/**
-	 * 所有已知 Provider ID。
+	 * 文派心思官方算力端点元数据（动态读取 WenpaiCloud::base_url()）。
+	 *
+	 * @return array{name:string, display_name:string, icon:string, base_url:string, is_cloud:bool}
+	 */
+	public static function cloud_definition(): array {
+		return [
+			'name'         => '文派心思官方算力',
+			'display_name' => '心思点数',
+			'icon'         => 'wenpai_cloud',
+			'base_url'     => WenpaiCloud::base_url(),
+			'is_cloud'     => true,
+		];
+	}
+
+	/**
+	 * 全部 Provider 定义（包含 BYOK 与官方托管算力）。
+	 *
+	 * @return array<string, array{name:string, display_name:string, icon:string, base_url:string, is_official?:bool, is_cloud?:bool}>
+	 */
+	public static function all(): array {
+		return array_merge(
+			self::DEFINITIONS,
+			[
+				WenpaiCloud::PROVIDER_ID => self::cloud_definition(),
+			]
+		);
+	}
+
+	/**
+	 * 所有已知 Provider ID（BYOK 持久化端点顺序）。
 	 *
 	 * @return list<string>
 	 */
@@ -167,13 +196,13 @@ final class ProviderDefinitions {
 	}
 
 	/**
-	 * 是否是已知 Provider。
+	 * 是否是已知 Provider（含官方算力端点）。
 	 *
 	 * @param string $id Provider ID.
 	 * @return bool
 	 */
 	public static function has( string $id ): bool {
-		return isset( self::DEFINITIONS[ $id ] );
+		return WenpaiCloud::PROVIDER_ID === $id || isset( self::DEFINITIONS[ $id ] );
 	}
 
 	/**
@@ -183,6 +212,9 @@ final class ProviderDefinitions {
 	 * @return array<string, mixed>|null
 	 */
 	public static function get( string $id ): ?array {
+		if ( WenpaiCloud::PROVIDER_ID === $id ) {
+			return self::cloud_definition();
+		}
 		return self::DEFINITIONS[ $id ] ?? null;
 	}
 
@@ -193,6 +225,9 @@ final class ProviderDefinitions {
 	 * @return string 未知 Provider 返回空串。
 	 */
 	public static function default_base_url( string $id ): string {
+		if ( WenpaiCloud::PROVIDER_ID === $id ) {
+			return WenpaiCloud::base_url();
+		}
 		return self::DEFINITIONS[ $id ]['base_url'] ?? '';
 	}
 

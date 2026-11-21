@@ -113,7 +113,7 @@ final class ExactCacheModule implements ModuleInterface {
 	 * @param string $hook_suffix Current page hook suffix.
 	 */
 	public function enqueue_admin_assets( string $hook_suffix ): void {
-		if ( ! in_array( $hook_suffix, [ 'settings_page_wpmind', 'toplevel_page_wpmind' ], true ) ) {
+		if ( ! $this->is_wpmind_admin_page( $hook_suffix ) ) {
 			return;
 		}
 		if ( 'module' !== \WPMind\Admin\AdminPage::current_view() || 'exact-cache' !== \WPMind\Admin\AdminPage::current_module() ) {
@@ -126,5 +126,20 @@ final class ExactCacheModule implements ModuleInterface {
 			WPMIND_VERSION,
 			true
 		);
+	}
+
+	/**
+	 * Check whether the current admin page belongs to WPMind.
+	 *
+	 * @param string $hook_suffix Current page hook suffix.
+	 * @return bool
+	 */
+	private function is_wpmind_admin_page( string $hook_suffix ): bool {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only page scope check.
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( (string) $_GET['page'] ) ) : '';
+		if ( '' !== $page && class_exists( 'Wenpai_Admin_Menu' ) && \Wenpai_Admin_Menu::owns_page( 'wpmind' ) ) {
+			return 'wpmind' === $page || str_starts_with( $page, 'wpmind-' ) || str_starts_with( $page, 'wpmind_' );
+		}
+		return str_ends_with( $hook_suffix, '_page_wpmind' );
 	}
 }

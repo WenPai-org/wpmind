@@ -23,21 +23,21 @@ use WP_Error;
 class EmbeddingService extends AbstractService {
 
 	/**
-	 * 嵌入模型映射表
+	 * 嵌入模型映射表（仅保留真实支持 embeddings 接口的服务商）。
 	 */
 	private const EMBED_MODELS = [
-		'openai'   => 'text-embedding-3-small',
-		'deepseek' => 'text-embedding-3-small',
-		'zhipu'    => 'embedding-2',
-		'qwen'     => 'text-embedding-v2',
+		'openai'       => 'text-embedding-3-small',
+		'zhipu'        => 'embedding-2',
+		'qwen'         => 'text-embedding-v2',
+		'wenpai_cloud' => 'text-embedding-3-small',
 	];
 
 	/**
 	 * 文本嵌入向量
 	 *
 	 * @since 2.6.0
-	 * @param string|array $texts   要嵌入的文本
-	 * @param array        $options 选项
+	 * @param string|array $texts   要嵌入的文本.
+	 * @param array        $options 选项.
 	 * @return array|WP_Error
 	 */
 	public function embed( $texts, array $options = [] ) {
@@ -48,13 +48,30 @@ class EmbeddingService extends AbstractService {
 		];
 		$options  = wp_parse_args( $options, $defaults );
 
-		$context     = $options['context'];
+		$context     = (string) $options['context'];
 		$input_texts = is_array( $texts ) ? $texts : [ $texts ];
 
-		$original_model = $options['model'];
-		$model_is_auto  = ( $original_model === 'auto' );
+		$original_model = (string) $options['model'];
+		$model_is_auto  = ( 'auto' === $original_model );
 
-		$provider = $this->resolve_provider( $options['provider'], $context );
+		$provider            = $this->resolve_provider( (string) $options['provider'], $context );
+		$supported_providers = array_values(
+			array_filter(
+				(array) apply_filters( 'wpmind_embedding_providers', array_keys( self::EMBED_MODELS ) ),
+				'is_string'
+			)
+		);
+
+		// 发上游请求前执行站内预算强控.
+		$budget_check = $this->check_budget_before_request( $provider, $context );
+		if ( is_wp_error( $budget_check ) ) {
+			do_action( 'wpmind_error', $budget_check, 'embed', compact( 'texts', 'options' ) );
+			return $budget_check;
+		}
+		if ( '' !== $budget_check['fallback_model'] ) {
+			$original_model = $budget_check['fallback_model'];
+			$model_is_auto  = false;
+		}
 
 		do_action( 'wpmind_before_request', 'embed', compact( 'texts', 'options' ), $context );
 
@@ -62,10 +79,10 @@ class EmbeddingService extends AbstractService {
 			'embed',
 			$provider,
 			$context,
-			function ( string $try_provider, array $endpoint ) use ( $input_texts, $model_is_auto, $original_model, $texts, $options ) {
+			function ( string $try_provider, array $endpoint ) use ( $input_texts, $model_is_auto, $original_model, $texts, $options, $context ) {
 				$embed_model = $model_is_auto
-				? ( self::EMBED_MODELS[ $try_provider ] ?? 'text-embedding-3-small' )
-				: $original_model;
+					? ( self::EMBED_MODELS[ $try_provider ] ?? 'text-embedding-3-small' )
+					: $original_model;
 
 				$base_url = $this->resolve_base_url( $try_provider );
 				$api_url  = trailingslashit( $base_url ) . 'embeddings';
@@ -76,18 +93,18 @@ class EmbeddingService extends AbstractService {
 				$response = wp_remote_post(
 					$api_url,
 					[
-						'headers' => [
+						'headers'               => [
 							'Authorization' => 'Bearer ' . $api_key,
 							'Content-Type'  => 'application/json',
 						],
-						'body'    => wp_json_encode(
+						'body'                  => wp_json_encode(
 							[
 								'model' => $embed_model,
 								'input' => $input_texts,
 							]
 						),
 						'_wpmind_skip_tracking' => true,
-						'timeout' => 60,
+						'timeout'               => 60,
 					]
 				);
 
@@ -99,6 +116,10 @@ class EmbeddingService extends AbstractService {
 						'wpmind_embed_failed',
 						sprintf( __( '嵌入请求失败: %s', 'wpmind' ), $response->get_error_message() )
 					);
+				}
+
+				if ( \WPMind\Provider\WenpaiCloud::PROVIDER_ID === $try_provider ) {
+					\WPMind\Provider\WenpaiCloud::update_balance_from_headers( wp_remote_retrieve_headers( $response ) );
 				}
 
 				$status_code = wp_remote_retrieve_response_code( $response );
@@ -126,10 +147,27 @@ class EmbeddingService extends AbstractService {
 					$embeddings[] = $item['embedding'];
 				}
 
+				$prompt_tokens = max( 0, (int) ( $data['usage']['prompt_tokens'] ?? $data['usage']['total_tokens'] ?? 0 ) );
+				if ( 0 === $prompt_tokens ) {
+					$joined        = implode( ' ', array_map( 'strval', $input_texts ) );
+					$prompt_tokens = max( 1, (int) ceil( mb_strlen( $joined ) / 3 ) );
+				}
+
 				$usage = [
-					'prompt_tokens' => $data['usage']['prompt_tokens'] ?? 0,
-					'total_tokens'  => $data['usage']['total_tokens'] ?? 0,
+					'prompt_tokens' => $prompt_tokens,
+					'total_tokens'  => max( $prompt_tokens, (int) ( $data['usage']['total_tokens'] ?? $prompt_tokens ) ),
 				];
+
+				do_action(
+					'wpmind_usage_record',
+					$try_provider,
+					$embed_model,
+					$prompt_tokens,
+					0,
+					$latency_ms,
+					$context,
+					\WPMind\Provider\WenpaiCloud::payer_for( $try_provider )
+				);
 
 				do_action( 'wpmind_after_request', 'embed', $embeddings, compact( 'texts', 'options' ), $usage );
 
@@ -140,7 +178,8 @@ class EmbeddingService extends AbstractService {
 					'usage'      => $usage,
 					'dimensions' => ! empty( $embeddings[0] ) ? count( $embeddings[0] ) : 0,
 				];
-			}
+			},
+			$supported_providers
 		);
 	}
 }

@@ -119,6 +119,9 @@ function get_wpmind_credentials(): array {
 	$endpoints = $plugin->get_custom_endpoints();
 
 	foreach ( $endpoints as $provider_id => $endpoint ) {
+		if ( \WPMind\Provider\WenpaiCloud::PROVIDER_ID === $provider_id ) {
+			continue;
+		}
 		if ( ! empty( $endpoint['enabled'] ) && ! empty( $endpoint['api_key'] ) ) {
 			$cache[ $provider_id ] = $endpoint['api_key'];
 		}

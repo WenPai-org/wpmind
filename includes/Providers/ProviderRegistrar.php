@@ -39,7 +39,8 @@ class ProviderRegistrar {
 		$map = apply_filters( 'wpmind_provider_map', self::PROVIDER_MAP );
 
 		foreach ( $map as $key => $provider_class ) {
-			if ( empty( $endpoints[ $key ]['enabled'] ) ) {
+			// 官方算力走独立 OpenAI 兼容网关，不注册 WP 7 SDK provider。
+			if ( \WPMind\Provider\WenpaiCloud::PROVIDER_ID === $key ) {
 				continue;
 			}
 
@@ -54,17 +55,20 @@ class ProviderRegistrar {
 				continue;
 			}
 
-			// Register the provider even without a key so WP 7.x Connectors can
-			// discover and list it for credential setup.
+			// Register built-in providers without custom_base_url by default
+			// (no enabled+key prerequisite) so WP 7.x Connectors can discover
+			// and list them for credential setup.
 			$registry->registerProvider( $provider_class );
 
-			// Credential resolution: wpmind option first, then the WP 7.x
-			// Connectors option (read-only fallback).
-			$api_key = isset( $endpoints[ $key ]['api_key'] ) && is_string( $endpoints[ $key ]['api_key'] )
-				? trim( $endpoints[ $key ]['api_key'] )
-				: '';
+			// Credential resolution: locked key > wpmind option > WP 7.x Connectors fallback.
+			$api_key = \WPMind\Provider\WenpaiCloud::locked_api_key( (string) $key );
 			if ( '' === $api_key ) {
-				$api_key = \WPMind\Provider\ConnectorCredentials::key_for( $key );
+				$api_key = isset( $endpoints[ $key ]['api_key'] ) && is_string( $endpoints[ $key ]['api_key'] )
+					? trim( $endpoints[ $key ]['api_key'] )
+					: '';
+			}
+			if ( '' === $api_key ) {
+				$api_key = \WPMind\Provider\ConnectorCredentials::key_for( (string) $key );
 			}
 
 			// Inject API key auth only when a key exists; otherwise Connectors UI
@@ -104,7 +108,7 @@ class ProviderRegistrar {
 					'credentials_url' => 'https://platform.deepseek.com/api_keys',
 				],
 				'qwen'        => [
-					'name'            => 'Qwen (通义千问)',
+					'name'            => 'Qwen (千问)',
 					'description'     => __( 'Text generation with Alibaba Qwen models.', 'wpmind' ),
 					'credentials_url' => 'https://dashscope.console.aliyun.com/apiKey',
 				],

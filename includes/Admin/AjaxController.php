@@ -636,8 +636,11 @@ final class AjaxController {
 			'openai_gpt_image'    => 'https://api.openai.com/v1/models',
 			'google_gemini_image' => 'https://generativelanguage.googleapis.com/v1beta/models',
 			'tencent_hunyuan'     => 'https://hunyuan.tencentcloudapi.com/',
+			'bytedance_reve'      => 'https://api.reve.com/v1/models',
+			'bytedance_seedream'  => 'https://ark.cn-beijing.volces.com/api/v3/models',
 			'bytedance_doubao'    => 'https://ark.cn-beijing.volces.com/api/v3/models',
 			'flux'                => 'https://fal.run/fal-ai/flux/dev',
+			'midjourney'          => 'https://api.midjourney.com/v1/models',
 			'qwen_image'          => 'https://dashscope.aliyuncs.com/api/v1/models',
 		];
 

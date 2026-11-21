@@ -213,14 +213,27 @@ class MarkdownFeed {
 	 * @param \WP_Post $post The post to convert.
 	 * @return string Markdown content.
 	 */
-	private function post_to_markdown( \WP_Post $post ): string {
+	public function post_to_markdown( \WP_Post $post ): string {
+		/**
+		 * Allow plugins (e.g. wpdocs) to supply raw Markdown directly for a post,
+		 * bypassing HTML-to-Markdown conversion when post_content is empty or externally synced.
+		 *
+		 * @param string|null $raw  Raw Markdown string or null to convert post_content.
+		 * @param \WP_Post    $post The post object.
+		 */
+		$raw = apply_filters( 'wpmind_raw_markdown_for_post', null, $post );
+
 		// Setup post data.
 		setup_postdata( $post );
 
-		// Build sections (convert HTML to Markdown).
+		$body = ( is_string( $raw ) && '' !== trim( $raw ) )
+			? $raw
+			: $this->converter->convert( $post->post_content );
+
+		// Build sections (convert HTML to Markdown unless raw Markdown was provided).
 		$sections = array(
 			'title'   => '# ' . esc_html( get_the_title( $post ) ) . "\n\n",
-			'content' => $this->converter->convert( $post->post_content ),
+			'content' => $body,
 		);
 
 		// Use unified processor for GEO enhancements.

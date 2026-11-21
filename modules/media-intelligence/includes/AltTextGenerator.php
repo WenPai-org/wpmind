@@ -33,11 +33,15 @@ class AltTextGenerator {
 		// Schedule async generation on upload (priority 20, after core processing).
 		add_action( 'add_attachment', [ $this, 'schedule_generation' ], 20 );
 
+		// Schedule async generation after WPSSS offloads an attachment to cloud storage.
+		add_action( 'wpsss_attachment_offloaded', [ $this, 'on_attachment_offloaded' ], 10, 2 );
+
 		// WP-Cron single event handler.
 		add_action( 'wpmind_generate_alt_text', [ $this, 'process_single' ] );
 
-		// Add "Regenerate" field in media edit screen.
+		// Add "Regenerate" field in media edit screen and delegated click listener (no inline onclick).
 		add_filter( 'attachment_fields_to_edit', [ $this, 'add_regenerate_field' ], 10, 2 );
+		add_action( 'admin_print_footer_scripts', [ $this, 'print_regenerate_script' ] );
 	}
 
 	/**
@@ -60,15 +64,15 @@ class AltTextGenerator {
 			return new \WP_Error( 'wpmind_vision_missing', __( 'Vision API 不可用', 'wpmind' ) );
 		}
 
-		$image_url = $this->get_optimized_url( $attachment_id );
-		if ( ! $image_url ) {
+		$image_input = $this->resolve_vision_image( $attachment_id );
+		if ( ! $image_input ) {
 			return new \WP_Error( 'wpmind_alt_no_url', __( '无法获取图片地址', 'wpmind' ) );
 		}
 
 		$lang = $this->get_language_label();
 
 		$result = wpmind_vision(
-			$image_url,
+			$image_input,
 			sprintf(
 				'为这张图片生成简洁的 alt text（%s），直接输出文本，不要引号或前缀。',
 				$lang
@@ -110,7 +114,25 @@ class AltTextGenerator {
 			return;
 		}
 
+		if ( wp_next_scheduled( 'wpmind_generate_alt_text', [ $attachment_id ] ) ) {
+			return;
+		}
+
 		wp_schedule_single_event( time(), 'wpmind_generate_alt_text', [ $attachment_id ] );
+	}
+
+	/**
+	 * Handle WPSSS attachment offloaded event: schedule async alt generation when alt is missing.
+	 *
+	 * @param int    $attachment_id Attachment post ID.
+	 * @param string $url           Offloaded cloud storage URL.
+	 */
+	public function on_attachment_offloaded( int $attachment_id, string $url = '' ): void {
+		if ( '' !== trim( $url ) ) {
+			set_transient( 'wpmind_offloaded_url_' . $attachment_id, esc_url_raw( $url ), HOUR_IN_SECONDS );
+		}
+
+		$this->schedule_generation( $attachment_id );
 	}
 
 	/**
@@ -123,15 +145,15 @@ class AltTextGenerator {
 			return;
 		}
 
-		$image_url = $this->get_optimized_url( $attachment_id );
-		if ( ! $image_url ) {
+		$image_input = $this->resolve_vision_image( $attachment_id );
+		if ( ! $image_input ) {
 			return;
 		}
 
 		$lang = $this->get_language_label();
 
 		$result = wpmind_vision(
-			$image_url,
+			$image_input,
 			sprintf(
 				'为这张图片生成简洁的 alt text（%s），直接输出文本，不要引号或前缀。',
 				$lang
@@ -157,7 +179,7 @@ class AltTextGenerator {
 
 		// Also generate title and caption if enabled.
 		if ( get_option( 'wpmind_media_auto_title', '1' ) === '1' ) {
-			$this->generate_title_and_caption( $attachment_id, $image_url );
+			$this->generate_title_and_caption( $attachment_id, $image_input );
 		}
 
 		// Track statistics.
@@ -217,22 +239,117 @@ class AltTextGenerator {
 			return $form_fields;
 		}
 
-		$nonce                            = wp_create_nonce( 'wpmind_ajax' );
+		$nonce = wp_create_nonce( 'wpmind_ajax' );
+		$attrs = [
+			'data-id'      => (string) $post->ID,
+			'data-nonce'   => $nonce,
+			'data-loading' => __( '生成中...', 'wpmind' ),
+			'data-done'    => __( '已生成', 'wpmind' ),
+			'data-fail'    => __( '失败', 'wpmind' ),
+		];
+
+		if ( class_exists( 'Wenpai_Admin_UI' ) ) {
+			$html = \Wenpai_Admin_UI::native_metabox_html(
+				[
+					'actions' => [
+						[
+							'label'   => __( '重新生成', 'wpmind' ),
+							'variant' => 'secondary',
+							'size'    => 'sm',
+							'class'   => 'wpmind-regenerate-alt',
+							'attrs'   => $attrs,
+						],
+					],
+				]
+			);
+		} else {
+			$html = sprintf(
+				'<div class="wpmind-native-field"><button type="button" class="components-button is-secondary is-small wpmind-regenerate-alt" data-id="%d" data-nonce="%s" data-loading="%s" data-done="%s" data-fail="%s">%s</button></div>',
+				$post->ID,
+				esc_attr( $nonce ),
+				esc_attr__( '生成中...', 'wpmind' ),
+				esc_attr__( '已生成', 'wpmind' ),
+				esc_attr__( '失败', 'wpmind' ),
+				esc_html__( '重新生成', 'wpmind' )
+			);
+		}
+
 		$form_fields['wpmind_regenerate'] = [
 			'label' => __( 'AI Alt Text', 'wpmind' ),
 			'input' => 'html',
-			'html'  => sprintf(
-				'<button type="button" class="button button-small wpmind-regenerate-alt" data-id="%d" data-nonce="%s" onclick="(function(btn){if(btn.disabled)return;btn.disabled=true;btn.textContent=\'%s\';jQuery.post(ajaxurl,{action:\'wpmind_media_regenerate\',nonce:btn.dataset.nonce,attachment_id:btn.dataset.id},function(r){if(r.success){var f=jQuery(\'#attachments-\'+btn.dataset.id+\'-alt\');if(f.length)f.val(r.data.alt_text);btn.textContent=\'%s\';}else{btn.textContent=\'%s\';}btn.disabled=false;});})(this)">%s</button>',
-				$post->ID,
-				esc_attr( $nonce ),
-				esc_js( __( '生成中...', 'wpmind' ) ),
-				esc_js( __( '已生成', 'wpmind' ) ),
-				esc_js( __( '失败', 'wpmind' ) ),
-				esc_html__( '重新生成', 'wpmind' )
-			),
+			'html'  => $html,
 		];
 
 		return $form_fields;
+	}
+
+	/**
+	 * Print delegated click handler for the media regenerate button (no inline onclick).
+	 */
+	public function print_regenerate_script(): void {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( $screen && ! in_array( $screen->base, [ 'upload', 'post', 'media' ], true ) ) {
+			return;
+		}
+		?>
+		<script>
+		(function () {
+			if (window.__wpmindMediaRegenerateBound) { return; }
+			window.__wpmindMediaRegenerateBound = true;
+			document.addEventListener('click', function (event) {
+				var btn = event.target && event.target.closest ? event.target.closest('.wpmind-regenerate-alt') : null;
+				if (!btn || btn.disabled || typeof ajaxurl === 'undefined') { return; }
+				btn.disabled = true;
+				var origLabel = btn.textContent;
+				btn.textContent = btn.getAttribute('data-loading') || origLabel;
+				var body = new URLSearchParams();
+				body.append('action', 'wpmind_media_regenerate');
+				body.append('nonce', btn.getAttribute('data-nonce') || '');
+				body.append('attachment_id', btn.getAttribute('data-id') || '');
+				fetch(ajaxurl, { method: 'POST', credentials: 'same-origin', body: body })
+					.then(function (r) { return r.json(); })
+					.then(function (r) {
+						if (r && r.success && r.data && r.data.alt_text) {
+							var field = document.getElementById('attachments-' + btn.getAttribute('data-id') + '-alt');
+							if (field) { field.value = r.data.alt_text; }
+							btn.textContent = btn.getAttribute('data-done') || origLabel;
+						} else {
+							btn.textContent = btn.getAttribute('data-fail') || origLabel;
+						}
+					})
+					.catch(function () {
+						btn.textContent = btn.getAttribute('data-fail') || origLabel;
+					})
+					.finally(function () {
+						btn.disabled = false;
+					});
+			});
+		})();
+		</script>
+		<?php
+	}
+
+	/**
+	 * Resolve image input for Vision API: prefer base64 data URI for local readable files,
+	 * falling back to offloaded or optimized attachment URL.
+	 *
+	 * @param int $attachment_id Attachment post ID.
+	 * @return string|null Data URI or image URL, or null if unavailable.
+	 */
+	public function resolve_vision_image( int $attachment_id ): ?string {
+		if ( class_exists( \WPMind\API\Services\VisionHelper::class ) ) {
+			$data_uri = \WPMind\API\Services\VisionHelper::attachment_to_data_uri( $attachment_id );
+			if ( is_string( $data_uri ) && '' !== $data_uri ) {
+				return $data_uri;
+			}
+		}
+
+		$offloaded_url = get_transient( 'wpmind_offloaded_url_' . $attachment_id );
+		if ( is_string( $offloaded_url ) && '' !== $offloaded_url ) {
+			return $offloaded_url;
+		}
+
+		return $this->get_optimized_url( $attachment_id );
 	}
 
 	/**

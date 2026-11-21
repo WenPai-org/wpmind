@@ -66,10 +66,13 @@
 			var misses = parseInt( stats.misses || 0, 10 );
 			var total = hits + misses;
 			var rate = total > 0 ? ( hits / total * 100 ).toFixed( 1 ) : '0';
+			var usd = parseFloat( ( savings && ( savings.saved_usd != null ? savings.saved_usd : savings.total_usd ) ) || 0 );
+			var cny = parseFloat( ( savings && savings.saved_cny ) || 0 );
+			var savedLabel = '$' + usd.toFixed( 2 ) + ( cny > 0 ? ' / ¥' + cny.toFixed( 2 ) : '' );
 
 			$( '#wpmind-cache-hit-rate' ).text( rate + '%' );
 			$( '#wpmind-cache-entries' ).text( stats.entries || 0 );
-			$( '#wpmind-cache-savings' ).text( '$' + ( savings.total_usd || 0 ) );
+			$( '#wpmind-cache-savings' ).text( savedLabel );
 			$( '#wpmind-cache-total-req' ).text( total );
 		},
 
@@ -186,13 +189,9 @@
 		},
 
 		flushCache: function() {
-			if ( ! confirm( '确定要清空所有缓存条目吗？此操作不可撤销。' ) ) {
-				return;
-			}
-
 			var self = this;
 			var $button = $( '#wpmind-flush-cache' );
-			$button.prop( 'disabled', true );
+			$button.prop( 'disabled', true ).addClass( 'is-busy' );
 
 			$.ajax( {
 				url: wpmindData.ajaxurl,
@@ -208,23 +207,19 @@
 					} else {
 						Toast.error( '清空失败' );
 					}
-					$button.prop( 'disabled', false );
+					$button.prop( 'disabled', false ).removeClass( 'is-busy' );
 				},
 				error: function() {
 					Toast.error( '网络错误' );
-					$button.prop( 'disabled', false );
+					$button.prop( 'disabled', false ).removeClass( 'is-busy' );
 				}
 			} );
 		},
 
 		resetStats: function() {
-			if ( ! confirm( '确定要重置所有统计数据吗？此操作不可撤销。' ) ) {
-				return;
-			}
-
 			var self = this;
 			var $button = $( '#wpmind-reset-cache-stats' );
-			$button.prop( 'disabled', true );
+			$button.prop( 'disabled', true ).addClass( 'is-busy' );
 
 			$.ajax( {
 				url: wpmindData.ajaxurl,
@@ -240,11 +235,11 @@
 					} else {
 						Toast.error( '重置失败' );
 					}
-					$button.prop( 'disabled', false );
+					$button.prop( 'disabled', false ).removeClass( 'is-busy' );
 				},
 				error: function() {
 					Toast.error( '网络错误' );
-					$button.prop( 'disabled', false );
+					$button.prop( 'disabled', false ).removeClass( 'is-busy' );
 				}
 			} );
 		}

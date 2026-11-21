@@ -1,674 +1,125 @@
 /*
- * WPMind 产品自留样式（kit 组件之上）。
- * kit 没有的组件：provider 折叠卡、模块网格、图表占位、优先级拖拽列、
- * Provider 用量小卡、活动流、状态机、预算限额栅格、任务页折叠明细。
- * 视觉向 kit 靠拢：圆角 var(--wenpai-radius)、边框 var(--wenpai-line-card)、间距用 space token。
- * 与 prototypes/wpmind/_wpmind.css 同源；产品实现里图标用内联 SVG（.wenpai-ico）。
+ * WPMind 产品补充样式（构建于 wenpai-admin-ui v0.13.7 令牌与组件之上）。
+ * 全站 400 字重、零原始色值、零裸间距 px。
  */
 
-/* ---- Provider 折叠卡 ---- */
-/* Provider 列表：卡内单栏行 + 行内展开（渐进式披露，与 simple-row 同解剖） */
-.wpmind-providers > details.wpmind-provider { border-top: 1px solid var(--wenpai-line-soft); }
-.wpmind-providers > details.wpmind-provider:first-child { border-top: 0; }
-.wenpai-app details.wpmind-provider { padding: 0; }
-.wenpai-app .wpmind-provider > summary {
-  display: flex;
-  align-items: center;
-  gap: var(--wenpai-space-3);
-  padding: var(--wenpai-space-3) 0;
-  cursor: pointer;
-  list-style: none;
-}
-.wenpai-app .wpmind-provider > summary::-webkit-details-marker { display: none; }
-.wpmind-provider .wpmind-provider-mark {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--wenpai-radius-lg);
-  background: var(--wenpai-card);
-  border: 1px solid var(--wenpai-line-card);
-  color: var(--wenpai-ink-2);
-  display: grid;
-  place-items: center;
-  flex: none;
-  font-size: 14px;
-  font-weight: var(--wenpai-weight-regular);
-}
-.wpmind-provider .wpmind-provider-mark svg,
-.wpmind-provider .wpmind-provider-mark img { width: 20px; height: 20px; object-fit: contain; }
-.wpmind-provider .wpmind-provider-name {
-  font-weight: var(--wenpai-weight-regular);
-  font-size: var(--wenpai-text-body);
-  line-height: var(--wenpai-leading-body);
-  color: var(--wenpai-ink);
-}
-.wpmind-provider .wpmind-provider-side {
-  margin-inline-start: auto;
-  display: flex;
-  align-items: center;
-  gap: var(--wenpai-space-2-5);
-  flex: none;
-}
-.wpmind-provider .wpmind-provider-chevron {
-  color: var(--wenpai-ink-3);
-  flex: none;
-  transition: transform var(--wenpai-motion-base, .15s) ease;
-}
-.wpmind-provider[open] > summary .wpmind-provider-chevron { transform: rotate(180deg); }
-.wpmind-provider[open] > summary { border-bottom: 1px solid var(--wenpai-line-soft); }
-.wpmind-provider-body { padding: 0 0 var(--wenpai-space-2); }
-.wpmind-provider-body .field { padding: var(--wenpai-space-3-5) 0; }
-.wpmind-provider-body .field:first-of-type { border-top: 0; padding-top: var(--wenpai-space-2); }
-.wpmind-provider-body .wpmind-error { margin-top: var(--wenpai-space-4); }
-.wpmind-provider-body .wpmind-advanced { margin-top: 0; }
-/* 摘要行里的迷你测试按钮：不触发展开 */
-
-/* 卡片级折叠区：details 复用 .card 外观，summary 当标题行（概览/模块设置用） */
-.wenpai-app details.wpmind-fold > summary {
-  list-style: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: var(--wenpai-space-2-5);
-}
-.wenpai-app details.wpmind-fold > summary::-webkit-details-marker { display: none; }
-.wpmind-fold-chevron {
-  color: var(--wenpai-ink-3);
-  flex: none;
-  display: inline-flex;
-  transition: transform var(--wenpai-motion-base, .15s) ease;
-}
-.wpmind-provider-chevron .wenpai-ico,
-.wpmind-fold-chevron .wenpai-ico { width: 16px; height: 16px; }
-details.wpmind-fold[open] .wpmind-fold-chevron { transform: rotate(180deg); }
-.wenpai-app details.wpmind-fold > summary .section-title { margin: 0; flex: none; }
-.wenpai-app details.wpmind-fold > summary .meta { margin-inline-start: auto; }
-.wenpai-app details.wpmind-fold[open] > summary { margin-bottom: var(--wenpai-space-4); }
-.wenpai-app details.wpmind-fold > .wpmind-fold-body { display: grid; gap: var(--wenpai-space-4); }
-/* 任务项明细是高密度 diff 审核表：数据格收为 meta 档，与表头/胶囊/btn-sm 同级 */
-.wenpai-app details.wpmind-fold .wenpai-table-wrap .tbl td {
-  font-size: var(--wenpai-text-meta);
-  line-height: var(--wenpai-leading-meta);
+/* ---- 内联品牌与图标微调 ---- */
+.wenpai-tab .wenpai-ico {
+	width: 18px;
+	height: 18px;
+	margin-inline-end: var(--wenpai-space-1);
+	vertical-align: -2px;
 }
 
-/* 卡内二级折叠：summary 是一行文字链接，默认收起次要字段 */
-.wenpai-app .wpmind-fold-inline > summary .wpmind-fold-chevron { color: var(--wenpai-accent); }
-.wenpai-app .wpmind-fold-inline > summary .wenpai-ico,
-.wenpai-app .wpmind-advanced > summary .wenpai-ico { width: 14px; height: 14px; }
-
-/* provider 卡内的高级折叠（第二层 details） */
-.wenpai-app .wpmind-advanced { margin-top: var(--wenpai-space-4); }
-.wenpai-app .wpmind-advanced > summary {
-  color: var(--wenpai-accent);
-  font-size: var(--wenpai-text-meta);
-  display: inline-flex;
-  align-items: center;
-  gap: var(--wenpai-space-1-5);
-}
-.wpmind-advanced .wpmind-advanced-body { padding-top: var(--wenpai-space-3); }
-.wpmind-advanced .wenpai-field + .wenpai-field { margin-top: var(--wenpai-space-4); }
-
-/* 最近错误行 */
-.wpmind-error {
-  background: var(--wenpai-bad-soft);
-  border-radius: var(--wenpai-radius-md);
-  padding: var(--wenpai-space-2-5) var(--wenpai-space-3-5);
-  color: var(--wenpai-bad-ink);
-  font-size: var(--wenpai-text-meta);
-  line-height: var(--wenpai-leading-meta);
-  margin-top: var(--wenpai-space-4);
-}
-.wpmind-error strong { font-weight: var(--wenpai-weight-regular); }
-
-/* ---- 模块网格 ---- */
-@media (max-width: 1100px) {
+.wenpai-app .btn .wenpai-ico {
+	width: 16px;
+	height: 16px;
+	vertical-align: -2px;
 }
 
-/* ---- 统计卡栅格（.card.stat-a 复用 kit StatArea） ---- */
-@media (max-width: 1100px) {
-}
-@media (max-width: 640px) {
-}
-
-/* ---- 图表占位 ---- */
-.wpmind-chart-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--wenpai-space-5);
-  align-items: start;
-}
-@media (max-width: 960px) {
-  .wpmind-chart-grid { grid-template-columns: 1fr; }
-}
-.wpmind-chart {
-  position: relative;
-  border: 1px dashed var(--wenpai-line-strong);
-  border-radius: var(--wenpai-radius-lg);
-  background: var(--wenpai-card);
-  overflow: hidden;
-}
-.wpmind-chart canvas {
-  display: block;
-  width: 100%;
-  height: 240px;
-  background-color: var(--wenpai-card);
-  background-image:
-    linear-gradient(to right, var(--wenpai-line-soft) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--wenpai-line-soft) 1px, transparent 1px);
-  background-size: 40px 40px;
+.wpmind-logo {
+	width: 14px;
+	height: 14px;
+	object-fit: contain;
+	flex: none;
+	vertical-align: -2px;
+	margin-inline-end: var(--wenpai-space-1-5);
 }
 
-/* ---- 智能路由：手动优先级拖拽列 ---- */
-.wpmind-priority { display: grid; gap: var(--wenpai-space-2); }
-.wpmind-priority-item {
-  display: flex;
-  align-items: center;
-  gap: var(--wenpai-space-3);
-  border: 1px solid var(--wenpai-line-card);
-  border-radius: var(--wenpai-radius-lg);
-  padding: var(--wenpai-space-3) var(--wenpai-space-4);
-  background: var(--wenpai-card);
-}
-.wpmind-priority-handle { color: var(--wenpai-ink-3); display: inline-flex; flex: none; cursor: grab; }
-.wpmind-priority-handle svg { width: 16px; height: 16px; }
-.wpmind-priority-index {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--wenpai-mute-soft);
-  color: var(--wenpai-ink-2);
-  display: grid;
-  place-items: center;
-  font-size: var(--wenpai-text-meta);
-  flex: none;
-}
-.wpmind-priority-name { font-weight: var(--wenpai-weight-regular); font-size: var(--wenpai-text-body); }
-.wpmind-priority-score { margin-inline-start: auto; color: var(--wenpai-ink-3); font-size: var(--wenpai-text-meta); flex: none; }
-
-/* ---- 智能路由：Provider 排名得分条 ---- */
-.wpmind-score { display: grid; gap: var(--wenpai-space-2-5); }
-.wpmind-score-row {
-  display: grid;
-  grid-template-columns: 28px minmax(0, 9rem) minmax(0, 1fr) 3.5rem;
-  align-items: center;
-  gap: var(--wenpai-space-3);
-}
-.wpmind-score-rank {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--wenpai-mute-soft);
-  color: var(--wenpai-ink-2);
-  display: grid;
-  place-items: center;
-  font-size: var(--wenpai-text-meta);
-  flex: none;
-}
-.wpmind-score-row.is-top .wpmind-score-rank { background: var(--wenpai-accent); color: var(--wenpai-on-accent); }
-.wpmind-score-name { font-size: var(--wenpai-text-body); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.wpmind-score-bar {
-  height: 8px;
-  border-radius: var(--wenpai-radius-xl);
-  background: var(--wenpai-mute-soft);
-  overflow: hidden;
-}
-.wpmind-score-fill { height: 100%; background: var(--wenpai-accent); border-radius: inherit; }
-.wpmind-score-row.is-top .wpmind-score-fill { background: var(--wenpai-ok); }
-.wpmind-score-value { color: var(--wenpai-ink-2); font-size: var(--wenpai-text-meta); text-align: end; font-variant-numeric: tabular-nums; }
-
-/* ---- Provider 用量小卡 ---- */
-@media (max-width: 960px) {
+/* ---- 紧凑数字/短选择控件 ---- */
+.wenpai-app .wpmind-num {
+	max-width: 10rem;
 }
 
-/* ---- 预算限额四宫格 ---- */
-@media (max-width: 960px) {
-}
-@media (max-width: 640px) {
-}
-
-/* ---- 活动流 ---- */
-.wpmind-feed { display: grid; }
-.wpmind-feed-item {
-  display: flex;
-  align-items: center;
-  gap: var(--wenpai-space-3-5);
-  padding: var(--wenpai-space-3-5) 0;
-  border-top: 1px solid var(--wenpai-line-soft);
-}
-.wpmind-feed-item:first-child { border-top: 0; padding-top: var(--wenpai-space-1); }
-.wpmind-feed-time { color: var(--wenpai-ink-3); font-size: var(--wenpai-text-meta); width: 4.5rem; flex: none; }
-.wpmind-feed-main { flex: 1 1 auto; min-width: 0; }
-.wpmind-feed-provider { font-weight: var(--wenpai-weight-regular); font-size: var(--wenpai-text-body); }
-.wpmind-feed-meta { margin-inline-start: auto; display: flex; gap: var(--wenpai-space-3-5); color: var(--wenpai-ink-2); font-size: var(--wenpai-text-meta); flex: none; font-variant-numeric: tabular-nums; }
-
-/* ---- 任务状态机示意 ---- */
-.wpmind-flow {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0;
-  padding: var(--wenpai-space-4) 0;
-}
-.wpmind-flow-step { display: flex; align-items: center; gap: var(--wenpai-space-2); }
-.wpmind-flow-dot {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--wenpai-mute-soft);
-  color: var(--wenpai-ink-3);
-  display: grid;
-  place-items: center;
-  font-size: var(--wenpai-text-meta);
-  flex: none;
-}
-.wpmind-flow-step.is-done .wpmind-flow-dot { background: var(--wenpai-ok-soft); color: var(--wenpai-ok-ink); }
-.wpmind-flow-step.is-cur .wpmind-flow-dot { background: var(--wenpai-accent); color: var(--wenpai-on-accent); }
-.wpmind-flow-label { font-size: var(--wenpai-text-meta); color: var(--wenpai-ink-2); white-space: nowrap; }
-.wpmind-flow-step.is-cur .wpmind-flow-label { color: var(--wenpai-ink); font-weight: var(--wenpai-weight-regular); }
-.wpmind-flow-arrow { color: var(--wenpai-ink-3); margin: 0 var(--wenpai-space-2-5); flex: none; display: inline-flex; }
-.wpmind-flow-arrow svg { width: 16px; height: 16px; }
-
-/* ---- 模块设置页：返回行 ---- */
-.wpmind-back { display: inline-flex; align-items: center; gap: var(--wenpai-space-1-5); color: var(--wenpai-ink-2); font-size: var(--wenpai-text-meta); margin-bottom: var(--wenpai-space-4); }
-.wpmind-back:hover { color: var(--wenpai-accent); }
-.wpmind-back svg { width: 16px; height: 16px; }
-
-/* ---- 小节标题（卡内分组） ---- */
-.wpmind-sub { font-size: var(--wenpai-text-title); line-height: var(--wenpai-leading-title); font-weight: var(--wenpai-weight-regular); margin: 0 0 var(--wenpai-space-1); }
-
-/* ---- 概览统计条（四合一） ---- */
-.wpmind-statbar {
-  display: flex;
-  align-items: stretch;
-}
-.wpmind-statbar-item {
-  flex: 1 1 0;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--wenpai-space-3);
-  padding: 18px var(--wenpai-space-5);
-}
-.wpmind-statbar-item + .wpmind-statbar-item { border-inline-start: 1px solid var(--wenpai-line-card); }
-.wpmind-statbar-ico {
-  flex: none;
-  width: 22px;
-  height: 22px;
-  align-self: flex-start;
-  margin-top: var(--wenpai-space-0-5);
-  color: var(--wenpai-accent);
-}
-.wpmind-statbar-text { min-width: 0; }
-.wpmind-statbar-item .k { font-size: var(--wenpai-text-meta); color: var(--wenpai-ink-3); }
-.wpmind-statbar-item .v {
-  font-size: 19px;
-  font-weight: var(--wenpai-weight-regular);
-  color: var(--wenpai-ink);
-  line-height: 1.35;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-.wpmind-statbar-item .v small { font-size: var(--wenpai-text-meta); font-weight: normal; color: var(--wenpai-ink-3); }
-@media (max-width: 900px) {
-  .wpmind-statbar { flex-wrap: wrap; }
-  .wpmind-statbar-item { flex: 1 1 50%; }
-  .wpmind-statbar-item + .wpmind-statbar-item { border-inline-start: 0; }
-  .wpmind-statbar-item:nth-child(even) { border-inline-start: 1px solid var(--wenpai-line-card); }
-  .wpmind-statbar-item:nth-child(n+3) { border-top: 1px solid var(--wenpai-line-card); }
-}
-@media (max-width: 560px) {
-  .wpmind-statbar-item { flex: 1 1 100%; }
-  .wpmind-statbar-item + .wpmind-statbar-item { border-inline-start: 0; border-top: 1px solid var(--wenpai-line-card); }
+/* ---- API Key 输入行与连接测试回执 ---- */
+.wpmind-key {
+	display: flex;
+	align-items: center;
+	gap: var(--wenpai-space-2);
 }
 
-/* ---- 健康度/活动双栏卡 ---- */
-
-/* ---- 概览「AI 服务动态」卡 ---- */
-
-@media (max-width: 900px) {
+.wpmind-key input {
+	flex: 1 1 auto;
+	min-width: 0;
 }
 
-.wpmind-feed-provider .wenpai-ico {
-  width: 14px; height: 14px; color: var(--wenpai-ink-3);
-  vertical-align: -2px; margin-inline-end: var(--wenpai-space-1-5);
-}
-.wpmind-feed-provider img { width: 14px; height: 14px; object-fit: contain; vertical-align: -2px; margin-inline-end: var(--wenpai-space-1-5); }
-
-/* ---- 内联 SVG 图标尺寸补齐（与原型 _wpmind.css 一致） ---- */
-.wenpai-tab .wenpai-ico { width: 18px; height: 18px; margin-inline-end: var(--wenpai-space-1); vertical-align: -2px; }
-.wenpai-app .btn .wenpai-ico { width: 16px; height: 16px; vertical-align: -2px; }
-.tile .wenpai-ico { width: 20px; height: 20px; }
-.next .tile .wenpai-ico { width: 18px; height: 18px; }
-
-/* Provider 摘要：迷你品牌 logo 内联 */
-.wpmind-mini-logo { width: 14px; height: 14px; object-fit: contain; flex: none; vertical-align: -2px; }
-.wpmind-score-name .wpmind-mini-logo { margin-inline-end: var(--wenpai-space-1-5); }
-
-@media (max-width: 782px) {
-  .wpmind-provider > summary { flex-wrap: wrap; row-gap: var(--wenpai-space-2); }
-  .wpmind-provider .prov { display: none; }
-  .wpmind-provider-side { flex-wrap: wrap; justify-content: flex-end; row-gap: var(--wenpai-space-1-5); }
-}
-
-/* 合并后的优先级+排名行 */
-.wpmind-rank-item .wpmind-score-bar { flex: 0 1 110px; height: 6px; }
-
-/* 简单/高级模式：简单模式隐藏高级配置（kit mode 合同的原型演示） */
-.wenpai-app:not(.mode-advanced) .wpmind-advanced,
-.wenpai-app:not(.mode-advanced) .wpmind-fold-inline,
-
-/* provider 展开区控件降一档：与单行摘要密度匹配 */
-.wpmind-provider-body .chk label { font-size: var(--wenpai-text-meta); }
-
-/* 路由策略条（routing 页 subnav 下方） */
-.wpmind-route-bar {
-  display: flex; align-items: center; gap: var(--wenpai-space-3); flex-wrap: wrap;
-  margin: 0 0 var(--wenpai-space-4); padding-right: var(--wenpai-space-6);
-}
-.wenpai-stack > .wpmind-route-bar { margin-bottom: 0; }
-.wpmind-route-bar-label { font-weight: var(--wenpai-weight-medium); font-size: var(--wenpai-text-sm); color: var(--wenpai-ink); white-space: nowrap; }
-.wpmind-route-bar-label { margin-left: auto; }
-.wpmind-route-bar .meta { margin: 0; }
-
-/* provider 体内单行/短字段行：内容垂直居中（kit .field 默认 top 对齐，长字段不受影响） */
-body.wenpai-ui-page .wenpai-app .wpmind-provider-body .wpmind-field--center { align-items: center; padding-top: var(--wenpai-space-3); padding-bottom: var(--wenpai-space-3); }
-body.wenpai-ui-page .wenpai-app .wpmind-provider-body .wpmind-field--center .field-ctl { justify-content: center; padding-bottom: 0; }
-
-/* 模块列表行：标题与描述拉开，行距略放宽 */
-.wpmind-module-list .simple-row .t { display: flex; align-items: center; gap: var(--wenpai-space-2); }
-.wpmind-module-list .simple-row .d { margin-top: var(--wenpai-space-1); }
-
-/* 模块行元信息列：预留槽位（付费标识/用量指标），当前留白 */
-.wpmind-module-list .wpmind-module-meta {
-  flex: none; width: 190px; text-align: right;
-  color: var(--wenpai-ink-3); font-size: var(--wenpai-text-meta); line-height: var(--wenpai-leading-meta);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-@media (max-width: 782px) {
-  .wpmind-module-list .wpmind-module-meta { width: auto; text-align: left; }
-}
-
-/* 表格/列表内品牌 logo 与文字间距 */
-.tbl .t .wpmind-mini-logo { margin-inline-end: var(--wenpai-space-1-5); }
-.simple-row .t .wpmind-mini-logo { margin-inline-end: var(--wenpai-space-1-5); }
-
-/* 导入确认闸：说明文字占满，状态 meta 右对齐 */
-.wenpai-gate label > span:first-of-type { flex: 1 1 auto; min-width: 0; }
-.wenpai-gate label > .meta { margin-inline-start: auto; align-self: center; flex: none; }
-
-/* 任务列表摘要：键值对紧凑展示 */
-.wpmind-task-stats { font-size: var(--wenpai-text-body); color: var(--wenpai-ink-3); }
-.wpmind-task-stats b { font-weight: var(--wenpai-weight-regular); color: var(--wenpai-ink); font-variant-numeric: tabular-nums; }
-.wpmind-task-stats b + * { margin-inline-start: var(--wenpai-space-0-5); }
-
-/* 宽表横向滚动容器（窄屏不撑破页面） */
-
-/* 工具页版本信息表：键列 */
-
-/* 服务页简单/高级 seg：kit page_head 把 aside 包进 .mode（30px/meta 档），
-   原型里是页头直排标准 seg（32px/body 档），此处恢复原型尺寸。 */
-.wenpai-app .mode .seg.wpmind-mode { font-size: var(--wenpai-text-body); line-height: var(--wenpai-leading-body); }
-.wenpai-app .mode .seg.wpmind-mode a { height: 32px; font-size: var(--wenpai-text-body); }
-
-/* ---- 服务页：连接测试结果 / Key 输入 / 摘要快捷测试 ---- */
-.wpmind-test-result { font-size: var(--wenpai-text-meta); color: var(--wenpai-ink-3); }
-.wpmind-test-result.success { color: var(--wenpai-ok-ink); }
-.wpmind-test-result.error { color: var(--wenpai-bad-ink); }
-.wpmind-test-result.warning { color: var(--wenpai-warn-ink); }
-.wenpai-actions .wpmind-test-result { align-self: center; }
-.wpmind-api-key-field { display: flex; align-items: center; gap: var(--wenpai-space-2); }
-.wpmind-api-key-field input { flex: 1 1 auto; min-width: 0; }
-.wpmind-toggle-key .wenpai-ico { width: 16px; height: 16px; }
-.wpmind-provider-side .wpmind-test-result { font-size: var(--wenpai-text-caption); }
-
-/* ---- 智能路由：策略 seg（label 承载 radio，JS 契约 .wpmind-strategy-item） ---- */
-.seg .wpmind-strategy-item {
-  padding: 0 var(--wenpai-space-3);
-  height: 32px;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--wenpai-space-2);
-  color: var(--wenpai-ink-2);
-  border-left: 1px solid var(--wenpai-line-strong);
-  font-size: var(--wenpai-text-body);
-  cursor: pointer;
-  user-select: none;
-}
-.seg .wpmind-strategy-item:first-child { border-inline-start: 0; }
-.seg .wpmind-strategy-item:hover { color: var(--wenpai-ink); background: var(--wenpai-line-soft); }
-.seg .wpmind-strategy-item.is-active,
-.seg .wpmind-strategy-item:has(input:checked) {
-  background: var(--wenpai-accent-soft);
-  color: var(--wenpai-accent);
-  font-weight: var(--wenpai-weight-regular);
-}
-.wpmind-strategy-item input[type="radio"] {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-.wpmind-route-bar .wpmind-refresh-routing .wenpai-ico,
-.wpmind-route-bar .btn .wenpai-ico { width: 14px; height: 14px; }
-
-/* ---- 智能路由：优先级区 ---- */
-.wpmind-routing-section-desc { margin: 0 0 var(--wenpai-space-3); }
-.wpmind-priority-badge { margin-inline-start: var(--wenpai-space-2); }
-.wpmind-routing-priority-actions { flex: none; }
-.wpmind-routing-priority .wpmind-priority { margin-bottom: var(--wenpai-space-4); }
-.wpmind-priority-item.ui-sortable-helper { box-shadow: var(--wenpai-shadow-pop); }
-
-/* ---- 分析视图：真实图表 ---- */
-.wpmind-chart.is-live { border: 0; background: transparent; }
-.wpmind-chart.is-live canvas { background: transparent; height: 260px; }
-.wpmind-chart-container.is-loading { opacity: .55; transition: opacity .15s ease; }
-
-/* ---- 模块设置：子页签 seg + 面板 ---- */
-.seg .wpmind-module-subtab {
-  appearance: none;
-  background: none;
-  border: 0;
-  border-left: 1px solid var(--wenpai-line-strong);
-  padding: 0 var(--wenpai-space-3);
-  height: 32px;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--wenpai-space-1-5);
-  color: var(--wenpai-ink-2);
-  font-family: inherit;
-  font-size: var(--wenpai-text-body);
-  cursor: pointer;
-  white-space: nowrap;
-}
-.seg .wpmind-module-subtab:first-child { border-inline-start: 0; }
-.seg .wpmind-module-subtab:hover { color: var(--wenpai-ink); background: var(--wenpai-line-soft); }
-.seg .wpmind-module-subtab.active { background: var(--wenpai-accent-soft); color: var(--wenpai-accent); font-weight: var(--wenpai-weight-regular); }
-.wpmind-module-tab-panel { display: none; }
-.wpmind-module-tab-panel.active { display: block; }
-.wpmind-geo-content { display: grid; gap: var(--wenpai-space-5); align-content: start; }
-
-/* ---- 模块设置：主栏 + 侧栏信息轨 ---- */
-.wpmind-geo-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
-  gap: var(--wenpai-space-5);
-  align-items: start;
-}
-.wpmind-geo-main, .wpmind-geo-side { display: grid; gap: var(--wenpai-space-5); align-content: start; min-width: 0; }
-@media (max-width: 1100px) {
-  .wpmind-geo-grid { grid-template-columns: 1fr; }
-}
-.wpmind-geo-info-body { font-size: var(--wenpai-text-meta); color: var(--wenpai-ink-2); line-height: var(--wenpai-leading-meta); }
-.wpmind-geo-info-body p { margin: 0 0 var(--wenpai-space-3); }
-.wpmind-geo-info-body ul { margin: 0 0 var(--wenpai-space-3); padding-inline-start: var(--wenpai-space-5); }
-.wpmind-geo-info-body li { margin-bottom: var(--wenpai-space-1); }
-.wpmind-crawler-list { display: grid; }
-
-/* 媒体智能：批量进度条（kit token 版，替代旧 pages/media-intelligence.css） */
-.wpmind-media-progress { margin-top: var(--wenpai-space-3); }
-.wpmind-media-progress-bar {
-	height: 8px;
-	background: var(--wenpai-mute-soft, var(--wenpai-line-soft));
-	border-radius: 999px;
-	overflow: hidden;
-}
-.wpmind-media-progress-fill {
-	height: 100%;
-	background: var(--wenpai-accent);
-	border-radius: inherit;
-	transition: width .3s ease;
-}
-.wpmind-media-progress-text {
-	display: block;
-	margin-top: var(--wenpai-space-1);
+.wpmind-key__result {
 	font-size: var(--wenpai-text-meta);
 	color: var(--wenpai-ink-3);
-	font-variant-numeric: tabular-nums;
+	align-self: center;
 }
 
-/* API Gateway：内联编辑 / 创建表单 / 新 Key 提示 / 日志筛选（kit token 版） */
-.wpmind-gw-edit-panel {
+.wpmind-key__result.is-ok {
+	color: var(--wenpai-ok-ink);
+}
+
+.wpmind-key__result.is-bad {
+	color: var(--wenpai-bad-ink);
+}
+
+.wpmind-key__result.is-warn {
+	color: var(--wenpai-warn-ink);
+}
+
+/* ---- 图表容器（包在 kit .wenpai-chart 内） ---- */
+.wpmind-chart .wenpai-chart__plot canvas {
+	display: block;
+	width: 100%;
+	height: 240px;
+}
+
+.wpmind-chart.is-loading {
+	opacity: 0.55;
+	transition: opacity var(--wenpai-motion-base) var(--wenpai-motion-ease);
+}
+
+/* ---- API Gateway 创建/编辑/筛选面板 ---- */
+.wpmind-gw__panel,
+.wpmind-gw__keybox {
 	margin: var(--wenpai-space-3) 0;
 	padding: var(--wenpai-space-4);
-	background: var(--wenpai-mute-soft, var(--wenpai-line-soft));
 	border: 1px solid var(--wenpai-line-soft);
 	border-radius: var(--wenpai-radius);
+	background: var(--wenpai-mute-soft);
 }
-.wpmind-gw-edit-grid {
+
+.wpmind-gw__keybox {
+	border-color: var(--wenpai-line);
+	background: var(--wenpai-accent-soft);
+}
+
+.wpmind-gw__keybox code {
+	word-break: break-all;
+}
+
+.wpmind-gw__field {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-	gap: var(--wenpai-space-3) var(--wenpai-space-4);
+	gap: var(--wenpai-space-1);
+	min-width: 0;
 }
-.wpmind-gw-edit-field { display: grid; gap: var(--wenpai-space-1); min-width: 0; }
-.wpmind-gw-edit-field label {
+
+.wpmind-gw__field label {
 	font-size: var(--wenpai-text-meta);
 	color: var(--wenpai-ink-3);
 	line-height: var(--wenpai-leading-meta);
+	font-weight: var(--wenpai-weight-regular);
 }
-.wpmind-gw-edit-field input { width: 100%; }
-.wpmind-gw-edit-actions { display: flex; gap: var(--wenpai-space-2); margin-top: var(--wenpai-space-3); }
-.wpmind-gw-create-panel {
-	margin: var(--wenpai-space-4) 0;
-	padding: var(--wenpai-space-4);
-	border: 1px solid var(--wenpai-line-soft);
-	border-radius: var(--wenpai-radius);
-	background: var(--wenpai-mute-soft, var(--wenpai-line-soft));
+
+.wpmind-gw__field input,
+.wpmind-gw__field select {
+	width: 100%;
 }
-.wpmind-gw-key-success {
-	margin: var(--wenpai-space-4) 0;
-	padding: var(--wenpai-space-4);
-	border: 1px solid var(--wenpai-accent-line, var(--wenpai-line));
-	border-radius: var(--wenpai-radius);
-	background: var(--wenpai-accent-soft);
+
+.wpmind-gw__actions {
+	margin-top: var(--wenpai-space-3);
 }
-.wpmind-gw-key-success strong { display: block; margin-bottom: var(--wenpai-space-2); }
-.wpmind-gw-key-display { display: flex; align-items: center; gap: var(--wenpai-space-3); flex-wrap: wrap; }
-.wpmind-gw-key-display code { word-break: break-all; }
-.wpmind-gw-log-filters {
-	display: flex;
-	flex-wrap: wrap;
-	gap: var(--wenpai-space-3) var(--wenpai-space-4);
+
+.wpmind-gw__filters {
 	align-items: flex-end;
 	margin-bottom: var(--wenpai-space-4);
 }
-.wpmind-gw-filter-group { display: grid; gap: var(--wenpai-space-1); }
-.wpmind-gw-filter-group label {
-	font-size: var(--wenpai-text-meta);
-	color: var(--wenpai-ink-3);
-	line-height: var(--wenpai-leading-meta);
-}
-.wpmind-gw-pagination {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: var(--wenpai-space-3);
-	margin-top: var(--wenpai-space-3);
-	flex-wrap: wrap;
-}
 
-/* ========================================
-   Toast 通知容器（Admin.Toast，kit notice 皮）
-   ======================================== */
-.wpmind-notice-container {
-	margin-bottom: var(--wenpai-space-5);
+/* ---- 兜底轻提示容器（kit wenpaiToast 不可用时使用） ---- */
+.wpmind-notice {
+	margin-bottom: var(--wenpai-space-4);
 }
-.wpmind-notice-container .notice {
-	margin: var(--wenpai-space-1, 4px) 0;
-}
-.wpmind-notice-icon {
-	flex: none;
-	margin-top: var(--wenpai-space-0-5);
-}
-.wpmind-notice.notice-success .wpmind-notice-icon { color: var(--wenpai-ok); }
-.wpmind-notice.notice-error .wpmind-notice-icon { color: var(--wenpai-bad); }
-.wpmind-notice.notice-warning .wpmind-notice-icon { color: var(--wenpai-warn); }
-.wpmind-notice.notice-info .wpmind-notice-icon { color: var(--wenpai-accent); }
-
-/* ========================================
-   确认对话框（Admin.Dialog）
-   ======================================== */
-.wpmind-dialog-overlay {
-	position: fixed;
-	inset: 0;
-	background: var(--wenpai-ink);
-	opacity: 0;
-	z-index: 100200;
-	transition: opacity var(--wenpai-motion-base) var(--wenpai-motion-ease);
-}
-.wpmind-dialog-overlay.is-visible { opacity: 0.45; }
-
-.wpmind-dialog {
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%) scale(0.96);
-	background: var(--wenpai-card);
-	border: 1px solid var(--wenpai-line-card);
-	border-radius: var(--wenpai-radius-lg);
-	box-shadow: var(--wenpai-shadow);
-	z-index: 100201;
-	min-width: 320px;
-	max-width: 480px;
-	width: calc(100% - 48px);
-	padding: var(--wenpai-space-5) var(--wenpai-space-6);
-	opacity: 0;
-	transition: opacity var(--wenpai-motion-base) var(--wenpai-motion-ease),
-		transform var(--wenpai-motion-base) var(--wenpai-motion-ease);
-}
-.wpmind-dialog.is-visible {
-	transform: translate(-50%, -50%) scale(1);
-	opacity: 1;
-}
-.wpmind-dialog-header {
-	display: flex;
-	align-items: center;
-	gap: var(--wenpai-space-3);
-	margin-bottom: var(--wenpai-space-3);
-}
-.wpmind-dialog-header .wpmind-dialog-icon {
-	width: 22px;
-	height: 22px;
-	flex: none;
-}
-.wpmind-dialog-title {
-	font-size: var(--wenpai-text-title);
-	line-height: var(--wenpai-leading-title);
-	font-weight: var(--wenpai-weight-regular);
-	color: var(--wenpai-ink);
-}
-.wpmind-dialog-body p {
-	margin: 0;
-	font-size: var(--wenpai-text-meta);
-	line-height: var(--wenpai-leading-meta);
-	color: var(--wenpai-ink-3);
-}
-.wpmind-dialog-footer {
-	display: flex;
-	justify-content: flex-end;
-	gap: var(--wenpai-space-3);
-	margin-top: var(--wenpai-space-5);
-}
-.wpmind-dialog-warning .wpmind-dialog-header .wpmind-dialog-icon { color: var(--wenpai-warn); }
-.wpmind-dialog-danger .wpmind-dialog-header .wpmind-dialog-icon { color: var(--wenpai-bad); }
-.wpmind-dialog-info .wpmind-dialog-header .wpmind-dialog-icon { color: var(--wenpai-accent); }
-.wpmind-dialog-success .wpmind-dialog-header .wpmind-dialog-icon { color: var(--wenpai-ok); }
-.wpmind-dialog-danger .wpmind-dialog-confirm { background: var(--wenpai-bad); }
-.wpmind-dialog-danger .wpmind-dialog-confirm:hover { background: var(--wenpai-bad-ink); }

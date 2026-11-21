@@ -90,10 +90,10 @@ class SchemaManager {
 	private static function get_api_keys_sql( string $prefix, string $charset_collate ): string {
 		return "CREATE TABLE {$prefix}wpmind_api_keys (
 			id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-			key_id CHAR(12) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-			key_prefix CHAR(8) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-			secret_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-			secret_salt CHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+			key_id CHAR(12) NOT NULL,
+			key_prefix CHAR(8) NOT NULL,
+			secret_hash CHAR(64) NOT NULL,
+			secret_salt CHAR(32) NOT NULL,
 			name VARCHAR(120) NOT NULL DEFAULT '',
 			owner_user_id BIGINT UNSIGNED NULL,
 			allowed_providers LONGTEXT NULL,
@@ -125,8 +125,8 @@ class SchemaManager {
 	private static function get_api_key_usage_sql( string $prefix, string $charset_collate ): string {
 		return "CREATE TABLE {$prefix}wpmind_api_key_usage (
 			id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-			key_id CHAR(12) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-			window_month CHAR(7) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+			key_id CHAR(12) NOT NULL,
+			window_month CHAR(7) NOT NULL,
 			request_count BIGINT UNSIGNED NOT NULL DEFAULT 0,
 			input_tokens BIGINT UNSIGNED NOT NULL DEFAULT 0,
 			output_tokens BIGINT UNSIGNED NOT NULL DEFAULT 0,
@@ -150,10 +150,10 @@ class SchemaManager {
 		return "CREATE TABLE {$prefix}wpmind_api_audit_log (
 			id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 			event_type VARCHAR(40) NOT NULL,
-			key_id CHAR(12) CHARACTER SET ascii COLLATE ascii_bin NULL,
+			key_id CHAR(12) NULL,
 			actor_user_id BIGINT UNSIGNED NULL,
-			request_id CHAR(36) CHARACTER SET ascii COLLATE ascii_bin NULL,
-			ip_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NULL,
+			request_id CHAR(36) NULL,
+			ip_hash CHAR(64) NULL,
 			user_agent VARCHAR(255) NULL,
 			detail_json LONGTEXT NULL,
 			created_at DATETIME NOT NULL,

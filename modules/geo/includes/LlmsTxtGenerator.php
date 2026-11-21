@@ -162,6 +162,8 @@ class LlmsTxtGenerator {
 	 * Render llms.txt content.
 	 */
 	public function render(): void {
+		do_action( 'wpmind_llms_txt_accessed' );
+
 		// Explicit 200: the matched rule leaves WP_Query looking like the front page.
 		// /llms.txt/ is answered here too (no 301 back, cached 301s would loop).
 		status_header( 200 );
@@ -186,9 +188,10 @@ class LlmsTxtGenerator {
 	/**
 	 * Generate llms.txt content.
 	 *
+	 * @param string $mode Generation mode passed to section filters (e.g. 'default', 'full').
 	 * @return string Generated content.
 	 */
-	private function generate_content(): string {
+	public function generate_content( string $mode = 'default' ): string {
 		$output = '';
 
 		// H1: Site name.
@@ -201,7 +204,7 @@ class LlmsTxtGenerator {
 		$output .= $this->get_additional_context();
 
 		// H2 sections: Content groups.
-		$output .= $this->get_content_sections();
+		$output .= $this->get_content_sections( $mode );
 
 		// ## Optional: Skippable information.
 		$output .= $this->get_optional_section();
@@ -275,10 +278,11 @@ class LlmsTxtGenerator {
 	/**
 	 * Get content sections (H2 groups with links).
 	 *
+	 * @param string $mode Generation mode passed to section filters.
 	 * @return string Content sections.
 	 */
-	private function get_content_sections(): string {
-		$output = '';
+	private function get_content_sections( string $mode = 'default' ): string {
+		$sections = array();
 
 		// Get categories with posts.
 		$categories = get_categories(
@@ -291,7 +295,7 @@ class LlmsTxtGenerator {
 		);
 
 		if ( ! empty( $categories ) ) {
-			$output .= '## ' . __( 'Categories', 'wpmind' ) . "\n\n";
+			$cat_md = '## ' . __( 'Categories', 'wpmind' ) . "\n\n";
 
 			foreach ( $categories as $category ) {
 				$url  = get_category_link( $category->term_id );
@@ -300,13 +304,13 @@ class LlmsTxtGenerator {
 					? esc_html( $category->description )
 					: sprintf( __( '%d posts', 'wpmind' ), $category->count );
 
-				$output .= "- [{$name}]({$url}): {$desc}\n";
+				$cat_md .= "- [{$name}]({$url}): {$desc}\n";
 			}
 
-			$output .= "\n";
+			$sections['categories'] = $cat_md . "\n";
 		}
 
-		// Get recent posts.
+		// Get recent posts (excluding noai posts).
 		$recent_posts = get_posts(
 			array(
 				'numberposts' => 10,
@@ -316,20 +320,24 @@ class LlmsTxtGenerator {
 		);
 
 		if ( ! empty( $recent_posts ) ) {
-			$output .= '## ' . __( 'Recent Posts', 'wpmind' ) . "\n\n";
-
+			$lines = array();
 			foreach ( $recent_posts as $post ) {
+				if ( $this->is_post_noai( $post ) ) {
+					continue;
+				}
 				$url     = get_permalink( $post );
 				$title   = esc_html( get_the_title( $post ) );
 				$excerpt = wp_trim_words( get_the_excerpt( $post ), 15, '...' );
 
-				$output .= "- [{$title}]({$url}): {$excerpt}\n";
+				$lines[] = "- [{$title}]({$url}): {$excerpt}\n";
 			}
 
-			$output .= "\n";
+			if ( ! empty( $lines ) ) {
+				$sections['recent_posts'] = '## ' . __( 'Recent Posts', 'wpmind' ) . "\n\n" . implode( '', $lines ) . "\n";
+			}
 		}
 
-		// Get pages.
+		// Get pages (excluding noai pages).
 		$pages = get_pages(
 			array(
 				'number'      => 5,
@@ -339,9 +347,11 @@ class LlmsTxtGenerator {
 		);
 
 		if ( ! empty( $pages ) ) {
-			$output .= '## ' . __( 'Pages', 'wpmind' ) . "\n\n";
-
+			$lines = array();
 			foreach ( $pages as $page ) {
+				if ( $this->is_post_noai( $page ) ) {
+					continue;
+				}
 				$url   = get_permalink( $page );
 				$title = esc_html( get_the_title( $page ) );
 				$desc  = wp_trim_words( get_the_excerpt( $page ), 10, '...' );
@@ -350,13 +360,99 @@ class LlmsTxtGenerator {
 					$desc = __( 'Site page', 'wpmind' );
 				}
 
-				$output .= "- [{$title}]({$url}): {$desc}\n";
+				$lines[] = "- [{$title}]({$url}): {$desc}\n";
 			}
 
-			$output .= "\n";
+			if ( ! empty( $lines ) ) {
+				$sections['pages'] = '## ' . __( 'Pages', 'wpmind' ) . "\n\n" . implode( '', $lines ) . "\n";
+			}
+		}
+
+		/**
+		 * Filter the assembled llms.txt sections before concatenation.
+		 *
+		 * Ecosystem plugins (e.g. wpdocs, bisheng-html) can inject H2 sections
+		 * either as raw markdown strings or structured arrays with `title` and `items`.
+		 *
+		 * @param array<string, mixed> $sections Associative array of sections.
+		 * @param string               $mode     Generation mode.
+		 */
+		$filtered_sections = apply_filters( 'wpmind_llms_txt_sections', $sections, $mode );
+
+		$output = '';
+		foreach ( (array) $filtered_sections as $section ) {
+			if ( is_string( $section ) && '' !== trim( $section ) ) {
+				$output .= rtrim( $section, "\n" ) . "\n\n";
+			} elseif ( is_array( $section ) ) {
+				$rendered = $this->render_structured_section( $section );
+				if ( '' !== $rendered ) {
+					$output .= $rendered;
+				}
+			}
 		}
 
 		return $output;
+	}
+
+	/**
+	 * Render a structured section array injected via wpmind_llms_txt_sections.
+	 *
+	 * @param array<string, mixed> $section Section array with title and items.
+	 * @return string Rendered markdown section or empty string.
+	 */
+	private function render_structured_section( array $section ): string {
+		$title = isset( $section['title'] ) ? trim( (string) $section['title'] ) : '';
+		$items = isset( $section['items'] ) && is_array( $section['items'] ) ? $section['items'] : array();
+		if ( '' === $title || empty( $items ) ) {
+			return '';
+		}
+
+		$md = "## {$title}\n\n";
+		foreach ( $items as $item ) {
+			if ( is_string( $item ) && '' !== trim( $item ) ) {
+				$md .= rtrim( $item, "\n" ) . "\n";
+				continue;
+			}
+			if ( ! is_array( $item ) ) {
+				continue;
+			}
+			$item_title = isset( $item['title'] ) ? trim( (string) $item['title'] ) : '';
+			$item_url   = isset( $item['url'] ) ? trim( (string) $item['url'] ) : '';
+			$item_desc  = isset( $item['desc'] ) ? trim( (string) $item['desc'] ) : '';
+			if ( '' === $item_title || '' === $item_url ) {
+				continue;
+			}
+			$md .= '' !== $item_desc
+				? "- [{$item_title}]({$item_url}): {$item_desc}\n"
+				: "- [{$item_title}]({$item_url})\n";
+		}
+
+		return $md . "\n";
+	}
+
+	/**
+	 * Check whether a post is excluded from AI indexing (noai).
+	 *
+	 * @param \WP_Post $post Post object.
+	 * @return bool True if excluded.
+	 */
+	private function is_post_noai( \WP_Post $post ): bool {
+		if ( 'noai' === get_post_meta( $post->ID, '_wpmind_ai_indexing', true ) ) {
+			return true;
+		}
+		if ( '1' === get_post_meta( $post->ID, '_wpmind_ai_noindex', true ) ) {
+			return true;
+		}
+		if ( '1' === get_post_meta( $post->ID, '_wpmind_ai_nollm', true ) ) {
+			return true;
+		}
+
+		$excluded_types = get_option( 'wpmind_ai_excluded_post_types', array() );
+		if ( is_array( $excluded_types ) && in_array( $post->post_type, $excluded_types, true ) ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

@@ -264,24 +264,55 @@ if ( ! function_exists( 'wpmind_generate_image' ) ) {
 }
 
 /**
- * 注册默认 Hooks
+ * 注册默认 Hooks（弱耦合 filter 包装，带防递归保护）
  *
- * 为不存在 WPMind 时提供 fallback
+ * 为不存在 WPMind 时提供 fallback，生态插件可直接 apply_filters( 'wpmind_*', ... )。
  */
 add_filter(
 	'wpmind_is_available',
 	function ( $available ) {
-		return wpmind_is_available();
+		static $in_filter = false;
+		if ( $in_filter ) {
+			return $available;
+		}
+		$in_filter = true;
+		try {
+			return wpmind_is_available();
+		} finally {
+			$in_filter = false;
+		}
+	}
+);
+
+add_filter(
+	'wpmind_get_status',
+	function ( $fallback ) {
+		static $in_filter = false;
+		if ( $in_filter ) {
+			return $fallback;
+		}
+		$in_filter = true;
+		try {
+			return wpmind_get_status();
+		} finally {
+			$in_filter = false;
+		}
 	}
 );
 
 add_filter(
 	'wpmind_chat',
-	function ( $default, $messages, $options = [] ) {
-		if ( wpmind_is_available() ) {
-			return wpmind_chat( $messages, $options );
+	function ( $fallback, $messages, $options = [] ) {
+		static $in_filter = false;
+		if ( $in_filter || ! wpmind_is_available() ) {
+			return $fallback;
 		}
-		return $default;
+		$in_filter = true;
+		try {
+			return wpmind_chat( $messages, is_array( $options ) ? $options : [] );
+		} finally {
+			$in_filter = false;
+		}
 	},
 	10,
 	3
@@ -289,14 +320,151 @@ add_filter(
 
 add_filter(
 	'wpmind_translate',
-	function ( $default, $text, $from = 'auto', $to = 'en', $options = [] ) {
-		if ( wpmind_is_available() ) {
-			return wpmind_translate( $text, $from, $to, $options );
+	function ( $fallback, $text, $from = 'auto', $to = 'en', $options = [] ) {
+		static $in_filter = false;
+		if ( $in_filter || ! wpmind_is_available() ) {
+			return $fallback;
 		}
-		return $default;
+		$in_filter = true;
+		try {
+			return wpmind_translate( (string) $text, (string) $from, (string) $to, is_array( $options ) ? $options : [] );
+		} finally {
+			$in_filter = false;
+		}
 	},
 	10,
 	5
+);
+
+add_filter(
+	'wpmind_structured',
+	function ( $fallback, $messages, $schema = [], $options = [] ) {
+		static $in_filter = false;
+		if ( $in_filter || ! wpmind_is_available() ) {
+			return $fallback;
+		}
+		$in_filter = true;
+		try {
+			return wpmind_structured( $messages, is_array( $schema ) ? $schema : [], is_array( $options ) ? $options : [] );
+		} finally {
+			$in_filter = false;
+		}
+	},
+	10,
+	4
+);
+
+add_filter(
+	'wpmind_pinyin',
+	function ( $fallback, $text, $options = [] ) {
+		static $in_filter = false;
+		if ( $in_filter || ! wpmind_is_available() ) {
+			return $fallback;
+		}
+		$in_filter = true;
+		try {
+			return wpmind_pinyin( (string) $text, is_array( $options ) ? $options : [] );
+		} finally {
+			$in_filter = false;
+		}
+	},
+	10,
+	3
+);
+
+add_filter(
+	'wpmind_summarize',
+	function ( $fallback, $text, $options = [] ) {
+		static $in_filter = false;
+		if ( $in_filter || ! wpmind_is_available() ) {
+			return $fallback;
+		}
+		$in_filter = true;
+		try {
+			return wpmind_summarize( (string) $text, is_array( $options ) ? $options : [] );
+		} finally {
+			$in_filter = false;
+		}
+	},
+	10,
+	3
+);
+
+add_filter(
+	'wpmind_moderate',
+	function ( $fallback, $content, $options = [] ) {
+		static $in_filter = false;
+		if ( $in_filter || ! wpmind_is_available() ) {
+			return $fallback;
+		}
+		$in_filter = true;
+		try {
+			return wpmind_moderate( (string) $content, is_array( $options ) ? $options : [] );
+		} finally {
+			$in_filter = false;
+		}
+	},
+	10,
+	3
+);
+
+add_filter(
+	'wpmind_vision',
+	function ( $fallback, $image_url, $prompt = '', $options = [] ) {
+		static $in_filter = false;
+		if ( $in_filter || ! wpmind_is_available() ) {
+			return $fallback;
+		}
+		$in_filter = true;
+		try {
+			return wpmind_vision( (string) $image_url, (string) $prompt, is_array( $options ) ? $options : [] );
+		} finally {
+			$in_filter = false;
+		}
+	},
+	10,
+	4
+);
+
+add_filter(
+	'wpmind_embed',
+	function ( $fallback, $texts, $options = [] ) {
+		static $in_filter = false;
+		if ( $in_filter || ! wpmind_is_available() ) {
+			return $fallback;
+		}
+		$in_filter = true;
+		try {
+			return wpmind_embed( $texts, is_array( $options ) ? $options : [] );
+		} finally {
+			$in_filter = false;
+		}
+	},
+	10,
+	3
+);
+
+add_filter(
+	'wpmind_generate_image',
+	function ( $fallback, $prompt, $options = [] ) {
+		static $in_filter = false;
+		if ( $in_filter ) {
+			return $fallback;
+		}
+		$has_image = class_exists( '\\WPMind\\Providers\\Image\\ImageRouter' )
+			&& \WPMind\Providers\Image\ImageRouter::instance()->hasAvailableProvider();
+		if ( ! $has_image && ! wpmind_is_available() ) {
+			return $fallback;
+		}
+		$in_filter = true;
+		try {
+			return wpmind_generate_image( (string) $prompt, is_array( $options ) ? $options : [] );
+		} finally {
+			$in_filter = false;
+		}
+	},
+	10,
+	3
 );
 
 // ============================================

@@ -204,58 +204,132 @@ class BudgetChecker {
 	/**
 	 * 检查是否允许发起请求
 	 *
-	 * @param string|null $provider 服务商 ID（可选）
-	 * @return array ['allowed' => bool, 'reason' => string|null, 'status' => array]
+	 * @param string|null $provider 服务商 ID（可选）.
+	 * @param string      $context  调用上下文（可选）.
+	 * @return array{allowed: bool, mode: string, reason: ?string, fallback_model: ?string, status: array}
 	 */
-	public function can_make_request( ?string $provider = null ): array {
-		$manager = BudgetManager::instance();
+	public function can_make_request( ?string $provider = '', string $context = '' ): array {
+		$provider = (string) ( $provider ?? '' );
+		$manager  = BudgetManager::instance();
+		$mode     = $manager->get_enforcement_mode();
 
 		if ( ! $manager->is_enabled() ) {
 			return [
-				'allowed' => true,
-				'reason'  => null,
-				'status'  => [],
+				'allowed'        => true,
+				'mode'           => $mode,
+				'reason'         => null,
+				'fallback_model' => null,
+				'status'         => [],
 			];
 		}
 
-		$mode = $manager->get_enforcement_mode();
+		$global_check   = $this->check_global_budget();
+		$exceeded       = ( self::STATUS_EXCEEDED === $global_check['status'] );
+		$exceeded_scope = $global_check;
+		$reason         = $exceeded ? __( '已超出全局预算限额', 'wpmind' ) : null;
 
-		// 仅告警模式始终允许请求
-		if ( $mode === BudgetManager::MODE_ALERT ) {
-			return [
-				'allowed' => true,
-				'reason'  => null,
-				'status'  => $this->check_global_budget(),
-			];
-		}
-
-		// 检查全局预算
-		$globalCheck = $this->check_global_budget();
-		if ( $globalCheck['status'] === self::STATUS_EXCEEDED ) {
-			return [
-				'allowed' => false,
-				'reason'  => __( '已超出全局预算限额', 'wpmind' ),
-				'status'  => $globalCheck,
-			];
-		}
-
-		// 检查服务商预算
-		if ( $provider ) {
-			$providerCheck = $this->check_provider_budget( $provider );
-			if ( $providerCheck['status'] === self::STATUS_EXCEEDED ) {
-				return [
-					'allowed' => false,
-					'reason'  => sprintf( __( '已超出 %s 的预算限额', 'wpmind' ), $provider ),
-					'status'  => $providerCheck,
-				];
+		if ( ! $exceeded && '' !== $provider ) {
+			$provider_check = $this->check_provider_budget( $provider );
+			if ( self::STATUS_EXCEEDED === $provider_check['status'] ) {
+				$exceeded       = true;
+				$exceeded_scope = $provider_check;
+				$reason         = sprintf( __( '已超出 %s 的预算限额', 'wpmind' ), $provider );
 			}
 		}
 
+		if ( ! $exceeded ) {
+			return [
+				'allowed'        => true,
+				'mode'           => $mode,
+				'reason'         => null,
+				'fallback_model' => null,
+				'status'         => $global_check,
+			];
+		}
+
+		if ( BudgetManager::MODE_DISABLE === $mode ) {
+			return [
+				'allowed'        => false,
+				'mode'           => $mode,
+				'reason'         => $reason,
+				'fallback_model' => null,
+				'status'         => $exceeded_scope,
+			];
+		}
+
+		if ( BudgetManager::MODE_DOWNGRADE === $mode ) {
+			return [
+				'allowed'        => true,
+				'mode'           => $mode,
+				'reason'         => $reason,
+				'fallback_model' => $this->resolve_fallback_model( $provider, $context ),
+				'status'         => $exceeded_scope,
+			];
+		}
+
+		// Alert-only mode: emit alert (deduplicated per day) and allow request.
+		if ( class_exists( BudgetAlert::class ) ) {
+			BudgetAlert::instance()->check_and_alert();
+		}
+
 		return [
-			'allowed' => true,
-			'reason'  => null,
-			'status'  => $globalCheck,
+			'allowed'        => true,
+			'mode'           => $mode,
+			'reason'         => $reason,
+			'fallback_model' => null,
+			'status'         => $exceeded_scope,
 		];
+	}
+
+	/**
+	 * Resolve a cheaper fallback model for budget downgrade mode.
+	 *
+	 * @param string $provider Provider ID.
+	 * @param string $context  Call context.
+	 * @return string Cheaper model identifier.
+	 */
+	private function resolve_fallback_model( string $provider, string $context ): string {
+		$filtered = (string) apply_filters( 'wpmind_budget_downgrade_model', '', $provider, $context );
+		if ( '' !== $filtered ) {
+			return $filtered;
+		}
+
+		if ( '' !== $provider && class_exists( \WPMind\Provider\Catalog\ModelCatalog::class ) ) {
+			$catalog = \WPMind\Provider\Catalog\ModelCatalog::instance();
+			$models  = $catalog->for_provider( $provider );
+			$best_id = null;
+			$best_px = null;
+			foreach ( $models as $model_id => $meta ) {
+				$pricing = $meta['pricing'] ?? null;
+				if ( ! is_array( $pricing ) || ! isset( $pricing['input'], $pricing['output'] ) ) {
+					continue;
+				}
+				$total = (float) $pricing['input'] + (float) $pricing['output'];
+				if ( null === $best_px || $total < $best_px ) {
+					$best_px = $total;
+					$best_id = (string) $model_id;
+				}
+			}
+			if ( null !== $best_id && '' !== $best_id ) {
+				return $best_id;
+			}
+		}
+
+		$fallback_map = [
+			'openai'      => 'gpt-4o-mini',
+			'anthropic'   => 'claude-3-haiku',
+			'google'      => 'gemini-2.0-flash',
+			'deepseek'    => 'deepseek-chat',
+			'qwen'        => 'qwen-turbo',
+			'zhipu'       => 'glm-4-flash',
+			'moonshot'    => 'moonshot-v1-8k',
+			'doubao'      => 'doubao-pro-4k',
+			'siliconflow' => 'deepseek-ai/DeepSeek-V3',
+			'baidu'       => 'ernie-3.5',
+			'minimax'     => 'abab6.5s-chat',
+		];
+
+		return $fallback_map[ $provider ] ?? 'gpt-4o-mini';
 	}
 
 	/**

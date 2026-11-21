@@ -82,6 +82,12 @@ final class ExactCache {
 	 * @return bool
 	 */
 	public function is_enabled(): bool {
+		if ( class_exists( '\\WPMind\\Core\\ModuleLoader' )
+			&& ! \WPMind\Core\ModuleLoader::instance()->is_module_enabled( 'exact-cache', true )
+		) {
+			return (bool) apply_filters( 'wpmind_exact_cache_enabled', false );
+		}
+
 		$raw_value       = get_option( self::OPTION_ENABLED, '1' );
 		$disabled_values = [ false, 0, '0', 'false', 'no', 'off' ];
 		$enabled         = ! in_array( $raw_value, $disabled_values, true );

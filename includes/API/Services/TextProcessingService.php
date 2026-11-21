@@ -45,18 +45,24 @@ class TextProcessingService extends AbstractService {
 			'format'    => 'text',
 			'hint'      => '',
 			'cache_ttl' => 86400,
+			'provider'  => 'auto',
+			'model'     => 'auto',
 		];
 		$options  = wp_parse_args( $options, $defaults );
 
-		$context = $options['context'];
+		$context = (string) $options['context'];
 
 		$args = compact( 'text', 'from', 'to', 'options' );
 		$args = apply_filters( 'wpmind_translate_args', $args, $context );
 
-		$default_provider = get_option( 'wpmind_default_provider', 'openai' );
-		$default_model    = $this->get_current_model( $default_provider );
+		$cache_provider = 'auto' === $options['provider']
+			? (string) get_option( 'wpmind_default_provider', 'openai' )
+			: (string) $options['provider'];
+		$cache_model    = 'auto' === $options['model']
+			? $this->get_current_model( $cache_provider )
+			: (string) $options['model'];
 
-		$cache_key    = $this->generate_cache_key( 'translate', $args, $default_provider, $default_model );
+		$cache_key    = $this->generate_cache_key( 'translate', $args, $cache_provider, $cache_model );
 		$cache_lookup = $this->get_cached_value( $cache_key, (int) $options['cache_ttl'] );
 		if ( $cache_lookup['hit'] ) {
 			return $cache_lookup['value'];
@@ -66,11 +72,17 @@ class TextProcessingService extends AbstractService {
 
 		do_action( 'wpmind_before_request', 'translate', $args, $context );
 
+		$max_tokens = isset( $options['max_tokens'] )
+			? (int) $options['max_tokens']
+			: min( 4096, max( 500, mb_strlen( $text ) * 2 ) );
+
 		$result = $this->chat_service->chat(
 			$prompt,
 			[
 				'context'     => $context,
-				'max_tokens'  => max( 500, strlen( $text ) * 2 ),
+				'provider'    => $options['provider'],
+				'model'       => $options['model'],
+				'max_tokens'  => $max_tokens,
 				'temperature' => 0.3,
 				'cache_ttl'   => 0,
 			]
@@ -98,8 +110,8 @@ class TextProcessingService extends AbstractService {
 			[
 				'type'     => 'translate',
 				'context'  => $context,
-				'provider' => $default_provider,
-				'model'    => $default_model,
+				'provider' => $result['provider'] ?? $cache_provider,
+				'model'    => $result['model'] ?? $cache_model,
 			]
 		);
 
@@ -121,15 +133,21 @@ class TextProcessingService extends AbstractService {
 			'style'      => 'paragraph',
 			'language'   => 'auto',
 			'cache_ttl'  => 3600,
+			'provider'   => 'auto',
+			'model'      => 'auto',
 		];
 		$options  = wp_parse_args( $options, $defaults );
 
-		$context = $options['context'];
+		$context = (string) $options['context'];
 
-		$default_provider = get_option( 'wpmind_default_provider', 'openai' );
-		$default_model    = $this->get_current_model( $default_provider );
+		$cache_provider = 'auto' === $options['provider']
+			? (string) get_option( 'wpmind_default_provider', 'openai' )
+			: (string) $options['provider'];
+		$cache_model    = 'auto' === $options['model']
+			? $this->get_current_model( $cache_provider )
+			: (string) $options['model'];
 
-		$cache_key    = $this->generate_cache_key( 'summarize', compact( 'text', 'options' ), $default_provider, $default_model );
+		$cache_key    = $this->generate_cache_key( 'summarize', compact( 'text', 'options' ), $cache_provider, $cache_model );
 		$cache_lookup = $this->get_cached_value( $cache_key, (int) $options['cache_ttl'] );
 		if ( $cache_lookup['hit'] ) {
 			return $cache_lookup['value'];
@@ -158,6 +176,8 @@ class TextProcessingService extends AbstractService {
 			$prompt,
 			[
 				'context'     => $context,
+				'provider'    => $options['provider'],
+				'model'       => $options['model'],
 				'max_tokens'  => max( 100, $options['max_length'] * 2 ),
 				'temperature' => 0.3,
 				'cache_ttl'   => 0,
@@ -180,8 +200,8 @@ class TextProcessingService extends AbstractService {
 			[
 				'type'     => 'summarize',
 				'context'  => $context,
-				'provider' => $default_provider,
-				'model'    => $default_model,
+				'provider' => $result['provider'] ?? $cache_provider,
+				'model'    => $result['model'] ?? $cache_model,
 			]
 		);
 
@@ -202,15 +222,21 @@ class TextProcessingService extends AbstractService {
 			'categories' => [ 'spam', 'adult', 'violence', 'hate', 'illegal' ],
 			'threshold'  => 0.7,
 			'cache_ttl'  => 300,
+			'provider'   => 'auto',
+			'model'      => 'auto',
 		];
 		$options  = wp_parse_args( $options, $defaults );
 
-		$context = $options['context'];
+		$context = (string) $options['context'];
 
-		$default_provider = get_option( 'wpmind_default_provider', 'openai' );
-		$default_model    = $this->get_current_model( $default_provider );
+		$cache_provider = 'auto' === $options['provider']
+			? (string) get_option( 'wpmind_default_provider', 'openai' )
+			: (string) $options['provider'];
+		$cache_model    = 'auto' === $options['model']
+			? $this->get_current_model( $cache_provider )
+			: (string) $options['model'];
 
-		$cache_key    = $this->generate_cache_key( 'moderate', compact( 'content', 'options' ), $default_provider, $default_model );
+		$cache_key    = $this->generate_cache_key( 'moderate', compact( 'content', 'options' ), $cache_provider, $cache_model );
 		$cache_lookup = $this->get_cached_value( $cache_key, (int) $options['cache_ttl'] );
 		if ( $cache_lookup['hit'] ) {
 			return $cache_lookup['value'];
@@ -254,6 +280,8 @@ class TextProcessingService extends AbstractService {
 			$schema,
 			[
 				'context'     => $context,
+				'provider'    => $options['provider'],
+				'model'       => $options['model'],
 				'temperature' => 0.1,
 				'retries'     => 2,
 			]
@@ -282,8 +310,8 @@ class TextProcessingService extends AbstractService {
 			[
 				'type'     => 'moderate',
 				'context'  => $context,
-				'provider' => $default_provider,
-				'model'    => $default_model,
+				'provider' => $result['provider'] ?? $cache_provider,
+				'model'    => $result['model'] ?? $cache_model,
 			]
 		);
 

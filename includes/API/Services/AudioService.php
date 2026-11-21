@@ -40,10 +40,22 @@ class AudioService extends AbstractService {
 		];
 		$options  = wp_parse_args( $options, $defaults );
 
-		$context              = $options['context'];
-		$transcribe_providers = [ 'openai' ];
+		$context              = (string) $options['context'];
+		$transcribe_providers = array_values(
+			array_filter(
+				(array) apply_filters( 'wpmind_transcribe_providers', [ 'openai', 'wenpai_cloud' ] ),
+				'is_string'
+			)
+		);
 
-		$provider = $this->resolve_provider( $options['provider'], $context );
+		$provider = $this->resolve_provider( (string) $options['provider'], $context );
+
+		// 发上游请求前执行站内预算强控.
+		$budget_check = $this->check_budget_before_request( $provider, $context );
+		if ( is_wp_error( $budget_check ) ) {
+			do_action( 'wpmind_error', $budget_check, 'transcribe', compact( 'audio_file', 'options' ) );
+			return $budget_check;
+		}
 
 		// 文件大小上限（25MB，与 OpenAI Whisper API 限制一致）
 		$max_file_size = apply_filters( 'wpmind_transcribe_max_file_size', 25 * MB_IN_BYTES );
@@ -127,7 +139,7 @@ class AudioService extends AbstractService {
 			'transcribe',
 			$provider,
 			$context,
-			function ( string $try_provider, array $endpoint ) use ( $file_content, $options, $audio_file ) {
+			function ( string $try_provider, array $endpoint ) use ( $file_content, $options, $audio_file, $context ) {
 				$api_key  = $endpoint['api_key'];
 				$base_url = $this->resolve_base_url( $try_provider );
 				$api_url  = trailingslashit( $base_url ) . 'audio/transcriptions';
@@ -201,6 +213,10 @@ class AudioService extends AbstractService {
 					);
 				}
 
+				if ( \WPMind\Provider\WenpaiCloud::PROVIDER_ID === $try_provider ) {
+					\WPMind\Provider\WenpaiCloud::update_balance_from_headers( wp_remote_retrieve_headers( $response ) );
+				}
+
 				$this->record_result( $try_provider, true, $latency_ms );
 
 				$result = [
@@ -213,6 +229,19 @@ class AudioService extends AbstractService {
 				if ( $options['format'] !== 'text' && is_array( $result['data'] ) ) {
 					$result['text'] = $result['data']['text'] ?? '';
 				}
+
+				$in_tokens  = max( 1, (int) ceil( strlen( (string) $file_content ) / 1024 ) );
+				$out_tokens = max( 1, (int) ceil( mb_strlen( (string) $result['text'] ) / 3 ) );
+				do_action(
+					'wpmind_usage_record',
+					$try_provider,
+					'whisper-1',
+					$in_tokens,
+					$out_tokens,
+					$latency_ms,
+					$context,
+					\WPMind\Provider\WenpaiCloud::payer_for( $try_provider )
+				);
 
 				do_action( 'wpmind_after_request', 'transcribe', $result, compact( 'audio_file', 'options' ), [] );
 
@@ -242,10 +271,25 @@ class AudioService extends AbstractService {
 		];
 		$options  = wp_parse_args( $options, $defaults );
 
-		$context          = $options['context'];
-		$speech_providers = [ 'openai', 'deepseek' ];
+		$context          = (string) $options['context'];
+		$speech_providers = array_values(
+			array_filter(
+				(array) apply_filters( 'wpmind_speech_providers', [ 'openai', 'wenpai_cloud' ] ),
+				'is_string'
+			)
+		);
 
-		$provider = $this->resolve_provider( $options['provider'], $context );
+		$provider = $this->resolve_provider( (string) $options['provider'], $context );
+
+		// 发上游请求前执行站内预算强控.
+		$budget_check = $this->check_budget_before_request( $provider, $context );
+		if ( is_wp_error( $budget_check ) ) {
+			do_action( 'wpmind_error', $budget_check, 'speech', compact( 'text', 'options' ) );
+			return $budget_check;
+		}
+		if ( '' !== $budget_check['fallback_model'] ) {
+			$options['model'] = $budget_check['fallback_model'];
+		}
 
 		do_action( 'wpmind_before_request', 'speech', compact( 'text', 'options' ), $context );
 
@@ -253,7 +297,7 @@ class AudioService extends AbstractService {
 			'speech',
 			$provider,
 			$context,
-			function ( string $try_provider, array $endpoint ) use ( $text, $options ) {
+			function ( string $try_provider, array $endpoint ) use ( $text, $options, $context ) {
 				$api_key  = $endpoint['api_key'];
 				$base_url = $this->resolve_base_url( $try_provider );
 				$api_url  = trailingslashit( $base_url ) . 'audio/speech';
@@ -304,6 +348,10 @@ class AudioService extends AbstractService {
 					);
 				}
 
+				if ( \WPMind\Provider\WenpaiCloud::PROVIDER_ID === $try_provider ) {
+					\WPMind\Provider\WenpaiCloud::update_balance_from_headers( wp_remote_retrieve_headers( $response ) );
+				}
+
 				$this->record_result( $try_provider, true, $latency_ms );
 
 				$result = [
@@ -340,6 +388,18 @@ class AudioService extends AbstractService {
 					$result['url']  = $upload['url'];
 					$result['file'] = $upload['file'];
 				}
+
+				$in_tokens = max( 1, mb_strlen( $text ) );
+				do_action(
+					'wpmind_usage_record',
+					$try_provider,
+					(string) $options['model'],
+					$in_tokens,
+					0,
+					$latency_ms,
+					$context,
+					\WPMind\Provider\WenpaiCloud::payer_for( $try_provider )
+				);
 
 				do_action( 'wpmind_after_request', 'speech', $result, compact( 'text', 'options' ), [] );
 

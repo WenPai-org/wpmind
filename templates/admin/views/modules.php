@@ -1,6 +1,6 @@
 <?php
 /**
- * 模块视图：AI 能力开关网格。
+ * 模块视图：上方已启用模块 module_grid + 下方其余模块 row 列表（保留权益徽标槽位）。
  *
  * @package WPMind
  */
@@ -11,65 +11,159 @@ use WPMind\Admin\AdminIcons;
 use WPMind\Admin\AdminPage;
 use WPMind\Core\ModuleLoader;
 
-$wpmind_modules = ModuleLoader::instance()->get_modules();
-$wpmind_enabled  = count( array_filter( $wpmind_modules, static fn( $m ) => $m['enabled'] ) );
-$wpmind_total    = count( $wpmind_modules );
+( static function (): void {
+	$wpmind_modules  = ModuleLoader::instance()->get_modules();
+	$wpmind_on_list  = [];
+	$wpmind_off_list = [];
+	foreach ( $wpmind_modules as $mod_id => $mod ) {
+		if ( ! empty( $mod['enabled'] ) ) {
+			$wpmind_on_list[ $mod_id ] = $mod;
+		} else {
+			$wpmind_off_list[ $mod_id ] = $mod;
+		}
+	}
 
-wpmind_page_head(
-	__( '模块', 'wpmind' ),
-	__( 'AI 能力开关。核心模块不可禁用；「设置」进模块设置页。', 'wpmind' )
-);
-?>
+	$wpmind_total   = count( $wpmind_modules );
+	$wpmind_enabled = count( $wpmind_on_list );
+
+	$wpmind_module_switch = static function ( string $mod_id, array $mod ): string {
+		$locked  = empty( $mod['can_disable'] );
+		$checked = ! empty( $mod['enabled'] );
+		$name    = (string) ( $mod['name'] ?? $mod_id );
+		$title   = $locked ? ' title="' . esc_attr__( '核心模块不可禁用', 'wpmind' ) . '"' : '';
+
+		return '<span class="wenpai-switch"' . $title . '>'
+		. '<input type="checkbox" role="switch" class="wenpai-switch__input wpmind-module-switch"'
+		. ' data-module-id="' . esc_attr( $mod_id ) . '"'
+		. ' aria-label="' . esc_attr( $name ) . '"'
+		. ( $checked ? ' checked' : '' )
+		. ( $locked ? ' disabled' : '' ) . '>'
+		. '<span class="wenpai-switch__track" aria-hidden="true"></span>'
+		. '</span>';
+	};
+
+	$wpmind_entitlement_badge = static function ( string $mod_id, array $mod ): string {
+		$badge = function_exists( 'apply_filters' )
+		? (string) apply_filters( 'wpmind_module_badge', '', $mod_id, $mod )
+		: '';
+		if ( '' === $badge ) {
+			return '';
+		}
+		return Wenpai_Admin_UI::pill_html(
+			[
+				'text'  => $badge,
+				'state' => 'mute',
+			]
+		);
+	};
+
+	wpmind_page_head(
+		__( '模块', 'wpmind' ),
+		sprintf(
+		/* translators: 1: enabled count, 2: total count */
+			__( '已开启 %1$d / %2$d 个模块，开关即点即存。', 'wpmind' ),
+			$wpmind_enabled,
+			$wpmind_total
+		)
+	);
+	?>
 
 <div class="wenpai-stack">
-	<section class="card wpmind-module-list">
-		<div class="card-head">
-			<div>
-				<h2 class="card-title"><?php esc_html_e( '功能模块', 'wpmind' ); ?></h2>
-				<p class="card-sub"><?php esc_html_e( '启用开关即时生效；核心模块不可禁用', 'wpmind' ); ?></p>
-			</div>
-			<span class="pill ok"><?php echo esc_html( sprintf( /* translators: %1$d enabled, %2$d total */ __( '%1$d / %2$d 已启用', 'wpmind' ), $wpmind_enabled, $wpmind_total ) ); ?></span>
-		</div>
+	<?php if ( ! empty( $wpmind_on_list ) ) : ?>
+		<?php
+		$grid_items = [];
+		$card_index = 0;
+		foreach ( $wpmind_on_list as $mod_id => $mod ) {
+			$mod_id  = (string) $mod_id;
+			$is_core = empty( $mod['can_disable'] );
+			$badge   = function_exists( 'apply_filters' )
+				? (string) apply_filters( 'wpmind_module_badge', '', $mod_id, $mod )
+				: '';
+			$status  = $is_core ? __( '核心模块', 'wpmind' ) : __( '已开启', 'wpmind' );
+			if ( '' !== $badge ) {
+				$status .= ' · ' . $badge;
+			} elseif ( ! empty( $mod['version'] ) ) {
+				$status .= ' · v' . (string) $mod['version'];
+			}
 
-		<?php foreach ( $wpmind_modules as $wpmind_mod_id => $wpmind_mod ) : ?>
-		<div class="simple-row wpmind-module-card <?php echo $wpmind_mod['enabled'] ? 'is-enabled' : 'is-disabled'; ?>">
-			<span class="tile <?php echo $wpmind_mod['enabled'] ? 'ok' : ''; ?>"><?php echo AdminIcons::svg( $wpmind_mod['icon'] ?? 'modules' ) ?: AdminIcons::svg( 'modules' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
-			<div>
-				<div class="t">
-					<?php echo esc_html( $wpmind_mod['name'] ); ?>
-					<?php if ( ! $wpmind_mod['can_disable'] ) : ?>
-						<span class="pill mute"><?php esc_html_e( '核心', 'wpmind' ); ?></span>
-					<?php endif; ?>
-					<span class="meta">v<?php echo esc_html( $wpmind_mod['version'] ); ?></span>
-				</div>
-				<div class="d"><?php echo esc_html( $wpmind_mod['description'] ); ?></div>
-			</div>
-			<div class="r">
-				<?php if ( ! $wpmind_mod['can_disable'] ) : ?>
-					<span class="wenpai-switch" title="<?php esc_attr_e( '核心模块不可禁用', 'wpmind' ); ?>">
-						<input type="checkbox" role="switch" class="wenpai-switch__input wpmind-module-switch" data-module-id="<?php echo esc_attr( $wpmind_mod_id ); ?>" <?php checked( $wpmind_mod['enabled'] ); ?> disabled>
-						<span class="wenpai-switch__track" aria-hidden="true"></span>
-						<span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on"><?php esc_html_e( '已开启', 'wpmind' ); ?></span><span class="wenpai-switch__off"><?php esc_html_e( '未开启', 'wpmind' ); ?></span></span>
-					</span>
-				<?php else : ?>
-					<span class="wenpai-switch">
-						<input type="checkbox" role="switch" class="wenpai-switch__input wpmind-module-switch" data-module-id="<?php echo esc_attr( $wpmind_mod_id ); ?>" aria-label="<?php echo esc_attr( $wpmind_mod['name'] ); ?>" <?php checked( $wpmind_mod['enabled'] ); ?>>
-						<span class="wenpai-switch__track" aria-hidden="true"></span>
-						<span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on"><?php esc_html_e( '已开启', 'wpmind' ); ?></span><span class="wenpai-switch__off"><?php esc_html_e( '未开启', 'wpmind' ); ?></span></span>
-					</span>
-				<?php endif; ?>
-				<?php if ( $wpmind_mod['enabled'] && ! empty( $wpmind_mod['settings_tab'] ) ) : ?>
-					<a class="btn btn-ghost btn-sm" href="<?php echo esc_url( AdminPage::url( [ 'tab' => 'module', 'module' => $wpmind_mod_id ] ) ); ?>"><?php esc_html_e( '设置', 'wpmind' ); ?></a>
-				<?php endif; ?>
-			</div>
-		</div>
-		<?php endforeach; ?>
+			$item = [
+				'title'        => (string) ( $mod['name'] ?? $mod_id ),
+				'desc'         => (string) ( $mod['description'] ?? '' ),
+				'icon_html'    => AdminIcons::svg( (string) ( $mod['icon'] ?? 'modules' ) ) ?: AdminIcons::svg( 'modules' ),
+				'tone'         => $card_index < 3 ? 'ok' : '',
+				'control_html' => $wpmind_module_switch( $mod_id, $mod ),
+				'status'       => $status,
+				'status_tone'  => 'ok',
+				'class'        => 'wpmind-module-item is-enabled',
+				'attrs'        => [ 'data-module-card' => $mod_id ],
+			];
+			if ( ! empty( $mod['settings_tab'] ) ) {
+				$item['action_label']   = __( '配置', 'wpmind' );
+				$item['action_url']     = AdminPage::url(
+					[
+						'tab'    => 'module',
+						'module' => $mod_id,
+					]
+				);
+				$item['action_variant'] = 'ghost';
+			}
+			$grid_items[] = $item;
+			++$card_index;
+		}
+		Wenpai_Admin_UI::module_grid( [ 'items' => $grid_items ] );
+		?>
+	<?php endif; ?>
 
-		<?php if ( empty( $wpmind_modules ) ) : ?>
-		<div class="simple-row">
-			<div class="d"><?php esc_html_e( '暂无可用模块', 'wpmind' ); ?></div>
-		</div>
-		<?php endif; ?>
+	<?php if ( ! empty( $wpmind_off_list ) ) : ?>
+		<?php
+		Wenpai_Admin_UI::card_open(
+			[
+				'title'             => __( '更多可用模块', 'wpmind' ),
+				'tile'              => false,
+				'head_actions_html' => Wenpai_Admin_UI::pill_html(
+					[
+						'text'  => sprintf( /* translators: %d: inactive module count */ __( '%d 项未开启', 'wpmind' ), count( $wpmind_off_list ) ),
+						'state' => 'mute',
+					]
+				),
+			]
+		);
+		foreach ( $wpmind_off_list as $mod_id => $mod ) {
+			$mod_id     = (string) $mod_id;
+			$badge_html = $wpmind_entitlement_badge( $mod_id, $mod );
+			$title_html = esc_html( (string) ( $mod['name'] ?? $mod_id ) );
+			if ( '' !== $badge_html ) {
+				$title_html .= ' ' . $badge_html;
+			}
+			if ( ! empty( $mod['version'] ) ) {
+				$title_html .= ' <span class="meta">v' . esc_html( (string) $mod['version'] ) . '</span>';
+			}
 
-	</section>
+			Wenpai_Admin_UI::row(
+				[
+					'icon_html'    => AdminIcons::svg( (string) ( $mod['icon'] ?? 'modules' ) ) ?: AdminIcons::svg( 'modules' ),
+					'title_html'   => $title_html,
+					'desc'         => (string) ( $mod['description'] ?? '' ),
+					'control_html' => $wpmind_module_switch( $mod_id, $mod ),
+					'class'        => 'wpmind-module-item is-disabled',
+					'attrs'        => [ 'data-module-card' => $mod_id ],
+				]
+			);
+		}
+		Wenpai_Admin_UI::card_close();
+		?>
+	<?php elseif ( empty( $wpmind_modules ) ) : ?>
+		<?php
+		Wenpai_Admin_UI::card_open();
+		Wenpai_Admin_UI::empty_state(
+			[
+				'text' => __( '未发现可用模块', 'wpmind' ),
+				'meta' => __( '请检查插件 modules 目录是否完整。', 'wpmind' ),
+			]
+		);
+		Wenpai_Admin_UI::card_close();
+		?>
+	<?php endif; ?>
 </div>
+	<?php
+} )();

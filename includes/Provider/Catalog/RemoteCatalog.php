@@ -30,6 +30,13 @@ final class RemoteCatalog {
 	private const URL       = 'https://updates.wenpai.net/wpmind/models.json';
 
 	/**
+	 * Whether maybe_refresh() has already attempted a refresh during this request.
+	 *
+	 * @var bool
+	 */
+	private static bool $checked_this_request = false;
+
+	/**
 	 * Remote catalog endpoint. Filter to disable ('' ) or point at a mirror.
 	 *
 	 * @return string
@@ -50,15 +57,34 @@ final class RemoteCatalog {
 	/**
 	 * Refresh the cached catalog when stale. Admin pages only.
 	 *
+	 * Runs at most once per request; resets ModelCatalog singleton on refresh
+	 * so subsequent reads in the same request see the new table.
+	 *
 	 * @return void
 	 */
 	public static function maybe_refresh(): void {
+		if ( self::$checked_this_request ) {
+			return;
+		}
+		self::$checked_this_request = true;
+
 		$raw        = get_transient( self::TRANSIENT );
 		$fetched_at = is_array( $raw ) ? (int) ( $raw['fetched_at'] ?? 0 ) : 0;
 		if ( $fetched_at > 0 && ( time() - $fetched_at ) < self::TTL ) {
 			return;
 		}
-		( new self() )->refresh();
+		if ( ( new self() )->refresh() ) {
+			ModelCatalog::reset_instance();
+		}
+	}
+
+	/**
+	 * Reset per-request refresh guard (tests only).
+	 *
+	 * @internal
+	 */
+	public static function reset_checked_flag(): void {
+		self::$checked_this_request = false;
 	}
 	/**
 	 * GET the remote catalog and store it. Manual refresh entry point.

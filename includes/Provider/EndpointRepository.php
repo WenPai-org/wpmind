@@ -78,7 +78,31 @@ final class EndpointRepository {
 	}
 
 	/**
+	 * 读取指定 Provider 的生效 API Key（统一出口）。
+	 *
+	 * 优先级：WenpaiCloud::locked_api_key > wpmind 自存（或云令牌）> ConnectorCredentials::key_for。
+	 *
+	 * @param string $id Provider ID.
+	 * @return string
+	 */
+	public function get_api_key( string $id ): string {
+		return $this->get( $id )->api_key;
+	}
+
+	/**
+	 * 判断指定 Provider 是否已有生效 API Key（含锁 Key 与 Connectors 回退）。
+	 *
+	 * @param string $id Provider ID.
+	 * @return bool
+	 */
+	public function has_api_key( string $id ): bool {
+		return $this->get( $id )->has_api_key();
+	}
+
+	/**
 	 * 一家的规范化配置：迁移后读 v2（api_key 取自原 option），迁移前按原 option 现场转换（不写库）。
+	 *
+	 * Key 解析优先级：WenpaiCloud::locked_api_key > wpmind 自存 > ConnectorCredentials::key_for。
 	 *
 	 * @param string                    $id  Provider ID.
 	 * @param array<string, mixed>      $raw 原 option.
@@ -86,12 +110,42 @@ final class EndpointRepository {
 	 * @return array<string, mixed>
 	 */
 	private function entry( string $id, array $raw, ?array $v2 ): array {
+		if ( WenpaiCloud::PROVIDER_ID === $id ) {
+			$locked_key = WenpaiCloud::locked_api_key( $id );
+			$token      = '' !== $locked_key ? $locked_key : WenpaiCloud::derive_request_token();
+			return self::normalize_entry(
+				$id,
+				[
+					'enabled' => WenpaiCloud::is_enabled(),
+					'api_key' => $token,
+				]
+			);
+		}
+
 		$legacy = is_array( $raw[ $id ] ?? null ) ? $raw[ $id ] : [];
 		if ( null === $v2 ) {
-			return self::normalize_entry( $id, $legacy );
+			$entry = $legacy;
+		} else {
+			$entry            = is_array( $v2['providers'][ $id ] ?? null ) ? $v2['providers'][ $id ] : [];
+			$entry['api_key'] = $legacy['api_key'] ?? '';
 		}
-		$entry            = is_array( $v2['providers'][ $id ] ?? null ) ? $v2['providers'][ $id ] : [];
-		$entry['api_key'] = $legacy['api_key'] ?? '';
+
+		$saved_key  = is_scalar( $entry['api_key'] ?? null ) ? trim( (string) $entry['api_key'] ) : '';
+		$locked_key = WenpaiCloud::locked_api_key( $id );
+
+		if ( '' !== $locked_key ) {
+			$entry['api_key'] = $locked_key;
+			$entry['enabled'] = true;
+		} elseif ( '' !== $saved_key ) {
+			$entry['api_key'] = $saved_key;
+		} else {
+			$connector_key = ConnectorCredentials::key_for( $id );
+			if ( '' !== $connector_key ) {
+				$entry['api_key'] = $connector_key;
+				$entry['enabled'] = true;
+			}
+		}
+
 		return self::normalize_entry( $id, $entry );
 	}
 
@@ -216,17 +270,24 @@ final class EndpointRepository {
 	}
 
 	/**
-	 * 已启用且配置了 key 的 Provider。
+	 * 已启用且配置了 key 的 Provider（含可用的官方算力端点）。
 	 *
 	 * @return array<string, Endpoint>
 	 */
 	public function enabled(): array {
-		return array_filter(
+		$enabled = array_filter(
 			$this->all(),
 			static function ( Endpoint $endpoint ): bool {
 				return $endpoint->is_usable();
 			}
 		);
+
+		$cloud = $this->get( WenpaiCloud::PROVIDER_ID );
+		if ( $cloud->is_usable() ) {
+			$enabled[ WenpaiCloud::PROVIDER_ID ] = $cloud;
+		}
+
+		return $enabled;
 	}
 
 	/**

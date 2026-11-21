@@ -62,12 +62,37 @@ final class Gateway {
 	private function __construct() {}
 
 	/**
+	 * Content abilities category slug (registered by content modules).
+	 */
+	private const CONTENT_ABILITY_CATEGORY = 'wpmind-content';
+
+	/**
+	 * Known content ability names fallback when wp_get_abilities() is unavailable.
+	 *
+	 * @var list<string>
+	 */
+	private const KNOWN_CONTENT_ABILITIES = [
+		'wpmind/auto-meta-preview',
+		'wpmind/media-alt-text-preview',
+	];
+
+	/**
 	 * Register MCP Gateway hooks.
 	 *
 	 * @return void
 	 */
 	public function init(): void {
 		if ( $this->initialized ) {
+			return;
+		}
+
+		/**
+		 * Master switch for WPMind MCP Gateway & Abilities registration.
+		 *
+		 * @since 0.14.0
+		 * @param bool $enabled Whether MCP Gateway is enabled.
+		 */
+		if ( ! (bool) apply_filters( 'wpmind_mcp_enabled', true ) ) {
 			return;
 		}
 
@@ -121,6 +146,10 @@ final class Gateway {
 	 * @return void
 	 */
 	public function register_abilities(): void {
+		if ( ! (bool) apply_filters( 'wpmind_mcp_enabled', true ) ) {
+			return;
+		}
+
 		if ( ! $this->is_abilities_api_available() ) {
 			return;
 		}
@@ -151,6 +180,10 @@ final class Gateway {
 	 * @return void
 	 */
 	public function register_server( $adapter ): void {
+		if ( ! (bool) apply_filters( 'wpmind_mcp_enabled', true ) ) {
+			return;
+		}
+
 		if ( ! $this->is_abilities_api_available() ) {
 			return;
 		}
@@ -167,7 +200,16 @@ final class Gateway {
 			$this->ability_names = $this->get_registered_ability_names();
 		}
 
-		if ( empty( $this->ability_names ) ) {
+		$server_abilities = array_values(
+			array_unique(
+				array_merge(
+					$this->ability_names,
+					$this->get_registered_content_ability_names()
+				)
+			)
+		);
+
+		if ( empty( $server_abilities ) ) {
 			do_action( 'wpmind_mcp_gateway_registration_failed', 'No abilities registered for gateway.' );
 			return;
 		}
@@ -187,10 +229,10 @@ final class Gateway {
 				WPMIND_VERSION,
 				$transports,
 				null,
-				$this->ability_names
+				$server_abilities
 			);
 
-			do_action( 'wpmind_mcp_gateway_registered', $this->ability_names );
+			do_action( 'wpmind_mcp_gateway_registered', $server_abilities );
 			return;
 		} catch ( \ArgumentCountError $error ) {
 			// Backward-compatible fallback for older adapter signatures.
@@ -207,7 +249,7 @@ final class Gateway {
 				'mcp'
 			);
 
-			do_action( 'wpmind_mcp_gateway_registered', $this->ability_names );
+			do_action( 'wpmind_mcp_gateway_registered', $server_abilities );
 		} catch ( \Throwable $error ) {
 			do_action( 'wpmind_mcp_gateway_registration_failed', $error->getMessage() );
 		}
@@ -622,6 +664,36 @@ final class Gateway {
 				static fn( string $name ): bool => wp_has_ability( $name )
 			)
 		);
+	}
+
+	/**
+	 * Collect registered abilities belonging to the wpmind-content category.
+	 *
+	 * @return list<string>
+	 */
+	private function get_registered_content_ability_names(): array {
+		$names = [];
+
+		if ( function_exists( 'wp_get_abilities' ) ) {
+			foreach ( wp_get_abilities() as $ability ) {
+				if ( self::CONTENT_ABILITY_CATEGORY === $ability->get_category() ) {
+					$name = $ability->get_name();
+					if ( '' !== $name ) {
+						$names[] = $name;
+					}
+				}
+			}
+		}
+
+		if ( function_exists( 'wp_has_ability' ) ) {
+			foreach ( self::KNOWN_CONTENT_ABILITIES as $known_name ) {
+				if ( wp_has_ability( $known_name ) ) {
+					$names[] = $known_name;
+				}
+			}
+		}
+
+		return array_values( array_unique( $names ) );
 	}
 
 	/**

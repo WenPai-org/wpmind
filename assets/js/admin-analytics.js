@@ -65,7 +65,7 @@
 							font: {
 								family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
 								size: 12,
-								weight: '500'
+								weight: '400'
 							},
 							color: self.colors.gray[ 600 ]
 						}
@@ -75,7 +75,7 @@
 						titleFont: {
 							family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
 							size: 13,
-							weight: '600'
+							weight: '400'
 						},
 						bodyFont: {
 							family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
@@ -136,9 +136,8 @@
 						self.bindEvents();
 					} else if ( retries >= maxRetries ) {
 						clearInterval( timer );
-						$( '.wpmind-chart-container' ).html(
-							'<p style="text-align:center;color:#6b7280;padding:2em 0;">' +
-							'图表库加载失败，其他功能不受影响。</p>'
+						$( '.wpmind-chart .wenpai-chart-frame__plot, .wpmind-chart-container' ).html(
+							'<p class="meta">图表库加载失败，其他功能不受影响。</p>'
 						);
 					}
 				}, 500 );
@@ -177,7 +176,7 @@
 			}
 
 			// 显示加载状态
-			$( '.wpmind-chart-container' ).addClass( 'is-loading' );
+			$( '.wpmind-chart, .wpmind-chart-container' ).addClass( 'is-loading' );
 
 			$.ajax( {
 				url: wpmindData.ajaxurl || ajaxurl,
@@ -198,7 +197,7 @@
 					Toast.error( '加载分析数据失败，请稍后重试' );
 				},
 				complete: function() {
-					$( '.wpmind-chart-container' ).removeClass( 'is-loading' );
+					$( '.wpmind-chart, .wpmind-chart-container' ).removeClass( 'is-loading' );
 					if ( 'function' === typeof callback ) {
 						callback();
 					}
@@ -274,7 +273,7 @@
 							title: {
 								display: true,
 								text: 'Tokens',
-								font: { size: 11, weight: '500' },
+								font: { size: 11, weight: '400' },
 								color: self.colors.gray[ 500 ]
 							},
 							grid: {
@@ -293,7 +292,7 @@
 							title: {
 								display: true,
 								text: '请求数',
-								font: { size: 11, weight: '500' },
+								font: { size: 11, weight: '400' },
 								color: self.colors.gray[ 500 ]
 							},
 							grid: {
@@ -360,7 +359,7 @@
 						},
 						tooltip: {
 							backgroundColor: self.colors.gray[ 800 ],
-							titleFont: { size: 13, weight: '600' },
+							titleFont: { size: 13, weight: '400' },
 							bodyFont: { size: 12 },
 							padding: 12,
 							cornerRadius: 0,
@@ -423,7 +422,7 @@
 							title: {
 								display: true,
 								text: '费用',
-								font: { size: 11, weight: '500' },
+								font: { size: 11, weight: '400' },
 								color: self.colors.gray[ 500 ]
 							},
 							grid: {
@@ -484,7 +483,7 @@
 						},
 						tooltip: {
 							backgroundColor: self.colors.gray[ 800 ],
-							titleFont: { size: 13, weight: '600' },
+							titleFont: { size: 13, weight: '400' },
 							bodyFont: { size: 12 },
 							padding: 12,
 							cornerRadius: 0
@@ -496,7 +495,7 @@
 							title: {
 								display: true,
 								text: '请求数',
-								font: { size: 11, weight: '500' },
+								font: { size: 11, weight: '400' },
 								color: self.colors.gray[ 500 ]
 							},
 							grid: {

@@ -24,6 +24,12 @@ if [ ! -d "$TARGET_DIR" ]; then
     exit 1
 fi
 
+# 防止误覆盖同名第三方插件（目标已有 wpmind.php 但不含 updates.wenpai.net 时拒绝覆盖）
+if [ -f "$TARGET_DIR/wpmind.php" ] && ! grep -q "updates.wenpai.net" "$TARGET_DIR/wpmind.php"; then
+    echo "❌ 拒绝覆盖：$TARGET_DIR/wpmind.php 不含 updates.wenpai.net，疑似非文派心思插件" >&2
+    exit 1
+fi
+
 # 同步发布文件；默认只预览，必须显式传 --apply 才写入目标目录。
 echo "📦 检查发布文件..."
 RSYNC_ARGS=(
@@ -56,9 +62,12 @@ wp i18n make-pot "$SOURCE_DIR" "$SOURCE_DIR/languages/wpmind.pot" --domain=wpmin
 
 sudo rsync "${RSYNC_ARGS[@]}" "$SOURCE_DIR/" "$TARGET_DIR/"
 
-# 修复权限
+# 修复权限（继承目标目录现有属主）
 echo "🔧 修复权限..."
-sudo chown -R www:www "$TARGET_DIR"
+TARGET_OWNER="$(stat -c '%U:%G' "$TARGET_DIR" 2>/dev/null || stat -f '%Su:%Sg' "$TARGET_DIR")"
+if [ -n "$TARGET_OWNER" ]; then
+    sudo chown -R "$TARGET_OWNER" "$TARGET_DIR"
+fi
 sudo find "$TARGET_DIR" -type f -exec chmod 644 {} \;
 sudo find "$TARGET_DIR" -type d -exec chmod 755 {} \;
 

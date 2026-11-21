@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<!-- 由 prototypes/wpmind/build.php 经真实 templates/admin/page.php 生成，请勿手工修改。 -->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块：GEO 优化 — 文派心思</title>
+<link rel="stylesheet" href="../../lib/wenpai-admin-ui/css/wenpai-tokens.css">
+<link rel="stylesheet" href="../../lib/wenpai-admin-ui/css/wenpai-admin.css">
+<link rel="stylesheet" href="../../lib/wenpai-admin-ui/css/wenpai-admin-wp.css">
+<link rel="stylesheet" href="../../assets/css/wpmind-admin.css">
+</head>
+<body class="wp-admin wp-core-ui wenpai-ui-page wpmind-admin">
+<div class="wenpai-app" data-wenpai-product="wpmind"><div class="wenpai-top"><div class="wenpai-wrap"><div class="wenpai-head"><a class="wenpai-brand" href="overview.html"><span class="wenpai-mark"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4"/><circle cx="12" cy="3" r="1"/><circle cx="9" cy="13" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1" fill="currentColor" stroke="none"/><path d="M9 17h6"/></svg></span><span class="wenpai-name">文派心思</span></a><nav class="wenpai-tabs" aria-label="文派心思"><a class="wenpai-tab" href="overview.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>概览</a><a class="wenpai-tab" href="services.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4"/><circle cx="12" cy="3" r="1"/><circle cx="9" cy="13" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1" fill="currentColor" stroke="none"/><path d="M9 17h6"/></svg>AI 服务</a><a class="wenpai-tab is-active" href="modules.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>模块</a><a class="wenpai-tab" href="analytics.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6" rx="0.5"/><rect x="12" y="8" width="3" height="10" rx="0.5"/><rect x="17" y="5" width="3" height="13" rx="0.5"/></svg>分析</a><a class="wenpai-tab" href="tools.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4.5 4.5 0 0 0-6 5.6L3 17.6V21h3.4l5.7-5.7a4.5 4.5 0 0 0 5.6-6l-3 3-2.5-.5-.5-2.5 3-3Z"/></svg>工具</a><a class="wenpai-tab" href="workflow.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 5.5 1.2 1.2L7 4.5M3.5 11.5l1.2 1.2L7 10.5M3.5 17.5l1.2 1.2L7 16.5"/></svg>任务</a></nav><div class="wenpai-head-right"><a class="btn btn-ghost wenpai-head-action" href="help.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 15H13V17H11V15ZM13 13.3551V14H11V12.5C11 11.9477 11.4477 11.5 12 11.5C12.8284 11.5 13.5 10.8284 13.5 10C13.5 9.17157 12.8284 8.5 12 8.5C11.2723 8.5 10.6656 9.01823 10.5288 9.70577L8.56731 9.31346C8.88637 7.70919 10.302 6.5 12 6.5C13.933 6.5 15.5 8.067 15.5 10C15.5 11.5855 14.4457 12.9248 13 13.3551Z"/></svg><span class="wenpai-head-label">帮助</span></a><a class="btn btn-ghost wenpai-head-action" href="https://wpcy.com/support" target="_blank" rel="noopener noreferrer"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.29117 20.8242L2 22L3.17581 16.7088C2.42544 15.3056 2 13.7025 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C10.2975 22 8.6944 21.5746 7.29117 20.8242ZM7.58075 18.711L8.23428 19.0605C9.38248 19.6745 10.6655 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 13.3345 4.32549 14.6175 4.93949 15.7657L5.28896 16.4192L4.63416 19.3658L7.58075 18.711Z"/></svg><span class="wenpai-head-label">反馈</span><span class="screen-reader-text">（在新标签页打开）</span></a></div></div></div></div><main class="wenpai-main wenpai-wrap wenpai-measure-wide"><div class="wenpai-subhead"><a class="wenpai-back" href="modules.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.82843 11H20V13H7.82843L13.1924 18.364L11.7782 19.7782L4 12L11.7782 4.22183L13.1924 5.63604L7.82843 11Z"/></svg><span>返回模块列表</span></a><div class="wenpai-page-head"><div><h1 class="wenpai-h1">GEO 优化</h1><p class="wenpai-lede">生成 llms.txt、AI Sitemap、结构化 Schema 与爬虫追踪。</p></div><div class="mode"><span class="pill ok">已开启</span></div></div></div>
+<div class="wenpai-stack">
+	
+<div class="wpmind-geo-panel wenpai-stack">
+	<nav class="wenpai-subnav" aria-label="GEO 优化分区"><span class="seg"><a href="module-geo.html?section=basics" class="on" aria-current="page">基础设置</a><a href="module-geo.html?section=content">内容输出</a><a href="module-geo.html?section=schema">结构化数据</a><a href="module-geo.html?section=control">AI 索引</a><a href="module-geo.html?section=crawlers">爬虫管理</a><a href="module-geo.html?section=brand">品牌实体</a></span></nav><section class="card"><dl class="wenpai-statbar"><div class="wenpai-statbar__item"><dt>AI 爬虫访问</dt><dd>306</dd></div><div class="wenpai-statbar__item"><dt>搜索引擎访问</dt><dd>210</dd></div><div class="wenpai-statbar__item"><dt>已识别爬虫</dt><dd>4</dd></div><div class="wenpai-statbar__item"><dt>Markdown Feed</dt><dd>已开启</dd></div></dl></section>
+	<!-- ========== 基础设置 ========== -->
+	<div data-wenpai-group="basics">
+		<div class="wenpai-split">
+			<div class="wenpai-stack">
+				<section class="card"><div class="card-head"><div><h2 class="card-title">GEO 增强</h2><p class="card-sub">优化内容结构与引用信号，提升 AI 搜索可见度。</p></div></div><div class="wenpai-field wenpai-field--toggle wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="wpmind-geo-enabled">启用 GEO 增强</label></div><div class="field-ctl"><span class="wenpai-switch"><input type="hidden" name="wpmind_geo_enabled" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-geo-enabled" name="wpmind_geo_enabled" value="1" checked="checked"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span><p class="wenpai-field__desc">控制前台 GEO 信号与结构化输出。</p></div></div><div class="wenpai-field wenpai-field--toggle wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="wpmind-geo-zh">中文内容优化</label></div><div class="field-ctl"><span class="wenpai-switch"><input type="hidden" name="wpmind_chinese_optimize" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-geo-zh" name="wpmind_chinese_optimize" value="1" checked="checked"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span><p class="wenpai-field__desc">优化中英文混排、标点与段落结构。</p></div></div><div class="wenpai-field wenpai-field--toggle wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="wpmind-geo-signals">GEO 信号注入</label></div><div class="field-ctl"><span class="wenpai-switch"><input type="hidden" name="wpmind_geo_signals" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-geo-signals" name="wpmind_geo_signals" value="1" checked="checked"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span><p class="wenpai-field__desc">注入作者、发布日期与引用权威信号。</p></div></div><div class="wenpai-field wenpai-field--toggle wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="wpmind-geo-crawler">AI 爬虫追踪</label></div><div class="field-ctl"><span class="wenpai-switch"><input type="hidden" name="wpmind_crawler_tracking" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-geo-crawler" name="wpmind_crawler_tracking" value="1" checked="checked"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span><p class="wenpai-field__desc">统计 GPTBot、ClaudeBot 等爬虫访问。</p></div></div></section>			</div>
+			<div class="wenpai-stack">
+				<section class="card"><div class="card-head"><div><h2 class="card-title">AI 爬虫统计</h2></div></div><div class="wenpai-tag-feed-scroll"><ul class="wenpai-tag-feed"><li><span class="wenpai-micro-tag is-ok">AI</span><span class="wenpai-tag-feed__text"><span>GPTBot</span><small>OpenAI</small></span><span class="wenpai-tag-feed__side"><span>124 次</span></span></li><li><span class="wenpai-micro-tag is-ok">AI</span><span class="wenpai-tag-feed__text"><span>ClaudeBot</span><small>Anthropic</small></span><span class="wenpai-tag-feed__side"><span>86 次</span></span></li><li><span class="wenpai-micro-tag is-ok">AI</span><span class="wenpai-tag-feed__text"><span>PerplexityBot</span><small>Perplexity</small></span><span class="wenpai-tag-feed__side"><span>62 次</span></span></li><li><span class="wenpai-micro-tag is-ok">AI</span><span class="wenpai-tag-feed__text"><span>Google-Extended</span><small>Google</small></span><span class="wenpai-tag-feed__side"><span>34 次</span></span></li><li><span class="wenpai-micro-tag">搜索</span><span class="wenpai-tag-feed__text"><span>Googlebot</span><small>Google</small></span><span class="wenpai-tag-feed__side"><span>210 次</span></span></li></ul></div></section><section class="card"><div class="card-head"><div><h2 class="card-title">什么是 GEO</h2></div></div><ul class="wenpai-tag-feed"><li><span class="wenpai-micro-tag">01</span><span class="wenpai-tag-feed__text"><span>输出结构化 Markdown，便于 AI 引擎解析。</span></span><span class="wenpai-tag-feed__side"></span></li><li><span class="wenpai-micro-tag">02</span><span class="wenpai-tag-feed__text"><span>注入作者、日期与品牌实体权威信号。</span></span><span class="wenpai-tag-feed__side"></span></li><li><span class="wenpai-micro-tag">03</span><span class="wenpai-tag-feed__text"><span>精细管理 AI 爬虫抓取与索引权限。</span></span><span class="wenpai-tag-feed__side"></span></li></ul><div class="card-foot"><a class="btn btn-ghost btn-sm" href="https://wpcy.com/document" target="_blank" rel="noopener noreferrer">查看文档<span class="screen-reader-text">（在新标签页打开）</span></a></div></section>			</div>
+		</div>
+	</div>
+
+	<!-- ========== 内容输出 ========== -->
+	<div data-wenpai-group="content" data-wenpai-view-hidden hidden>
+		<div class="wenpai-split">
+			<div class="wenpai-stack">
+				<section class="card"><div class="card-head"><div><h2 class="card-title">Markdown Feed</h2><p class="card-sub">提供纯净 Markdown 格式供 AI 爬虫读取。</p></div></div><div class="wenpai-field wenpai-field--toggle wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="wpmind-md-feed">启用独立 Markdown Feed</label></div><div class="field-ctl"><span class="wenpai-switch"><input type="hidden" name="wpmind_standalone_markdown_feed" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-md-feed" name="wpmind_standalone_markdown_feed" value="1" checked="checked"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span><p class="wenpai-field__desc">提供 /?feed=markdown 与 .md 路径。</p></div></div>					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><span class="wenpai-field__label">访问地址</span></div>
+						<div class="field-ctl">
+							<div class="wenpai-row wenpai-row--tight">
+								<span class="wenpai-code-row"><code class="wenpai-code">https://example.com/?feed=markdown</code><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-text="https://example.com/?feed=markdown" data-label="复制" data-done-label="已复制">复制</button></span>								<span class="wenpai-code-row"><code class="wenpai-code">https://example.com/your-post-slug.md</code><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-text="https://example.com/your-post-slug.md" data-label="复制" data-done-label="已复制">复制</button></span>							</div>
+						</div>
+					</div>
+					</section><section class="card"><div class="card-head"><div><h2 class="card-title">llms.txt</h2><p class="card-sub">在 /llms.txt 提供站点导航与内容索引。</p></div></div><div class="wenpai-field wenpai-field--toggle wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="wpmind-llms-txt">启用 llms.txt</label></div><div class="field-ctl"><span class="wenpai-switch"><input type="hidden" name="wpmind_llms_txt_enabled" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-llms-txt" name="wpmind_llms_txt_enabled" value="1" checked="checked"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span><p class="wenpai-field__desc">为 AI 引擎提供站点结构索引。</p></div></div>					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><span class="wenpai-field__label">访问地址</span></div>
+						<div class="field-ctl">
+				<span class="wenpai-code-row"><code class="wenpai-code">https://example.com/llms.txt</code><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-text="https://example.com/llms.txt" data-label="复制" data-done-label="已复制">复制</button></span>												<p class="wenpai-field__desc">朴素固定链接下请使用上方参数地址。</p>
+																	</div>
+					</div>
+					</section><section class="card"><div class="card-head"><div><h2 class="card-title">AI Sitemap</h2><p class="card-sub">在 /ai-sitemap.xml 输出 AI 专用站点地图。</p></div></div><div class="wenpai-field wenpai-field--toggle wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="wpmind-ai-sitemap">启用 AI Sitemap</label></div><div class="field-ctl"><span class="wenpai-switch"><input type="hidden" name="wpmind_ai_sitemap_enabled" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-ai-sitemap" name="wpmind_ai_sitemap_enabled" value="1" checked="checked"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span><p class="wenpai-field__desc">包含内容声明与摘要元数据。</p></div></div>				<div class="wenpai-field wenpai-field--row field">
+					<div class="field-label"><label class="wenpai-field__label" for="wpmind-ai-sitemap-max">最大条目数</label></div>
+					<div class="field-ctl">
+						<div class="field-ctl-row">
+							<input type="number" class="wpmind-num" id="wpmind-ai-sitemap-max" name="wpmind_ai_sitemap_max_entries" value="500" min="10" max="5000" step="10">
+							<span class="meta">10–5000</span>
+						</div>
+						<p class="wenpai-field__desc"><span class="wenpai-code-row"><code class="wenpai-code">https://example.com/ai-sitemap.xml</code><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-text="https://example.com/ai-sitemap.xml" data-label="复制" data-done-label="已复制">复制</button></span></p>
+					</div>
+				</div>
+				</section><section class="card"><div class="card-head"><div><h2 class="card-title">AI 摘要</h2><p class="card-sub">主动提供面向 AI 的文章摘要描述。</p></div></div><div class="wenpai-field wenpai-field--toggle wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="wpmind-ai-summary">启用 AI 摘要</label></div><div class="field-ctl"><span class="wenpai-switch"><input type="hidden" name="wpmind_ai_summary_enabled" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-ai-summary" name="wpmind_ai_summary_enabled" value="1" checked="checked"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span><p class="wenpai-field__desc">输出为 meta 标签与 Schema abstract。</p></div></div>				<div class="wenpai-field wenpai-field--row field">
+					<div class="field-label"><label class="wenpai-field__label" for="wpmind-ai-summary-fallback">无摘要时回退</label></div>
+					<div class="field-ctl">
+						<select id="wpmind-ai-summary-fallback" name="wpmind_ai_summary_fallback">
+							<option value="excerpt"  selected="selected">使用文章摘要</option>
+							<option value="none" >不输出</option>
+						</select>
+					</div>
+				</div>
+				</section>			</div>
+			<div class="wenpai-stack">
+				<section class="card"><div class="card-head"><div><h2 class="card-title">AI 内容分发</h2></div></div><ul class="wenpai-tag-feed"><li><span class="wenpai-micro-tag">01</span><span class="wenpai-tag-feed__text"><span>Markdown Feed 去除页面导航噪音。</span></span><span class="wenpai-tag-feed__side"></span></li><li><span class="wenpai-micro-tag">02</span><span class="wenpai-tag-feed__text"><span>llms.txt 引导 AI 快速发现核心栏目。</span></span><span class="wenpai-tag-feed__side"></span></li><li><span class="wenpai-micro-tag">03</span><span class="wenpai-tag-feed__text"><span>AI Sitemap 自动跳过 noai 标记文章。</span></span><span class="wenpai-tag-feed__side"></span></li></ul><div class="card-foot"><a class="btn btn-ghost btn-sm" href="https://wpcy.com/document" target="_blank" rel="noopener noreferrer">查看文档<span class="screen-reader-text">（在新标签页打开）</span></a></div></section>			</div>
+		</div>
+	</div>
+
+	<!-- ========== 结构化数据 ========== -->
+	<div data-wenpai-group="schema" data-wenpai-view-hidden hidden>
+		<div class="wenpai-split">
+			<div class="wenpai-stack">
+				<section class="card"><div class="card-head"><div><h2 class="card-title">Schema.org</h2><p class="card-sub">自动输出 Article、Breadcrumb 与 WebSite JSON-LD。</p></div></div><div class="wenpai-field wenpai-field--toggle wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="wpmind-schema-enabled">启用 Schema.org</label></div><div class="field-ctl"><span class="wenpai-switch"><input type="hidden" name="wpmind_schema_enabled" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-schema-enabled" name="wpmind_schema_enabled" value="1" checked="checked"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span><p class="wenpai-field__desc">为文章与页面注入语义结构化数据。</p></div></div>				<div class="wenpai-field wenpai-field--row field">
+					<div class="field-label"><label class="wenpai-field__label" for="wpmind-schema-mode">兼容模式</label></div>
+					<div class="field-ctl">
+						<select id="wpmind-schema-mode" name="wpmind_schema_mode">
+							<option value="auto"  selected="selected">自动（检测到 SEO 插件时不输出）</option>
+							<option value="force" >强制输出</option>
+						</select>
+					</div>
+				</div>
+				</section><section class="card"><div class="card-head"><div><h2 class="card-title">JSON-LD 预览</h2></div><div class="head-actions"><div class="wenpai-seg-tabs" role="tablist" data-wenpai-tabs="wpmind-geo-schema" aria-label="JSON-LD 预览类型"><button type="button" role="tab" class="is-active" aria-selected="true" data-wenpai-tab="article">Article</button><button type="button" role="tab" class="" aria-selected="false" data-wenpai-tab="breadcrumb">Breadcrumb</button><button type="button" role="tab" class="" aria-selected="false" data-wenpai-tab="website">WebSite</button></div></div></div><div class="wenpai-view-panes" data-wenpai-panes="wpmind-geo-schema"><div class="wenpai-view-pane" role="tabpanel" data-wenpai-pane="article"><div class="wenpai-code"><div class="wenpai-code__bar"><span class="wenpai-code__lang">json</span><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-target="self:code" data-label="复制" data-done-label="已复制">复制</button></div><pre><code class="language-json">{
+    &quot;@context&quot;: &quot;https://schema.org&quot;,
+    &quot;@type&quot;: &quot;BlogPosting&quot;,
+    &quot;headline&quot;: &quot;示例文章标题&quot;,
+    &quot;author&quot;: {
+        &quot;@type&quot;: &quot;Person&quot;,
+        &quot;name&quot;: &quot;Author&quot;
+    },
+    &quot;datePublished&quot;: &quot;2026-11-21T18:00:00+00:00&quot;,
+    &quot;publisher&quot;: {
+        &quot;@type&quot;: &quot;Organization&quot;,
+        &quot;name&quot;: &quot;示例技术博客&quot;,
+        &quot;url&quot;: &quot;https://example.com&quot;
+    },
+    &quot;inLanguage&quot;: &quot;zh_CN&quot;
+}</code></pre></div></div><div class="wenpai-view-pane is-inactive" role="tabpanel" data-wenpai-pane="breadcrumb" inert><div class="wenpai-code"><div class="wenpai-code__bar"><span class="wenpai-code__lang">json</span><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-target="self:code" data-label="复制" data-done-label="已复制">复制</button></div><pre><code class="language-json">{
+    &quot;@context&quot;: &quot;https://schema.org&quot;,
+    &quot;@type&quot;: &quot;BreadcrumbList&quot;,
+    &quot;itemListElement&quot;: [
+        {
+            &quot;@type&quot;: &quot;ListItem&quot;,
+            &quot;position&quot;: 1,
+            &quot;name&quot;: &quot;示例技术博客&quot;,
+            &quot;item&quot;: &quot;https://example.com/&quot;
+        },
+        {
+            &quot;@type&quot;: &quot;ListItem&quot;,
+            &quot;position&quot;: 2,
+            &quot;name&quot;: &quot;示例文章标题&quot;
+        }
+    ]
+}</code></pre></div></div><div class="wenpai-view-pane is-inactive" role="tabpanel" data-wenpai-pane="website" inert><div class="wenpai-code"><div class="wenpai-code__bar"><span class="wenpai-code__lang">json</span><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-target="self:code" data-label="复制" data-done-label="已复制">复制</button></div><pre><code class="language-json">{
+    &quot;@context&quot;: &quot;https://schema.org&quot;,
+    &quot;@type&quot;: &quot;WebSite&quot;,
+    &quot;name&quot;: &quot;示例技术博客&quot;,
+    &quot;url&quot;: &quot;https://example.com/&quot;,
+    &quot;potentialAction&quot;: {
+        &quot;@type&quot;: &quot;SearchAction&quot;,
+        &quot;target&quot;: &quot;https://example.com/?s={search_term_string}&quot;,
+        &quot;query-input&quot;: &quot;required name=search_term_string&quot;
+    }
+}</code></pre></div></div></div></section>			</div>
+			<div class="wenpai-stack">
+				<section class="card"><div class="card-head"><div><h2 class="card-title">Schema.org 说明</h2></div></div><ul class="wenpai-tag-feed"><li><span class="wenpai-micro-tag">01</span><span class="wenpai-tag-feed__text"><span>自动兼容 Yoast、Rank Math 与 Slim SEO。</span></span><span class="wenpai-tag-feed__side"></span></li><li><span class="wenpai-micro-tag">02</span><span class="wenpai-tag-feed__text"><span>中文字数与英文词数混合精确统计。</span></span><span class="wenpai-tag-feed__side"></span></li><li><span class="wenpai-micro-tag">03</span><span class="wenpai-tag-feed__text"><span>品牌实体开启后自动丰富 publisher。</span></span><span class="wenpai-tag-feed__side"></span></li></ul></section>			</div>
+		</div>
+	</div>
+
+	<!-- ========== AI 索引 ========== -->
+	<div data-wenpai-group="control" data-wenpai-view-hidden hidden>
+		<div class="wenpai-split">
+			<div class="wenpai-stack">
+				<section class="card"><div class="card-head"><div><h2 class="card-title">AI 索引指令</h2><p class="card-sub">控制 AI 爬虫对站点内容的索引与训练权限。</p></div></div><div class="wenpai-field wenpai-field--toggle wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="wpmind-ai-indexing">启用 AI 索引指令</label></div><div class="field-ctl"><span class="wenpai-switch"><input type="hidden" name="wpmind_ai_indexing_enabled" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-ai-indexing" name="wpmind_ai_indexing_enabled" value="1" checked="checked"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span><p class="wenpai-field__desc">输出 noai / nollm 标签与 HTTP 响应头。</p></div></div>				<div>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-ai-declaration">默认内容声明</label></div>
+						<div class="field-ctl">
+							<select id="wpmind-ai-declaration" name="wpmind_ai_default_declaration">
+								<option value="original"  selected="selected">原创内容 (original)</option>
+								<option value="ai-assisted" >AI 辅助创作 (ai-assisted)</option>
+								<option value="ai-generated" >AI 生成内容 (ai-generated)</option>
+							</select>
+						</div>
+					</div>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><span class="wenpai-field__label">排除的内容类型</span></div>
+						<div class="field-ctl">
+							<ul class="wenpai-checkgroup__list">
+																	<li><label class="chk">
+										<input type="checkbox" name="wpmind_ai_excluded_post_types[]" value="post" >
+										<span class="wenpai-checkgroup__text">文章 (post)</span>
+									</label></li>
+																	<li><label class="chk">
+										<input type="checkbox" name="wpmind_ai_excluded_post_types[]" value="page" >
+										<span class="wenpai-checkgroup__text">页面 (page)</span>
+									</label></li>
+															</ul>
+							<p class="wenpai-field__desc">勾选类型将输出 noai 与 nollm 指令。</p>
+						</div>
+					</div>
+				</div>
+				</section>			</div>
+			<div class="wenpai-stack">
+				<section class="card"><div class="card-head"><div><h2 class="card-title">索引权限说明</h2></div></div><ul class="wenpai-tag-feed"><li><span class="wenpai-micro-tag">01</span><span class="wenpai-tag-feed__text"><span>noai 禁止 AI 搜索引擎索引页面。</span></span><span class="wenpai-tag-feed__side"></span></li><li><span class="wenpai-micro-tag">02</span><span class="wenpai-tag-feed__text"><span>nollm 声明内容不用于模型训练。</span></span><span class="wenpai-tag-feed__side"></span></li><li><span class="wenpai-micro-tag">03</span><span class="wenpai-tag-feed__text"><span>单篇文章可在编辑器侧边栏单独覆盖。</span></span><span class="wenpai-tag-feed__side"></span></li></ul><div class="card-foot"><a class="btn btn-ghost btn-sm" href="https://wpcy.com/document" target="_blank" rel="noopener noreferrer">查看文档<span class="screen-reader-text">（在新标签页打开）</span></a></div></section>			</div>
+		</div>
+	</div>
+
+	<!-- ========== 爬虫管理 ========== -->
+	<div data-wenpai-group="crawlers" data-wenpai-view-hidden hidden>
+		<div class="wenpai-split">
+			<div class="wenpai-stack">
+				<section class="card"><div class="card-head"><div><h2 class="card-title">robots.txt AI 管理</h2><p class="card-sub">按爬虫注入 Allow 或 Disallow 规则，不改物理文件。</p></div></div><div class="wenpai-field wenpai-field--toggle wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="wpmind-robots-ai">启用 robots.txt 管理</label></div><div class="field-ctl"><span class="wenpai-switch"><input type="hidden" name="wpmind_robots_ai_enabled" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-robots-ai" name="wpmind_robots_ai_enabled" value="1" checked="checked"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span><p class="wenpai-field__desc">动态注入 AI 爬虫访问规则。</p></div></div>					<div class="wenpai-table-wrap">
+						<table class="tbl">
+							<thead>
+								<tr>
+									<th>爬虫</th>
+									<th>机构</th>
+									<th>规则</th>
+								</tr>
+							</thead>
+							<tbody>
+																	<tr>
+										<td>
+											<div class="t"><span class="mono">GPTBot</span></div>
+											<div class="d">OpenAI 检索与训练爬虫</div>
+										</td>
+										<td>OpenAI</td>
+										<td>
+											<select name="wpmind_robots_ai_rules[GPTBot]" class="wpmind-num">
+												<option value="" >不管理</option>
+												<option value="allow"  selected="selected">Allow</option>
+												<option value="disallow" >Disallow</option>
+											</select>
+										</td>
+									</tr>
+																	<tr>
+										<td>
+											<div class="t"><span class="mono">ClaudeBot</span></div>
+											<div class="d">Anthropic 内容索引爬虫</div>
+										</td>
+										<td>Anthropic</td>
+										<td>
+											<select name="wpmind_robots_ai_rules[ClaudeBot]" class="wpmind-num">
+												<option value="" >不管理</option>
+												<option value="allow"  selected="selected">Allow</option>
+												<option value="disallow" >Disallow</option>
+											</select>
+										</td>
+									</tr>
+																	<tr>
+										<td>
+											<div class="t"><span class="mono">PerplexityBot</span></div>
+											<div class="d">Perplexity AI 搜索索引</div>
+										</td>
+										<td>Perplexity</td>
+										<td>
+											<select name="wpmind_robots_ai_rules[PerplexityBot]" class="wpmind-num">
+												<option value="" >不管理</option>
+												<option value="allow"  selected="selected">Allow</option>
+												<option value="disallow" >Disallow</option>
+											</select>
+										</td>
+									</tr>
+																	<tr>
+										<td>
+											<div class="t"><span class="mono">Google-Extended</span></div>
+											<div class="d">Google Gemini 语料控制标记</div>
+										</td>
+										<td>Google</td>
+										<td>
+											<select name="wpmind_robots_ai_rules[Google-Extended]" class="wpmind-num">
+												<option value="" >不管理</option>
+												<option value="allow" >Allow</option>
+												<option value="disallow" >Disallow</option>
+											</select>
+										</td>
+									</tr>
+																	<tr>
+										<td>
+											<div class="t"><span class="mono">Bytespider</span></div>
+											<div class="d">字节跳动大模型索引爬虫</div>
+										</td>
+										<td>ByteDance</td>
+										<td>
+											<select name="wpmind_robots_ai_rules[Bytespider]" class="wpmind-num">
+												<option value="" >不管理</option>
+												<option value="allow" >Allow</option>
+												<option value="disallow"  selected="selected">Disallow</option>
+											</select>
+										</td>
+									</tr>
+															</tbody>
+						</table>
+					</div>
+					<p class="wenpai-field__desc">预览地址： <span class="wenpai-code-row"><code class="wenpai-code">https://example.com/robots.txt</code><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-text="https://example.com/robots.txt" data-label="复制" data-done-label="已复制">复制</button></span></p>
+					</section>			</div>
+			<div class="wenpai-stack">
+				<section class="card"><div class="card-head"><div><h2 class="card-title">AI 爬虫规则</h2></div></div><ul class="wenpai-tag-feed"><li><span class="wenpai-micro-tag">01</span><span class="wenpai-tag-feed__text"><span>覆盖国内外主流 20 余种 AI 爬虫。</span></span><span class="wenpai-tag-feed__side"></span></li><li><span class="wenpai-micro-tag">02</span><span class="wenpai-tag-feed__text"><span>通过 WordPress 过滤器注入，安全可逆。</span></span><span class="wenpai-tag-feed__side"></span></li></ul><div class="card-foot"><a class="btn btn-ghost btn-sm" href="https://wpcy.com/document" target="_blank" rel="noopener noreferrer">查看文档<span class="screen-reader-text">（在新标签页打开）</span></a></div></section>			</div>
+		</div>
+	</div>
+
+	<!-- ========== 品牌实体 ========== -->
+	<div data-wenpai-group="brand" data-wenpai-view-hidden hidden>
+		<div class="wenpai-split">
+			<div class="wenpai-stack">
+				<section class="card"><div class="card-head"><div><h2 class="card-title">组织与品牌实体</h2><p class="card-sub">增强 publisher Schema 并在首页输出 Organization JSON-LD。</p></div></div><div class="wenpai-field wenpai-field--toggle wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-entity">启用品牌实体</label></div><div class="field-ctl"><span class="wenpai-switch"><input type="hidden" name="wpmind_brand_entity_enabled" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-brand-entity" name="wpmind_brand_entity_enabled" value="1" checked="checked"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span><p class="wenpai-field__desc">输出品牌身份、社交主页与知识图谱链接。</p></div></div>				<div>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-org-type">组织类型</label></div>
+						<div class="field-ctl">
+							<select id="wpmind-brand-org-type" name="wpmind_brand_org_type">
+								<option value="Organization"  selected="selected">Organization</option>
+								<option value="Corporation" >Corporation</option>
+								<option value="LocalBusiness" >LocalBusiness</option>
+								<option value="OnlineBusiness" >OnlineBusiness</option>
+								<option value="NewsMediaOrganization" >NewsMediaOrganization</option>
+							</select>
+						</div>
+					</div>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-name">品牌名称</label></div>
+						<div class="field-ctl">
+							<input type="text" id="wpmind-brand-name" name="wpmind_brand_name" value="示例技术博客" placeholder="示例技术博客">
+						</div>
+					</div>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-desc">品牌描述</label></div>
+						<div class="field-ctl">
+							<textarea id="wpmind-brand-desc" name="wpmind_brand_description" rows="3" placeholder="简要介绍品牌或组织">专注 WordPress 与中文内容生态的实践笔记。</textarea>
+						</div>
+					</div>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-url">品牌网址</label></div>
+						<div class="field-ctl">
+							<input type="url" id="wpmind-brand-url" name="wpmind_brand_url" value="https://example.com" placeholder="https://example.com/">
+						</div>
+					</div>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-founding">创立日期</label></div>
+						<div class="field-ctl">
+							<input type="text" class="wpmind-num" id="wpmind-brand-founding" name="wpmind_brand_founding_date" value="" placeholder="2020-01-01">
+						</div>
+					</div>
+
+											<div class="wenpai-field wenpai-field--row field">
+							<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-facebook">Facebook</label></div>
+							<div class="field-ctl">
+								<input type="url" id="wpmind-brand-facebook" name="wpmind_brand_social_facebook" value="" placeholder="https://">
+							</div>
+						</div>
+											<div class="wenpai-field wenpai-field--row field">
+							<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-twitter">X (Twitter)</label></div>
+							<div class="field-ctl">
+								<input type="url" id="wpmind-brand-twitter" name="wpmind_brand_social_twitter" value="" placeholder="https://">
+							</div>
+						</div>
+											<div class="wenpai-field wenpai-field--row field">
+							<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-linkedin">LinkedIn</label></div>
+							<div class="field-ctl">
+								<input type="url" id="wpmind-brand-linkedin" name="wpmind_brand_social_linkedin" value="" placeholder="https://">
+							</div>
+						</div>
+											<div class="wenpai-field wenpai-field--row field">
+							<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-youtube">YouTube</label></div>
+							<div class="field-ctl">
+								<input type="url" id="wpmind-brand-youtube" name="wpmind_brand_social_youtube" value="" placeholder="https://">
+							</div>
+						</div>
+											<div class="wenpai-field wenpai-field--row field">
+							<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-github">GitHub</label></div>
+							<div class="field-ctl">
+								<input type="url" id="wpmind-brand-github" name="wpmind_brand_social_github" value="" placeholder="https://">
+							</div>
+						</div>
+											<div class="wenpai-field wenpai-field--row field">
+							<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-weibo">微博</label></div>
+							<div class="field-ctl">
+								<input type="url" id="wpmind-brand-weibo" name="wpmind_brand_social_weibo" value="" placeholder="https://">
+							</div>
+						</div>
+											<div class="wenpai-field wenpai-field--row field">
+							<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-zhihu">知乎</label></div>
+							<div class="field-ctl">
+								<input type="url" id="wpmind-brand-zhihu" name="wpmind_brand_social_zhihu" value="" placeholder="https://">
+							</div>
+						</div>
+											<div class="wenpai-field wenpai-field--row field">
+							<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-wechat">微信公众号</label></div>
+							<div class="field-ctl">
+								<input type="url" id="wpmind-brand-wechat" name="wpmind_brand_social_wechat" value="" placeholder="https://">
+							</div>
+						</div>
+					
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-contact-email">联系邮箱</label></div>
+						<div class="field-ctl">
+							<input type="email" id="wpmind-brand-contact-email" name="wpmind_brand_contact_email" value="" placeholder="hello@example.com">
+						</div>
+					</div>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-contact-phone">联系电话</label></div>
+						<div class="field-ctl">
+							<input type="tel" id="wpmind-brand-contact-phone" name="wpmind_brand_contact_phone" value="" placeholder="+86-xxx-xxxx-xxxx">
+						</div>
+					</div>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-wikidata">Wikidata URL</label></div>
+						<div class="field-ctl">
+							<input type="url" id="wpmind-brand-wikidata" name="wpmind_brand_wikidata_url" value="" placeholder="https://www.wikidata.org/wiki/Q...">
+						</div>
+					</div>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-wikipedia">Wikipedia URL</label></div>
+						<div class="field-ctl">
+							<input type="url" id="wpmind-brand-wikipedia" name="wpmind_brand_wikipedia_url" value="" placeholder="https://en.wikipedia.org/wiki/...">
+						</div>
+					</div>
+					<div class="wenpai-field wenpai-field--toggle wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="wpmind-entity-linker">文章实体关联</label></div><div class="field-ctl"><span class="wenpai-switch"><input type="hidden" name="wpmind_entity_linker_enabled" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-entity-linker" name="wpmind_entity_linker_enabled" value="1" checked="checked"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span><p class="wenpai-field__desc">在编辑器关联 Wikidata 实体输出 about.sameAs。</p></div></div>				</div>
+				</section>			</div>
+			<div class="wenpai-stack">
+				<section class="card"><div class="card-head"><div><h2 class="card-title">品牌实体说明</h2></div></div><ul class="wenpai-tag-feed"><li><span class="wenpai-micro-tag">01</span><span class="wenpai-tag-feed__text"><span>首页输出 Organization JSON-LD 身份声明。</span></span><span class="wenpai-tag-feed__side"></span></li><li><span class="wenpai-micro-tag">02</span><span class="wenpai-tag-feed__text"><span>sameAs 关联社交档案强化可信度。</span></span><span class="wenpai-tag-feed__side"></span></li><li><span class="wenpai-micro-tag">03</span><span class="wenpai-tag-feed__text"><span>Wikidata 链接协助 AI 消除语义歧义。</span></span><span class="wenpai-tag-feed__side"></span></li></ul><div class="card-foot"><a class="btn btn-ghost btn-sm" href="https://wpcy.com/document" target="_blank" rel="noopener noreferrer">查看文档<span class="screen-reader-text">（在新标签页打开）</span></a></div></section>			</div>
+		</div>
+	</div>
+
+	<section class="card"><div class="card-foot start"><span class="meta">一次保存全部六个分区的 GEO 设置。</span><button type="button" class="btn btn-primary" id="wpmind-save-geo">保存 GEO 设置</button></div></section></div>
+	</div>
+<footer class="foot"><span>文派心思 v0.14.0</span><span class="r"><a href="https://wpcy.com/document" target="_blank" rel="noopener noreferrer">文档<span class="screen-reader-text">（在新标签页打开）</span></a><a href="https://github.com/WenPai-org/wpmind" target="_blank" rel="noopener noreferrer">GitHub<span class="screen-reader-text">（在新标签页打开）</span></a></span></footer></main></div>
+<script src="../../lib/wenpai-admin-ui/js/wenpai-admin.js"></script>
+</body>
+</html>

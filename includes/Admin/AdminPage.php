@@ -92,11 +92,15 @@ final class AdminPage {
 	 * @return string
 	 */
 	public static function url( array $args = [] ): string {
-		if ( class_exists( 'Wenpai_Admin_Menu', false ) ) {
+		if ( class_exists( 'Wenpai_Admin_Menu', false ) && function_exists( 'admin_url' ) && function_exists( 'add_query_arg' ) ) {
 			return \Wenpai_Admin_Menu::url( 'wpmind', $args );
 		}
-		$base = menu_page_url( 'wpmind', false );
-		return $base ? add_query_arg( $args, $base ) : '';
+		if ( function_exists( 'menu_page_url' ) && function_exists( 'add_query_arg' ) ) {
+			$base = menu_page_url( 'wpmind', false );
+			return $base ? add_query_arg( $args, $base ) : '';
+		}
+		$query = array_merge( [ 'page' => 'wpmind' ], $args );
+		return '?' . http_build_query( $query );
 	}
 
 	/**
@@ -148,27 +152,45 @@ final class AdminPage {
 	}
 
 	/**
-	 * 添加管理菜单（kit Settings 子菜单；kit 未加载时退回 options 页）
+	 * 添加管理菜单（kit 顶级中枢菜单；kit 未加载时退回 options 页）
 	 */
 	public function add_admin_menu(): void {
+		$display = SuiteIntegration::display();
+		$label   = $display['menu_label'];
+		$title   = $display['brand'];
+
 		if ( class_exists( 'Wenpai_Admin_Menu', false ) ) {
 			\Wenpai_Admin_Menu::register(
 				[
-					'slug'    => 'wpmind',
-					'label'   => __( '心思', 'wpmind' ),
-					'title'   => __( '文派心思', 'wpmind' ),
-					'render'  => [ $this, 'render_settings_page' ],
+					'slug'       => 'wpmind',
+					'top_level'  => true,
+					'label'      => $label,
+					'title'      => $title,
+					'capability' => 'manage_options',
+					'icon'       => self::menu_icon_data_uri(),
+					'render'     => [ $this, 'render_settings_page' ],
 				]
 			);
 			return;
 		}
 		add_options_page(
-			__( '文派心思', 'wpmind' ),
-			__( '心思', 'wpmind' ),
+			$title,
+			$label,
 			'manage_options',
 			'wpmind',
 			[ $this, 'render_settings_page' ]
 		);
+	}
+
+	/**
+	 * WordPress 左侧菜单单色 SVG 图标（base64 data URI）。
+	 *
+	 * @return string
+	 */
+	private static function menu_icon_data_uri(): string {
+		$svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4"/><circle cx="12" cy="3" r="1"/><circle cx="9" cy="13" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1" fill="currentColor" stroke="none"/><path d="M9 17h6"/></svg>';
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- WordPress admin menu SVG icon data URI.
+		return 'data:image/svg+xml;base64,' . base64_encode( $svg );
 	}
 
 	/**
@@ -232,6 +254,16 @@ final class AdminPage {
 				'type'              => 'string',
 				'sanitize_callback' => [ $this, 'sanitize_default_provider' ],
 				'default'           => '',
+			]
+		);
+
+		register_setting(
+			'wpmind_settings',
+			'wpmind_cloud_enabled',
+			[
+				'type'              => 'string',
+				'sanitize_callback' => [ $this, 'sanitize_exact_cache_enabled' ],
+				'default'           => '0',
 			]
 		);
 
@@ -434,8 +466,11 @@ final class AdminPage {
 			'openai_gpt_image',
 			'google_gemini_image',
 			'tencent_hunyuan',
+			'bytedance_reve',
+			'bytedance_seedream',
 			'bytedance_doubao',
 			'flux',
+			'midjourney',
 			'qwen_image',
 		];
 
@@ -584,11 +619,15 @@ final class AdminPage {
 			return $links;
 		}
 
-		$links[] = sprintf(
-			'<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
-			esc_url( 'https://linuxjoy.com/plugins/wpmind/docs' ),
-			esc_html__( '文档', 'wpmind' )
-		);
+		$display  = SuiteIntegration::display();
+		$docs_url = $display['docs_url'];
+		if ( '' !== $docs_url ) {
+			$links[] = sprintf(
+				'<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+				esc_url( $docs_url ),
+				esc_html__( '文档', 'wpmind' )
+			);
+		}
 
 		return $links;
 	}

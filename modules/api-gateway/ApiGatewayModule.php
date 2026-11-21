@@ -134,7 +134,7 @@ class ApiGatewayModule implements ModuleInterface {
 		// Runtime-only setup starts after the explicit gateway opt-in.
 		SchemaManager::maybe_upgrade();
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
-		add_action( 'wpmind_gateway_sse_complete', array( $this, 'log_sse_completion' ), 10, 3 );
+		add_action( 'wpmind_gateway_sse_complete', array( $this, 'log_sse_completion' ), 10, 4 );
 
 		/**
 		 * Fires when API Gateway module is initialized.
@@ -171,12 +171,30 @@ class ApiGatewayModule implements ModuleInterface {
 	 * SSE streams exit() before pipeline finalization, so this
 	 * hook ensures audit logs and usage counters are still updated.
 	 *
-	 * @param string              $request_id Request ID.
-	 * @param string              $key_id     API key ID.
-	 * @param Stream\StreamResult $result     Stream result.
+	 * @param string                              $request_id Request ID.
+	 * @param string                              $key_id     API key ID.
+	 * @param Stream\StreamResult                 $result     Stream result.
+	 * @param Pipeline\GatewayRequestContext|null $context    Optional request context.
 	 */
-	public function log_sse_completion( string $request_id, string $key_id, Stream\StreamResult $result ): void {
+	public function log_sse_completion(
+		string $request_id,
+		string $key_id,
+		Stream\StreamResult $result,
+		?Pipeline\GatewayRequestContext $context = null
+	): void {
 		global $wpdb;
+
+		$payload  = $context?->get_internal_payload() ?? [];
+		$provider = '' !== $result->provider ? $result->provider : (string) ( $payload['provider'] ?? '' );
+		$model    = '' !== $result->model ? $result->model : (string) ( $payload['model'] ?? '' );
+
+		$input_tokens  = $result->input_tokens;
+		$output_tokens = $result->output_tokens > 0 ? $result->output_tokens : $result->tokens_used;
+		$total_tokens  = $input_tokens + $output_tokens;
+		$latency_ms    = $result->latency_ms > 0 ? $result->latency_ms : ( $context?->elapsed_ms() ?? 0 );
+		$cost_usd      = '' !== $provider
+			? Pipeline\LogMiddleware::calculate_cost_usd( $provider, $model, $input_tokens, $output_tokens )
+			: 0.0;
 
 		// Audit log.
 		$audit_table = $wpdb->prefix . 'wpmind_api_audit_log';
@@ -191,7 +209,12 @@ class ApiGatewayModule implements ModuleInterface {
 				'user_agent'    => sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ?? '' ) ),
 				'detail_json'   => wp_json_encode(
 					[
-						'tokens_used'   => $result->tokens_used,
+						'provider'      => $provider,
+						'model'         => $model,
+						'input_tokens'  => $input_tokens,
+						'output_tokens' => $output_tokens,
+						'tokens_used'   => $total_tokens,
+						'cost_usd'      => $cost_usd,
 						'finish_reason' => $result->finish_reason,
 						'stream'        => true,
 					]
@@ -201,31 +224,36 @@ class ApiGatewayModule implements ModuleInterface {
 			[ '%s', '%s', '%d', '%s', '%s', '%s', '%s', '%s' ]
 		);
 
-		// Usage upsert.
-		$usage_table  = $wpdb->prefix . 'wpmind_api_key_usage';
+		// SQLite- and MySQL-compatible monthly usage upsert.
 		$window_month = gmdate( 'Y-m' );
 		$now          = current_time( 'mysql', true );
-		$tokens       = $result->tokens_used;
-
-		$wpdb->query(
-			$wpdb->prepare(
-				'INSERT INTO %i (key_id, window_month, request_count, input_tokens, output_tokens, total_tokens, total_cost_usd, updated_at)
-			VALUES (%s, %s, 1, 0, %d, %d, 0, %s)
-			ON DUPLICATE KEY UPDATE
-				request_count = request_count + 1,
-				output_tokens = output_tokens + %d,
-				total_tokens = total_tokens + %d,
-				updated_at = %s',
-				$usage_table,
-				$key_id,
-				$window_month,
-				$tokens,
-				$tokens,
-				$now,
-				$tokens,
-				$tokens,
-				$now
-			)
+		Pipeline\LogMiddleware::upsert_key_usage(
+			$key_id,
+			$window_month,
+			$input_tokens,
+			$output_tokens,
+			$total_tokens,
+			$cost_usd,
+			$now
 		);
+
+		// Emit site-wide usage event for SSE completion.
+		$auth_result = $context?->auth_result();
+		$key_prefix  = is_object( $auth_result ) && isset( $auth_result->key_prefix ) && '' !== (string) $auth_result->key_prefix
+			? (string) $auth_result->key_prefix
+			: substr( $key_id, 0, 8 );
+
+		if ( $total_tokens > 0 || '' !== $provider ) {
+			do_action(
+				'wpmind_usage_record',
+				$provider,
+				$model,
+				$input_tokens,
+				$output_tokens,
+				$latency_ms,
+				'api_gateway:' . $key_prefix,
+				'byok'
+			);
+		}
 	}
 }

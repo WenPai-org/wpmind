@@ -88,7 +88,6 @@ final class WPMind {
 	 * 构造函数
 	 */
 	private function __construct() {
-		$this->load_textdomain();
 		$this->load_core();
 		$this->load_custom_endpoints();
 		$this->load_public_api();
@@ -159,11 +158,11 @@ final class WPMind {
 	}
 
 	/**
-	 * 加载翻译文件
+	 * 加载翻译文件（挂在 init 优先级 1，避免 WP 6.7+ JIT 警告）。
 	 *
 	 * @since 1.1.0
 	 */
-	private function load_textdomain(): void {
+	public function load_textdomain(): void {
 		load_plugin_textdomain(
 			'wpmind',
 			false,
@@ -180,6 +179,11 @@ final class WPMind {
 	 * 再和代码默认值拼成旧的数组结构，供模板、服务层和第三方继续使用。
 	 */
 	private function load_custom_endpoints(): void {
+		// 后台首次构造 ModelCatalog 前先让 RemoteCatalog 有机会刷新，避免过期后首个请求读旧表.
+		if ( is_admin() && ( ! function_exists( 'wp_doing_ajax' ) || ! wp_doing_ajax() ) ) {
+			Provider\Catalog\RemoteCatalog::maybe_refresh();
+		}
+
 		$repository = new Provider\EndpointRepository();
 		$defaults   = $this->get_default_endpoints();
 
@@ -212,7 +216,7 @@ final class WPMind {
 	public function get_default_endpoints(): array {
 		$catalog   = Provider\Catalog\ModelCatalog::instance();
 		$endpoints = [];
-		foreach ( Provider\ProviderDefinitions::DEFINITIONS as $key => $definition ) {
+		foreach ( Provider\ProviderDefinitions::all() as $key => $definition ) {
 			$endpoint = [
 				'name'         => $definition['name'],
 				'display_name' => $definition['display_name'],
@@ -225,6 +229,9 @@ final class WPMind {
 			if ( ! empty( $definition['is_official'] ) ) {
 				$endpoint['is_official'] = true;
 			}
+			if ( ! empty( $definition['is_cloud'] ) ) {
+				$endpoint['is_cloud'] = true;
+			}
 			$endpoints[ $key ] = $endpoint;
 		}
 		return $endpoints;
@@ -234,6 +241,18 @@ final class WPMind {
 	 * 初始化钩子
 	 */
 	private function init_hooks(): void {
+		// 翻译加载挂在 init 优先级 1（符合 WP 6.7+ 规范）.
+		add_action( 'init', [ $this, 'load_textdomain' ], 1 );
+
+		// 文派套件集成（文件存在时加载并初始化）.
+		$suite_integration = WPMIND_PLUGIN_DIR . 'includes/Admin/SuiteIntegration.php';
+		if ( file_exists( $suite_integration ) ) {
+			require_once $suite_integration;
+			if ( class_exists( '\\WPMind\\Admin\\SuiteIntegration' ) ) {
+				\WPMind\Admin\SuiteIntegration::init();
+			}
+		}
+
 		// 管理后台
 		if ( is_admin() || wp_doing_ajax() ) {
 			Admin\AdminBoot::instance()->init();
@@ -376,7 +395,16 @@ final class WPMind {
 
 		if ( $input_tokens > 0 || $output_tokens > 0 ) {
 			/** This action is documented in modules/cost-control/CostControlModule.php */
-			do_action( 'wpmind_usage_record', $provider_id, $model_name, $input_tokens, $output_tokens, 0 );
+			do_action(
+				'wpmind_usage_record',
+				$provider_id,
+				$model_name,
+				$input_tokens,
+				$output_tokens,
+				0,
+				'wp_core_ai',
+				Provider\WenpaiCloud::payer_for( $provider_id )
+			);
 		}
 	}
 
@@ -428,14 +456,22 @@ final class WPMind {
 		}
 
 		// 使用图像路由器
-		$router = Providers\Image\ImageRouter::instance();
-
-		return $router->generate(
+		$router    = Providers\Image\ImageRouter::instance();
+		$generated = $router->generate(
 			$prompt,
 			[
 				'size' => '1024x1024',
 			]
 		);
+
+		if ( is_wp_error( $generated ) ) {
+			return [
+				'success' => false,
+				'error'   => $generated->get_error_message(),
+			];
+		}
+
+		return $generated;
 	}
 
 	/**
@@ -545,13 +581,24 @@ final class WPMind {
 		 *
 		 * @since 3.3.0
 		 *
-		 * @param string $provider Provider ID
-		 * @param string $model 模型名称
-		 * @param int    $input_tokens 输入 tokens
-		 * @param int    $output_tokens 输出 tokens
-		 * @param int    $latency_ms 延迟（毫秒）
+		 * @param string $provider Provider ID.
+		 * @param string $model 模型名称.
+		 * @param int    $input_tokens 输入 tokens.
+		 * @param int    $output_tokens 输出 tokens.
+		 * @param int    $latency_ms 延迟（毫秒）.
+		 * @param string $context 调用上下文.
+		 * @param string $payer 计费方（wenpai_cloud 或 byok）.
 		 */
-		do_action( 'wpmind_usage_record', $provider, $model, $input_tokens, $output_tokens, $latency_ms );
+		do_action(
+			'wpmind_usage_record',
+			$provider,
+			$model,
+			$input_tokens,
+			$output_tokens,
+			$latency_ms,
+			'',
+			Provider\WenpaiCloud::payer_for( $provider )
+		);
 	}
 
 	/**
@@ -616,41 +663,36 @@ final class WPMind {
 	}
 
 	/**
-	 * 检查端点是否已配置 API Key
+	 * 检查端点是否已配置 API Key（含锁 Key、Connectors 回退与官方算力令牌）。
 	 *
-	 * @param string $endpoint_key 端点标识
+	 * @param string $endpoint_key 端点标识.
 	 * @return bool 是否已配置
 	 * @since 1.2.0
 	 */
 	public function has_api_key( string $endpoint_key ): bool {
-		return ! empty( $this->custom_endpoints[ $endpoint_key ]['api_key'] );
+		return ( new Provider\EndpointRepository() )->has_api_key( $endpoint_key );
 	}
 
 	/**
-	 * 获取指定端点的 API Key
+	 * 获取指定端点的 API Key（含锁 Key、Connectors 回退与官方算力令牌）。
 	 *
-	 * @param string $endpoint_key 端点标识
+	 * @param string $endpoint_key 端点标识.
 	 * @return string API Key
 	 * @since 1.1.0
 	 */
 	public function get_api_key( string $endpoint_key ): string {
-		return $this->custom_endpoints[ $endpoint_key ]['api_key'] ?? '';
+		return ( new Provider\EndpointRepository() )->get_api_key( $endpoint_key );
 	}
 
 	/**
-	 * 检查端点是否可用
+	 * 检查端点是否可用（已启用且有可用凭证）。
 	 *
-	 * @param string $endpoint_key 端点标识
+	 * @param string $endpoint_key 端点标识.
 	 * @return bool 是否可用
 	 * @since 1.1.0
 	 */
 	public function is_endpoint_available( string $endpoint_key ): bool {
-		if ( ! isset( $this->custom_endpoints[ $endpoint_key ] ) ) {
-			return false;
-		}
-
-		$endpoint = $this->custom_endpoints[ $endpoint_key ];
-		return ! empty( $endpoint['enabled'] ) && ! empty( $endpoint['api_key'] );
+		return ( new Provider\EndpointRepository() )->get( $endpoint_key )->is_usable();
 	}
 }
 

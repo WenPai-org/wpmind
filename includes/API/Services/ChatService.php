@@ -106,6 +106,18 @@ class ChatService extends AbstractService {
 			return $cache_lookup['value'];
 		}
 
+		// 缓存未命中、发上游请求前执行站内预算强控.
+		$budget_check = $this->check_budget_before_request( $provider, (string) $context );
+		if ( is_wp_error( $budget_check ) ) {
+			do_action( 'wpmind_error', $budget_check, 'chat', $args );
+			return $budget_check;
+		}
+		$budget_fallback_model = $budget_check['fallback_model'];
+		if ( '' !== $budget_fallback_model ) {
+			$model         = $budget_fallback_model;
+			$model_is_auto = false;
+		}
+
 		do_action( 'wpmind_before_request', 'chat', $args, $context );
 
 		$result          = null;
@@ -124,7 +136,9 @@ class ChatService extends AbstractService {
 
 			$tried_providers[] = $try_provider;
 
-			$try_model = $this->resolve_attempt_model( $try_provider, (string) $model, $model_is_auto );
+			$try_model = '' !== $budget_fallback_model
+				? $budget_fallback_model
+				: $this->resolve_attempt_model( $try_provider, (string) $model, $model_is_auto );
 
 			$provider_attempts = 0;
 			$max_attempts      = 2; // 每家最多 2 次
@@ -138,7 +152,7 @@ class ChatService extends AbstractService {
 				$hop_timeout = max( 1, (int) floor( min( $remaining, $hop_cap_ms ) / 1000 ) );
 
 				++$provider_attempts;
-				$result = $this->execute_chat_request( $args, $try_provider, $try_model, $hop_timeout );
+				$result = $this->execute_chat_request( $args, $try_provider, $try_model, $hop_timeout, (string) $context );
 
 				if ( ! is_wp_error( $result ) ) {
 					$failover_meta = [
@@ -300,6 +314,18 @@ class ChatService extends AbstractService {
 			do_action( 'wpmind_provider_failover', $provider, $failover_chain[0], $context, 'preferred_unavailable' );
 		}
 
+		// 发上游请求前执行站内预算强控.
+		$budget_check = $this->check_budget_before_request( $provider, (string) $context );
+		if ( is_wp_error( $budget_check ) ) {
+			do_action( 'wpmind_error', $budget_check, 'stream', compact( 'messages', 'options' ) );
+			return $budget_check;
+		}
+		$budget_fallback_model = $budget_check['fallback_model'];
+		if ( '' !== $budget_fallback_model ) {
+			$original_model = $budget_fallback_model;
+			$model_is_auto  = false;
+		}
+
 		do_action( 'wpmind_before_request', 'stream', compact( 'messages', 'options' ), $context );
 
 		$endpoints             = $this->get_endpoints();
@@ -327,7 +353,9 @@ class ChatService extends AbstractService {
 			}
 
 			$custom_url = '' !== trim( (string) ( $endpoint['custom_base_url'] ?? '' ) );
-			if ( $custom_url ) {
+			if ( '' !== $budget_fallback_model ) {
+				$model = $budget_fallback_model;
+			} elseif ( $custom_url ) {
 				// Custom endpoint: foreign model namespace, skip catalog resolution.
 				$model = $this->resolve_attempt_model( $try_provider, (string) $original_model, $model_is_auto );
 			} else {
@@ -392,8 +420,12 @@ class ChatService extends AbstractService {
 				continue; // 建连前可回退
 			}
 
-			$full_content     = '';
-			$content_started  = false;
+			$full_content    = '';
+			$content_started = false;
+			$stream_usage    = [
+				'prompt_tokens'     => 0,
+				'completion_tokens' => 0,
+			];
 
 			while ( ! feof( $stream ) ) {
 				$line = fgets( $stream );
@@ -416,6 +448,11 @@ class ChatService extends AbstractService {
 					continue;
 				}
 
+				if ( isset( $json['usage'] ) && is_array( $json['usage'] ) ) {
+					$stream_usage['prompt_tokens']     = max( 0, (int) ( $json['usage']['prompt_tokens'] ?? $json['usage']['input_tokens'] ?? $stream_usage['prompt_tokens'] ) );
+					$stream_usage['completion_tokens'] = max( 0, (int) ( $json['usage']['completion_tokens'] ?? $json['usage']['output_tokens'] ?? $stream_usage['completion_tokens'] ) );
+				}
+
 				$delta = $json['choices'][0]['delta']['content'] ?? '';
 				if ( ! empty( $delta ) ) {
 					$content_started        = true;
@@ -431,7 +468,37 @@ class ChatService extends AbstractService {
 
 			if ( $stream_output_started || '' !== $full_content ) {
 				$this->record_result( $try_provider, true, $latency_ms );
-				do_action( 'wpmind_after_request', 'stream', [ 'content' => $full_content ], compact( 'messages', 'options' ), [] );
+
+				$in_tokens  = $stream_usage['prompt_tokens'];
+				$out_tokens = $stream_usage['completion_tokens'];
+				if ( 0 === $in_tokens && 0 === $out_tokens ) {
+					$prompt_text = wp_json_encode( $normalized_messages );
+					$in_tokens   = max( 1, (int) ceil( mb_strlen( is_string( $prompt_text ) ? $prompt_text : '' ) / 3 ) );
+					$out_tokens  = max( 1, (int) ceil( mb_strlen( $full_content ) / 3 ) );
+				}
+
+				do_action(
+					'wpmind_usage_record',
+					$try_provider,
+					$model,
+					$in_tokens,
+					$out_tokens,
+					$latency_ms,
+					(string) $context,
+					\WPMind\Provider\WenpaiCloud::payer_for( $try_provider )
+				);
+
+				do_action(
+					'wpmind_after_request',
+					'stream',
+					[ 'content' => $full_content ],
+					compact( 'messages', 'options' ),
+					[
+						'prompt_tokens'     => $in_tokens,
+						'completion_tokens' => $out_tokens,
+						'total_tokens'      => $in_tokens + $out_tokens,
+					]
+				);
 				return true;
 			}
 
@@ -514,12 +581,14 @@ class ChatService extends AbstractService {
 	 * 执行 Chat 请求（路由方法）
 	 *
 	 * @since 3.6.0
-	 * @param array  $args     请求参数
-	 * @param string $provider 服务商
-	 * @param string $model    模型
+	 * @param array  $args     请求参数.
+	 * @param string $provider 服务商.
+	 * @param string $model    模型.
+	 * @param int    $timeout  超时秒数.
+	 * @param string $context  调用上下文.
 	 * @return array|WP_Error
 	 */
-	private function execute_chat_request( array $args, string $provider, string $model, int $timeout = 0 ) {
+	private function execute_chat_request( array $args, string $provider, string $model, int $timeout = 0, string $context = '' ) {
 		if ( $this->should_use_sdk( $provider, $args ) ) {
 			$sdk        = new \WPMind\SDK\SDKAdapter();
 			$start_time = microtime( true );
@@ -541,19 +610,21 @@ class ChatService extends AbstractService {
 			}
 		}
 
-		return $this->execute_chat_request_native( $args, $provider, $model, $timeout );
+		return $this->execute_chat_request_native( $args, $provider, $model, $timeout, $context );
 	}
 
 	/**
 	 * 通过原生 HTTP 执行 chat 请求
 	 *
 	 * @since 3.6.0
-	 * @param array  $args     请求参数
-	 * @param string $provider 服务商
-	 * @param string $model    模型
+	 * @param array  $args     请求参数.
+	 * @param string $provider 服务商.
+	 * @param string $model    模型.
+	 * @param int    $timeout  超时秒数.
+	 * @param string $context  调用上下文.
 	 * @return array|WP_Error
 	 */
-	private function execute_chat_request_native( array $args, string $provider, string $model, int $timeout = 0 ) {
+	private function execute_chat_request_native( array $args, string $provider, string $model, int $timeout = 0, string $context = '' ) {
 		$endpoints = $this->get_endpoints();
 
 		if ( ! isset( $endpoints[ $provider ] ) ) {
@@ -616,6 +687,7 @@ class ChatService extends AbstractService {
 				'body'    => $request_body,
 				'timeout' => $timeout,
 				'model'   => $model,
+				'context' => $context,
 			]
 		);
 

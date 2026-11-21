@@ -76,14 +76,21 @@
 		return type === 'meta_bulk' ? 'Meta 批量' : 'Alt 批量';
 	}
 
+	function microTagTone( state ) {
+		if ( state === 'ok' || state === 'warn' || state === 'bad' || state === 'accent' ) {
+			return ' is-' + state;
+		}
+		return '';
+	}
+
 	function taskPill( status ) {
 		var p = TASK_PILLS[ status ] || [ status || '', 'mute' ];
-		return '<span class="pill ' + p[1] + '">' + esc( p[0] ) + '</span>';
+		return '<span class="wenpai-micro-tag' + microTagTone( p[1] ) + '">' + esc( p[0] ) + '</span>';
 	}
 
 	function itemPill( status, errorMessage ) {
 		var p = ITEM_PILLS[ status ] || [ status || '', 'mute' ];
-		var html = '<span class="pill ' + p[1] + '">' + esc( p[0] ) + '</span>';
+		var html = '<span class="wenpai-micro-tag' + microTagTone( p[1] ) + '">' + esc( p[0] ) + '</span>';
 		if ( errorMessage ) {
 			html += ' <span class="meta">— ' + esc( errorMessage ) + '</span>';
 		}
@@ -216,7 +223,7 @@
 			}
 			// 焦点卡操作组按任务类型显隐（alt_bulk / meta_bulk）。
 			$( '.wpmind-workflow-actset' ).each( function() {
-				$( this ).toggle( type !== '' && type === $( this ).data( 'type' ) );
+				$( this ).prop( 'hidden', ! ( type !== '' && type === $( this ).data( 'type' ) ) );
 			} );
 		},
 
@@ -628,7 +635,7 @@
 					'</tr>'
 				);
 			} );
-			$wrap.show();
+			$wrap.prop( 'hidden', false );
 		}
 	};
 

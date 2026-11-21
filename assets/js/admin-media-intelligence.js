@@ -26,17 +26,11 @@
 
 		init: function() {
 			this.bindEvents();
-			this.restoreSubTab();
 			this.loadStats();
 		},
 
 		bindEvents: function() {
 			var self = this;
-
-			// Sub-tab switching (scoped to media panel).
-			$( '.wpmind-media-panel .wpmind-module-subtab' ).on( 'click', function() {
-				self.switchTab( $( this ).data( 'tab' ) );
-			} );
 
 			$( '#wpmind-save-media-settings, #wpmind-save-media-safety' ).on( 'click', function() {
 				self.saveSettings( $( this ) );
@@ -47,29 +41,6 @@
 			$( '#wpmind-media-bulk-start' ).on( 'click', function() {
 				self.startBulkProcess();
 			} );
-		},
-
-		switchTab: function( tab ) {
-			$( '.wpmind-media-panel .wpmind-module-subtab' ).removeClass( 'active' );
-			$( '.wpmind-media-panel .wpmind-module-subtab[data-tab="' + tab + '"]' ).addClass( 'active' );
-
-			$( '.wpmind-media-panel .wpmind-module-tab-panel' ).removeClass( 'active' );
-			$( '.wpmind-media-panel .wpmind-module-tab-panel[data-panel="' + tab + '"]' ).addClass( 'active' );
-
-			try {
-				sessionStorage.setItem( 'wpmind_mi_subtab', tab );
-			} catch ( e ) {}
-		},
-
-		restoreSubTab: function() {
-			var tab = 'settings';
-			try {
-				var saved = sessionStorage.getItem( 'wpmind_mi_subtab' );
-				if ( saved && $( '.wpmind-media-panel .wpmind-module-subtab[data-tab="' + saved + '"]' ).length ) {
-					tab = saved;
-				}
-			} catch ( e ) {}
-			this.switchTab( tab );
 		},
 
 		loadStats: function() {
@@ -170,9 +141,16 @@
 			this.totalProcessed = 0;
 
 			$( '#wpmind-media-bulk-start' ).prop( 'disabled', true );
-			$( '.wpmind-media-progress' ).show();
+			$( '.wpmind-media-progress' ).prop( 'hidden', false );
 
 			this.processBatch();
+		},
+
+		setProgress: function( pct, labelText ) {
+			var $bar = $( '#wpmind-media-progressbar' );
+			$bar.attr( 'aria-valuenow', pct ).attr( 'aria-valuetext', labelText );
+			$bar.children( 'i' ).css( 'width', pct + '%' );
+			$bar.siblings( '.progress-pct' ).text( labelText );
 		},
 
 		processBatch: function() {
@@ -194,16 +172,13 @@
 
 					self.totalProcessed += response.data.processed;
 
-					// Update progress bar.
 					var total = self.missingCount || 1;
 					var pct = Math.min( 100, Math.round( self.totalProcessed / total * 100 ) );
-					$( '.wpmind-media-progress-fill' ).css( 'width', pct + '%' );
-					$( '.wpmind-media-progress-text' ).text( pct + '% (' + self.totalProcessed + '/' + total + ')' );
+					self.setProgress( pct, pct + '% (' + self.totalProcessed + '/' + total + ')' );
 
 					if ( response.data.done ) {
 						self.finishBulk( '批量处理完成，共处理 ' + self.totalProcessed + ' 张图片' );
 					} else {
-						// Continue with next batch.
 						self.processBatch();
 					}
 				},
@@ -215,15 +190,13 @@
 
 		finishBulk: function( message ) {
 			this.isProcessing = false;
-			$( '.wpmind-media-progress-fill' ).css( 'width', '100%' );
-			$( '.wpmind-media-progress-text' ).text( '100%' );
+			this.setProgress( 100, '100%' );
 			Toast.success( message );
 			this.loadStats();
 
-			// Re-enable scan button after a short delay.
 			setTimeout( function() {
 				$( '#wpmind-media-bulk-start' ).prop( 'disabled', true );
-				$( '.wpmind-media-progress' ).fadeOut();
+				$( '.wpmind-media-progress' ).prop( 'hidden', true );
 			}, 3000 );
 		}
 	};

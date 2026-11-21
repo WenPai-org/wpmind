@@ -19,12 +19,6 @@ parameters:
 			path: ../../includes/API/Services/AudioService.php
 
 		-
-			message: '#^Call to function is_wp_error\(\) with array will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: ../../includes/API/Services/ImageService.php
-
-		-
 			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
 			identifier: constant.notFound
 			count: 10
@@ -319,26 +313,8 @@ parameters:
 			path: ../../modules/cost-control/CostControlModule.php
 
 		-
-			message: '#^Parameter \#1 \$text of function esc_attr expects string, float\|int given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../modules/cost-control/includes/BudgetAlert.php
-
-		-
 			message: '#^Constant WPMind\\Modules\\CostControl\\UsageTracker\:\:PRICING is unused\.$#'
 			identifier: classConstant.unused
-			count: 1
-			path: ../../modules/cost-control/includes/UsageTracker.php
-
-		-
-			message: '#^Offset ''daily'' on non\-empty\-array\<mixed\> on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: ../../modules/cost-control/includes/UsageTracker.php
-
-		-
-			message: '#^Offset ''monthly'' on non\-empty\-array\<mixed\> on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
 			count: 1
 			path: ../../modules/cost-control/includes/UsageTracker.php
 
@@ -469,36 +445,6 @@ parameters:
 			path: ../../templates/admin/views/module.php
 
 		-
-			message: '#^Constant WPMIND_PLUGIN_DIR not found\.$#'
-			identifier: constant.notFound
-			count: 1
-			path: ../../templates/admin/views/overview.php
-
-		-
-			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
-			identifier: constant.notFound
-			count: 1
-			path: ../../templates/admin/views/overview.php
-
-		-
-			message: '#^Constant WPMIND_PLUGIN_DIR not found\.$#'
-			identifier: constant.notFound
-			count: 1
-			path: ../../templates/admin/views/routing.php
-
-		-
-			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
-			identifier: constant.notFound
-			count: 1
-			path: ../../templates/admin/views/routing.php
-
-		-
-			message: '#^Offset ''description'' on array\{name\: string, display_name\: string, description\: string\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: ../../templates/admin/views/routing.php
-
-		-
 			message: '#^Offset ''display_name'' on array\{name\: string, display_name\: string, description\: string\} on left side of \?\? always exists and is not nullable\.$#'
 			identifier: nullCoalesce.offset
 			count: 1
@@ -513,12 +459,6 @@ parameters:
 		-
 			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
 			identifier: constant.notFound
-			count: 1
-			path: ../../templates/admin/views/services.php
-
-		-
-			message: '#^Offset ''bytedance_doubao''\|''flux''\|''google_gemini_image''\|''openai_gpt_image''\|''qwen_image''\|''tencent_hunyuan'' on array\{openai_gpt_image\: ''services'', google_gemini_image\: ''globe'', tencent_hunyuan\: ''image'', bytedance_doubao\: ''zap'', flux\: ''robot'', qwen_image\: ''image''\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
 			count: 1
 			path: ../../templates/admin/views/services.php
 

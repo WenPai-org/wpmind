@@ -2,7 +2,7 @@
 
 > 一个插件连接国内外 AI，并在同一设置中心提供内容、媒体、GEO、成本与网关功能。
 
-*路线图版本：0.14 | 更新日期：2026-10-24*
+*路线图版本：0.14 | 更新日期：2026-11-21*
 
 ## 产品规则
 
@@ -79,13 +79,21 @@ WPMind 是面向中国使用环境的 WordPress AI Provider Bridge：
 - Gateway、GEO 和自动化功能默认关闭且可彻底停止运行；
 - 发布包、升级包和卸载路径有自动化验收记录。
 
+### 1.0 后：内容自动化拆分（`bisheng-writer`）
+
+1.0 稳定化门槛通过后，执行产品边界收敛：
+
+- **`modules/geo` 留在 WPMind**：GEO（`/llms.txt`、Markdown Feed、AI Sitemap、Schema 与爬虫追踪）与 AI 基础设施紧耦合，继续留在 WPMind；
+- **拆出独立插件 `bisheng-writer`（笔笙写作）**：将 `auto-meta`、`media-intelligence` 与 `includes/Workflow`（含 `wpmind_task` CPT）平滑迁出为独立插件 `bisheng-writer`，不塞入 `bisheng-html`；
+- **单向软依赖**：`bisheng-writer` 作为未来独立自动化写作平台的 WordPress 执行端（worker），所有 AI 调用继续单向走 WPMind 站内 PHP API 与 filter 包装，不在笔笙侧重复保存云厂商 Key。
+
 ## 商业化
 
 WPMind 不销售功能残缺的免费版，也不维护另一套 Pro 插件。
 
 - **BYOK 与本地功能**：同一插件内完整提供。
-- **托管 AI**：预付额度或按量结算，不承诺无限调用。
-- **多站点服务**：集中预算、审计、模型策略和故障告警。
+- **托管 AI（文派心思官方算力 `wenpai_cloud`）**：统一结算单位为「**心思点数**」，默认商业网关为 `https://mind-api.wenpai.net/v1`（支持 `WPMIND_CLOUD_BASE_URL` 与 `wpmind_cloud_base_url` 覆盖）；采用预付费心思点数包与会员月度额度按量扣减，不承诺无限调用；商业网关后端物理隔离正规企业商用渠道池，经响应头实时回写本地余额缓存。
+- **代理商 / OEM 与多站点服务**：支持 `wenpai_plugin_display` 全套白标与 `WPMIND_LOCKED_PROVIDERS` / `WPMIND_API_KEYS` 站点锁 Key，集中预算、审计、模型策略和故障告警。
 - **企业交付**：私有部署、迁移、合规配置、SLA 与技术支持。
 - **WenPai 会员**：更新支持、服务额度和交付优惠，不锁定插件本地功能。
 

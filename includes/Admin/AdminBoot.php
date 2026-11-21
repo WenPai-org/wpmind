@@ -58,6 +58,8 @@ final class AdminBoot {
 		$page   = AdminPage::instance();
 		$ajax   = AjaxController::instance();
 
+		SuiteIntegration::init();
+
 		add_action( 'admin_menu', [ $page, 'add_admin_menu' ] );
 		add_action( 'admin_init', [ $page, 'register_settings' ] );
 		add_action( 'admin_enqueue_scripts', [ $assets, 'enqueue_admin_assets' ] );

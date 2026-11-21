@@ -36,6 +36,7 @@ class SchemaGenerator {
 		'all-in-one-seo-pack/all_in_one_seo_pack.php',  // AIOSEO.
 		'the-seo-framework/autodescription.php',        // The SEO Framework.
 		'squirrly-seo/squirrly.php',                    // Squirrly SEO.
+		'slim-seo/slim-seo.php',                        // Slim SEO.
 	);
 
 	/**
@@ -159,7 +160,7 @@ class SchemaGenerator {
 	 * @param \WP_Post $post The post object.
 	 * @return array Schema data.
 	 */
-	private function generate_article_schema( \WP_Post $post ): array {
+	public function generate_article_schema( \WP_Post $post ): array {
 		$schema = array(
 			'@context' => 'https://schema.org',
 			'@type'    => $this->get_article_type( $post ),
@@ -202,9 +203,8 @@ class SchemaGenerator {
 			$schema['description'] = wp_strip_all_tags( $excerpt );
 		}
 
-		// Word count (optional).
-		$content    = wp_strip_all_tags( $post->post_content );
-		$word_count = str_word_count( $content );
+		// Word count (optional, CJK characters + Latin words).
+		$word_count = self::count_words( (string) $post->post_content );
 		if ( $word_count > 0 ) {
 			$schema['wordCount'] = $word_count;
 		}
@@ -476,6 +476,28 @@ class SchemaGenerator {
 		if ( in_array( $mode, array( self::MODE_AUTO, self::MODE_MERGE, self::MODE_FORCE ), true ) ) {
 			$this->mode = $mode;
 		}
+	}
+
+	/**
+	 * Count words in mixed CJK and Latin content.
+	 *
+	 * Counts each CJK character as one word plus space/punctuation-delimited Latin/alphanumeric words.
+	 *
+	 * @param string $content Raw post content (HTML allowed).
+	 * @return int Total word count.
+	 */
+	public static function count_words( string $content ): int {
+		$text = trim( wp_strip_all_tags( $content ) );
+		if ( '' === $text ) {
+			return 0;
+		}
+
+		$cjk_pattern = '/[\x{4E00}-\x{9FFF}\x{3400}-\x{4DBF}\x{3040}-\x{30FF}\x{AC00}-\x{D7AF}]/u';
+		$cjk_count   = (int) preg_match_all( $cjk_pattern, $text );
+		$non_cjk     = (string) preg_replace( $cjk_pattern, ' ', $text );
+		$latin_count = (int) preg_match_all( '/[A-Za-z0-9]+(?:[\'’.-][A-Za-z0-9]+)*/u', $non_cjk );
+
+		return $cjk_count + $latin_count;
 	}
 
 	/**

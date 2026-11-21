@@ -101,8 +101,8 @@ class CostControlModule implements ModuleInterface {
 		add_action( 'wp_ajax_wpmind_get_cost_control_status', array( $this, 'ajax_get_status' ) );
 		add_action( 'wp_ajax_wpmind_clear_usage_stats', array( $this, 'ajax_clear_stats' ) );
 
-		// Register usage recording hook (event-driven architecture).
-		add_action( 'wpmind_usage_record', array( $this, 'record_usage' ), 10, 5 );
+		// Register usage recording hook (event-driven architecture, supports 4-8 args).
+		add_action( 'wpmind_usage_record', array( $this, 'record_usage' ), 10, 8 );
 
 		/**
 		 * Fires when Cost Control module is initialized.
@@ -133,14 +133,26 @@ class CostControlModule implements ModuleInterface {
 	/**
 	 * Record usage via event-driven hook.
 	 *
-	 * @param string $provider    Provider ID.
-	 * @param string $model       Model name.
+	 * @param string $provider      Provider ID.
+	 * @param string $model         Model name.
 	 * @param int    $input_tokens  Input tokens.
 	 * @param int    $output_tokens Output tokens.
 	 * @param int    $latency_ms    Latency in milliseconds.
+	 * @param string $context       Optional call context.
+	 * @param string $payer         Optional payer identifier (byok or wenpai_cloud).
+	 * @param int    $credits       Optional cloud credits consumed.
 	 */
-	public function record_usage( string $provider, string $model, int $input_tokens, int $output_tokens, int $latency_ms = 0 ): void {
-		UsageTracker::record( $provider, $model, $input_tokens, $output_tokens, $latency_ms );
+	public function record_usage(
+		string $provider,
+		string $model,
+		int $input_tokens,
+		int $output_tokens,
+		int $latency_ms = 0,
+		string $context = '',
+		string $payer = '',
+		int $credits = 0
+	): void {
+		UsageTracker::record( $provider, $model, $input_tokens, $output_tokens, $latency_ms, $context, $payer, $credits );
 
 		// Check budget and send alerts.
 		BudgetAlert::instance()->check_and_alert();
@@ -158,8 +170,11 @@ class CostControlModule implements ModuleInterface {
 		 * @param int    $input_tokens  Input tokens.
 		 * @param int    $output_tokens Output tokens.
 		 * @param int    $latency_ms    Latency in milliseconds.
+		 * @param string $context       Call context.
+		 * @param string $payer         Payer identifier.
+		 * @param int    $credits       Cloud credits consumed.
 		 */
-		do_action( 'wpmind_usage_recorded', $provider, $model, $input_tokens, $output_tokens, $latency_ms );
+		do_action( 'wpmind_usage_recorded', $provider, $model, $input_tokens, $output_tokens, $latency_ms, $context, $payer, $credits );
 	}
 
 	/**

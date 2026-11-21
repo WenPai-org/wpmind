@@ -23,17 +23,11 @@
 
 		init: function() {
 			this.bindEvents();
-			this.restoreSubTab();
 			this.loadStats();
 		},
 
 		bindEvents: function() {
 			var self = this;
-
-			// Sub-tab switching (scoped to auto-meta panel).
-			$( '.wpmind-auto-meta-panel .wpmind-module-subtab' ).on( 'click', function() {
-				self.switchTab( $( this ).data( 'tab' ) );
-			} );
 
 			$( '#wpmind-save-am-settings' ).on( 'click', function() {
 				self.saveSettings( $( this ) );
@@ -41,29 +35,6 @@
 			$( '#wpmind-am-generate' ).on( 'click', function() {
 				self.manualGenerate();
 			} );
-		},
-
-		switchTab: function( tab ) {
-			$( '.wpmind-auto-meta-panel .wpmind-module-subtab' ).removeClass( 'active' );
-			$( '.wpmind-auto-meta-panel .wpmind-module-subtab[data-tab="' + tab + '"]' ).addClass( 'active' );
-
-			$( '.wpmind-auto-meta-panel .wpmind-module-tab-panel' ).removeClass( 'active' );
-			$( '.wpmind-auto-meta-panel .wpmind-module-tab-panel[data-panel="' + tab + '"]' ).addClass( 'active' );
-
-			try {
-				sessionStorage.setItem( 'wpmind_am_subtab', tab );
-			} catch ( e ) {}
-		},
-
-		restoreSubTab: function() {
-			var tab = 'am-settings';
-			try {
-				var saved = sessionStorage.getItem( 'wpmind_am_subtab' );
-				if ( saved && $( '.wpmind-auto-meta-panel .wpmind-module-subtab[data-tab="' + saved + '"]' ).length ) {
-					tab = saved;
-				}
-			} catch ( e ) {}
-			this.switchTab( tab );
 		},
 
 		loadStats: function() {
@@ -165,7 +136,7 @@
 						}
 						$( '#wpmind-am-result-faq' ).html( faqHtml );
 
-						$( '.wpmind-am-result' ).show();
+						$( '.wpmind-am-result' ).prop( 'hidden', false );
 						Toast.success( d.message || '生成成功' );
 					} else {
 						Toast.error( response.data && response.data.message || '生成失败' );

@@ -1,417 +1,436 @@
 <?php
 /**
- * GEO 优化模块设置（kit 化）。
- * 保留 JS 契约：.wpmind-geo-panel / .wpmind-module-subtab[data-tab] /
- * .wpmind-module-tab-panel[data-panel] / #wpmind-save-geo /
- * .wpmind-schema-preview-tabs .wpmind-schema-tab / .wpmind-schema-preview-panel。
- * input name 全部不变（admin-geo.js saveSettings 逐字段收集）。
+ * GEO 优化模块设置（kit 化）：URL 驱动 subnav + statbar + wenpai-split + view_tabs + field--row。
+ * 保留全部 input name 供 admin-geo.js 统一收集提交。
  *
  * @package WPMind
  */
 
 defined( 'ABSPATH' ) || exit();
 
-use WPMind\Admin\AdminIcons;
+use WPMind\Admin\AdminPage;
+use WPMind\Admin\SuiteIntegration;
 
-$is_enabled = static function ( $option, $default = '1' ) {
-	$value = get_option( $option, $default );
-	return $value === '1' || $value === true || $value === 1;
-};
+( static function (): void {
+	$is_enabled = static function ( string $option, string $fallback = '1' ): bool {
+		$value = get_option( $option, $fallback );
+		return '1' === $value || true === $value || 1 === $value;
+	};
 
-$standalone_feed   = $is_enabled( 'wpmind_standalone_markdown_feed', '0' );
-$geo_enabled       = $is_enabled( 'wpmind_geo_enabled', '1' );
-$chinese_optimize  = $is_enabled( 'wpmind_chinese_optimize', '1' );
-$geo_signals       = $is_enabled( 'wpmind_geo_signals', '1' );
-$crawler_tracking  = $is_enabled( 'wpmind_crawler_tracking', '1' );
-$llms_txt_enabled  = $is_enabled( 'wpmind_llms_txt_enabled', '1' );
-$schema_enabled    = $is_enabled( 'wpmind_schema_enabled', '1' );
-$schema_mode       = get_option( 'wpmind_schema_mode', 'auto' );
-$ai_indexing       = $is_enabled( 'wpmind_ai_indexing_enabled', '0' );
-$ai_declaration    = get_option( 'wpmind_ai_default_declaration', 'original' );
-$ai_excluded_types = get_option( 'wpmind_ai_excluded_post_types', [] );
-if ( ! is_array( $ai_excluded_types ) ) {
-	$ai_excluded_types = [];
-}
-$ai_sitemap_enabled   = $is_enabled( 'wpmind_ai_sitemap_enabled', '0' );
-$ai_sitemap_max       = (int) get_option( 'wpmind_ai_sitemap_max_entries', 500 );
-$robots_ai_enabled    = $is_enabled( 'wpmind_robots_ai_enabled', '0' );
-$robots_ai_rules      = get_option( 'wpmind_robots_ai_rules', [] );
-if ( ! is_array( $robots_ai_rules ) ) {
-	$robots_ai_rules = [];
-}
-$ai_summary_enabled    = $is_enabled( 'wpmind_ai_summary_enabled', '0' );
-$ai_summary_fallback   = get_option( 'wpmind_ai_summary_fallback', 'excerpt' );
-$entity_linker_enabled = $is_enabled( 'wpmind_entity_linker_enabled', '0' );
-$brand_entity_enabled  = $is_enabled( 'wpmind_brand_entity_enabled', '0' );
-$brand_org_type        = get_option( 'wpmind_brand_org_type', 'Organization' );
+	$standalone_feed   = $is_enabled( 'wpmind_standalone_markdown_feed', '0' );
+	$geo_enabled       = $is_enabled( 'wpmind_geo_enabled', '1' );
+	$chinese_optimize  = $is_enabled( 'wpmind_chinese_optimize', '1' );
+	$geo_signals       = $is_enabled( 'wpmind_geo_signals', '1' );
+	$crawler_tracking  = $is_enabled( 'wpmind_crawler_tracking', '1' );
+	$llms_txt_enabled  = $is_enabled( 'wpmind_llms_txt_enabled', '1' );
+	$schema_enabled    = $is_enabled( 'wpmind_schema_enabled', '1' );
+	$schema_mode       = (string) get_option( 'wpmind_schema_mode', 'auto' );
+	$ai_indexing       = $is_enabled( 'wpmind_ai_indexing_enabled', '0' );
+	$ai_declaration    = (string) get_option( 'wpmind_ai_default_declaration', 'original' );
+	$ai_excluded_types = get_option( 'wpmind_ai_excluded_post_types', [] );
+	if ( ! is_array( $ai_excluded_types ) ) {
+		$ai_excluded_types = [];
+	}
+	$ai_sitemap_enabled = $is_enabled( 'wpmind_ai_sitemap_enabled', '0' );
+	$ai_sitemap_max     = (int) get_option( 'wpmind_ai_sitemap_max_entries', 500 );
+	$robots_ai_enabled  = $is_enabled( 'wpmind_robots_ai_enabled', '0' );
+	$robots_ai_rules    = get_option( 'wpmind_robots_ai_rules', [] );
+	if ( ! is_array( $robots_ai_rules ) ) {
+		$robots_ai_rules = [];
+	}
+	$ai_summary_enabled    = $is_enabled( 'wpmind_ai_summary_enabled', '0' );
+	$ai_summary_fallback   = (string) get_option( 'wpmind_ai_summary_fallback', 'excerpt' );
+	$entity_linker_enabled = $is_enabled( 'wpmind_entity_linker_enabled', '0' );
+	$brand_entity_enabled  = $is_enabled( 'wpmind_brand_entity_enabled', '0' );
+	$brand_org_type        = (string) get_option( 'wpmind_brand_org_type', 'Organization' );
 
-$official_installed = class_exists( 'AI_Experiments\\Experiments\\Markdown_Feeds' );
+	$official_installed = class_exists( 'AI_Experiments\\Experiments\\Markdown_Feeds' );
 
-$crawler_tracker = new \WPMind\Modules\Geo\CrawlerTracker();
-$crawler_stats   = $crawler_tracker->get_stats();
-$ai_summary_data = $crawler_tracker->get_ai_summary();
+	$crawler_tracker = new \WPMind\Modules\Geo\CrawlerTracker();
+	$crawler_stats   = $crawler_tracker->get_stats();
+	$ai_summary_data = $crawler_tracker->get_ai_summary();
 
-$learn_more_url = 'https://wpcy.com/c/wpmind';
+	$display        = SuiteIntegration::display();
+	$learn_more_url = $display['docs_url'];
 
-// kit 字段行小工具：switch 行。
-$wpmind_switch = static function ( string $id, string $name, bool $checked, string $label, string $desc = '', bool $disabled = false ): void {
-	echo '<div class="wenpai-field wenpai-field--toggle field wenpai-field--row">'
+	$sections = [
+		'basics'   => __( '基础设置', 'wpmind' ),
+		'content'  => __( '内容输出', 'wpmind' ),
+		'schema'   => __( '结构化数据', 'wpmind' ),
+		'control'  => __( 'AI 索引', 'wpmind' ),
+		'crawlers' => __( '爬虫管理', 'wpmind' ),
+		'brand'    => __( '品牌实体', 'wpmind' ),
+	];
+	$section  = Wenpai_Admin_UI::section( $sections, 'basics' );
+
+	$subnav_items = [];
+	foreach ( $sections as $sec_id => $sec_label ) {
+		$subnav_items[] = [
+			'id'      => $sec_id,
+			'label'   => $sec_label,
+			'url'     => AdminPage::url(
+				[
+					'tab'     => 'module',
+					'module'  => 'geo',
+					'section' => $sec_id,
+				]
+			),
+			'current' => $section === $sec_id,
+		];
+	}
+
+	$wpmind_switch = static function ( string $id, string $name, bool $checked, string $label, string $desc = '', bool $disabled = false ): void {
+		$switch_html = Wenpai_Admin_Settings::switch_html(
+			[
+				'id'       => $id,
+				'name'     => $name,
+				'checked'  => $checked,
+				'disabled' => $disabled,
+				'on'       => __( '已开启', 'wpmind' ),
+				'off'      => __( '未开启', 'wpmind' ),
+			]
+		);
+		echo '<div class="wenpai-field wenpai-field--toggle wenpai-field--row field">'
 		. '<div class="field-label"><label class="wenpai-field__label" for="' . esc_attr( $id ) . '">' . esc_html( $label ) . '</label></div>'
 		. '<div class="field-ctl">'
-		. '<span class="wenpai-switch">'
-		. '<input type="checkbox" role="switch" class="wenpai-switch__input" id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" value="1"' . ( $checked ? ' checked' : '' ) . ( $disabled ? ' disabled' : '' ) . '>'
-		. '<span class="wenpai-switch__track" aria-hidden="true"></span>'
-		. '<span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">' . esc_html__( '已开启', 'wpmind' ) . '</span><span class="wenpai-switch__off">' . esc_html__( '未开启', 'wpmind' ) . '</span></span>'
-		. '</span>'
+		. $switch_html // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		. ( '' !== $desc ? '<p class="wenpai-field__desc">' . esc_html( $desc ) . '</p>' : '' )
 		. '</div></div>';
-};
+	};
 
-// 信息卡小工具。
-$wpmind_info_card = static function ( string $icon, string $title, string $body_html ): void {
-	echo '<section class="card wpmind-geo-info"><div class="card-head"><span class="tile">' . AdminIcons::svg( $icon ) . '</span><div><h2 class="card-title">' . esc_html( $title ) . '</h2></div></div><div class="wpmind-geo-info-body">' . $body_html . '</div></section>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- caller-built trusted HTML
-};
+	$wpmind_info_card = static function ( string $title, array $items, string $more_url = '' ): void {
+		Wenpai_Admin_UI::card_open(
+			[
+				'title' => $title,
+				'tile'  => false,
+			]
+		);
+		$feed_items = [];
+		foreach ( $items as $idx => $line ) {
+			$feed_items[] = [
+				'tag'   => sprintf( '%02d', $idx + 1 ),
+				'title' => $line,
+			];
+		}
+		Wenpai_Admin_UI::tag_feed( [ 'items' => $feed_items ] );
+		if ( '' !== $more_url ) {
+			Wenpai_Admin_UI::card_foot(
+				[
+					'actions' => [
+						[
+							'label'   => __( '查看文档', 'wpmind' ),
+							'href'    => $more_url,
+							'variant' => 'ghost',
+							'size'    => 'sm',
+							'target'  => '_blank',
+						],
+					],
+				]
+			);
+		}
+		Wenpai_Admin_UI::card_close();
+	};
+	?>
 
-$wpmind_info_list = static function ( array $items, string $more_url = '' ): string {
-	$html = '<p>' . esc_html__( '面向 AI 搜索引擎的优化说明。', 'wpmind' ) . '</p><ul>';
-	foreach ( $items as $item ) {
-		$html .= '<li>' . esc_html( $item ) . '</li>';
-	}
-	$html .= '</ul>';
-	if ( '' !== $more_url ) {
-		$html .= '<p><a href="' . esc_url( $more_url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( '了解更多 →', 'wpmind' ) . '</a></p>';
-	}
-	return $html;
-};
-?>
+<div class="wpmind-geo-panel wenpai-stack">
+	<?php
+	Wenpai_Admin_UI::subnav(
+		[
+			'items'   => $subnav_items,
+			'current' => $section,
+			'label'   => __( 'GEO 优化分区', 'wpmind' ),
+		]
+	);
 
-<div class="wpmind-geo-panel">
+	Wenpai_Admin_UI::card_open();
+	Wenpai_Admin_UI::statbar(
+		[
+			'items' => [
+				[
+					'label' => __( 'AI 爬虫访问', 'wpmind' ),
+					'value' => number_format_i18n( (int) ( $ai_summary_data['total_ai_hits'] ?? 0 ) ),
+				],
+				[
+					'label' => __( '搜索引擎访问', 'wpmind' ),
+					'value' => number_format_i18n( (int) ( $ai_summary_data['total_search_hits'] ?? 0 ) ),
+				],
+				[
+					'label' => __( '已识别爬虫', 'wpmind' ),
+					'value' => (string) count( (array) ( $ai_summary_data['ai_crawlers'] ?? [] ) ),
+				],
+				[
+					'label' => 'Markdown Feed',
+					'value' => ( $standalone_feed || get_option( 'ai_experiments_markdown_feed_enabled', false ) )
+						? __( '已开启', 'wpmind' )
+						: __( '未开启', 'wpmind' ),
+				],
+			],
+		]
+	);
+	Wenpai_Admin_UI::card_close();
+	?>
 
-	<div class="wenpai-subnav">
-		<div class="seg wpmind-module-subtabs">
-			<button type="button" class="wpmind-module-subtab active" data-tab="basics"><?php esc_html_e( '基础设置', 'wpmind' ); ?></button>
-			<button type="button" class="wpmind-module-subtab" data-tab="content"><?php esc_html_e( '内容输出', 'wpmind' ); ?></button>
-			<button type="button" class="wpmind-module-subtab" data-tab="schema"><?php esc_html_e( '结构化数据', 'wpmind' ); ?></button>
-			<button type="button" class="wpmind-module-subtab" data-tab="control"><?php esc_html_e( 'AI 索引', 'wpmind' ); ?></button>
-			<button type="button" class="wpmind-module-subtab" data-tab="crawlers"><?php esc_html_e( '爬虫管理', 'wpmind' ); ?></button>
-			<button type="button" class="wpmind-module-subtab" data-tab="brand"><?php esc_html_e( '品牌实体', 'wpmind' ); ?></button>
+	<!-- ========== 基础设置 ========== -->
+	<div<?php echo Wenpai_Admin_UI::group_attrs( 'basics', $section ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<div class="wenpai-split">
+			<div class="wenpai-stack">
+				<?php
+				Wenpai_Admin_UI::card_open(
+					[
+						'title' => __( 'GEO 增强', 'wpmind' ),
+						'sub'   => __( '优化内容结构与引用信号，提升 AI 搜索可见度。', 'wpmind' ),
+						'tile'  => false,
+					]
+				);
+				$wpmind_switch( 'wpmind-geo-enabled', 'wpmind_geo_enabled', $geo_enabled, __( '启用 GEO 增强', 'wpmind' ), __( '控制前台 GEO 信号与结构化输出。', 'wpmind' ) );
+				$wpmind_switch( 'wpmind-geo-zh', 'wpmind_chinese_optimize', $chinese_optimize, __( '中文内容优化', 'wpmind' ), __( '优化中英文混排、标点与段落结构。', 'wpmind' ) );
+				$wpmind_switch( 'wpmind-geo-signals', 'wpmind_geo_signals', $geo_signals, __( 'GEO 信号注入', 'wpmind' ), __( '注入作者、发布日期与引用权威信号。', 'wpmind' ) );
+				$wpmind_switch( 'wpmind-geo-crawler', 'wpmind_crawler_tracking', $crawler_tracking, __( 'AI 爬虫追踪', 'wpmind' ), __( '统计 GPTBot、ClaudeBot 等爬虫访问。', 'wpmind' ) );
+				Wenpai_Admin_UI::card_close();
+				?>
+			</div>
+			<div class="wenpai-stack">
+				<?php
+				Wenpai_Admin_UI::card_open(
+					[
+						'title' => __( 'AI 爬虫统计', 'wpmind' ),
+						'tile'  => false,
+					]
+				);
+				if ( empty( $crawler_stats ) ) {
+					Wenpai_Admin_UI::empty_state(
+						[
+							'text' => __( '还没有爬虫访问记录', 'wpmind' ),
+							'meta' => __( '开启追踪后，AI 爬虫访问会统计在这里。', 'wpmind' ),
+						]
+					);
+				} else {
+					$bot_items = [];
+					foreach ( $crawler_stats as $crawler => $data ) {
+						$bot_items[] = [
+							'tag'   => ! empty( $data['is_ai'] ) ? 'AI' : __( '搜索', 'wpmind' ),
+							'tone'  => ! empty( $data['is_ai'] ) ? 'ok' : '',
+							'title' => (string) $crawler,
+							'note'  => (string) ( $data['company'] ?? '' ),
+							'when'  => number_format( (int) ( $data['total_hits'] ?? 0 ) ) . ' ' . __( '次', 'wpmind' ),
+						];
+					}
+					Wenpai_Admin_UI::tag_feed(
+						[
+							'scrollable' => true,
+							'items'      => $bot_items,
+						]
+					);
+				}
+				Wenpai_Admin_UI::card_close();
+
+				$wpmind_info_card(
+					__( '什么是 GEO', 'wpmind' ),
+					[
+						__( '输出结构化 Markdown，便于 AI 引擎解析。', 'wpmind' ),
+						__( '注入作者、日期与品牌实体权威信号。', 'wpmind' ),
+						__( '精细管理 AI 爬虫抓取与索引权限。', 'wpmind' ),
+					],
+					$learn_more_url
+				);
+				?>
+			</div>
 		</div>
 	</div>
 
-	<div class="wpmind-geo-content">
-
-		<section class="card">
-			<div class="wpmind-statbar">
-				<div class="wpmind-statbar-item">
-					<?php echo AdminIcons::svg( 'robot', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-					<div class="wpmind-statbar-text">
-						<div class="k"><?php esc_html_e( 'AI 爬虫访问', 'wpmind' ); ?></div>
-						<div class="v"><?php echo esc_html( number_format_i18n( (int) ( $ai_summary_data['total_ai_hits'] ?? 0 ) ) ); ?></div>
-					</div>
-				</div>
-				<div class="wpmind-statbar-item">
-					<?php echo AdminIcons::svg( 'search', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-					<div class="wpmind-statbar-text">
-						<div class="k"><?php esc_html_e( '搜索引擎访问', 'wpmind' ); ?></div>
-						<div class="v"><?php echo esc_html( number_format_i18n( (int) ( $ai_summary_data['total_search_hits'] ?? 0 ) ) ); ?></div>
-					</div>
-				</div>
-				<div class="wpmind-statbar-item">
-					<?php echo AdminIcons::svg( 'target', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-					<div class="wpmind-statbar-text">
-						<div class="k"><?php esc_html_e( '已识别爬虫', 'wpmind' ); ?></div>
-						<div class="v"><?php echo esc_html( (string) count( (array) ( $ai_summary_data['ai_crawlers'] ?? [] ) ) ); ?></div>
-					</div>
-				</div>
-				<div class="wpmind-statbar-item">
-					<?php echo AdminIcons::svg( 'doc', 'wenpai-ico wpmind-statbar-ico' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-					<div class="wpmind-statbar-text">
-						<div class="k"><?php esc_html_e( 'Markdown Feed', 'wpmind' ); ?></div>
-						<div class="v"><?php echo $standalone_feed || get_option( 'ai_experiments_markdown_feed_enabled', false ) ? esc_html__( '已启用', 'wpmind' ) : esc_html__( '未启用', 'wpmind' ); ?></div>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<!-- ========== 基础设置 ========== -->
-		<div class="wpmind-module-tab-panel active" data-panel="basics">
-			<div class="wpmind-geo-grid">
-				<div class="wpmind-geo-main">
-					<section class="card">
-						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'robot' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
-							<div>
-								<h2 class="card-title"><?php esc_html_e( 'GEO 增强', 'wpmind' ); ?></h2>
-								<p class="card-sub"><?php esc_html_e( '优化内容结构，提高 AI 引用率。', 'wpmind' ); ?></p>
+	<!-- ========== 内容输出 ========== -->
+	<div<?php echo Wenpai_Admin_UI::group_attrs( 'content', $section ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<div class="wenpai-split">
+			<div class="wenpai-stack">
+				<?php
+				Wenpai_Admin_UI::card_open(
+					[
+						'title' => 'Markdown Feed',
+						'sub'   => __( '提供纯净 Markdown 格式供 AI 爬虫读取。', 'wpmind' ),
+						'tile'  => false,
+					]
+				);
+				if ( $official_installed ) {
+					wpmind_notice(
+						[
+							'level' => 'info',
+							'wrap'  => false,
+							'text'  => __( '已检测到官方 AI Experiments 插件，将自动增强其 Markdown Feed。', 'wpmind' ),
+						]
+					);
+				}
+				$wpmind_switch( 'wpmind-md-feed', 'wpmind_standalone_markdown_feed', $standalone_feed, __( '启用独立 Markdown Feed', 'wpmind' ), __( '提供 /?feed=markdown 与 .md 路径。', 'wpmind' ), $official_installed );
+				if ( $standalone_feed ) :
+					?>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><span class="wenpai-field__label"><?php esc_html_e( '访问地址', 'wpmind' ); ?></span></div>
+						<div class="field-ctl">
+							<div class="wenpai-row wenpai-row--tight">
+								<?php echo wpmind_code_inline_html( [ 'code' => home_url( '/?feed=markdown' ) ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+								<?php echo wpmind_code_inline_html( [ 'code' => home_url( '/your-post-slug.md' ) ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							</div>
 						</div>
-						<?php
-						$wpmind_switch( 'wpmind-geo-enabled', 'wpmind_geo_enabled', $geo_enabled, __( '启用 GEO 增强', 'wpmind' ), __( '总开关，控制所有 GEO 优化功能。', 'wpmind' ) );
-						$wpmind_switch( 'wpmind-geo-zh', 'wpmind_chinese_optimize', $chinese_optimize, __( '中文内容优化', 'wpmind' ), __( '优化中英文混排、标点符号、段落结构。', 'wpmind' ) );
-						$wpmind_switch( 'wpmind-geo-signals', 'wpmind_geo_signals', $geo_signals, __( 'GEO 信号注入', 'wpmind' ), __( '添加作者信息、发布日期、引用格式等权威性信号。', 'wpmind' ) );
-						$wpmind_switch( 'wpmind-geo-crawler', 'wpmind_crawler_tracking', $crawler_tracking, __( 'AI 爬虫追踪', 'wpmind' ), __( '记录 GPTBot、ClaudeBot 等 AI 爬虫的访问。', 'wpmind' ) );
-						?>
-					</section>
-				</div>
-				<div class="wpmind-geo-side">
-					<section class="card">
-						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'analytics' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
-							<div>
-								<h2 class="card-title"><?php esc_html_e( 'AI 爬虫统计', 'wpmind' ); ?></h2>
-							</div>
-						</div>
-						<?php if ( empty( $crawler_stats ) ) : ?>
-						<p class="meta"><?php esc_html_e( '暂无爬虫访问记录。启用追踪后，AI 爬虫的访问将记录在这里。', 'wpmind' ); ?></p>
-						<?php else : ?>
-						<div class="wpmind-crawler-list">
-							<?php foreach ( $crawler_stats as $crawler => $data ) : ?>
-							<div class="simple-row is-static">
-								<div class="tile<?php echo $data['is_ai'] ? ' ok' : ''; ?>"><?php echo AdminIcons::svg( 'robot' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></div>
-								<div>
-									<div class="t"><?php echo esc_html( $crawler ); ?> <?php if ( $data['is_ai'] ) : ?><span class="pill"><?php esc_html_e( 'AI', 'wpmind' ); ?></span><?php endif; ?></div>
-									<div class="d"><?php echo esc_html( $data['company'] ); ?></div>
-								</div>
-								<div class="r"><span class="meta"><?php echo esc_html( number_format( $data['total_hits'] ) ); ?> <?php esc_html_e( '次', 'wpmind' ); ?></span></div>
-							</div>
+					</div>
+					<?php
+				endif;
+				Wenpai_Admin_UI::card_close();
+
+				Wenpai_Admin_UI::card_open(
+					[
+						'title' => 'llms.txt',
+						'sub'   => __( '在 /llms.txt 提供站点导航与内容索引。', 'wpmind' ),
+						'tile'  => false,
+					]
+				);
+				$wpmind_switch( 'wpmind-llms-txt', 'wpmind_llms_txt_enabled', $llms_txt_enabled, __( '启用 llms.txt', 'wpmind' ), __( '为 AI 引擎提供站点结构索引。', 'wpmind' ) );
+	if ( $llms_txt_enabled ) :
+		?>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><span class="wenpai-field__label"><?php esc_html_e( '访问地址', 'wpmind' ); ?></span></div>
+						<div class="field-ctl">
+				<?php echo wpmind_code_inline_html( [ 'code' => \WPMind\Modules\Geo\LlmsTxtGenerator::get_public_url() ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php if ( '' === (string) get_option( 'permalink_structure' ) ) : ?>
+								<p class="wenpai-field__desc"><?php esc_html_e( '朴素固定链接下请使用上方参数地址。', 'wpmind' ); ?></p>
+							<?php endif; ?>
+				<?php foreach ( \WPMind\Modules\Geo\LlmsTxtGenerator::detect_conflicts() as $conflict_msg ) : ?>
+								<p class="wenpai-field__desc"><?php echo esc_html( $conflict_msg ); ?></p>
 							<?php endforeach; ?>
 						</div>
-						<?php endif; ?>
-					</section>
+					</div>
 					<?php
-					$wpmind_info_card(
-						'info',
-						__( '什么是 GEO？', 'wpmind' ),
-						'<p>' . esc_html__( 'GEO (Generative Engine Optimization) 是针对 AI 搜索引擎的优化策略，帮助内容在 ChatGPT、Claude、Perplexity 等 AI 助手中获得更好的引用和展示。', 'wpmind' ) . '</p><ul>'
-						. '<li>' . esc_html__( '提供结构化 Markdown 格式，便于 AI 解析', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( '注入权威性信号，提高内容可信度', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( '关联 Wikidata 实体，消除语义歧义', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( '控制 AI 爬虫访问，保护敏感内容', 'wpmind' ) . '</li></ul>'
-						. '<p><a href="' . esc_url( $learn_more_url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( '了解更多 →', 'wpmind' ) . '</a></p>'
-					);
-					?>
+				endif;
+				Wenpai_Admin_UI::card_close();
+
+				Wenpai_Admin_UI::card_open(
+					[
+						'title' => 'AI Sitemap',
+						'sub'   => __( '在 /ai-sitemap.xml 输出 AI 专用站点地图。', 'wpmind' ),
+						'tile'  => false,
+					]
+				);
+				$wpmind_switch( 'wpmind-ai-sitemap', 'wpmind_ai_sitemap_enabled', $ai_sitemap_enabled, __( '启用 AI Sitemap', 'wpmind' ), __( '包含内容声明与摘要元数据。', 'wpmind' ) );
+	?>
+				<div class="wenpai-field wenpai-field--row field"<?php echo $ai_sitemap_enabled ? '' : ' hidden'; ?>>
+					<div class="field-label"><label class="wenpai-field__label" for="wpmind-ai-sitemap-max"><?php esc_html_e( '最大条目数', 'wpmind' ); ?></label></div>
+					<div class="field-ctl">
+						<div class="field-ctl-row">
+							<input type="number" class="wpmind-num" id="wpmind-ai-sitemap-max" name="wpmind_ai_sitemap_max_entries" value="<?php echo esc_attr( (string) $ai_sitemap_max ); ?>" min="10" max="5000" step="10">
+							<span class="meta">10–5000</span>
+						</div>
+						<p class="wenpai-field__desc"><?php echo wpmind_code_inline_html( [ 'code' => \WPMind\Modules\Geo\AiSitemapGenerator::get_public_url() ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
+					</div>
 				</div>
+				<?php
+				Wenpai_Admin_UI::card_close();
+
+				Wenpai_Admin_UI::card_open(
+					[
+						'title' => __( 'AI 摘要', 'wpmind' ),
+						'sub'   => __( '主动提供面向 AI 的文章摘要描述。', 'wpmind' ),
+						'tile'  => false,
+					]
+				);
+				$wpmind_switch( 'wpmind-ai-summary', 'wpmind_ai_summary_enabled', $ai_summary_enabled, __( '启用 AI 摘要', 'wpmind' ), __( '输出为 meta 标签与 Schema abstract。', 'wpmind' ) );
+				?>
+				<div class="wenpai-field wenpai-field--row field"<?php echo $ai_summary_enabled ? '' : ' hidden'; ?>>
+					<div class="field-label"><label class="wenpai-field__label" for="wpmind-ai-summary-fallback"><?php esc_html_e( '无摘要时回退', 'wpmind' ); ?></label></div>
+					<div class="field-ctl">
+						<select id="wpmind-ai-summary-fallback" name="wpmind_ai_summary_fallback">
+							<option value="excerpt" <?php selected( $ai_summary_fallback, 'excerpt' ); ?>><?php esc_html_e( '使用文章摘要', 'wpmind' ); ?></option>
+							<option value="none" <?php selected( $ai_summary_fallback, 'none' ); ?>><?php esc_html_e( '不输出', 'wpmind' ); ?></option>
+						</select>
+					</div>
+				</div>
+				<?php Wenpai_Admin_UI::card_close(); ?>
+			</div>
+			<div class="wenpai-stack">
+				<?php
+				$wpmind_info_card(
+					__( 'AI 内容分发', 'wpmind' ),
+					[
+						__( 'Markdown Feed 去除页面导航噪音。', 'wpmind' ),
+						__( 'llms.txt 引导 AI 快速发现核心栏目。', 'wpmind' ),
+						__( 'AI Sitemap 自动跳过 noai 标记文章。', 'wpmind' ),
+					],
+					$learn_more_url
+				);
+				?>
 			</div>
 		</div>
+	</div>
 
-		<!-- ========== 内容输出 ========== -->
-		<div class="wpmind-module-tab-panel" data-panel="content">
-			<div class="wpmind-geo-grid">
-				<div class="wpmind-geo-main">
-					<section class="card">
-						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'doc' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
-							<div>
-								<h2 class="card-title"><?php esc_html_e( 'Markdown Feed', 'wpmind' ); ?></h2>
-								<p class="card-sub"><?php esc_html_e( '为 AI 爬虫提供结构化的 Markdown 格式内容。', 'wpmind' ); ?></p>
-							</div>
-						</div>
-						<?php if ( $official_installed ) : ?>
-						<p class="meta"><?php esc_html_e( '检测到官方 AI Experiments 插件，WPMind 将自动增强其 Markdown Feed。', 'wpmind' ); ?></p>
-						<?php endif; ?>
-						<?php $wpmind_switch( 'wpmind-md-feed', 'wpmind_standalone_markdown_feed', $standalone_feed, __( '启用独立 Markdown Feed', 'wpmind' ), __( '提供 /?feed=markdown 端点和 .md 后缀访问。', 'wpmind' ), $official_installed ); ?>
-						<?php if ( $standalone_feed ) : ?>
-						<p class="wenpai-field__desc" style="margin-top:8px;"><?php esc_html_e( '访问方式：', 'wpmind' ); ?></p>
-						<p>
-							<?php echo wpmind_code_inline_html( [ 'code' => home_url( '/?feed=markdown' ) ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit helper escapes internally ?>
-							<?php echo wpmind_code_inline_html( [ 'code' => home_url( '/your-post-slug.md' ) ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit helper escapes internally ?>
-						</p>
-						<?php endif; ?>
-					</section>
-
-					<section class="card">
-						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'doc' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
-							<div>
-								<h2 class="card-title">llms.txt</h2>
-								<p class="card-sub"><?php esc_html_e( '为 AI 爬虫提供站点导航和内容索引。', 'wpmind' ); ?></p>
-							</div>
-						</div>
-						<?php $wpmind_switch( 'wpmind-llms-txt', 'wpmind_llms_txt_enabled', $llms_txt_enabled, __( '启用 llms.txt', 'wpmind' ), __( '在 /llms.txt 提供站点内容导航。', 'wpmind' ) ); ?>
-						<?php if ( $llms_txt_enabled ) : ?>
-						<p class="wenpai-field__desc" style="margin-top:8px;"><?php esc_html_e( '访问地址：', 'wpmind' ); ?></p>
-						<p><?php echo wpmind_code_inline_html( [ 'code' => \WPMind\Modules\Geo\LlmsTxtGenerator::get_public_url() ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit helper escapes internally ?></p>
-						<?php if ( '' === (string) get_option( 'permalink_structure' ) ) : ?>
-						<p class="meta"><?php esc_html_e( '当前是朴素固定链接，只能用上面这个带参数的地址。启用固定链接后才有 /llms.txt。', 'wpmind' ); ?></p>
-						<?php endif; ?>
-						<?php foreach ( \WPMind\Modules\Geo\LlmsTxtGenerator::detect_conflicts() as $wpmind_llms_conflict ) : ?>
-						<p class="meta"><?php echo esc_html( $wpmind_llms_conflict ); ?></p>
-						<?php endforeach; ?>
-						<?php endif; ?>
-					</section>
-
-					<section class="card">
-						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'globe' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
-							<div>
-								<h2 class="card-title"><?php esc_html_e( 'AI Sitemap', 'wpmind' ); ?></h2>
-								<p class="card-sub"><?php esc_html_e( '为 AI 爬虫提供专属 XML Sitemap，包含内容声明和摘要等元数据。', 'wpmind' ); ?></p>
-							</div>
-						</div>
-						<?php $wpmind_switch( 'wpmind-ai-sitemap', 'wpmind_ai_sitemap_enabled', $ai_sitemap_enabled, __( '启用 AI Sitemap', 'wpmind' ), __( '在 /ai-sitemap.xml 提供 AI 专属站点地图。', 'wpmind' ) ); ?>
-						<?php if ( $ai_sitemap_enabled ) : ?>
-						<div class="wenpai-field field wenpai-field--row">
-							<div class="field-label"><label class="wenpai-field__label" for="wpmind-ai-sitemap-max"><?php esc_html_e( '最大条目数', 'wpmind' ); ?></label></div>
-							<div class="field-ctl">
-								<div class="field-ctl-row">
-									<input type="number" id="wpmind-ai-sitemap-max" name="wpmind_ai_sitemap_max_entries" value="<?php echo esc_attr( (string) $ai_sitemap_max ); ?>" min="10" max="5000" step="10" style="max-width:7rem">
-									<span class="meta">(10–5000)</span>
-								</div>
-								<p class="wenpai-field__desc"><?php esc_html_e( '条目数过多会拖慢生成。', 'wpmind' ); ?></p>
-							</div>
-						</div>
-						<p class="wenpai-field__desc" style="margin-top:8px;"><?php esc_html_e( '访问地址：', 'wpmind' ); ?></p>
-						<p><?php echo wpmind_code_inline_html( [ 'code' => \WPMind\Modules\Geo\AiSitemapGenerator::get_public_url() ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit helper escapes internally ?></p>
-						<?php endif; ?>
-					</section>
-
-					<section class="card">
-						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'help' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
-							<div>
-								<h2 class="card-title"><?php esc_html_e( 'AI 摘要', 'wpmind' ); ?> <span class="pill"><?php esc_html_e( 'NEW', 'wpmind' ); ?></span></h2>
-								<p class="card-sub"><?php esc_html_e( '控制 AI 如何描述您的文章，而非让 AI 自行猜测。', 'wpmind' ); ?></p>
-							</div>
-						</div>
-						<?php $wpmind_switch( 'wpmind-ai-summary', 'wpmind_ai_summary_enabled', $ai_summary_enabled, __( '启用 AI 摘要', 'wpmind' ), __( '在编辑器中添加 AI 摘要字段，输出为 meta 标签和 Schema.org abstract。', 'wpmind' ) ); ?>
-						<?php if ( $ai_summary_enabled ) : ?>
-						<div class="wenpai-field field wenpai-field--row">
-							<div class="field-label"><label class="wenpai-field__label" for="wpmind-ai-summary-fallback"><?php esc_html_e( '无摘要时的回退', 'wpmind' ); ?></label></div>
-							<div class="field-ctl">
-								<select id="wpmind-ai-summary-fallback" name="wpmind_ai_summary_fallback" style="max-width:420px">
-									<option value="excerpt" <?php selected( $ai_summary_fallback, 'excerpt' ); ?>><?php esc_html_e( '使用文章摘要 (excerpt)', 'wpmind' ); ?></option>
-									<option value="none" <?php selected( $ai_summary_fallback, 'none' ); ?>><?php esc_html_e( '不输出', 'wpmind' ); ?></option>
-								</select>
-								<p class="wenpai-field__desc"><?php esc_html_e( '在编辑器侧边栏的「AI 摘要」面板中为每篇文章编写专属摘要。', 'wpmind' ); ?></p>
-							</div>
-						</div>
-						<?php endif; ?>
-					</section>
+	<!-- ========== 结构化数据 ========== -->
+	<div<?php echo Wenpai_Admin_UI::group_attrs( 'schema', $section ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<div class="wenpai-split">
+			<div class="wenpai-stack">
+				<?php
+				Wenpai_Admin_UI::card_open(
+					[
+						'title' => 'Schema.org',
+						'sub'   => __( '自动输出 Article、Breadcrumb 与 WebSite JSON-LD。', 'wpmind' ),
+						'tile'  => false,
+					]
+				);
+				$wpmind_switch( 'wpmind-schema-enabled', 'wpmind_schema_enabled', $schema_enabled, __( '启用 Schema.org', 'wpmind' ), __( '为文章与页面注入语义结构化数据。', 'wpmind' ) );
+				?>
+				<div class="wenpai-field wenpai-field--row field"<?php echo $schema_enabled ? '' : ' hidden'; ?>>
+					<div class="field-label"><label class="wenpai-field__label" for="wpmind-schema-mode"><?php esc_html_e( '兼容模式', 'wpmind' ); ?></label></div>
+					<div class="field-ctl">
+						<select id="wpmind-schema-mode" name="wpmind_schema_mode">
+							<option value="auto" <?php selected( $schema_mode, 'auto' ); ?>><?php esc_html_e( '自动（检测到 SEO 插件时不输出）', 'wpmind' ); ?></option>
+							<option value="force" <?php selected( $schema_mode, 'force' ); ?>><?php esc_html_e( '强制输出', 'wpmind' ); ?></option>
+						</select>
+					</div>
 				</div>
-				<div class="wpmind-geo-side">
-					<?php
-					$wpmind_info_card(
-						'info',
-						__( 'AI 内容分发', 'wpmind' ),
-						'<p>' . esc_html__( 'AI 搜索引擎通过 Markdown Feed、llms.txt 和 AI Sitemap 等专用通道获取内容。这些格式去除了导航、广告等噪音，让 AI 能直接解析核心内容。', 'wpmind' ) . '</p><ul>'
-						. '<li>' . esc_html__( 'Markdown Feed 提供纯净的结构化内容', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( 'llms.txt 是 AI 时代的 robots.txt，引导 AI 发现内容', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( 'AI Sitemap 包含内容声明等 AI 专属元数据', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( 'AI 摘要让您主动控制 AI 如何描述文章', 'wpmind' ) . '</li></ul>'
-						. '<p><a href="' . esc_url( $learn_more_url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( '了解更多 →', 'wpmind' ) . '</a></p>'
-					);
-					?>
-				</div>
-			</div>
-		</div>
+				<?php
+				Wenpai_Admin_UI::card_close();
 
-		<!-- ========== 结构化数据 ========== -->
-		<div class="wpmind-module-tab-panel" data-panel="schema">
-			<div class="wpmind-geo-grid">
-				<div class="wpmind-geo-main">
-					<section class="card">
-						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'doc' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
-							<div>
-								<h2 class="card-title"><?php esc_html_e( 'Schema.org', 'wpmind' ); ?></h2>
-								<p class="card-sub"><?php esc_html_e( '为内容添加结构化数据，帮助 AI 理解语义。', 'wpmind' ); ?></p>
-							</div>
-						</div>
-						<?php $wpmind_switch( 'wpmind-schema-enabled', 'wpmind_schema_enabled', $schema_enabled, __( '启用 Schema.org', 'wpmind' ), __( '自动为文章添加 Article 结构化数据。', 'wpmind' ) ); ?>
-						<?php if ( $schema_enabled ) : ?>
-						<div class="wenpai-field field wenpai-field--row">
-							<div class="field-label"><label class="wenpai-field__label" for="wpmind-schema-mode"><?php esc_html_e( '兼容模式', 'wpmind' ); ?></label></div>
-							<div class="field-ctl">
-								<select id="wpmind-schema-mode" name="wpmind_schema_mode" style="max-width:420px">
-									<option value="auto" <?php selected( $schema_mode, 'auto' ); ?>><?php esc_html_e( '自动 - 检测到 SEO 插件时不输出', 'wpmind' ); ?></option>
-									<option value="merge" <?php selected( $schema_mode, 'merge' ); ?> disabled><?php esc_html_e( '合并 - 与现有 Schema 合并 (即将推出)', 'wpmind' ); ?></option>
-									<option value="force" <?php selected( $schema_mode, 'force' ); ?>><?php esc_html_e( '强制 - 始终输出（可能重复）', 'wpmind' ); ?></option>
-								</select>
-							</div>
-						</div>
-						<?php endif; ?>
-					</section>
-
-					<?php if ( $schema_enabled ) : ?>
-					<section class="card">
-						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'doc' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
-							<div>
-								<h2 class="card-title"><?php esc_html_e( '输出属性一览', 'wpmind' ); ?></h2>
-								<p class="card-sub"><?php esc_html_e( '每篇文章自动输出的 JSON-LD 属性。', 'wpmind' ); ?></p>
-							</div>
-						</div>
-						<div class="wenpai-table-wrap">
-						<table class="tbl">
-							<tbody>
-								<tr><td class="mono">@type</td><td><?php esc_html_e( '48h 内 NewsArticle，之后 BlogPosting，页面 Article', 'wpmind' ); ?></td></tr>
-								<tr><td class="mono">headline</td><td><?php esc_html_e( '文章标题', 'wpmind' ); ?></td></tr>
-								<tr><td class="mono">author</td><td><?php esc_html_e( 'Person: name + url + sameAs (社交档案)', 'wpmind' ); ?></td></tr>
-								<tr><td class="mono">publisher</td><td><?php esc_html_e( 'Organization (品牌实体增强)', 'wpmind' ); ?></td></tr>
-								<tr><td class="mono">image</td><td><?php esc_html_e( '特色图片或正文首图', 'wpmind' ); ?></td></tr>
-								<tr><td class="mono">description</td><td><?php esc_html_e( '文章摘要', 'wpmind' ); ?></td></tr>
-								<tr><td class="mono">wordCount</td><td><?php esc_html_e( '字数统计', 'wpmind' ); ?></td></tr>
-								<tr><td class="mono">articleSection</td><td><?php esc_html_e( '所属分类', 'wpmind' ); ?></td></tr>
-								<tr><td class="mono">keywords</td><td><?php esc_html_e( '文章标签', 'wpmind' ); ?></td></tr>
-								<tr><td class="mono">inLanguage</td><td><?php esc_html_e( '内容语言', 'wpmind' ); ?></td></tr>
-								<tr><td class="mono" colspan="2"><strong><?php esc_html_e( 'BreadcrumbList (每篇文章)', 'wpmind' ); ?></strong></td></tr>
-								<tr><td class="mono">itemListElement</td><td><?php esc_html_e( '首页 > 分类层级 > 当前页', 'wpmind' ); ?></td></tr>
-								<tr><td class="mono" colspan="2"><strong><?php esc_html_e( 'WebSite (仅首页)', 'wpmind' ); ?></strong></td></tr>
-								<tr><td class="mono">potentialAction</td><td><?php esc_html_e( 'SearchAction 站内搜索', 'wpmind' ); ?></td></tr>
-							</tbody>
-						</table>
-						</div>
-					</section>
-
-					<section class="card">
-						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'eye' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
-							<div>
-								<h2 class="card-title"><?php esc_html_e( 'JSON-LD 预览', 'wpmind' ); ?></h2>
-								<p class="card-sub"><?php esc_html_e( '基于当前设置生成的示例输出。', 'wpmind' ); ?></p>
-							</div>
-						</div>
-						<?php
-						$preview_brand_name = get_option( 'wpmind_brand_name', '' ) ?: get_bloginfo( 'name' );
-						$preview_org_type   = get_option( 'wpmind_brand_org_type', 'Organization' );
-						$preview_brand_url  = get_option( 'wpmind_brand_url', '' ) ?: home_url( '/' );
-						$preview_author     = [
-							'@type' => 'Person',
-							'name'  => wp_get_current_user()->display_name ?: 'Author',
-							'url'   => home_url( '/author/example/' ),
-						];
-						$preview_schema     = [
-							'@context'         => 'https://schema.org',
-							'@type'            => 'BlogPosting',
-							'headline'         => __( '示例文章标题', 'wpmind' ),
-							'author'           => $preview_author,
-							'datePublished'    => wp_date( 'c' ),
-							'publisher'        => [
-								'@type' => $preview_org_type,
+				if ( $schema_enabled ) :
+					$preview_brand_name = get_option( 'wpmind_brand_name', '' ) ?: get_bloginfo( 'name' );
+					$preview_brand_url  = get_option( 'wpmind_brand_url', '' ) ?: home_url( '/' );
+					$current_user       = function_exists( 'wp_get_current_user' ) ? wp_get_current_user() : null;
+					$author_name        = ( $current_user && ! empty( $current_user->display_name ) ) ? $current_user->display_name : 'Author';
+					$preview_json       = (string) wp_json_encode(
+						[
+							'@context'      => 'https://schema.org',
+							'@type'         => 'BlogPosting',
+							'headline'      => __( '示例文章标题', 'wpmind' ),
+							'author'        => [
+								'@type' => 'Person',
+								'name'  => $author_name,
+							],
+							'datePublished' => function_exists( 'wp_date' ) ? wp_date( 'c' ) : gmdate( 'c' ),
+							'publisher'     => [
+								'@type' => $brand_org_type,
 								'name'  => $preview_brand_name,
 								'url'   => $preview_brand_url,
 							],
-							'description'      => __( '文章摘要内容...', 'wpmind' ),
-							'mainEntityOfPage' => [
-								'@type' => 'WebPage',
-								'@id'   => home_url( '/example-post/' ),
-							],
-							'inLanguage'       => get_locale(),
-						];
-						$preview_json       = wp_json_encode( $preview_schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
-
-						$preview_breadcrumb = [
+							'inLanguage'    => function_exists( 'get_locale' ) ? get_locale() : 'zh_CN',
+						],
+						JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT
+					);
+					$preview_bc_json    = (string) wp_json_encode(
+						[
 							'@context'        => 'https://schema.org',
 							'@type'           => 'BreadcrumbList',
 							'itemListElement' => [
-								[ '@type' => 'ListItem', 'position' => 1, 'name' => get_bloginfo( 'name' ), 'item' => home_url( '/' ) ],
-								[ '@type' => 'ListItem', 'position' => 2, 'name' => __( '示例分类', 'wpmind' ), 'item' => home_url( '/category/example/' ) ],
-								[ '@type' => 'ListItem', 'position' => 3, 'name' => __( '示例文章标题', 'wpmind' ) ],
+								[
+									'@type'    => 'ListItem',
+									'position' => 1,
+									'name'     => get_bloginfo( 'name' ),
+									'item'     => home_url( '/' ),
+								],
+								[
+									'@type'    => 'ListItem',
+									'position' => 2,
+									'name'     => __( '示例文章标题', 'wpmind' ),
+								],
 							],
-						];
-						$preview_breadcrumb_json = wp_json_encode( $preview_breadcrumb, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
-
-						$preview_website = [
+						],
+						JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT
+					);
+					$preview_site_json  = (string) wp_json_encode(
+						[
 							'@context'        => 'https://schema.org',
 							'@type'           => 'WebSite',
 							'name'            => $preview_brand_name,
@@ -421,341 +440,354 @@ $wpmind_info_list = static function ( array $items, string $more_url = '' ): str
 								'target'      => home_url( '/?s={search_term_string}' ),
 								'query-input' => 'required name=search_term_string',
 							],
-							'inLanguage'      => get_locale(),
-						];
-						$site_desc       = get_bloginfo( 'description' );
-						if ( ! empty( $site_desc ) ) {
-							$preview_website['description'] = $site_desc;
-						}
-						$preview_website_json = wp_json_encode( $preview_website, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
-						?>
-						<div class="seg wpmind-schema-preview-tabs" style="margin-bottom:var(--wenpai-space-3);">
-							<button type="button" class="wpmind-module-subtab wpmind-schema-tab active" data-preview="article"><?php esc_html_e( 'Article', 'wpmind' ); ?></button>
-							<button type="button" class="wpmind-module-subtab wpmind-schema-tab" data-preview="breadcrumb"><?php esc_html_e( 'Breadcrumb', 'wpmind' ); ?></button>
-							<button type="button" class="wpmind-module-subtab wpmind-schema-tab" data-preview="website"><?php esc_html_e( 'WebSite', 'wpmind' ); ?></button>
-						</div>
-						<div class="wpmind-schema-preview-panel" data-preview-panel="article">
-							<pre class="wenpai-code"><code><?php echo esc_html( $preview_json ); ?></code></pre>
-							<p class="meta" style="margin-top:8px;"><?php esc_html_e( '每篇文章/页面自动输出。品牌实体启用后 publisher 将自动增强。', 'wpmind' ); ?></p>
-						</div>
-						<div class="wpmind-schema-preview-panel" data-preview-panel="breadcrumb" style="display:none;">
-							<pre class="wenpai-code"><code><?php echo esc_html( $preview_breadcrumb_json ); ?></code></pre>
-							<p class="meta" style="margin-top:8px;"><?php esc_html_e( '每篇文章/页面自动输出面包屑导航。支持分类层级和页面父子关系。', 'wpmind' ); ?></p>
-						</div>
-						<div class="wpmind-schema-preview-panel" data-preview-panel="website" style="display:none;">
-							<pre class="wenpai-code"><code><?php echo esc_html( $preview_website_json ); ?></code></pre>
-							<p class="meta" style="margin-top:8px;"><?php esc_html_e( '仅在首页输出。包含站内搜索 SearchAction，帮助搜索引擎展示站内搜索框。', 'wpmind' ); ?></p>
-						</div>
-					</section>
-					<?php endif; ?>
-				</div>
-				<div class="wpmind-geo-side">
-					<?php
-					$wpmind_info_card(
-						'info',
-						__( 'Schema.org 与 AI 搜索', 'wpmind' ),
-						'<p>' . esc_html__( 'Schema.org JSON-LD 是 AI 理解页面语义的核心通道。结构化数据直接告诉 AI「这是什么类型的内容、谁写的、什么时候发布的」。', 'wpmind' ) . '</p><ul>'
-						. '<li>' . esc_html__( 'Article/BlogPosting/NewsArticle 类型自动识别', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( 'headline, author, datePublished 等核心属性', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( 'publisher 由品牌实体自动增强', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( 'wordCount, articleSection, keywords 辅助 AI 分类', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( 'inLanguage 帮助多语言内容正确归类', 'wpmind' ) . '</li></ul>'
+						],
+						JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT
 					);
-					?>
-				</div>
+
+					$schema_tabs = Wenpai_Admin_UI::view_tabs_html(
+						[
+							'group'      => 'wpmind-geo-schema',
+							'aria_label' => __( 'JSON-LD 预览类型', 'wpmind' ),
+							'items'      => [
+								[
+									'id'     => 'article',
+									'label'  => 'Article',
+									'active' => true,
+								],
+								[
+									'id'    => 'breadcrumb',
+									'label' => 'Breadcrumb',
+								],
+								[
+									'id'    => 'website',
+									'label' => 'WebSite',
+								],
+							],
+						]
+					);
+
+					Wenpai_Admin_UI::card_open(
+						[
+							'title'             => __( 'JSON-LD 预览', 'wpmind' ),
+							'tile'              => false,
+							'head_control_html' => $schema_tabs,
+						]
+					);
+					Wenpai_Admin_UI::view_panes(
+						[
+							'group' => 'wpmind-geo-schema',
+							'panes' => [
+								[
+									'id'     => 'article',
+									'active' => true,
+									'html'   => wpmind_code_block_html(
+										[
+											'code' => $preview_json,
+											'lang' => 'json',
+										]
+									),
+								],
+								[
+									'id'   => 'breadcrumb',
+									'html' => wpmind_code_block_html(
+										[
+											'code' => $preview_bc_json,
+											'lang' => 'json',
+										]
+									),
+								],
+								[
+									'id'   => 'website',
+									'html' => wpmind_code_block_html(
+										[
+											'code' => $preview_site_json,
+											'lang' => 'json',
+										]
+									),
+								],
+							],
+						]
+					);
+					Wenpai_Admin_UI::card_close();
+				endif;
+				?>
+			</div>
+			<div class="wenpai-stack">
+				<?php
+				$wpmind_info_card(
+					__( 'Schema.org 说明', 'wpmind' ),
+					[
+						__( '自动兼容 Yoast、Rank Math 与 Slim SEO。', 'wpmind' ),
+						__( '中文字数与英文词数混合精确统计。', 'wpmind' ),
+						__( '品牌实体开启后自动丰富 publisher。', 'wpmind' ),
+					]
+				);
+				?>
 			</div>
 		</div>
+	</div>
 
-		<!-- ========== AI 索引 ========== -->
-		<div class="wpmind-module-tab-panel" data-panel="control">
-			<div class="wpmind-geo-grid">
-				<div class="wpmind-geo-main">
-					<section class="card">
-						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'lock' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
-							<div>
-								<h2 class="card-title"><?php esc_html_e( 'AI 索引指令', 'wpmind' ); ?></h2>
-								<p class="card-sub"><?php esc_html_e( '控制 AI 爬虫对内容的索引和训练权限。', 'wpmind' ); ?></p>
-							</div>
+	<!-- ========== AI 索引 ========== -->
+	<div<?php echo Wenpai_Admin_UI::group_attrs( 'control', $section ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<div class="wenpai-split">
+			<div class="wenpai-stack">
+				<?php
+				Wenpai_Admin_UI::card_open(
+					[
+						'title' => __( 'AI 索引指令', 'wpmind' ),
+						'sub'   => __( '控制 AI 爬虫对站点内容的索引与训练权限。', 'wpmind' ),
+						'tile'  => false,
+					]
+				);
+				$wpmind_switch( 'wpmind-ai-indexing', 'wpmind_ai_indexing_enabled', $ai_indexing, __( '启用 AI 索引指令', 'wpmind' ), __( '输出 noai / nollm 标签与 HTTP 响应头。', 'wpmind' ) );
+				?>
+				<div<?php echo $ai_indexing ? '' : ' hidden'; ?>>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-ai-declaration"><?php esc_html_e( '默认内容声明', 'wpmind' ); ?></label></div>
+						<div class="field-ctl">
+							<select id="wpmind-ai-declaration" name="wpmind_ai_default_declaration">
+								<option value="original" <?php selected( $ai_declaration, 'original' ); ?>><?php esc_html_e( '原创内容 (original)', 'wpmind' ); ?></option>
+								<option value="ai-assisted" <?php selected( $ai_declaration, 'ai-assisted' ); ?>><?php esc_html_e( 'AI 辅助创作 (ai-assisted)', 'wpmind' ); ?></option>
+								<option value="ai-generated" <?php selected( $ai_declaration, 'ai-generated' ); ?>><?php esc_html_e( 'AI 生成内容 (ai-generated)', 'wpmind' ); ?></option>
+							</select>
 						</div>
-						<?php $wpmind_switch( 'wpmind-ai-indexing', 'wpmind_ai_indexing_enabled', $ai_indexing, __( '启用 AI 索引指令', 'wpmind' ), __( '输出 noai/nollm meta 标签和 X-Robots-Tag HTTP 头。', 'wpmind' ) ); ?>
-						<?php if ( $ai_indexing ) : ?>
-						<div class="wenpai-field field wenpai-field--row">
-							<div class="field-label"><label class="wenpai-field__label" for="wpmind-ai-declaration"><?php esc_html_e( '默认内容声明', 'wpmind' ); ?></label></div>
-							<div class="field-ctl">
-								<select id="wpmind-ai-declaration" name="wpmind_ai_default_declaration" style="max-width:420px">
-									<option value="original" <?php selected( $ai_declaration, 'original' ); ?>><?php esc_html_e( '原创内容 (original)', 'wpmind' ); ?></option>
-									<option value="ai-assisted" <?php selected( $ai_declaration, 'ai-assisted' ); ?>><?php esc_html_e( 'AI 辅助创作 (ai-assisted)', 'wpmind' ); ?></option>
-									<option value="ai-generated" <?php selected( $ai_declaration, 'ai-generated' ); ?>><?php esc_html_e( 'AI 生成内容 (ai-generated)', 'wpmind' ); ?></option>
-								</select>
-							</div>
+					</div>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><span class="wenpai-field__label"><?php esc_html_e( '排除的内容类型', 'wpmind' ); ?></span></div>
+						<div class="field-ctl">
+							<ul class="wenpai-checkgroup__list">
+								<?php
+								$public_types = get_post_types( [ 'public' => true ], 'objects' );
+								foreach ( $public_types as $type ) :
+									?>
+									<li><label class="chk">
+										<input type="checkbox" name="wpmind_ai_excluded_post_types[]" value="<?php echo esc_attr( $type->name ); ?>" <?php checked( in_array( $type->name, $ai_excluded_types, true ) ); ?>>
+										<span class="wenpai-checkgroup__text"><?php echo esc_html( $type->labels->name ); ?> (<?php echo esc_html( $type->name ); ?>)</span>
+									</label></li>
+								<?php endforeach; ?>
+							</ul>
+							<p class="wenpai-field__desc"><?php esc_html_e( '勾选类型将输出 noai 与 nollm 指令。', 'wpmind' ); ?></p>
 						</div>
-						<div class="wenpai-field field wenpai-field--row">
-							<div class="field-label"><span class="wenpai-field__label"><?php esc_html_e( '排除的内容类型', 'wpmind' ); ?></span></div>
-							<div class="field-ctl">
-								<p class="wenpai-field__desc" style="margin-bottom:8px;"><?php esc_html_e( '勾选的内容类型将输出 noai, nollm 指令，禁止 AI 索引和训练。', 'wpmind' ); ?></p>
-								<div class="opts">
-									<?php
-									$public_types = get_post_types( [ 'public' => true ], 'objects' );
-									foreach ( $public_types as $type ) :
-										?>
-									<label><input type="checkbox" name="wpmind_ai_excluded_post_types[]" value="<?php echo esc_attr( $type->name ); ?>" <?php checked( in_array( $type->name, $ai_excluded_types, true ) ); ?>> <?php echo esc_html( $type->labels->name ); ?> <code>(<?php echo esc_html( $type->name ); ?>)</code></label>
-									<?php endforeach; ?>
-								</div>
-							</div>
-						</div>
-						<p class="meta" style="margin-top:8px;"><?php esc_html_e( '单篇文章可在编辑器侧边栏的「AI 索引指令」面板中覆盖全局设置。', 'wpmind' ); ?></p>
-						<?php endif; ?>
-					</section>
+					</div>
 				</div>
-				<div class="wpmind-geo-side">
-					<?php
-					$wpmind_info_card(
-						'info',
-						__( 'AI 索引权限控制', 'wpmind' ),
-						'<p>' . esc_html__( '随着 AI 爬虫大量抓取网站内容用于训练和索引，内容创作者需要明确声明权限意愿。noai 和 nollm 是新兴的 meta robots 指令标准。', 'wpmind' ) . '</p><ul>'
-						. '<li>' . esc_html__( 'noai — 禁止 AI 搜索引擎索引内容', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( 'nollm — 禁止将内容用于 LLM 训练', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( '内容声明标注 AI 参与程度（原创/辅助/生成）', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( 'X-Robots-Tag HTTP 头对非 HTML 资源生效', 'wpmind' ) . '</li></ul>'
-						. '<p><a href="' . esc_url( $learn_more_url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( '了解更多 →', 'wpmind' ) . '</a></p>'
-					);
-					?>
-				</div>
+				<?php Wenpai_Admin_UI::card_close(); ?>
+			</div>
+			<div class="wenpai-stack">
+				<?php
+				$wpmind_info_card(
+					__( '索引权限说明', 'wpmind' ),
+					[
+						__( 'noai 禁止 AI 搜索引擎索引页面。', 'wpmind' ),
+						__( 'nollm 声明内容不用于模型训练。', 'wpmind' ),
+						__( '单篇文章可在编辑器侧边栏单独覆盖。', 'wpmind' ),
+					],
+					$learn_more_url
+				);
+				?>
 			</div>
 		</div>
+	</div>
 
-		<!-- ========== 爬虫管理 ========== -->
-		<div class="wpmind-module-tab-panel" data-panel="crawlers">
-			<div class="wpmind-geo-grid">
-				<div class="wpmind-geo-main">
-					<section class="card">
-						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'robot' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
-							<div>
-								<h2 class="card-title"><?php esc_html_e( 'robots.txt AI 管理', 'wpmind' ); ?> <span class="pill"><?php esc_html_e( 'NEW', 'wpmind' ); ?></span></h2>
-								<p class="card-sub"><?php esc_html_e( '通过 robots.txt 控制 AI 爬虫的访问权限，不修改物理文件。', 'wpmind' ); ?></p>
-							</div>
-						</div>
-						<?php $wpmind_switch( 'wpmind-robots-ai', 'wpmind_robots_ai_enabled', $robots_ai_enabled, __( '启用 robots.txt AI 管理', 'wpmind' ), __( '在 robots.txt 中注入 AI 爬虫的 Allow/Disallow 规则。', 'wpmind' ) ); ?>
-						<?php if ( $robots_ai_enabled ) : ?>
-						<div class="wenpai-table-wrap" style="margin-top:var(--wenpai-space-3);">
+	<!-- ========== 爬虫管理 ========== -->
+	<div<?php echo Wenpai_Admin_UI::group_attrs( 'crawlers', $section ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<div class="wenpai-split">
+			<div class="wenpai-stack">
+				<?php
+				Wenpai_Admin_UI::card_open(
+					[
+						'title' => __( 'robots.txt AI 管理', 'wpmind' ),
+						'sub'   => __( '按爬虫注入 Allow 或 Disallow 规则，不改物理文件。', 'wpmind' ),
+						'tile'  => false,
+					]
+				);
+				$wpmind_switch( 'wpmind-robots-ai', 'wpmind_robots_ai_enabled', $robots_ai_enabled, __( '启用 robots.txt 管理', 'wpmind' ), __( '动态注入 AI 爬虫访问规则。', 'wpmind' ) );
+				if ( $robots_ai_enabled ) :
+					?>
+					<div class="wenpai-table-wrap">
 						<table class="tbl">
 							<thead>
 								<tr>
 									<th><?php esc_html_e( '爬虫', 'wpmind' ); ?></th>
-									<th><?php esc_html_e( '公司', 'wpmind' ); ?></th>
+									<th><?php esc_html_e( '机构', 'wpmind' ); ?></th>
 									<th><?php esc_html_e( '规则', 'wpmind' ); ?></th>
 								</tr>
 							</thead>
 							<tbody>
 								<?php foreach ( \WPMind\Modules\Geo\RobotsTxtManager::AI_CRAWLERS as $bot => $info ) : ?>
-								<tr>
-									<td><div class="t"><span class="mono"><?php echo esc_html( $bot ); ?></span></div><div class="d"><?php echo esc_html( $info['description'] ); ?></div></td>
-									<td><?php echo esc_html( $info['company'] ); ?></td>
-									<td>
-										<select name="wpmind_robots_ai_rules[<?php echo esc_attr( $bot ); ?>]" style="width:auto;min-width:120px">
-											<option value="" <?php selected( $robots_ai_rules[ $bot ] ?? '', '' ); ?>><?php esc_html_e( '不管理', 'wpmind' ); ?></option>
-											<option value="allow" <?php selected( $robots_ai_rules[ $bot ] ?? '', 'allow' ); ?>><?php esc_html_e( 'Allow', 'wpmind' ); ?></option>
-											<option value="disallow" <?php selected( $robots_ai_rules[ $bot ] ?? '', 'disallow' ); ?>><?php esc_html_e( 'Disallow', 'wpmind' ); ?></option>
-										</select>
-									</td>
-								</tr>
+									<tr>
+										<td>
+											<div class="t"><span class="mono"><?php echo esc_html( $bot ); ?></span></div>
+											<div class="d"><?php echo esc_html( $info['description'] ); ?></div>
+										</td>
+										<td><?php echo esc_html( $info['company'] ); ?></td>
+										<td>
+											<select name="wpmind_robots_ai_rules[<?php echo esc_attr( $bot ); ?>]" class="wpmind-num">
+												<option value="" <?php selected( $robots_ai_rules[ $bot ] ?? '', '' ); ?>><?php esc_html_e( '不管理', 'wpmind' ); ?></option>
+												<option value="allow" <?php selected( $robots_ai_rules[ $bot ] ?? '', 'allow' ); ?>>Allow</option>
+												<option value="disallow" <?php selected( $robots_ai_rules[ $bot ] ?? '', 'disallow' ); ?>>Disallow</option>
+											</select>
+										</td>
+									</tr>
 								<?php endforeach; ?>
 							</tbody>
 						</table>
-						</div>
-						<p class="wenpai-field__desc" style="margin-top:var(--wenpai-space-3);"><?php esc_html_e( '预览地址：', 'wpmind' ); ?> <?php echo wpmind_code_inline_html( [ 'code' => home_url( '/robots.txt' ) ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit helper escapes internally ?></p>
-						<?php endif; ?>
-					</section>
-				</div>
-				<div class="wpmind-geo-side">
+					</div>
+					<p class="wenpai-field__desc"><?php esc_html_e( '预览地址：', 'wpmind' ); ?> <?php echo wpmind_code_inline_html( [ 'code' => home_url( '/robots.txt' ) ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
 					<?php
-					$wpmind_info_card(
-						'info',
-						__( 'AI 爬虫生态', 'wpmind' ),
-						'<p>' . esc_html__( '目前活跃的 AI 爬虫超过 20 种，来自 OpenAI、Anthropic、Google、百度等公司。通过 robots.txt 可以精细控制每个爬虫的访问权限。', 'wpmind' ) . '</p><ul>'
-						. '<li>' . esc_html__( 'GPTBot、ClaudeBot 是最活跃的 AI 爬虫', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( '中国 AI 爬虫：百度蜘蛛、搜狗、360、神马', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( '规则通过 WordPress 过滤器注入，不修改物理文件', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( 'Allow 允许爬取，Disallow 禁止爬取', 'wpmind' ) . '</li></ul>'
-						. '<p><a href="' . esc_url( $learn_more_url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( '了解更多 →', 'wpmind' ) . '</a></p>'
-					);
-					?>
-				</div>
+				endif;
+				Wenpai_Admin_UI::card_close();
+				?>
+			</div>
+			<div class="wenpai-stack">
+				<?php
+				$wpmind_info_card(
+					__( 'AI 爬虫规则', 'wpmind' ),
+					[
+						__( '覆盖国内外主流 20 余种 AI 爬虫。', 'wpmind' ),
+						__( '通过 WordPress 过滤器注入，安全可逆。', 'wpmind' ),
+					],
+					$learn_more_url
+				);
+				?>
 			</div>
 		</div>
-
-		<!-- ========== 品牌实体 ========== -->
-		<div class="wpmind-module-tab-panel" data-panel="brand">
-			<div class="wpmind-geo-grid">
-				<div class="wpmind-geo-main">
-					<section class="card">
-						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'services' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
-							<div>
-								<h2 class="card-title"><?php esc_html_e( '组织基础', 'wpmind' ); ?> <span class="pill"><?php esc_html_e( 'NEW', 'wpmind' ); ?></span></h2>
-								<p class="card-sub"><?php esc_html_e( '定义品牌实体信息，增强 publisher Schema 并在首页输出 Organization JSON-LD。', 'wpmind' ); ?></p>
-							</div>
-						</div>
-						<?php $wpmind_switch( 'wpmind-brand-entity', 'wpmind_brand_entity_enabled', $brand_entity_enabled, __( '启用品牌实体', 'wpmind' ), __( '丰富文章 publisher Schema，并在首页输出独立 Organization JSON-LD。', 'wpmind' ) ); ?>
-						<?php if ( $brand_entity_enabled ) : ?>
-						<div class="wenpai-field field wenpai-field--row">
-							<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-org-type"><?php esc_html_e( '组织类型', 'wpmind' ); ?></label></div>
-							<div class="field-ctl">
-								<select id="wpmind-brand-org-type" name="wpmind_brand_org_type" style="max-width:420px">
-									<option value="Organization" <?php selected( $brand_org_type, 'Organization' ); ?>><?php esc_html_e( 'Organization (通用)', 'wpmind' ); ?></option>
-									<option value="Corporation" <?php selected( $brand_org_type, 'Corporation' ); ?>><?php esc_html_e( 'Corporation (公司)', 'wpmind' ); ?></option>
-									<option value="LocalBusiness" <?php selected( $brand_org_type, 'LocalBusiness' ); ?>><?php esc_html_e( 'LocalBusiness (本地商户)', 'wpmind' ); ?></option>
-									<option value="OnlineBusiness" <?php selected( $brand_org_type, 'OnlineBusiness' ); ?>><?php esc_html_e( 'OnlineBusiness (在线业务)', 'wpmind' ); ?></option>
-									<option value="NewsMediaOrganization" <?php selected( $brand_org_type, 'NewsMediaOrganization' ); ?>><?php esc_html_e( 'NewsMediaOrganization (新闻媒体)', 'wpmind' ); ?></option>
-								</select>
-							</div>
-						</div>
-						<div class="wenpai-field field wenpai-field--row">
-							<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-name"><?php esc_html_e( '品牌名称', 'wpmind' ); ?></label></div>
-							<div class="field-ctl">
-								<input type="text" id="wpmind-brand-name" name="wpmind_brand_name" value="<?php echo esc_attr( get_option( 'wpmind_brand_name', '' ) ); ?>" placeholder="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
-								<p class="wenpai-field__desc"><?php esc_html_e( '留空则使用站点名称。', 'wpmind' ); ?></p>
-							</div>
-						</div>
-						<div class="wenpai-field field wenpai-field--row">
-							<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-desc"><?php esc_html_e( '品牌描述', 'wpmind' ); ?></label></div>
-							<div class="field-ctl">
-								<textarea id="wpmind-brand-desc" name="wpmind_brand_description" rows="3" placeholder="<?php esc_attr_e( '简要描述您的品牌/组织', 'wpmind' ); ?>"><?php echo esc_textarea( get_option( 'wpmind_brand_description', '' ) ); ?></textarea>
-							</div>
-						</div>
-						<div class="wenpai-field field wenpai-field--row">
-							<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-url"><?php esc_html_e( '品牌 URL', 'wpmind' ); ?></label></div>
-							<div class="field-ctl">
-								<input type="url" id="wpmind-brand-url" name="wpmind_brand_url" value="<?php echo esc_attr( get_option( 'wpmind_brand_url', '' ) ); ?>" placeholder="<?php echo esc_attr( home_url( '/' ) ); ?>">
-								<p class="wenpai-field__desc"><?php esc_html_e( '留空则使用站点首页地址。', 'wpmind' ); ?></p>
-							</div>
-						</div>
-						<div class="wenpai-field field wenpai-field--row">
-							<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-founding"><?php esc_html_e( '创立日期', 'wpmind' ); ?></label></div>
-							<div class="field-ctl">
-								<input type="text" id="wpmind-brand-founding" name="wpmind_brand_founding_date" value="<?php echo esc_attr( get_option( 'wpmind_brand_founding_date', '' ) ); ?>" placeholder="<?php esc_attr_e( '例如：2020 或 2020-01-01', 'wpmind' ); ?>" style="max-width:280px">
-							</div>
-						</div>
-						<?php endif; ?>
-					</section>
-
-					<?php if ( $brand_entity_enabled ) : ?>
-					<section class="card">
-						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'external' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
-							<div>
-								<h2 class="card-title"><?php esc_html_e( '社交档案', 'wpmind' ); ?></h2>
-								<p class="card-sub"><?php esc_html_e( '社交平台主页 URL，将作为 Schema.org sameAs 输出。', 'wpmind' ); ?></p>
-							</div>
-						</div>
-						<?php
-						$social_fields = [
-							'wpmind_brand_social_facebook' => 'Facebook',
-							'wpmind_brand_social_twitter'  => 'X (Twitter)',
-							'wpmind_brand_social_linkedin' => 'LinkedIn',
-							'wpmind_brand_social_youtube'  => 'YouTube',
-							'wpmind_brand_social_github'   => 'GitHub',
-							'wpmind_brand_social_weibo'    => __( '微博', 'wpmind' ),
-							'wpmind_brand_social_zhihu'    => __( '知乎', 'wpmind' ),
-							'wpmind_brand_social_wechat'   => __( '微信公众号', 'wpmind' ),
-						];
-						foreach ( $social_fields as $field_name => $label ) :
-							$field_id = 'wpmind-brand-' . sanitize_html_class( str_replace( 'wpmind_brand_social_', '', $field_name ) );
-							?>
-						<div class="wenpai-field field wenpai-field--row">
-							<div class="field-label"><label class="wenpai-field__label" for="<?php echo esc_attr( $field_id ); ?>"><?php echo esc_html( $label ); ?></label></div>
-							<div class="field-ctl">
-								<input type="url" id="<?php echo esc_attr( $field_id ); ?>" name="<?php echo esc_attr( $field_name ); ?>" value="<?php echo esc_attr( get_option( $field_name, '' ) ); ?>" placeholder="https://">
-							</div>
-						</div>
-						<?php endforeach; ?>
-					</section>
-
-					<section class="card">
-						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'help' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
-							<div>
-								<h2 class="card-title"><?php esc_html_e( '联系方式', 'wpmind' ); ?></h2>
-								<p class="card-sub"><?php esc_html_e( '可选的联系信息，将作为 Schema.org contactPoint 输出。', 'wpmind' ); ?></p>
-							</div>
-						</div>
-						<div class="wenpai-field field wenpai-field--row">
-							<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-contact-email"><?php esc_html_e( '联系邮箱', 'wpmind' ); ?></label></div>
-							<div class="field-ctl">
-								<input type="email" id="wpmind-brand-contact-email" name="wpmind_brand_contact_email" value="<?php echo esc_attr( get_option( 'wpmind_brand_contact_email', '' ) ); ?>" placeholder="hello@example.com">
-							</div>
-						</div>
-						<div class="wenpai-field field wenpai-field--row">
-							<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-contact-phone"><?php esc_html_e( '联系电话', 'wpmind' ); ?></label></div>
-							<div class="field-ctl">
-								<input type="tel" id="wpmind-brand-contact-phone" name="wpmind_brand_contact_phone" value="<?php echo esc_attr( get_option( 'wpmind_brand_contact_phone', '' ) ); ?>" placeholder="+86-xxx-xxxx-xxxx">
-							</div>
-						</div>
-					</section>
-
-					<section class="card">
-						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'globe' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
-							<div>
-								<h2 class="card-title"><?php esc_html_e( 'Knowledge Graph', 'wpmind' ); ?></h2>
-								<p class="card-sub"><?php esc_html_e( '关联品牌的 Wikidata/Wikipedia 页面，强化知识图谱信号。', 'wpmind' ); ?></p>
-							</div>
-						</div>
-						<div class="wenpai-field field wenpai-field--row">
-							<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-wikidata"><?php esc_html_e( 'Wikidata URL', 'wpmind' ); ?></label></div>
-							<div class="field-ctl">
-								<input type="url" id="wpmind-brand-wikidata" name="wpmind_brand_wikidata_url" value="<?php echo esc_attr( get_option( 'wpmind_brand_wikidata_url', '' ) ); ?>" placeholder="https://www.wikidata.org/wiki/Q...">
-							</div>
-						</div>
-						<div class="wenpai-field field wenpai-field--row">
-							<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-wikipedia"><?php esc_html_e( 'Wikipedia URL', 'wpmind' ); ?></label></div>
-							<div class="field-ctl">
-								<input type="url" id="wpmind-brand-wikipedia" name="wpmind_brand_wikipedia_url" value="<?php echo esc_attr( get_option( 'wpmind_brand_wikipedia_url', '' ) ); ?>" placeholder="https://en.wikipedia.org/wiki/...">
-							</div>
-						</div>
-					</section>
-
-					<section class="card">
-						<div class="card-head">
-							<span class="tile"><?php echo AdminIcons::svg( 'route' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit 静态 SVG。 ?></span>
-							<div>
-								<h2 class="card-title"><?php esc_html_e( '文章实体关联', 'wpmind' ); ?></h2>
-								<p class="card-sub"><?php esc_html_e( '将每篇文章关联到 Wikidata/Wikipedia 实体，帮助 AI 消除歧义并建立权威性。', 'wpmind' ); ?></p>
-							</div>
-						</div>
-						<?php $wpmind_switch( 'wpmind-entity-linker', 'wpmind_entity_linker_enabled', $entity_linker_enabled, __( '启用文章实体关联', 'wpmind' ), __( '在编辑器中添加实体关联字段，输出为 Schema.org about.sameAs。', 'wpmind' ) ); ?>
-						<?php if ( $entity_linker_enabled ) : ?>
-						<p class="meta" style="margin-top:8px;"><?php esc_html_e( '在编辑器侧边栏的「实体关联」面板中为每篇文章关联 Wikidata 实体。', 'wpmind' ); ?></p>
-						<?php endif; ?>
-					</section>
-					<?php endif; ?>
-				</div>
-				<div class="wpmind-geo-side">
-					<?php
-					$wpmind_info_card(
-						'info',
-						__( '实体与 AI 搜索', 'wpmind' ),
-						'<p>' . esc_html__( '品牌实体是 GEO 的基础层。AI 搜索引擎必须先「理解」品牌身份，才能信任并推荐其内容。', 'wpmind' ) . '</p><ul>'
-						. '<li>' . esc_html__( 'Organization JSON-LD 在首页输出，是知识图谱的主要信号源', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( 'sameAs 关联社交档案，帮助 AI 验证品牌真实性', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( 'Wikidata/Wikipedia 链接强化实体消歧', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( '文章 publisher 自动增强，无需逐篇配置', 'wpmind' ) . '</li>'
-						. '<li>' . esc_html__( '文章实体关联通过 about.sameAs 消除语义歧义', 'wpmind' ) . '</li></ul>'
-						. '<p><a href="' . esc_url( $learn_more_url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( '了解更多 →', 'wpmind' ) . '</a></p>'
-					);
-					?>
-				</div>
-			</div>
-		</div>
-
-	</div><!-- /wpmind-geo-content -->
-
-	<div class="card-foot" style="margin-top:var(--wenpai-space-5);">
-		<span class="wenpai-actions">
-			<button type="button" class="btn btn-primary" id="wpmind-save-geo"><?php esc_html_e( '保存设置', 'wpmind' ); ?></button>
-		</span>
 	</div>
 
-</div><!-- /wpmind-geo-panel -->
+	<!-- ========== 品牌实体 ========== -->
+	<div<?php echo Wenpai_Admin_UI::group_attrs( 'brand', $section ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<div class="wenpai-split">
+			<div class="wenpai-stack">
+				<?php
+				Wenpai_Admin_UI::card_open(
+					[
+						'title' => __( '组织与品牌实体', 'wpmind' ),
+						'sub'   => __( '增强 publisher Schema 并在首页输出 Organization JSON-LD。', 'wpmind' ),
+						'tile'  => false,
+					]
+				);
+				$wpmind_switch( 'wpmind-brand-entity', 'wpmind_brand_entity_enabled', $brand_entity_enabled, __( '启用品牌实体', 'wpmind' ), __( '输出品牌身份、社交主页与知识图谱链接。', 'wpmind' ) );
+				?>
+				<div<?php echo $brand_entity_enabled ? '' : ' hidden'; ?>>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-org-type"><?php esc_html_e( '组织类型', 'wpmind' ); ?></label></div>
+						<div class="field-ctl">
+							<select id="wpmind-brand-org-type" name="wpmind_brand_org_type">
+								<option value="Organization" <?php selected( $brand_org_type, 'Organization' ); ?>>Organization</option>
+								<option value="Corporation" <?php selected( $brand_org_type, 'Corporation' ); ?>>Corporation</option>
+								<option value="LocalBusiness" <?php selected( $brand_org_type, 'LocalBusiness' ); ?>>LocalBusiness</option>
+								<option value="OnlineBusiness" <?php selected( $brand_org_type, 'OnlineBusiness' ); ?>>OnlineBusiness</option>
+								<option value="NewsMediaOrganization" <?php selected( $brand_org_type, 'NewsMediaOrganization' ); ?>>NewsMediaOrganization</option>
+							</select>
+						</div>
+					</div>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-name"><?php esc_html_e( '品牌名称', 'wpmind' ); ?></label></div>
+						<div class="field-ctl">
+							<input type="text" id="wpmind-brand-name" name="wpmind_brand_name" value="<?php echo esc_attr( (string) get_option( 'wpmind_brand_name', '' ) ); ?>" placeholder="<?php echo esc_attr( (string) get_bloginfo( 'name' ) ); ?>">
+						</div>
+					</div>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-desc"><?php esc_html_e( '品牌描述', 'wpmind' ); ?></label></div>
+						<div class="field-ctl">
+							<textarea id="wpmind-brand-desc" name="wpmind_brand_description" rows="3" placeholder="<?php esc_attr_e( '简要介绍品牌或组织', 'wpmind' ); ?>"><?php echo esc_textarea( (string) get_option( 'wpmind_brand_description', '' ) ); ?></textarea>
+						</div>
+					</div>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-url"><?php esc_html_e( '品牌网址', 'wpmind' ); ?></label></div>
+						<div class="field-ctl">
+							<input type="url" id="wpmind-brand-url" name="wpmind_brand_url" value="<?php echo esc_attr( (string) get_option( 'wpmind_brand_url', '' ) ); ?>" placeholder="<?php echo esc_attr( home_url( '/' ) ); ?>">
+						</div>
+					</div>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-founding"><?php esc_html_e( '创立日期', 'wpmind' ); ?></label></div>
+						<div class="field-ctl">
+							<input type="text" class="wpmind-num" id="wpmind-brand-founding" name="wpmind_brand_founding_date" value="<?php echo esc_attr( (string) get_option( 'wpmind_brand_founding_date', '' ) ); ?>" placeholder="2020-01-01">
+						</div>
+					</div>
+
+					<?php
+					$social_fields = [
+						'wpmind_brand_social_facebook' => 'Facebook',
+						'wpmind_brand_social_twitter'  => 'X (Twitter)',
+						'wpmind_brand_social_linkedin' => 'LinkedIn',
+						'wpmind_brand_social_youtube'  => 'YouTube',
+						'wpmind_brand_social_github'   => 'GitHub',
+						'wpmind_brand_social_weibo'    => __( '微博', 'wpmind' ),
+						'wpmind_brand_social_zhihu'    => __( '知乎', 'wpmind' ),
+						'wpmind_brand_social_wechat'   => __( '微信公众号', 'wpmind' ),
+					];
+					foreach ( $social_fields as $field_name => $label ) :
+						$field_id = 'wpmind-brand-' . sanitize_html_class( str_replace( 'wpmind_brand_social_', '', $field_name ) );
+						?>
+						<div class="wenpai-field wenpai-field--row field">
+							<div class="field-label"><label class="wenpai-field__label" for="<?php echo esc_attr( $field_id ); ?>"><?php echo esc_html( $label ); ?></label></div>
+							<div class="field-ctl">
+								<input type="url" id="<?php echo esc_attr( $field_id ); ?>" name="<?php echo esc_attr( $field_name ); ?>" value="<?php echo esc_attr( (string) get_option( $field_name, '' ) ); ?>" placeholder="https://">
+							</div>
+						</div>
+					<?php endforeach; ?>
+
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-contact-email"><?php esc_html_e( '联系邮箱', 'wpmind' ); ?></label></div>
+						<div class="field-ctl">
+							<input type="email" id="wpmind-brand-contact-email" name="wpmind_brand_contact_email" value="<?php echo esc_attr( (string) get_option( 'wpmind_brand_contact_email', '' ) ); ?>" placeholder="hello@example.com">
+						</div>
+					</div>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-contact-phone"><?php esc_html_e( '联系电话', 'wpmind' ); ?></label></div>
+						<div class="field-ctl">
+							<input type="tel" id="wpmind-brand-contact-phone" name="wpmind_brand_contact_phone" value="<?php echo esc_attr( (string) get_option( 'wpmind_brand_contact_phone', '' ) ); ?>" placeholder="+86-xxx-xxxx-xxxx">
+						</div>
+					</div>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-wikidata">Wikidata URL</label></div>
+						<div class="field-ctl">
+							<input type="url" id="wpmind-brand-wikidata" name="wpmind_brand_wikidata_url" value="<?php echo esc_attr( (string) get_option( 'wpmind_brand_wikidata_url', '' ) ); ?>" placeholder="https://www.wikidata.org/wiki/Q...">
+						</div>
+					</div>
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-brand-wikipedia">Wikipedia URL</label></div>
+						<div class="field-ctl">
+							<input type="url" id="wpmind-brand-wikipedia" name="wpmind_brand_wikipedia_url" value="<?php echo esc_attr( (string) get_option( 'wpmind_brand_wikipedia_url', '' ) ); ?>" placeholder="https://en.wikipedia.org/wiki/...">
+						</div>
+					</div>
+					<?php $wpmind_switch( 'wpmind-entity-linker', 'wpmind_entity_linker_enabled', $entity_linker_enabled, __( '文章实体关联', 'wpmind' ), __( '在编辑器关联 Wikidata 实体输出 about.sameAs。', 'wpmind' ) ); ?>
+				</div>
+				<?php Wenpai_Admin_UI::card_close(); ?>
+			</div>
+			<div class="wenpai-stack">
+				<?php
+				$wpmind_info_card(
+					__( '品牌实体说明', 'wpmind' ),
+					[
+						__( '首页输出 Organization JSON-LD 身份声明。', 'wpmind' ),
+						__( 'sameAs 关联社交档案强化可信度。', 'wpmind' ),
+						__( 'Wikidata 链接协助 AI 消除语义歧义。', 'wpmind' ),
+					],
+					$learn_more_url
+				);
+				?>
+			</div>
+		</div>
+	</div>
+
+	<?php
+	Wenpai_Admin_UI::card_open();
+	Wenpai_Admin_UI::card_foot(
+		[
+			'start'   => true,
+			'meta'    => __( '一次保存全部六个分区的 GEO 设置。', 'wpmind' ),
+			'actions' => [
+				[
+					'label'   => __( '保存 GEO 设置', 'wpmind' ),
+					'variant' => 'primary',
+					'attrs'   => [ 'id' => 'wpmind-save-geo' ],
+				],
+			],
+		]
+	);
+	Wenpai_Admin_UI::card_close();
+	?>
+</div>
+	<?php
+} )();

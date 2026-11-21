@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<!-- 由 prototypes/wpmind/build.php 经真实 templates/admin/page.php 生成，请勿手工修改。 -->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 服务 — 文派心思</title>
+<link rel="stylesheet" href="../../lib/wenpai-admin-ui/css/wenpai-tokens.css">
+<link rel="stylesheet" href="../../lib/wenpai-admin-ui/css/wenpai-admin.css">
+<link rel="stylesheet" href="../../lib/wenpai-admin-ui/css/wenpai-admin-wp.css">
+<link rel="stylesheet" href="../../assets/css/wpmind-admin.css">
+</head>
+<body class="wp-admin wp-core-ui wenpai-ui-page wpmind-admin">
+<div class="wenpai-app" data-wenpai-product="wpmind"><div class="wenpai-top"><div class="wenpai-wrap"><div class="wenpai-head"><a class="wenpai-brand" href="overview.html"><span class="wenpai-mark"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4"/><circle cx="12" cy="3" r="1"/><circle cx="9" cy="13" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1" fill="currentColor" stroke="none"/><path d="M9 17h6"/></svg></span><span class="wenpai-name">文派心思</span></a><nav class="wenpai-tabs" aria-label="文派心思"><a class="wenpai-tab" href="overview.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>概览</a><a class="wenpai-tab is-active" href="services.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4"/><circle cx="12" cy="3" r="1"/><circle cx="9" cy="13" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1" fill="currentColor" stroke="none"/><path d="M9 17h6"/></svg>AI 服务</a><a class="wenpai-tab" href="modules.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>模块</a><a class="wenpai-tab" href="analytics.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6" rx="0.5"/><rect x="12" y="8" width="3" height="10" rx="0.5"/><rect x="17" y="5" width="3" height="13" rx="0.5"/></svg>分析</a><a class="wenpai-tab" href="tools.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4.5 4.5 0 0 0-6 5.6L3 17.6V21h3.4l5.7-5.7a4.5 4.5 0 0 0 5.6-6l-3 3-2.5-.5-.5-2.5 3-3Z"/></svg>工具</a><a class="wenpai-tab" href="workflow.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 5.5 1.2 1.2L7 4.5M3.5 11.5l1.2 1.2L7 10.5M3.5 17.5l1.2 1.2L7 16.5"/></svg>任务</a></nav><div class="wenpai-head-right"><a class="btn btn-ghost wenpai-head-action" href="help.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 15H13V17H11V15ZM13 13.3551V14H11V12.5C11 11.9477 11.4477 11.5 12 11.5C12.8284 11.5 13.5 10.8284 13.5 10C13.5 9.17157 12.8284 8.5 12 8.5C11.2723 8.5 10.6656 9.01823 10.5288 9.70577L8.56731 9.31346C8.88637 7.70919 10.302 6.5 12 6.5C13.933 6.5 15.5 8.067 15.5 10C15.5 11.5855 14.4457 12.9248 13 13.3551Z"/></svg><span class="wenpai-head-label">帮助</span></a><a class="btn btn-ghost wenpai-head-action" href="https://wpcy.com/support" target="_blank" rel="noopener noreferrer"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.29117 20.8242L2 22L3.17581 16.7088C2.42544 15.3056 2 13.7025 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C10.2975 22 8.6944 21.5746 7.29117 20.8242ZM7.58075 18.711L8.23428 19.0605C9.38248 19.6745 10.6655 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 13.3345 4.32549 14.6175 4.93949 15.7657L5.28896 16.4192L4.63416 19.3658L7.58075 18.711Z"/></svg><span class="wenpai-head-label">反馈</span><span class="screen-reader-text">（在新标签页打开）</span></a></div></div></div></div><main class="wenpai-main wenpai-wrap wenpai-measure-wide"><div class="wenpai-page-head"><div><h1 class="wenpai-h1">AI 服务</h1><p class="wenpai-lede">管理官方算力、文本与图像接口。</p></div><div class="mode"><span class="seg" role="group" aria-label="显示模式"><a href="services.html?mode=simple" class="on" aria-current="page">简单</a><a href="services.html?mode=advanced">高级</a></span></div></div><nav class="wenpai-subnav" aria-label="AI 服务子导航"><span class="seg"><a href="services.html?mode=simple" class="on" aria-current="page">Provider 服务</a><a href="routing.html">智能路由</a></span></nav>
+<div class="wenpai-stack">
+	<form method="post" action="options.php" id="wpmind-settings-form">
+		<input type="hidden" name="option_page" value="wpmind_settings"><input type="hidden" name="action" value="update"><input type="hidden" name="_wpnonce" value="proto">
+		<div class="wenpai-stack">
+			<section class="card"><div class="card-head"><span class="tile ok"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 4.4375C15.3462 4.4375 16.4375 3.34619 16.4375 2H17.5625C17.5625 3.34619 18.6538 4.4375 20 4.4375V5.5625C18.6538 5.5625 17.5625 6.65381 17.5625 8H16.4375C16.4375 6.65381 15.3462 5.5625 14 5.5625V4.4375ZM1 11C4.31371 11 7 8.31371 7 5H9C9 8.31371 11.6863 11 15 11V13C11.6863 13 9 15.6863 9 19H7C7 15.6863 4.31371 13 1 13V11ZM4.87601 12C6.18717 12.7276 7.27243 13.8128 8 15.124 8.72757 13.8128 9.81283 12.7276 11.124 12 9.81283 11.2724 8.72757 10.1872 8 8.87601 7.27243 10.1872 6.18717 11.2724 4.87601 12ZM17.25 14C17.25 15.7949 15.7949 17.25 14 17.25V18.75C15.7949 18.75 17.25 20.2051 17.25 22H18.75C18.75 20.2051 20.2051 18.75 22 18.75V17.25C20.2051 17.25 18.75 15.7949 18.75 14H17.25Z"/></svg></span><div><h2 class="card-title">文派心思官方算力</h2></div><span class="head-actions"><span class="pill ok">已绑定站点</span></span></div>			<div class="wenpai-field wenpai-field--toggle wenpai-field--row field">
+				<div class="field-label"><label class="wenpai-field__label" for="wpmind_cloud_enabled">启用官方算力</label></div>
+				<div class="field-ctl">
+					<span class="wenpai-switch"><input type="hidden" name="wpmind_cloud_enabled" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind_cloud_enabled" name="wpmind_cloud_enabled" value="1" checked="checked"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span>					<p class="wenpai-field__desc">
+						免配第三方密钥，统一按心思点数结算。					</p>
+				</div>
+			</div>
+
+			<div class="wenpai-field wenpai-field--row field">
+				<div class="field-label"><span class="wenpai-field__label">剩余心思点数</span></div>
+				<div class="field-ctl">
+					<div class="wenpai-row wenpai-row--tight">
+						<span>4,820 心思点数（本月已用 1,180 / 6,000）</span>
+						<span class="pill ok">套件托管</span>					</div>
+				</div>
+			</div>
+
+			<div class="wenpai-field wenpai-field--row field" data-wenpai-mode="advanced" data-wenpai-view-hidden hidden>
+				<div class="field-label"><span class="wenpai-field__label">网关地址</span></div>
+				<div class="field-ctl">
+					<span class="wenpai-code-row"><code class="wenpai-code">https://mind-api.wenpai.net/v1</code><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-text="https://mind-api.wenpai.net/v1" data-label="复制" data-done-label="已复制">复制</button></span>				</div>
+			</div>
+			<div class="card-foot start"><span class="meta">站点通行证已连接，可直接参与智能路由。</span><a class="btn btn-ghost" href="https://wenpai.net/mind-credits" target="_blank" rel="noopener noreferrer">补充心思点数<span class="screen-reader-text">（在新标签页打开）</span></a></div></section><section class="card"><div class="card-head"><div><h2 class="card-title">文本服务</h2><p class="card-sub">4 个端点 · 默认：DeepSeek</p></div><span class="head-actions"><span class="pill mute">Key 加密保存</span></span></div>			<div class="wenpai-field wenpai-field--row field">
+				<div class="field-label"><label class="wenpai-field__label" for="wpmind_default_provider">默认服务</label></div>
+				<div class="field-ctl">
+					<select id="wpmind_default_provider" name="wpmind_default_provider">
+						<option value="">— 自动按路由选择 —</option>
+													<option value="deepseek"  selected="selected">DeepSeek</option>
+													<option value="qwen" >通义千问</option>
+													<option value="openai" >OpenAI</option>
+													<option value="anthropic" >Anthropic Claude</option>
+											</select>
+					<p class="wenpai-field__desc">路由策略未命中时的兜底服务。</p>
+				</div>
+			</div>
+
+			<div class="wenpai-field wenpai-field--row field" data-wenpai-mode="advanced" data-wenpai-view-hidden hidden>
+				<div class="field-label"><label class="wenpai-field__label" for="wpmind_request_timeout">请求超时</label></div>
+				<div class="field-ctl">
+					<input type="number" class="wpmind-num" id="wpmind_request_timeout" name="wpmind_request_timeout" value="60" min="10" max="300" step="1">
+					<p class="wenpai-field__desc">单位秒（建议 60–120），超时自动故障转移。</p>
+				</div>
+			</div>
+
+			<div class="wenpai-folds"><details class="wenpai-fold" id="endpoint-deepseek" open><summary><span class="wenpai-logo"><img src="../../assets/images/providers/deepseek.svg" alt="" width="20" height="20"></span><span class="wenpai-fold__text"><span class="wenpai-fold__title">DeepSeek</span><span class="wenpai-fold__desc">DeepSeek 深度求索</span></span><span class="wenpai-fold__side"><span class="pill ok">已开启 · 默认</span></span><svg class="wenpai-ico wenpai-fold__chevron" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.9999 13.1714L16.9497 8.22168L18.364 9.63589L11.9999 15.9999L5.63589 9.63589L7.0501 8.22168L11.9999 13.1714Z"/></svg></summary><div class="wenpai-fold__body">				<div class="wpmind-endpoint-card" data-provider="deepseek">
+					<div class="wenpai-field wenpai-field--toggle wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-sw-deepseek">启用</label></div>
+						<div class="field-ctl">
+							<span class="wenpai-switch"><input type="hidden" name="wpmind_custom_endpoints[deepseek][enabled]" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-sw-deepseek" name="wpmind_custom_endpoints[deepseek][enabled]" value="1" checked="checked"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span>						</div>
+					</div>
+
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="api_key_deepseek">API Key</label></div>
+						<div class="field-ctl">
+															<div class="wpmind-key">
+									<input type="password" id="api_key_deepseek" name="wpmind_custom_endpoints[deepseek][api_key]" value="" autocomplete="new-password" placeholder="••••••••••••••••">
+									<button type="button" class="btn btn-sm btn-ghost wpmind-toggle-key" data-target="api_key_deepseek" aria-label="切换密码显示">
+										<span class="wpmind-key__eye-on"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+										<span class="wpmind-key__eye-off" hidden><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3.2 3.9M6.6 6.6C3.9 8.4 2 12 2 12s3.5 6 10 6c1.5 0 2.9-.3 4.1-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></span>
+									</button>
+								</div>
+																	<p class="wenpai-field__desc">填写密钥后点击底部保存。</p>
+																									<div class="chk"><label><input type="checkbox" name="wpmind_custom_endpoints[deepseek][clear_api_key]" value="1" class="wpmind-clear-checkbox"> 清除已保存的 API Key</label></div>
+																<div class="wenpai-actions">
+									<button type="button" class="btn btn-sm btn-secondary wpmind-test-connection" data-provider="deepseek" >测试连接</button>
+									<button type="button" class="btn btn-sm btn-ghost wpmind-rotate-key" data-provider="deepseek">验证并替换</button>
+									<button type="button" class="btn btn-sm btn-ghost wpmind-reset-breaker" data-provider="deepseek">重置状态</button>
+									<span class="chk"><label><input type="checkbox" class="wpmind-deep-test" value="1"> 深度测试</label></span>
+									<span class="wpmind-key__result" aria-live="polite"></span>
+								</div>
+													</div>
+					</div>
+
+					
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="models_deepseek">支持的模型</label></div>
+						<div class="field-ctl">
+							<input type="text" id="models_deepseek" name="wpmind_custom_endpoints[deepseek][models]" value="deepseek-chat, deepseek-reasoner" placeholder="留空使用目录推荐模型">
+							<p class="wenpai-field__desc">多个模型以英文逗号分隔，留空用默认列表。</p>
+						</div>
+					</div>
+
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="default_model_deepseek">默认模型</label></div>
+						<div class="field-ctl">
+							<input type="text" id="default_model_deepseek" name="wpmind_custom_endpoints[deepseek][default_model]" value="deepseek-chat" placeholder="auto">
+							<div class="wenpai-actions">
+								<button type="button" class="btn btn-sm btn-ghost wpmind-fetch-models" data-provider="deepseek">拉取远程模型</button>
+								<span class="meta wpmind-fetch-models-hint">从接口读取可用对话模型并追加。</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="wenpai-field wenpai-field--row field" data-wenpai-mode="advanced" data-wenpai-view-hidden hidden>
+						<div class="field-label"><label class="wenpai-field__label" for="custom_base_url_deepseek">自定义接口地址</label></div>
+						<div class="field-ctl">
+							<input type="url" id="custom_base_url_deepseek" name="wpmind_custom_endpoints[deepseek][custom_base_url]" value="" placeholder="https://api.deepseek.com/v1">
+							<p class="wenpai-field__desc">留空使用官方默认接口地址。</p>
+						</div>
+					</div>
+				</div>
+				</div></details><details class="wenpai-fold" id="endpoint-qwen" open><summary><span class="wenpai-logo"><img src="../../assets/images/providers/qwen.svg" alt="" width="20" height="20"></span><span class="wenpai-fold__text"><span class="wenpai-fold__title">通义千问</span><span class="wenpai-fold__desc">阿里云百炼通义千问</span></span><span class="wenpai-fold__side"><span class="pill ok">已由站点配置锁定</span></span><svg class="wenpai-ico wenpai-fold__chevron" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.9999 13.1714L16.9497 8.22168L18.364 9.63589L11.9999 15.9999L5.63589 9.63589L7.0501 8.22168L11.9999 13.1714Z"/></svg></summary><div class="wenpai-fold__body">				<div class="wpmind-endpoint-card" data-provider="qwen">
+					<div class="wenpai-field wenpai-field--toggle wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-sw-qwen">启用</label></div>
+						<div class="field-ctl">
+							<span class="wenpai-switch"><input type="hidden" name="wpmind_custom_endpoints[qwen][enabled]" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-sw-qwen" name="wpmind_custom_endpoints[qwen][enabled]" value="1" checked="checked"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span>						</div>
+					</div>
+
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="api_key_qwen">API Key</label></div>
+						<div class="field-ctl">
+															<div class="wenpai-row wenpai-row--tight">
+									<span class="pill ok">已由站点配置锁定</span>									<span class="meta">密钥由站点配置文件托管，后台不可修改。</span>
+								</div>
+								<div class="wenpai-actions">
+									<button type="button" class="btn btn-sm btn-secondary wpmind-test-connection" data-provider="qwen" >测试连接</button>
+									<button type="button" class="btn btn-sm btn-ghost wpmind-reset-breaker" data-provider="qwen">重置状态</button>
+									<span class="wpmind-key__result" aria-live="polite"></span>
+								</div>
+													</div>
+					</div>
+
+					
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="models_qwen">支持的模型</label></div>
+						<div class="field-ctl">
+							<input type="text" id="models_qwen" name="wpmind_custom_endpoints[qwen][models]" value="qwen-plus, qwen-max, qwen-turbo" placeholder="留空使用目录推荐模型">
+							<p class="wenpai-field__desc">多个模型以英文逗号分隔，留空用默认列表。</p>
+						</div>
+					</div>
+
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="default_model_qwen">默认模型</label></div>
+						<div class="field-ctl">
+							<input type="text" id="default_model_qwen" name="wpmind_custom_endpoints[qwen][default_model]" value="qwen-plus" placeholder="auto">
+							<div class="wenpai-actions">
+								<button type="button" class="btn btn-sm btn-ghost wpmind-fetch-models" data-provider="qwen">拉取远程模型</button>
+								<span class="meta wpmind-fetch-models-hint">从接口读取可用对话模型并追加。</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="wenpai-field wenpai-field--row field" data-wenpai-mode="advanced" data-wenpai-view-hidden hidden>
+						<div class="field-label"><label class="wenpai-field__label" for="custom_base_url_qwen">自定义接口地址</label></div>
+						<div class="field-ctl">
+							<input type="url" id="custom_base_url_qwen" name="wpmind_custom_endpoints[qwen][custom_base_url]" value="" placeholder="https://dashscope.aliyuncs.com/compatible-mode/v1">
+							<p class="wenpai-field__desc">留空使用官方默认接口地址。</p>
+						</div>
+					</div>
+				</div>
+				</div></details><details class="wenpai-fold" id="endpoint-openai" open><summary><span class="wenpai-logo"><img src="../../assets/images/providers/openai.svg" alt="" width="20" height="20"></span><span class="wenpai-fold__text"><span class="wenpai-fold__title">OpenAI</span><span class="wenpai-fold__desc">OpenAI 官方接口</span></span><span class="wenpai-fold__side"><span class="pill ok">已开启</span></span><svg class="wenpai-ico wenpai-fold__chevron" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.9999 13.1714L16.9497 8.22168L18.364 9.63589L11.9999 15.9999L5.63589 9.63589L7.0501 8.22168L11.9999 13.1714Z"/></svg></summary><div class="wenpai-fold__body">				<div class="wpmind-endpoint-card" data-provider="openai">
+					<div class="wenpai-field wenpai-field--toggle wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-sw-openai">启用</label></div>
+						<div class="field-ctl">
+							<span class="wenpai-switch"><input type="hidden" name="wpmind_custom_endpoints[openai][enabled]" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-sw-openai" name="wpmind_custom_endpoints[openai][enabled]" value="1" checked="checked"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span>						</div>
+					</div>
+
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="api_key_openai">API Key</label></div>
+						<div class="field-ctl">
+															<div class="wpmind-key">
+									<input type="password" id="api_key_openai" name="wpmind_custom_endpoints[openai][api_key]" value="" autocomplete="new-password" placeholder="••••••••••••••••">
+									<button type="button" class="btn btn-sm btn-ghost wpmind-toggle-key" data-target="api_key_openai" aria-label="切换密码显示">
+										<span class="wpmind-key__eye-on"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+										<span class="wpmind-key__eye-off" hidden><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3.2 3.9M6.6 6.6C3.9 8.4 2 12 2 12s3.5 6 10 6c1.5 0 2.9-.3 4.1-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></span>
+									</button>
+								</div>
+																	<p class="wenpai-field__desc">填写密钥后点击底部保存。</p>
+																									<div class="chk"><label><input type="checkbox" name="wpmind_custom_endpoints[openai][clear_api_key]" value="1" class="wpmind-clear-checkbox"> 清除已保存的 API Key</label></div>
+																<div class="wenpai-actions">
+									<button type="button" class="btn btn-sm btn-secondary wpmind-test-connection" data-provider="openai" >测试连接</button>
+									<button type="button" class="btn btn-sm btn-ghost wpmind-rotate-key" data-provider="openai">验证并替换</button>
+									<button type="button" class="btn btn-sm btn-ghost wpmind-reset-breaker" data-provider="openai">重置状态</button>
+									<span class="chk"><label><input type="checkbox" class="wpmind-deep-test" value="1"> 深度测试</label></span>
+									<span class="wpmind-key__result" aria-live="polite"></span>
+								</div>
+													</div>
+					</div>
+
+					
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="models_openai">支持的模型</label></div>
+						<div class="field-ctl">
+							<input type="text" id="models_openai" name="wpmind_custom_endpoints[openai][models]" value="gpt-4o-mini, gpt-4o" placeholder="留空使用目录推荐模型">
+							<p class="wenpai-field__desc">多个模型以英文逗号分隔，留空用默认列表。</p>
+						</div>
+					</div>
+
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="default_model_openai">默认模型</label></div>
+						<div class="field-ctl">
+							<input type="text" id="default_model_openai" name="wpmind_custom_endpoints[openai][default_model]" value="gpt-4o-mini" placeholder="auto">
+							<div class="wenpai-actions">
+								<button type="button" class="btn btn-sm btn-ghost wpmind-fetch-models" data-provider="openai">拉取远程模型</button>
+								<span class="meta wpmind-fetch-models-hint">从接口读取可用对话模型并追加。</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="wenpai-field wenpai-field--row field" data-wenpai-mode="advanced" data-wenpai-view-hidden hidden>
+						<div class="field-label"><label class="wenpai-field__label" for="custom_base_url_openai">自定义接口地址</label></div>
+						<div class="field-ctl">
+							<input type="url" id="custom_base_url_openai" name="wpmind_custom_endpoints[openai][custom_base_url]" value="" placeholder="https://api.openai.com/v1">
+							<p class="wenpai-field__desc">留空使用官方默认接口地址。</p>
+						</div>
+					</div>
+				</div>
+				</div></details><details class="wenpai-fold" id="endpoint-anthropic"><summary><span class="wenpai-logo"><img src="../../assets/images/providers/anthropic.svg" alt="" width="20" height="20"></span><span class="wenpai-fold__text"><span class="wenpai-fold__title">Anthropic Claude</span><span class="wenpai-fold__desc">Claude 文本与推理</span></span><span class="wenpai-fold__side"><span class="pill mute">未开启</span></span><svg class="wenpai-ico wenpai-fold__chevron" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.9999 13.1714L16.9497 8.22168L18.364 9.63589L11.9999 15.9999L5.63589 9.63589L7.0501 8.22168L11.9999 13.1714Z"/></svg></summary><div class="wenpai-fold__body">				<div class="wpmind-endpoint-card" data-provider="anthropic">
+					<div class="wenpai-field wenpai-field--toggle wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="wpmind-sw-anthropic">启用</label></div>
+						<div class="field-ctl">
+							<span class="wenpai-switch"><input type="hidden" name="wpmind_custom_endpoints[anthropic][enabled]" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-sw-anthropic" name="wpmind_custom_endpoints[anthropic][enabled]" value="1"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span>						</div>
+					</div>
+
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="api_key_anthropic">API Key</label></div>
+						<div class="field-ctl">
+															<div class="wpmind-key">
+									<input type="password" id="api_key_anthropic" name="wpmind_custom_endpoints[anthropic][api_key]" value="" autocomplete="new-password" placeholder="请输入 API Key">
+									<button type="button" class="btn btn-sm btn-ghost wpmind-toggle-key" data-target="api_key_anthropic" aria-label="切换密码显示">
+										<span class="wpmind-key__eye-on"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+										<span class="wpmind-key__eye-off" hidden><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3.2 3.9M6.6 6.6C3.9 8.4 2 12 2 12s3.5 6 10 6c1.5 0 2.9-.3 4.1-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></span>
+									</button>
+								</div>
+																	<p class="wenpai-field__desc">填写密钥后点击底部保存。</p>
+																								<div class="wenpai-actions">
+									<button type="button" class="btn btn-sm btn-secondary wpmind-test-connection" data-provider="anthropic" disabled>测试连接</button>
+									<button type="button" class="btn btn-sm btn-ghost wpmind-rotate-key" data-provider="anthropic">验证并替换</button>
+									<button type="button" class="btn btn-sm btn-ghost wpmind-reset-breaker" data-provider="anthropic">重置状态</button>
+									<span class="chk"><label><input type="checkbox" class="wpmind-deep-test" value="1"> 深度测试</label></span>
+									<span class="wpmind-key__result" aria-live="polite"></span>
+								</div>
+													</div>
+					</div>
+
+					
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="models_anthropic">支持的模型</label></div>
+						<div class="field-ctl">
+							<input type="text" id="models_anthropic" name="wpmind_custom_endpoints[anthropic][models]" value="claude-3-5-sonnet-latest" placeholder="留空使用目录推荐模型">
+							<p class="wenpai-field__desc">多个模型以英文逗号分隔，留空用默认列表。</p>
+						</div>
+					</div>
+
+					<div class="wenpai-field wenpai-field--row field">
+						<div class="field-label"><label class="wenpai-field__label" for="default_model_anthropic">默认模型</label></div>
+						<div class="field-ctl">
+							<input type="text" id="default_model_anthropic" name="wpmind_custom_endpoints[anthropic][default_model]" value="claude-3-5-sonnet-latest" placeholder="auto">
+							<div class="wenpai-actions">
+								<button type="button" class="btn btn-sm btn-ghost wpmind-fetch-models" data-provider="anthropic">拉取远程模型</button>
+								<span class="meta wpmind-fetch-models-hint">从接口读取可用对话模型并追加。</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="wenpai-field wenpai-field--row field" data-wenpai-mode="advanced" data-wenpai-view-hidden hidden>
+						<div class="field-label"><label class="wenpai-field__label" for="custom_base_url_anthropic">自定义接口地址</label></div>
+						<div class="field-ctl">
+							<input type="url" id="custom_base_url_anthropic" name="wpmind_custom_endpoints[anthropic][custom_base_url]" value="" placeholder="https://api.anthropic.com/v1">
+							<p class="wenpai-field__desc">留空使用官方默认接口地址。</p>
+						</div>
+					</div>
+				</div>
+				</div></details></div><div class="card-foot start"><span class="meta">密钥加密保存；测试连接会直接探测上游接口。</span><button type="submit" class="btn btn-primary" name="submit">保存服务设置</button></div></section>		</div>
+	</form>
+
+		<form method="post" action="options.php" id="wpmind-image-settings-form">
+		<input type="hidden" name="option_page" value="wpmind_image_settings"><input type="hidden" name="action" value="update"><input type="hidden" name="_wpnonce" value="proto">
+		<section class="card"><div class="card-head"><div><h2 class="card-title">图像服务</h2><p class="card-sub">8 个图像端点 · 默认：通义万相</p></div><span class="head-actions"><span class="pill mute">Key 加密保存</span></span></div>		<div class="wenpai-field wenpai-field--row field">
+			<div class="field-label"><label class="wenpai-field__label" for="wpmind_default_image_provider">默认图像服务</label></div>
+			<div class="field-ctl">
+				<select id="wpmind_default_image_provider" name="wpmind_default_image_provider">
+					<option value="">— 选择默认图像服务 —</option>
+											<option value="openai_gpt_image" >GPT Image</option>
+											<option value="google_gemini_image" >Gemini Image</option>
+											<option value="tencent_hunyuan" >混元图像</option>
+											<option value="bytedance_reve" >Reve Image</option>
+											<option value="bytedance_seedream" >Seedream</option>
+											<option value="flux" >Flux (Fal.ai)</option>
+											<option value="midjourney" >Midjourney</option>
+											<option value="qwen_image"  selected="selected">通义万相</option>
+									</select>
+			</div>
+		</div>
+
+		<div class="wenpai-folds"><details class="wenpai-fold" id="image-endpoint-openai_gpt_image"><summary><span class="tile"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.9918 21C2.44405 21 2 20.5551 2 20.0066V3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082C21.556 3 22 3.44495 22 3.9934V20.0066C22 20.5552 21.5447 21 21.0082 21H2.9918ZM20 15V5H4V19L14 9L20 15ZM20 17.8284L14 11.8284L6.82843 19H20V17.8284ZM8 11C6.89543 11 6 10.1046 6 9C6 7.89543 6.89543 7 8 7C9.10457 7 10 7.89543 10 9C10 10.1046 9.10457 11 8 11Z"/></svg></span><span class="wenpai-fold__text"><span class="wenpai-fold__title">GPT Image</span><span class="wenpai-fold__desc">openai-image</span></span><span class="wenpai-fold__side"><span class="pill mute">未开启</span></span><svg class="wenpai-ico wenpai-fold__chevron" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.9999 13.1714L16.9497 8.22168L18.364 9.63589L11.9999 15.9999L5.63589 9.63589L7.0501 8.22168L11.9999 13.1714Z"/></svg></summary><div class="wenpai-fold__body">			<div class="wpmind-endpoint-card" data-provider="openai_gpt_image">
+				<div class="wenpai-field wenpai-field--toggle wenpai-field--row field">
+					<div class="field-label"><label class="wenpai-field__label" for="wpmind-img-sw-openai_gpt_image">启用</label></div>
+					<div class="field-ctl">
+						<span class="wenpai-switch"><input type="hidden" name="wpmind_image_endpoints[openai_gpt_image][enabled]" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-img-sw-openai_gpt_image" name="wpmind_image_endpoints[openai_gpt_image][enabled]" value="1"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span>						<p class="wenpai-field__desc">OpenAI 图像生成，文字渲染清晰。</p>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field">
+					<div class="field-label"><label class="wenpai-field__label" for="image_api_key_openai_gpt_image">API Key</label></div>
+					<div class="field-ctl">
+						<div class="wpmind-key">
+							<input type="password" id="image_api_key_openai_gpt_image" name="wpmind_image_endpoints[openai_gpt_image][api_key]" value="" autocomplete="new-password" placeholder="请输入 API Key">
+							<button type="button" class="btn btn-sm btn-ghost wpmind-toggle-key" data-target="image_api_key_openai_gpt_image" aria-label="切换密码显示">
+								<span class="wpmind-key__eye-on"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+								<span class="wpmind-key__eye-off" hidden><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3.2 3.9M6.6 6.6C3.9 8.4 2 12 2 12s3.5 6 10 6c1.5 0 2.9-.3 4.1-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></span>
+							</button>
+						</div>
+												<div class="wenpai-actions">
+							<button type="button" class="btn btn-sm btn-secondary wpmind-test-image-connection" data-provider="openai_gpt_image" disabled>测试连接</button>
+							<span class="wpmind-key__result" aria-live="polite"></span>
+						</div>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field">
+					<div class="field-label"><span class="wenpai-field__label">支持模型</span></div>
+					<div class="field-ctl">
+						<div class="wenpai-row wenpai-row--tight">
+															<span class="wenpai-code-row"><code class="wenpai-code">gpt-image-1.5</code><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-text="gpt-image-1.5" data-label="复制" data-done-label="已复制">复制</button></span>															<span class="wenpai-code-row"><code class="wenpai-code">dall-e-3</code><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-text="dall-e-3" data-label="复制" data-done-label="已复制">复制</button></span>													</div>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field" data-wenpai-mode="advanced" data-wenpai-view-hidden hidden>
+					<div class="field-label"><label class="wenpai-field__label" for="image_base_url_openai_gpt_image">自定义接口地址</label></div>
+					<div class="field-ctl">
+						<input type="url" id="image_base_url_openai_gpt_image" name="wpmind_image_endpoints[openai_gpt_image][custom_base_url]" value="" placeholder="https://api.openai.com/v1/">
+					</div>
+				</div>
+			</div>
+			</div></details><details class="wenpai-fold" id="image-endpoint-google_gemini_image"><summary><span class="tile"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.9918 21C2.44405 21 2 20.5551 2 20.0066V3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082C21.556 3 22 3.44495 22 3.9934V20.0066C22 20.5552 21.5447 21 21.0082 21H2.9918ZM20 15V5H4V19L14 9L20 15ZM20 17.8284L14 11.8284L6.82843 19H20V17.8284ZM8 11C6.89543 11 6 10.1046 6 9C6 7.89543 6.89543 7 8 7C9.10457 7 10 7.89543 10 9C10 10.1046 9.10457 11 8 11Z"/></svg></span><span class="wenpai-fold__text"><span class="wenpai-fold__title">Gemini Image</span><span class="wenpai-fold__desc">google-imagen</span></span><span class="wenpai-fold__side"><span class="pill mute">未开启</span></span><svg class="wenpai-ico wenpai-fold__chevron" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.9999 13.1714L16.9497 8.22168L18.364 9.63589L11.9999 15.9999L5.63589 9.63589L7.0501 8.22168L11.9999 13.1714Z"/></svg></summary><div class="wenpai-fold__body">			<div class="wpmind-endpoint-card" data-provider="google_gemini_image">
+				<div class="wenpai-field wenpai-field--toggle wenpai-field--row field">
+					<div class="field-label"><label class="wenpai-field__label" for="wpmind-img-sw-google_gemini_image">启用</label></div>
+					<div class="field-ctl">
+						<span class="wenpai-switch"><input type="hidden" name="wpmind_image_endpoints[google_gemini_image][enabled]" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-img-sw-google_gemini_image" name="wpmind_image_endpoints[google_gemini_image][enabled]" value="1"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span>						<p class="wenpai-field__desc">Google 图像模型，复杂构图稳定。</p>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field">
+					<div class="field-label"><label class="wenpai-field__label" for="image_api_key_google_gemini_image">API Key</label></div>
+					<div class="field-ctl">
+						<div class="wpmind-key">
+							<input type="password" id="image_api_key_google_gemini_image" name="wpmind_image_endpoints[google_gemini_image][api_key]" value="" autocomplete="new-password" placeholder="请输入 API Key">
+							<button type="button" class="btn btn-sm btn-ghost wpmind-toggle-key" data-target="image_api_key_google_gemini_image" aria-label="切换密码显示">
+								<span class="wpmind-key__eye-on"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+								<span class="wpmind-key__eye-off" hidden><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3.2 3.9M6.6 6.6C3.9 8.4 2 12 2 12s3.5 6 10 6c1.5 0 2.9-.3 4.1-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></span>
+							</button>
+						</div>
+												<div class="wenpai-actions">
+							<button type="button" class="btn btn-sm btn-secondary wpmind-test-image-connection" data-provider="google_gemini_image" disabled>测试连接</button>
+							<span class="wpmind-key__result" aria-live="polite"></span>
+						</div>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field">
+					<div class="field-label"><span class="wenpai-field__label">支持模型</span></div>
+					<div class="field-ctl">
+						<div class="wenpai-row wenpai-row--tight">
+															<span class="wenpai-code-row"><code class="wenpai-code">imagen-3.0-generate-001</code><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-text="imagen-3.0-generate-001" data-label="复制" data-done-label="已复制">复制</button></span>													</div>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field" data-wenpai-mode="advanced" data-wenpai-view-hidden hidden>
+					<div class="field-label"><label class="wenpai-field__label" for="image_base_url_google_gemini_image">自定义接口地址</label></div>
+					<div class="field-ctl">
+						<input type="url" id="image_base_url_google_gemini_image" name="wpmind_image_endpoints[google_gemini_image][custom_base_url]" value="" placeholder="https://generativelanguage.googleapis.com/v1beta/">
+					</div>
+				</div>
+			</div>
+			</div></details><details class="wenpai-fold" id="image-endpoint-tencent_hunyuan"><summary><span class="tile"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.9918 21C2.44405 21 2 20.5551 2 20.0066V3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082C21.556 3 22 3.44495 22 3.9934V20.0066C22 20.5552 21.5447 21 21.0082 21H2.9918ZM20 15V5H4V19L14 9L20 15ZM20 17.8284L14 11.8284L6.82843 19H20V17.8284ZM8 11C6.89543 11 6 10.1046 6 9C6 7.89543 6.89543 7 8 7C9.10457 7 10 7.89543 10 9C10 10.1046 9.10457 11 8 11Z"/></svg></span><span class="wenpai-fold__text"><span class="wenpai-fold__title">混元图像</span><span class="wenpai-fold__desc">hunyuan-image</span></span><span class="wenpai-fold__side"><span class="pill mute">未开启</span></span><svg class="wenpai-ico wenpai-fold__chevron" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.9999 13.1714L16.9497 8.22168L18.364 9.63589L11.9999 15.9999L5.63589 9.63589L7.0501 8.22168L11.9999 13.1714Z"/></svg></summary><div class="wenpai-fold__body">			<div class="wpmind-endpoint-card" data-provider="tencent_hunyuan">
+				<div class="wenpai-field wenpai-field--toggle wenpai-field--row field">
+					<div class="field-label"><label class="wenpai-field__label" for="wpmind-img-sw-tencent_hunyuan">启用</label></div>
+					<div class="field-ctl">
+						<span class="wenpai-switch"><input type="hidden" name="wpmind_image_endpoints[tencent_hunyuan][enabled]" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-img-sw-tencent_hunyuan" name="wpmind_image_endpoints[tencent_hunyuan][enabled]" value="1"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span>						<p class="wenpai-field__desc">腾讯混元，中文语义理解出色。</p>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field">
+					<div class="field-label"><label class="wenpai-field__label" for="image_api_key_tencent_hunyuan">API Key</label></div>
+					<div class="field-ctl">
+						<div class="wpmind-key">
+							<input type="password" id="image_api_key_tencent_hunyuan" name="wpmind_image_endpoints[tencent_hunyuan][api_key]" value="" autocomplete="new-password" placeholder="请输入 API Key">
+							<button type="button" class="btn btn-sm btn-ghost wpmind-toggle-key" data-target="image_api_key_tencent_hunyuan" aria-label="切换密码显示">
+								<span class="wpmind-key__eye-on"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+								<span class="wpmind-key__eye-off" hidden><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3.2 3.9M6.6 6.6C3.9 8.4 2 12 2 12s3.5 6 10 6c1.5 0 2.9-.3 4.1-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></span>
+							</button>
+						</div>
+												<div class="wenpai-actions">
+							<button type="button" class="btn btn-sm btn-secondary wpmind-test-image-connection" data-provider="tencent_hunyuan" disabled>测试连接</button>
+							<span class="wpmind-key__result" aria-live="polite"></span>
+						</div>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field">
+					<div class="field-label"><span class="wenpai-field__label">支持模型</span></div>
+					<div class="field-ctl">
+						<div class="wenpai-row wenpai-row--tight">
+															<span class="wenpai-code-row"><code class="wenpai-code">hunyuan-image-v3</code><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-text="hunyuan-image-v3" data-label="复制" data-done-label="已复制">复制</button></span>													</div>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field" data-wenpai-mode="advanced" data-wenpai-view-hidden hidden>
+					<div class="field-label"><label class="wenpai-field__label" for="image_base_url_tencent_hunyuan">自定义接口地址</label></div>
+					<div class="field-ctl">
+						<input type="url" id="image_base_url_tencent_hunyuan" name="wpmind_image_endpoints[tencent_hunyuan][custom_base_url]" value="" placeholder="https://hunyuan.tencentcloudapi.com/">
+					</div>
+				</div>
+			</div>
+			</div></details><details class="wenpai-fold" id="image-endpoint-bytedance_reve"><summary><span class="tile"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.9918 21C2.44405 21 2 20.5551 2 20.0066V3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082C21.556 3 22 3.44495 22 3.9934V20.0066C22 20.5552 21.5447 21 21.0082 21H2.9918ZM20 15V5H4V19L14 9L20 15ZM20 17.8284L14 11.8284L6.82843 19H20V17.8284ZM8 11C6.89543 11 6 10.1046 6 9C6 7.89543 6.89543 7 8 7C9.10457 7 10 7.89543 10 9C10 10.1046 9.10457 11 8 11Z"/></svg></span><span class="wenpai-fold__text"><span class="wenpai-fold__title">Reve Image</span><span class="wenpai-fold__desc">bytedance-reve</span></span><span class="wenpai-fold__side"><span class="pill mute">未开启</span></span><svg class="wenpai-ico wenpai-fold__chevron" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.9999 13.1714L16.9497 8.22168L18.364 9.63589L11.9999 15.9999L5.63589 9.63589L7.0501 8.22168L11.9999 13.1714Z"/></svg></summary><div class="wenpai-fold__body">			<div class="wpmind-endpoint-card" data-provider="bytedance_reve">
+				<div class="wenpai-field wenpai-field--toggle wenpai-field--row field">
+					<div class="field-label"><label class="wenpai-field__label" for="wpmind-img-sw-bytedance_reve">启用</label></div>
+					<div class="field-ctl">
+						<span class="wenpai-switch"><input type="hidden" name="wpmind_image_endpoints[bytedance_reve][enabled]" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-img-sw-bytedance_reve" name="wpmind_image_endpoints[bytedance_reve][enabled]" value="1"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span>						<p class="wenpai-field__desc">指令遵循与排版细节表现均衡。</p>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field">
+					<div class="field-label"><label class="wenpai-field__label" for="image_api_key_bytedance_reve">API Key</label></div>
+					<div class="field-ctl">
+						<div class="wpmind-key">
+							<input type="password" id="image_api_key_bytedance_reve" name="wpmind_image_endpoints[bytedance_reve][api_key]" value="" autocomplete="new-password" placeholder="请输入 API Key">
+							<button type="button" class="btn btn-sm btn-ghost wpmind-toggle-key" data-target="image_api_key_bytedance_reve" aria-label="切换密码显示">
+								<span class="wpmind-key__eye-on"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+								<span class="wpmind-key__eye-off" hidden><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3.2 3.9M6.6 6.6C3.9 8.4 2 12 2 12s3.5 6 10 6c1.5 0 2.9-.3 4.1-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></span>
+							</button>
+						</div>
+												<div class="wenpai-actions">
+							<button type="button" class="btn btn-sm btn-secondary wpmind-test-image-connection" data-provider="bytedance_reve" disabled>测试连接</button>
+							<span class="wpmind-key__result" aria-live="polite"></span>
+						</div>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field">
+					<div class="field-label"><span class="wenpai-field__label">支持模型</span></div>
+					<div class="field-ctl">
+						<div class="wenpai-row wenpai-row--tight">
+															<span class="wenpai-code-row"><code class="wenpai-code">reve-image-1</code><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-text="reve-image-1" data-label="复制" data-done-label="已复制">复制</button></span>													</div>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field" data-wenpai-mode="advanced" data-wenpai-view-hidden hidden>
+					<div class="field-label"><label class="wenpai-field__label" for="image_base_url_bytedance_reve">自定义接口地址</label></div>
+					<div class="field-ctl">
+						<input type="url" id="image_base_url_bytedance_reve" name="wpmind_image_endpoints[bytedance_reve][custom_base_url]" value="" placeholder="https://api.reve.com/v1/">
+					</div>
+				</div>
+			</div>
+			</div></details><details class="wenpai-fold" id="image-endpoint-bytedance_seedream"><summary><span class="tile"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.9918 21C2.44405 21 2 20.5551 2 20.0066V3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082C21.556 3 22 3.44495 22 3.9934V20.0066C22 20.5552 21.5447 21 21.0082 21H2.9918ZM20 15V5H4V19L14 9L20 15ZM20 17.8284L14 11.8284L6.82843 19H20V17.8284ZM8 11C6.89543 11 6 10.1046 6 9C6 7.89543 6.89543 7 8 7C9.10457 7 10 7.89543 10 9C10 10.1046 9.10457 11 8 11Z"/></svg></span><span class="wenpai-fold__text"><span class="wenpai-fold__title">Seedream</span><span class="wenpai-fold__desc">seedream</span></span><span class="wenpai-fold__side"><span class="pill mute">未开启</span></span><svg class="wenpai-ico wenpai-fold__chevron" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.9999 13.1714L16.9497 8.22168L18.364 9.63589L11.9999 15.9999L5.63589 9.63589L7.0501 8.22168L11.9999 13.1714Z"/></svg></summary><div class="wenpai-fold__body">			<div class="wpmind-endpoint-card" data-provider="bytedance_seedream">
+				<div class="wenpai-field wenpai-field--toggle wenpai-field--row field">
+					<div class="field-label"><label class="wenpai-field__label" for="wpmind-img-sw-bytedance_seedream">启用</label></div>
+					<div class="field-ctl">
+						<span class="wenpai-switch"><input type="hidden" name="wpmind_image_endpoints[bytedance_seedream][enabled]" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-img-sw-bytedance_seedream" name="wpmind_image_endpoints[bytedance_seedream][enabled]" value="1"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span>						<p class="wenpai-field__desc">火山引擎图像模型，中文场景友好。</p>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field">
+					<div class="field-label"><label class="wenpai-field__label" for="image_api_key_bytedance_seedream">API Key</label></div>
+					<div class="field-ctl">
+						<div class="wpmind-key">
+							<input type="password" id="image_api_key_bytedance_seedream" name="wpmind_image_endpoints[bytedance_seedream][api_key]" value="" autocomplete="new-password" placeholder="请输入 API Key">
+							<button type="button" class="btn btn-sm btn-ghost wpmind-toggle-key" data-target="image_api_key_bytedance_seedream" aria-label="切换密码显示">
+								<span class="wpmind-key__eye-on"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+								<span class="wpmind-key__eye-off" hidden><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3.2 3.9M6.6 6.6C3.9 8.4 2 12 2 12s3.5 6 10 6c1.5 0 2.9-.3 4.1-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></span>
+							</button>
+						</div>
+												<div class="wenpai-actions">
+							<button type="button" class="btn btn-sm btn-secondary wpmind-test-image-connection" data-provider="bytedance_seedream" disabled>测试连接</button>
+							<span class="wpmind-key__result" aria-live="polite"></span>
+						</div>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field">
+					<div class="field-label"><span class="wenpai-field__label">支持模型</span></div>
+					<div class="field-ctl">
+						<div class="wenpai-row wenpai-row--tight">
+															<span class="wenpai-code-row"><code class="wenpai-code">seedream-4.5</code><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-text="seedream-4.5" data-label="复制" data-done-label="已复制">复制</button></span>													</div>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field" data-wenpai-mode="advanced" data-wenpai-view-hidden hidden>
+					<div class="field-label"><label class="wenpai-field__label" for="image_base_url_bytedance_seedream">自定义接口地址</label></div>
+					<div class="field-ctl">
+						<input type="url" id="image_base_url_bytedance_seedream" name="wpmind_image_endpoints[bytedance_seedream][custom_base_url]" value="" placeholder="https://ark.cn-beijing.volces.com/api/v3/">
+					</div>
+				</div>
+			</div>
+			</div></details><details class="wenpai-fold" id="image-endpoint-flux"><summary><span class="tile"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.9918 21C2.44405 21 2 20.5551 2 20.0066V3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082C21.556 3 22 3.44495 22 3.9934V20.0066C22 20.5552 21.5447 21 21.0082 21H2.9918ZM20 15V5H4V19L14 9L20 15ZM20 17.8284L14 11.8284L6.82843 19H20V17.8284ZM8 11C6.89543 11 6 10.1046 6 9C6 7.89543 6.89543 7 8 7C9.10457 7 10 7.89543 10 9C10 10.1046 9.10457 11 8 11Z"/></svg></span><span class="wenpai-fold__text"><span class="wenpai-fold__title">Flux (Fal.ai)</span><span class="wenpai-fold__desc">flux</span></span><span class="wenpai-fold__side"><span class="pill mute">未开启</span></span><svg class="wenpai-ico wenpai-fold__chevron" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.9999 13.1714L16.9497 8.22168L18.364 9.63589L11.9999 15.9999L5.63589 9.63589L7.0501 8.22168L11.9999 13.1714Z"/></svg></summary><div class="wenpai-fold__body">			<div class="wpmind-endpoint-card" data-provider="flux">
+				<div class="wenpai-field wenpai-field--toggle wenpai-field--row field">
+					<div class="field-label"><label class="wenpai-field__label" for="wpmind-img-sw-flux">启用</label></div>
+					<div class="field-ctl">
+						<span class="wenpai-switch"><input type="hidden" name="wpmind_image_endpoints[flux][enabled]" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-img-sw-flux" name="wpmind_image_endpoints[flux][enabled]" value="1"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span>						<p class="wenpai-field__desc">开源图像模型，细节质感丰富。</p>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field">
+					<div class="field-label"><label class="wenpai-field__label" for="image_api_key_flux">API Key</label></div>
+					<div class="field-ctl">
+						<div class="wpmind-key">
+							<input type="password" id="image_api_key_flux" name="wpmind_image_endpoints[flux][api_key]" value="" autocomplete="new-password" placeholder="请输入 API Key">
+							<button type="button" class="btn btn-sm btn-ghost wpmind-toggle-key" data-target="image_api_key_flux" aria-label="切换密码显示">
+								<span class="wpmind-key__eye-on"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+								<span class="wpmind-key__eye-off" hidden><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3.2 3.9M6.6 6.6C3.9 8.4 2 12 2 12s3.5 6 10 6c1.5 0 2.9-.3 4.1-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></span>
+							</button>
+						</div>
+												<div class="wenpai-actions">
+							<button type="button" class="btn btn-sm btn-secondary wpmind-test-image-connection" data-provider="flux" disabled>测试连接</button>
+							<span class="wpmind-key__result" aria-live="polite"></span>
+						</div>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field">
+					<div class="field-label"><span class="wenpai-field__label">支持模型</span></div>
+					<div class="field-ctl">
+						<div class="wenpai-row wenpai-row--tight">
+															<span class="wenpai-code-row"><code class="wenpai-code">flux/dev</code><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-text="flux/dev" data-label="复制" data-done-label="已复制">复制</button></span>															<span class="wenpai-code-row"><code class="wenpai-code">flux/schnell</code><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-text="flux/schnell" data-label="复制" data-done-label="已复制">复制</button></span>															<span class="wenpai-code-row"><code class="wenpai-code">flux-pro-1.1</code><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-text="flux-pro-1.1" data-label="复制" data-done-label="已复制">复制</button></span>													</div>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field" data-wenpai-mode="advanced" data-wenpai-view-hidden hidden>
+					<div class="field-label"><label class="wenpai-field__label" for="image_base_url_flux">自定义接口地址</label></div>
+					<div class="field-ctl">
+						<input type="url" id="image_base_url_flux" name="wpmind_image_endpoints[flux][custom_base_url]" value="" placeholder="https://fal.run/fal-ai/">
+					</div>
+				</div>
+			</div>
+			</div></details><details class="wenpai-fold" id="image-endpoint-midjourney"><summary><span class="tile"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.9918 21C2.44405 21 2 20.5551 2 20.0066V3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082C21.556 3 22 3.44495 22 3.9934V20.0066C22 20.5552 21.5447 21 21.0082 21H2.9918ZM20 15V5H4V19L14 9L20 15ZM20 17.8284L14 11.8284L6.82843 19H20V17.8284ZM8 11C6.89543 11 6 10.1046 6 9C6 7.89543 6.89543 7 8 7C9.10457 7 10 7.89543 10 9C10 10.1046 9.10457 11 8 11Z"/></svg></span><span class="wenpai-fold__text"><span class="wenpai-fold__title">Midjourney</span><span class="wenpai-fold__desc">midjourney</span></span><span class="wenpai-fold__side"><span class="pill mute">未开启</span></span><svg class="wenpai-ico wenpai-fold__chevron" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.9999 13.1714L16.9497 8.22168L18.364 9.63589L11.9999 15.9999L5.63589 9.63589L7.0501 8.22168L11.9999 13.1714Z"/></svg></summary><div class="wenpai-fold__body">			<div class="wpmind-endpoint-card" data-provider="midjourney">
+				<div class="wenpai-field wenpai-field--toggle wenpai-field--row field">
+					<div class="field-label"><label class="wenpai-field__label" for="wpmind-img-sw-midjourney">启用</label></div>
+					<div class="field-ctl">
+						<span class="wenpai-switch"><input type="hidden" name="wpmind_image_endpoints[midjourney][enabled]" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-img-sw-midjourney" name="wpmind_image_endpoints[midjourney][enabled]" value="1"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span>						<p class="wenpai-field__desc">艺术风格与光影表现突出。</p>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field">
+					<div class="field-label"><label class="wenpai-field__label" for="image_api_key_midjourney">API Key</label></div>
+					<div class="field-ctl">
+						<div class="wpmind-key">
+							<input type="password" id="image_api_key_midjourney" name="wpmind_image_endpoints[midjourney][api_key]" value="" autocomplete="new-password" placeholder="请输入 API Key">
+							<button type="button" class="btn btn-sm btn-ghost wpmind-toggle-key" data-target="image_api_key_midjourney" aria-label="切换密码显示">
+								<span class="wpmind-key__eye-on"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+								<span class="wpmind-key__eye-off" hidden><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3.2 3.9M6.6 6.6C3.9 8.4 2 12 2 12s3.5 6 10 6c1.5 0 2.9-.3 4.1-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></span>
+							</button>
+						</div>
+												<div class="wenpai-actions">
+							<button type="button" class="btn btn-sm btn-secondary wpmind-test-image-connection" data-provider="midjourney" disabled>测试连接</button>
+							<span class="wpmind-key__result" aria-live="polite"></span>
+						</div>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field">
+					<div class="field-label"><span class="wenpai-field__label">支持模型</span></div>
+					<div class="field-ctl">
+						<div class="wenpai-row wenpai-row--tight">
+															<span class="wenpai-code-row"><code class="wenpai-code">midjourney-v6</code><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-text="midjourney-v6" data-label="复制" data-done-label="已复制">复制</button></span>													</div>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field" data-wenpai-mode="advanced" data-wenpai-view-hidden hidden>
+					<div class="field-label"><label class="wenpai-field__label" for="image_base_url_midjourney">自定义接口地址</label></div>
+					<div class="field-ctl">
+						<input type="url" id="image_base_url_midjourney" name="wpmind_image_endpoints[midjourney][custom_base_url]" value="" placeholder="https://api.midjourney.com/v1/">
+					</div>
+				</div>
+			</div>
+			</div></details><details class="wenpai-fold" id="image-endpoint-qwen_image"><summary><span class="tile"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2.9918 21C2.44405 21 2 20.5551 2 20.0066V3.9934C2 3.44476 2.45531 3 2.9918 3H21.0082C21.556 3 22 3.44495 22 3.9934V20.0066C22 20.5552 21.5447 21 21.0082 21H2.9918ZM20 15V5H4V19L14 9L20 15ZM20 17.8284L14 11.8284L6.82843 19H20V17.8284ZM8 11C6.89543 11 6 10.1046 6 9C6 7.89543 6.89543 7 8 7C9.10457 7 10 7.89543 10 9C10 10.1046 9.10457 11 8 11Z"/></svg></span><span class="wenpai-fold__text"><span class="wenpai-fold__title">通义万相</span><span class="wenpai-fold__desc">wanx</span></span><span class="wenpai-fold__side"><span class="pill mute">未开启</span></span><svg class="wenpai-ico wenpai-fold__chevron" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.9999 13.1714L16.9497 8.22168L18.364 9.63589L11.9999 15.9999L5.63589 9.63589L7.0501 8.22168L11.9999 13.1714Z"/></svg></summary><div class="wenpai-fold__body">			<div class="wpmind-endpoint-card" data-provider="qwen_image">
+				<div class="wenpai-field wenpai-field--toggle wenpai-field--row field">
+					<div class="field-label"><label class="wenpai-field__label" for="wpmind-img-sw-qwen_image">启用</label></div>
+					<div class="field-ctl">
+						<span class="wenpai-switch"><input type="hidden" name="wpmind_image_endpoints[qwen_image][enabled]" value="0"><input type="checkbox" role="switch" class="wenpai-switch__input" id="wpmind-img-sw-qwen_image" name="wpmind_image_endpoints[qwen_image][enabled]" value="1"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span>						<p class="wenpai-field__desc">阿里云通义万相，写实风格自然。</p>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field">
+					<div class="field-label"><label class="wenpai-field__label" for="image_api_key_qwen_image">API Key</label></div>
+					<div class="field-ctl">
+						<div class="wpmind-key">
+							<input type="password" id="image_api_key_qwen_image" name="wpmind_image_endpoints[qwen_image][api_key]" value="" autocomplete="new-password" placeholder="请输入 API Key">
+							<button type="button" class="btn btn-sm btn-ghost wpmind-toggle-key" data-target="image_api_key_qwen_image" aria-label="切换密码显示">
+								<span class="wpmind-key__eye-on"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+								<span class="wpmind-key__eye-off" hidden><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1A9.8 9.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-3.2 3.9M6.6 6.6C3.9 8.4 2 12 2 12s3.5 6 10 6c1.5 0 2.9-.3 4.1-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg></span>
+							</button>
+						</div>
+												<div class="wenpai-actions">
+							<button type="button" class="btn btn-sm btn-secondary wpmind-test-image-connection" data-provider="qwen_image" disabled>测试连接</button>
+							<span class="wpmind-key__result" aria-live="polite"></span>
+						</div>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field">
+					<div class="field-label"><span class="wenpai-field__label">支持模型</span></div>
+					<div class="field-ctl">
+						<div class="wenpai-row wenpai-row--tight">
+															<span class="wenpai-code-row"><code class="wenpai-code">wanx-v1</code><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-text="wanx-v1" data-label="复制" data-done-label="已复制">复制</button></span>															<span class="wenpai-code-row"><code class="wenpai-code">wanx-background-generation-v2</code><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-text="wanx-background-generation-v2" data-label="复制" data-done-label="已复制">复制</button></span>													</div>
+					</div>
+				</div>
+
+				<div class="wenpai-field wenpai-field--row field" data-wenpai-mode="advanced" data-wenpai-view-hidden hidden>
+					<div class="field-label"><label class="wenpai-field__label" for="image_base_url_qwen_image">自定义接口地址</label></div>
+					<div class="field-ctl">
+						<input type="url" id="image_base_url_qwen_image" name="wpmind_image_endpoints[qwen_image][custom_base_url]" value="" placeholder="https://dashscope.aliyuncs.com/api/v1/">
+					</div>
+				</div>
+			</div>
+			</div></details></div><div class="card-foot start"><span class="meta">图像密钥独立加密保存，供内容配图与扩展调用。</span><button type="submit" class="btn btn-secondary" name="submit">保存图像设置</button></div></section>	</form>
+
+	<div class="wenpai-savebar" data-wenpai-savebar data-wenpai-savebar-for="wpmind-settings-form" hidden><span class="wenpai-savebar__msg">有未保存的服务配置更改</span><div class="wenpai-savebar__actions"><button type="reset" class="btn btn-ghost" form="wpmind-settings-form" data-wenpai-savebar-reset>放弃更改</button><button type="submit" class="btn btn-primary" form="wpmind-settings-form">保存服务设置</button></div></div></div>
+	<footer class="foot"><span>文派心思 v0.14.0</span><span class="r"><a href="https://wpcy.com/document" target="_blank" rel="noopener noreferrer">文档<span class="screen-reader-text">（在新标签页打开）</span></a><a href="https://github.com/WenPai-org/wpmind" target="_blank" rel="noopener noreferrer">GitHub<span class="screen-reader-text">（在新标签页打开）</span></a></span></footer></main></div>
+<script src="../../lib/wenpai-admin-ui/js/wenpai-admin.js"></script>
+</body>
+</html>

@@ -107,9 +107,12 @@ final class LogMiddleware implements GatewayStageInterface {
 	}
 
 	/**
-	 * Update the API key usage counters (atomic upsert).
+	 * Update the API key usage counters (SQLite- and MySQL-compatible upsert).
 	 *
 	 * Only runs for successful requests with a valid key_id.
+	 * Non-streaming requests already emit `wpmind_usage_record` inside PublicAPI
+	 * with context `api_gateway:<key_prefix>`, so this method only updates the
+	 * per-key gateway table and does not double-record into site-wide UsageTracker.
 	 *
 	 * @param GatewayRequestContext $context Request context.
 	 */
@@ -124,64 +127,175 @@ final class LogMiddleware implements GatewayStageInterface {
 			return;
 		}
 
-		global $wpdb;
-
-		$table        = $wpdb->prefix . 'wpmind_api_key_usage';
 		$window_month = gmdate( 'Y-m' );
 		$now          = current_time( 'mysql', true );
 
 		// Extract token counts from internal result if available.
 		$result        = $context->get_internal_result();
+		$payload       = $context->get_internal_payload() ?? [];
 		$input_tokens  = 0;
 		$output_tokens = 0;
 		$total_tokens  = 0;
 		$cost_usd      = 0.0;
+		$provider      = '';
+		$model         = '';
 
 		if ( is_array( $result ) ) {
 			$usage = $result['usage'] ?? [];
 			if ( is_array( $usage ) ) {
-				$input_tokens  = (int) ( $usage['prompt_tokens'] ?? 0 );
-				$output_tokens = (int) ( $usage['completion_tokens'] ?? 0 );
-				$total_tokens  = (int) ( $usage['total_tokens'] ?? 0 );
+				$input_tokens  = (int) ( $usage['prompt_tokens'] ?? $usage['input_tokens'] ?? 0 );
+				$output_tokens = (int) ( $usage['completion_tokens'] ?? $usage['output_tokens'] ?? 0 );
+				$total_tokens  = (int) ( $usage['total_tokens'] ?? ( $input_tokens + $output_tokens ) );
 			}
-			$cost_usd = (float) ( $result['cost_usd'] ?? 0.0 );
+			$cost_usd = isset( $result['cost_usd'] ) && is_numeric( $result['cost_usd'] )
+				? (float) $result['cost_usd']
+				: 0.0;
+			$provider = (string) ( $result['provider'] ?? $payload['provider'] ?? '' );
+			$model    = (string) ( $result['model'] ?? $payload['model'] ?? '' );
 		}
 
-		// Atomic upsert: INSERT ... ON DUPLICATE KEY UPDATE.
+		// Calculate USD cost from Pricing when upstream result does not include cost_usd.
+		if ( $cost_usd <= 0.0 && ( $input_tokens > 0 || $output_tokens > 0 ) && '' !== $provider ) {
+			$cost_usd = self::calculate_cost_usd( $provider, $model, $input_tokens, $output_tokens );
+		}
+
+		self::upsert_key_usage( $key_id, $window_month, $input_tokens, $output_tokens, $total_tokens, $cost_usd, $now );
+	}
+
+	/**
+	 * Calculate USD cost for a gateway request using Pricing (CNY converted via wpmind_usd_cny_rate).
+	 *
+	 * @param string $provider      Provider ID.
+	 * @param string $model         Model identifier.
+	 * @param int    $input_tokens  Input tokens.
+	 * @param int    $output_tokens Output tokens.
+	 * @return float Cost in USD.
+	 */
+	public static function calculate_cost_usd(
+		string $provider,
+		string $model,
+		int $input_tokens,
+		int $output_tokens
+	): float {
+		if ( ! class_exists( \WPMind\Usage\Pricing::class ) ) {
+			require_once WPMIND_PATH . 'includes/Usage/Pricing.php';
+		}
+
+		return \WPMind\Usage\Pricing::calculate_cost_usd( $provider, $model, $input_tokens, $output_tokens );
+	}
+
+	/**
+	 * SQLite- and MySQL-compatible upsert for wpmind_api_key_usage.
+	 *
+	 * Attempts UPDATE first; if 0 rows affected, inserts a new monthly row.
+	 *
+	 * @param string $key_id        API key ID.
+	 * @param string $window_month  Month window (YYYY-MM).
+	 * @param int    $input_tokens  Input tokens to add.
+	 * @param int    $output_tokens Output tokens to add.
+	 * @param int    $total_tokens  Total tokens to add.
+	 * @param float  $cost_usd      USD cost to add.
+	 * @param string $now           UTC MySQL timestamp.
+	 * @return bool True on success, false on database error.
+	 */
+	public static function upsert_key_usage(
+		string $key_id,
+		string $window_month,
+		int $input_tokens,
+		int $output_tokens,
+		int $total_tokens,
+		float $cost_usd,
+		string $now
+	): bool {
+		global $wpdb;
+
+		$table = $wpdb->prefix . 'wpmind_api_key_usage';
+
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$query_result = $wpdb->query(
+		$updated = $wpdb->query(
 			$wpdb->prepare(
-				'INSERT INTO %i
-					( key_id, window_month, request_count, input_tokens, output_tokens, total_tokens, total_cost_usd, updated_at )
-				VALUES ( %s, %s, 1, %d, %d, %d, %f, %s )
-				ON DUPLICATE KEY UPDATE
-					request_count  = request_count  + 1,
-					input_tokens   = input_tokens   + VALUES(input_tokens),
-					output_tokens  = output_tokens  + VALUES(output_tokens),
-					total_tokens   = total_tokens   + VALUES(total_tokens),
-					total_cost_usd = total_cost_usd + VALUES(total_cost_usd),
-					updated_at     = VALUES(updated_at)',
+				'UPDATE %i
+				SET request_count  = request_count + 1,
+					input_tokens   = input_tokens + %d,
+					output_tokens  = output_tokens + %d,
+					total_tokens   = total_tokens + %d,
+					total_cost_usd = total_cost_usd + %f,
+					updated_at     = %s
+				WHERE key_id = %s AND window_month = %s',
 				$table,
-				$key_id,
-				$window_month,
 				$input_tokens,
 				$output_tokens,
 				$total_tokens,
 				$cost_usd,
-				$now
+				$now,
+				$key_id,
+				$window_month
 			)
 		);
 
-		if ( $query_result === false ) {
-			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			error_log(
-				sprintf(
-					'[WPMind API Gateway] Failed to update key usage for %s: %s',
+		if ( is_int( $updated ) && $updated > 0 ) {
+			return true;
+		}
+
+		if ( 0 === $updated ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			$inserted = $wpdb->insert(
+				$table,
+				[
+					'key_id'         => $key_id,
+					'window_month'   => $window_month,
+					'request_count'  => 1,
+					'input_tokens'   => $input_tokens,
+					'output_tokens'  => $output_tokens,
+					'total_tokens'   => $total_tokens,
+					'total_cost_usd' => $cost_usd,
+					'updated_at'     => $now,
+				],
+				[ '%s', '%s', '%d', '%d', '%d', '%d', '%f', '%s' ]
+			);
+
+			if ( false !== $inserted ) {
+				return true;
+			}
+
+			// Concurrent insert race: retry UPDATE once.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$retried = $wpdb->query(
+				$wpdb->prepare(
+					'UPDATE %i
+					SET request_count  = request_count + 1,
+						input_tokens   = input_tokens + %d,
+						output_tokens  = output_tokens + %d,
+						total_tokens   = total_tokens + %d,
+						total_cost_usd = total_cost_usd + %f,
+						updated_at     = %s
+					WHERE key_id = %s AND window_month = %s',
+					$table,
+					$input_tokens,
+					$output_tokens,
+					$total_tokens,
+					$cost_usd,
+					$now,
 					$key_id,
-					$wpdb->last_error
+					$window_month
 				)
 			);
+
+			if ( is_int( $retried ) && $retried > 0 ) {
+				return true;
+			}
 		}
+
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log(
+			sprintf(
+				'[WPMind API Gateway] Failed to update key usage for %s: %s',
+				$key_id,
+				$wpdb->last_error ?? ''
+			)
+		);
+
+		return false;
 	}
 
 	/**

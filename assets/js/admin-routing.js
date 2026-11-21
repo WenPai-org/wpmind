@@ -15,35 +15,24 @@
 		warning: function() {},
 		info: function() {}
 	};
-	var Dialog = Admin.Dialog || {
-		show: function() {}
-	};
 
 	/**
 	 * Routing Panel 路由管理
 	 */
 	var RoutingManager = {
 		init: function() {
-			if ( ! $( '.wpmind-routing-panel' ).length ) return;
+			if ( ! $( '.wpmind-routing-panel' ).length ) {
+				return;
+			}
 			this.bindEvents();
 		},
 
 		bindEvents: function() {
 			var self = this;
 
-			// 策略选择 - 监听 radio change 事件
+			// 策略选择（kit seg_radio 的 radio change 事件）
 			$( document ).on( 'change', 'input[name="routing_strategy"]', function() {
-				var strategy = $( this ).val();
-				self.setStrategy( strategy );
-			} );
-
-			// 策略卡片点击 - 备用方案（preventDefault 阻断 label 原生二次 toggle）
-			$( document ).on( 'click', '.wpmind-strategy-item', function( e ) {
-				e.preventDefault();
-				var $radio = $( this ).find( 'input[type="radio"]' );
-				if ( ! $radio.prop( 'checked' ) ) {
-					$radio.prop( 'checked', true ).trigger( 'change' );
-				}
+				self.setStrategy( $( this ).val() );
 			} );
 
 			// 刷新路由状态
@@ -56,44 +45,34 @@
 				} );
 			} );
 
-			// 初始化拖拽排序
-			self.initSortable();
-
 			// 保存优先级
 			$( document ).on( 'click', '.wpmind-save-priority', function( e ) {
 				e.preventDefault();
 				self.savePriority();
 			} );
 
-			// 清除优先级
+			// 清除优先级（确认门由 kit data-wenpai-confirm 统一接管）
 			$( document ).on( 'click', '.wpmind-clear-priority', function( e ) {
 				e.preventDefault();
 				self.clearPriority();
 			} );
 		},
 
-		initSortable: function() {
-			var $list = $( '#wpmind-priority-list' );
-			if ( ! $list.length ) return;
-
-			// 检查 jQuery UI sortable 是否可用
-			if ( 'function' !== typeof $.fn.sortable ) {
-				console.warn( 'WPMind: jQuery UI Sortable not available' );
-				return;
+		getPriorityOrder: function() {
+			var raw = $( '#wpmind-priority-order' ).val();
+			if ( raw ) {
+				return String( raw ).split( ',' ).map( function( item ) {
+					return item.trim();
+				} ).filter( Boolean );
 			}
-
-			$list.sortable( {
-				handle: '.wpmind-priority-handle',
-				placeholder: 'wpmind-priority-placeholder',
-				axis: 'y',
-				tolerance: 'pointer',
-				update: function() {
-					// 更新序号显示
-					$list.find( '.wpmind-priority-item' ).each( function( index ) {
-						$( this ).find( '.wpmind-priority-index' ).text( index + 1 );
-					} );
+			var priority = [];
+			$( '#wpmind-priority-list [data-wenpai-sortable-item]' ).each( function() {
+				var id = $( this ).attr( 'data-wenpai-sortable-item' );
+				if ( id ) {
+					priority.push( id );
 				}
 			} );
+			return priority;
 		},
 
 		savePriority: function() {
@@ -103,14 +82,9 @@
 				return;
 			}
 
-			var $list = $( '#wpmind-priority-list' );
-			var priority = [];
-			$list.find( '.wpmind-priority-item' ).each( function() {
-				priority.push( $( this ).data( 'provider' ) );
-			} );
-
+			var priority = self.getPriorityOrder();
 			if ( 0 === priority.length ) {
-				Toast.warning( '没有可排序的 Provider' );
+				Toast.warning( '没有可排序的服务商' );
 				return;
 			}
 
@@ -128,19 +102,18 @@
 				success: function( response ) {
 					if ( response.success ) {
 						Toast.success( '优先级已保存' );
-						// 显示清除按钮
 						if ( ! $( '.wpmind-clear-priority' ).length ) {
-							$( '.wpmind-routing-priority-actions' ).prepend(
-								'<button type="button" class="btn btn-sm btn-ghost wpmind-clear-priority">清除优先级</button>'
-							);
+							var $clear = $( '<button type="button" class="btn btn-sm btn-ghost wpmind-clear-priority">清除优先级</button>' );
+							$clear.attr( 'data-wenpai-confirm', '清除后将恢复由当前路由策略自动排序。' );
+							$clear.attr( 'data-wenpai-confirm-title', '清除手动优先级' );
+							$clear.attr( 'data-wenpai-confirm-ok', '确认清除' );
+							$( '.wpmind-routing-priority-actions' ).prepend( $clear );
 						}
-						// 显示已启用标记
 						if ( ! $( '.wpmind-priority-badge' ).length ) {
-							$( '.wpmind-routing-priority .wpmind-routing-section-desc' ).append(
-								' <span class="wpmind-priority-badge">已启用手动优先级</span>'
+							$( '.wpmind-routing-priority .card-sub' ).append(
+								' <span class="wenpai-micro-tag wpmind-priority-badge">手动优先级生效中</span>'
 							);
 						}
-						// 刷新路由状态
 						self.refreshStatus();
 					} else {
 						var msg = ( response.data && response.data.message ) || '保存失败';
@@ -163,45 +136,34 @@
 				return;
 			}
 
-			Dialog.show( {
-				title: '清除手动优先级',
-				message: '确定要清除手动优先级设置吗？<br><small style="color:#666;">清除后将使用智能路由自动排序</small>',
-				type: 'warning',
-				confirmText: '确定清除',
-				cancelText: '取消',
-				onConfirm: function() {
-					var $btn = $( '.wpmind-clear-priority' );
-					$btn.prop( 'disabled', true ).addClass( 'is-busy' );
+			var $btn = $( '.wpmind-clear-priority' );
+			$btn.prop( 'disabled', true ).addClass( 'is-busy' );
 
-					$.ajax( {
-						url: wpmindData.ajaxurl || ajaxurl,
-						type: 'POST',
-						data: {
-							action: 'wpmind_set_provider_priority',
-							priority: [],
-							clear: 1,
-							nonce: wpmindData.nonce
-						},
-						success: function( response ) {
-							if ( response.success ) {
-								Toast.success( '手动优先级已清除' );
-								// 移除清除按钮和标记
-								$( '.wpmind-clear-priority' ).remove();
-								$( '.wpmind-priority-badge' ).remove();
-								// 刷新路由状态
-								self.refreshStatus();
-							} else {
-								var msg = ( response.data && response.data.message ) || '清除失败';
-								Toast.error( msg );
-							}
-						},
-						error: function() {
-							Toast.error( '清除失败，请重试' );
-						},
-						complete: function() {
-							$btn.prop( 'disabled', false ).removeClass( 'is-busy' );
-						}
-					} );
+			$.ajax( {
+				url: wpmindData.ajaxurl || ajaxurl,
+				type: 'POST',
+				data: {
+					action: 'wpmind_set_provider_priority',
+					priority: [],
+					clear: 1,
+					nonce: wpmindData.nonce
+				},
+				success: function( response ) {
+					if ( response.success ) {
+						Toast.success( '手动优先级已清除' );
+						$( '.wpmind-clear-priority' ).remove();
+						$( '.wpmind-priority-badge' ).remove();
+						self.refreshStatus();
+					} else {
+						var msg = ( response.data && response.data.message ) || '清除失败';
+						Toast.error( msg );
+					}
+				},
+				error: function() {
+					Toast.error( '清除失败，请重试' );
+				},
+				complete: function() {
+					$btn.prop( 'disabled', false ).removeClass( 'is-busy' );
 				}
 			} );
 		},
@@ -211,12 +173,6 @@
 				Toast.error( '配置错误' );
 				return;
 			}
-
-			// 更新 UI 状态
-			$( '.wpmind-strategy-item' ).removeClass( 'is-active' );
-			$( 'input[name="routing_strategy"][value="' + strategy + '"]' )
-				.closest( '.wpmind-strategy-item' )
-				.addClass( 'is-active' );
 
 			$.ajax( {
 				url: wpmindData.ajaxurl || ajaxurl,
@@ -229,7 +185,6 @@
 				success: function( response ) {
 					if ( response.success ) {
 						Toast.success( '路由策略已更新' );
-						// 刷新得分显示
 						RoutingManager.refreshStatus();
 					} else {
 						var msg = ( response.data && response.data.message ) || '更新失败';
@@ -244,7 +199,9 @@
 
 		refreshStatus: function( callback ) {
 			if ( 'undefined' === typeof wpmindData ) {
-				if ( 'function' === typeof callback ) callback();
+				if ( 'function' === typeof callback ) {
+					callback();
+				}
 				return;
 			}
 
@@ -265,55 +222,68 @@
 					Toast.error( '刷新失败' );
 				},
 				complete: function() {
-					if ( 'function' === typeof callback ) callback();
+					if ( 'function' === typeof callback ) {
+						callback();
+					}
 				}
 			} );
 		},
 
 		updateDisplay: function( data ) {
-			// 更新得分排名
+			// 更新 kit meter 得分排名
 			var $scores = $( '#wpmind-routing-scores' );
 			if ( $scores.length && data.provider_scores ) {
 				$scores.empty();
+				var rank = 0;
 				$.each( data.provider_scores, function( providerId, scoreData ) {
-					var isTop = 1 === scoreData.rank;
-					var $item = $( '<div class="wpmind-score-row"></div>' );
-					if ( isTop ) $item.addClass( 'is-top' );
-					$item.append( $( '<span class="wpmind-score-rank"></span>' ).text( scoreData.rank ) );
-					$item.append( $( '<span class="wpmind-score-name"></span>' ).text( scoreData.name ) );
-					var $bar = $( '<span class="wpmind-score-bar"></span>' );
-					$bar.append( $( '<span class="wpmind-score-fill"></span>' ).css( 'width', scoreData.score + '%' ) );
-					$item.append( $bar );
-					$item.append( $( '<span class="wpmind-score-value"></span>' ).text( scoreData.score.toFixed( 1 ) ) );
+					rank++;
+					var r = scoreData.rank || rank;
+					var score = Number( scoreData.score ) || 0;
+					var pct = Math.max( 0, Math.min( 100, score ) );
+					var $item = $( '<li class="wenpai-meter__row"></li>' );
+					if ( 1 === r ) {
+						$item.addClass( 'is-top' );
+					}
+					$item.append( $( '<span class="wenpai-meter__rank"></span>' ).text( String( r ) ) );
+					$item.append( $( '<span class="wenpai-meter__name"></span>' ).text( scoreData.name || providerId ) );
+					var $fill = $( '<i aria-hidden="true"></i>' ).css( 'inline-size', pct + '%' );
+					$item.append( $( '<span class="wenpai-meter__bar" aria-hidden="true"></span>' ).append( $fill ) );
+					$item.append( $( '<span class="wenpai-meter__value"></span>' ).text( score.toFixed( 1 ) ) );
 					$scores.append( $item );
 				} );
 			}
 
-			// 更新推荐 Provider
+			// 更新首选服务商
 			if ( data.recommended && data.provider_scores && data.provider_scores[ data.recommended ] ) {
 				var recommendedData = data.provider_scores[ data.recommended ];
 				$( '#wpmind-recommended-provider' ).text( recommendedData.name );
-				// 更新得分显示
-				$( '.wpmind-routing-status-score-value' ).text( recommendedData.score.toFixed( 1 ) );
+				$( '.wpmind-routing-status-score-value' ).text( Number( recommendedData.score || 0 ).toFixed( 1 ) );
 			}
 
-			// 更新故障转移链 - 新的可视化结构
+			// 更新 kit tag_feed 故障转移链
 			var $failoverChain = $( '#wpmind-failover-chain' );
 			if ( $failoverChain.length && data.failover_chain && data.failover_chain.length ) {
 				$failoverChain.empty();
 				$.each( data.failover_chain, function( index, provider ) {
 					var isFirst = 0 === index;
-					var $node = $( '<div class="wpmind-feed-item"></div>' );
-					$node.append( $( '<span class="wpmind-feed-time"></span>' ).text( String( index + 1 ) ) );
-					$node.append( $( '<span class="wpmind-feed-main"></span>' ).append(
-						$( '<span class="wpmind-feed-provider"></span>' ).text( provider )
-					) );
-					var $meta = $( '<span class="wpmind-feed-meta"></span>' );
-					if ( isFirst ) {
-						$meta.append( '<span class="pill ok">主</span>' );
-					}
-					$node.append( $meta );
-					$failoverChain.append( $node );
+					var name = ( data.provider_scores && data.provider_scores[ provider ] && data.provider_scores[ provider ].name ) || provider;
+					var $li = $( '<li></li>' );
+					$li.append(
+						$( '<span class="wenpai-micro-tag"></span>' )
+							.addClass( isFirst ? 'is-ok' : '' )
+							.text( isFirst ? '主通道' : '备选 ' + index )
+					);
+					$li.append(
+						$( '<span class="wenpai-tag-feed__text"></span>' ).append(
+							$( '<span></span>' ).text( name )
+						)
+					);
+					$li.append(
+						$( '<span class="wenpai-tag-feed__side"></span>' ).append(
+							$( '<span></span>' ).text( '#' + ( index + 1 ) )
+						)
+					);
+					$failoverChain.append( $li );
 				} );
 			}
 		}
@@ -321,11 +291,10 @@
 
 	Admin.RoutingManager = RoutingManager;
 
-	/**
-	 * Initialize on document ready
-	 */
 	$( function() {
-		if ( ! $( '.wpmind-routing-panel' ).length ) return;
+		if ( ! $( '.wpmind-routing-panel' ).length ) {
+			return;
+		}
 
 		var safeInit = Admin.safeInit || function( label, fn ) {
 			try {

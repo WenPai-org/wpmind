@@ -162,12 +162,29 @@ class AiIndexingManager {
 			$excluded_types = [];
 		}
 		$globally_excluded = in_array( get_post_type( $post ), $excluded_types, true );
+		$wrapper_class     = class_exists( 'Wenpai_Admin_UI' )
+			? 'wenpai-native wpmind-ai-indexing-metabox'
+			: 'wpmind-ai-indexing-metabox';
 		?>
-		<div class="wpmind-ai-indexing-metabox">
+		<div class="<?php echo esc_attr( $wrapper_class ); ?>">
 			<?php if ( $globally_excluded ) : ?>
-			<p class="description" style="color:#d63638;margin-bottom:8px;">
-				<?php esc_html_e( '此内容类型已被全局排除 AI 索引。', 'wpmind' ); ?>
-			</p>
+				<?php if ( class_exists( 'Wenpai_Admin_UI' ) ) : ?>
+					<?php
+					\Wenpai_Admin_UI::native_metabox(
+						[
+							'pill' => [
+								'text'  => __( '已全局排除', 'wpmind' ),
+								'state' => 'bad',
+							],
+							'note' => __( '此内容类型已被全局排除 AI 索引。', 'wpmind' ),
+						]
+					);
+					?>
+				<?php else : ?>
+					<p class="description">
+						<?php esc_html_e( '此内容类型已被全局排除 AI 索引。', 'wpmind' ); ?>
+					</p>
+				<?php endif; ?>
 			<?php endif; ?>
 
 			<p>
@@ -184,7 +201,7 @@ class AiIndexingManager {
 			</p>
 			<p>
 				<label for="wpmind_ai_declaration"><?php esc_html_e( '内容声明：', 'wpmind' ); ?></label>
-				<select name="wpmind_ai_declaration" id="wpmind_ai_declaration" style="width:100%;margin-top:4px;">
+				<select name="wpmind_ai_declaration" id="wpmind_ai_declaration" class="widefat">
 					<option value="" <?php selected( $declaration, '' ); ?>><?php esc_html_e( '使用全局默认', 'wpmind' ); ?></option>
 					<option value="original" <?php selected( $declaration, 'original' ); ?>><?php esc_html_e( '原创内容', 'wpmind' ); ?></option>
 					<option value="ai-assisted" <?php selected( $declaration, 'ai-assisted' ); ?>><?php esc_html_e( 'AI 辅助创作', 'wpmind' ); ?></option>
