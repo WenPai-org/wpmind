@@ -14,7 +14,7 @@ use WPMind\Admin\AdminPage;
 $wpmind_kit_version = '';
 if ( class_exists( 'Wenpai_Admin_Loader', false ) && function_exists( 'wenpai_admin_ui_info' ) ) {
 	$wpmind_kit_info    = wenpai_admin_ui_info();
-	$wpmind_kit_version = (string) ( $wpmind_kit_info['version'] ?? '' );
+	$wpmind_kit_version = (string) $wpmind_kit_info['version'];
 }
 
 wpmind_page_head(

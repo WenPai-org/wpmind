@@ -166,21 +166,61 @@ if ( ! class_exists( 'Wenpai_Admin_Shell', false ) ) {
 		/**
 		 * Page heading inside main.
 		 *
-		 * @param string $title Already translated.
-		 * @param string $lede  Already translated. Optional.
-		 * @param string $aside Optional HTML for .mode (escaped by caller).
+		 * @param string $title           Already translated.
+		 * @param string $lede            Already translated. Optional.
+		 * @param string $aside           Optional HTML for .mode (escaped by caller).
+		 * @param string $lede_extra_html Optional inline HTML appended inside .wenpai-lede (e.g. drawer_toggle_html(); escaped by caller).
 		 */
-		public static function page_head( $title, $lede = '', $aside = '' ) {
+		public static function page_head( $title, $lede = '', $aside = '', $lede_extra_html = '' ) {
 			echo '<div class="wenpai-page-head">';
 			echo '<div>';
 			echo '<h1 class="wenpai-h1">' . esc_html( $title ) . '</h1>';
-			if ( '' !== $lede ) {
-				echo '<p class="wenpai-lede">' . esc_html( $lede ) . '</p>';
+			if ( '' !== $lede || '' !== $lede_extra_html ) {
+				echo '<p class="wenpai-lede">';
+				if ( '' !== $lede ) {
+					echo esc_html( $lede );
+				}
+				if ( '' !== $lede_extra_html ) {
+					echo $lede_extra_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- caller HTML (e.g. Wenpai_Admin_UI::drawer_toggle_html).
+				}
+				echo '</p>';
 			}
 			echo '</div>';
 			if ( '' !== $aside ) {
 				echo '<div class="mode">' . $aside . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- caller HTML.
 			}
+			echo '</div>';
+		}
+
+		/**
+		 * Drill-down subpage heading with back breadcrumb link above the page head (kit 0.12.0).
+		 *
+		 * @param array $args {
+		 *     Subpage heading arguments.
+		 *
+		 *     @type string $title      Subpage h1 title (already translated).
+		 *     @type string $back_url   Parent tab/directory URL.
+		 *     @type string $back_label Back link label (e.g. 「返回功能列表」).
+		 *     @type string $lede       Optional subtitle.
+		 *     @type string $aside_html Optional HTML for .mode (pill, switch, or secondary action; caller escapes).
+		 * }
+		 */
+		public static function subpage_head( $args = array() ) {
+			$title      = isset( $args['title'] ) ? (string) $args['title'] : '';
+			$back_url   = isset( $args['back_url'] ) ? (string) $args['back_url'] : '';
+			$back_label = isset( $args['back_label'] ) ? (string) $args['back_label'] : '';
+			$lede       = isset( $args['lede'] ) ? (string) $args['lede'] : '';
+			$aside_html = isset( $args['aside_html'] ) ? (string) $args['aside_html'] : '';
+			$arrow      = class_exists( 'Wenpai_Admin_Icons', false ) ? Wenpai_Admin_Icons::svg( 'arrow-left' ) : '';
+
+			echo '<div class="wenpai-subhead">';
+			if ( '' !== $back_url && '' !== $back_label ) {
+				echo '<a class="wenpai-back" href="' . esc_url( $back_url ) . '">';
+				echo $arrow; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Wenpai_Admin_Icons::svg() safe SVG.
+				echo '<span>' . esc_html( $back_label ) . '</span>';
+				echo '</a>';
+			}
+			self::page_head( $title, $lede, $aside_html );
 			echo '</div>';
 		}
 

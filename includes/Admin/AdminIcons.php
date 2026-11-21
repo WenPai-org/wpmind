@@ -21,6 +21,7 @@ final class AdminIcons {
 	 *
 	 * @var array<string, string>
 	 */
+	// phpcs:disable Squiz.Commenting.InlineComment.InvalidEndChar, WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned -- 图标表：短标签注释 + 长 path 值，对齐反而难读。
 	private const PATHS = [
 		// 概览：四宫格仪表盘
 		'overview' => '<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
@@ -96,6 +97,7 @@ final class AdminIcons {
 		// 双卡片（运行环境/系统信息）
 		'layers'   => '<rect x="3" y="4" width="18" height="7" rx="1.5"/><rect x="3" y="13" width="18" height="7" rx="1.5"/><path d="M7 7.5h.01M7 16.5h.01"/>',
 	];
+	// phpcs:enable
 
 	/**
 	 * 取图标 SVG 字符串。

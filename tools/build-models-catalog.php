@@ -15,90 +15,97 @@
  * bundled meta always wins for ids already known. default_model is never
  * overridden by this script — review and set it by hand if needed.
  *
+ * No `declare(strict_types=1)` here: `wp eval-file` runs this file through
+ * eval(), where a declare statement is a fatal error.
+ *
  * @package WPMind
  */
 
-declare(strict_types=1);
+// phpcs:disable WordPress.WP.AlternativeFunctions -- CLI build script: reads a bundled file and writes progress to STDERR.
 
 if ( ! defined( 'ABSPATH' ) ) {
 	fwrite( STDERR, "Run via wp eval-file inside WordPress.\n" );
-	exit( 1);
+	exit( 1 );
 }
 
-$bundled_path = dirname( __DIR__ ) . '/includes/Provider/Catalog/models.json';
-$bundled      = json_decode( (string) file_get_contents( $bundled_path ), true );
-if ( ! is_array( $bundled ) || ! isset( $bundled['providers'] ) ) {
-	fwrite( STDERR, "Cannot read bundled models.json\n" );
-	exit( 1);
-}
-
-$out = $bundled;
-$out['catalog_version'] = 'remote-' . gmdate( 'Y.m.d' );
-$out['generated_at']    = gmdate( 'Y-m-d' );
-$out['notes']           = 'Auto-merged remote /models ids; bundled meta preserved.';
-
-$fetch = static function ( string $url, string $key ): array {
-	$response = wp_remote_get(
-		$url,
-		[
-			'timeout' => 10,
-			'headers' => [
-				'Authorization' => 'Bearer ' . $key,
-				'Accept'        => 'application/json',
-			],
-		]
-	);
-	if ( is_wp_error( $response ) ) {
-		return [];
-	}
-	$code = (int) wp_remote_retrieve_response_code( $response );
-	if ( $code < 200 || $code >= 300 ) {
-		return [];
-	}
-	$body = json_decode( (string) wp_remote_retrieve_body( $response ), true );
-	return is_array( $body ) && isset( $body['data'] ) && is_array( $body['data'] ) ? $body['data'] : [];
-};
-
-foreach ( array_keys( $out['providers'] ) as $provider_id ) {
-	$env_key  = 'WPMIND_CAT_KEY_' . strtoupper( $provider_id );
-	$api_key  = isset( $_ENV[ $env_key ] ) ? (string) $_ENV[ $env_key ] : (string) getenv( $env_key );
-	$url_env  = 'WPMIND_CAT_URL_' . strtoupper( $provider_id );
-	$base_url = isset( $_ENV[ $url_env ] ) ? (string) $_ENV[ $url_env ] : (string) getenv( $url_env );
-	if ( '' === $base_url ) {
-		$base_url = \WPMind\Provider\ProviderDefinitions::default_base_url( $provider_id );
-	}
-	if ( '' === $api_key || '' === $base_url ) {
-		fwrite( STDERR, "skip {$provider_id}: no key or base url\n" );
-		continue;
+( static function (): void {
+	$bundled_path = dirname( __DIR__ ) . '/includes/Provider/Catalog/models.json';
+	$bundled      = json_decode( (string) file_get_contents( $bundled_path ), true );
+	if ( ! is_array( $bundled ) || ! isset( $bundled['providers'] ) ) {
+		fwrite( STDERR, "Cannot read bundled models.json\n" );
+		exit( 1 );
 	}
 
-	$rows = $fetch( untrailingslashit( $base_url ) . '/models', $api_key );
-	if ( [] === $rows ) {
-		fwrite( STDERR, "skip {$provider_id}: empty /models\n" );
-		continue;
-	}
+	$out                    = $bundled;
+	$out['catalog_version'] = 'remote-' . gmdate( 'Y.m.d' );
+	$out['generated_at']    = gmdate( 'Y-m-d' );
+	$out['notes']           = 'Auto-merged remote /models ids; bundled meta preserved.';
 
-	$block  = $out['providers'][ $provider_id ];
-	$models = isset( $block['models'] ) && is_array( $block['models'] ) ? $block['models'] : [];
-	$added  = 0;
-	foreach ( $rows as $row ) {
-		$id = is_array( $row ) && isset( $row['id'] ) && is_string( $row['id'] ) ? trim( $row['id'] ) : '';
-		if ( '' === $id || isset( $models[ $id ] ) ) {
+	$fetch = static function ( string $url, string $key ): array {
+		$response = wp_remote_get(
+			$url,
+			[
+				'timeout' => 10,
+				'headers' => [
+					'Authorization' => 'Bearer ' . $key,
+					'Accept'        => 'application/json',
+				],
+			]
+		);
+		if ( is_wp_error( $response ) ) {
+			return [];
+		}
+		$code = (int) wp_remote_retrieve_response_code( $response );
+		if ( $code < 200 || $code >= 300 ) {
+			return [];
+		}
+		$body = json_decode( (string) wp_remote_retrieve_body( $response ), true );
+		return is_array( $body ) && isset( $body['data'] ) && is_array( $body['data'] ) ? $body['data'] : [];
+	};
+
+	$env = static function ( string $name ): string {
+		return isset( $_ENV[ $name ] ) ? (string) $_ENV[ $name ] : (string) getenv( $name );
+	};
+
+	foreach ( array_keys( $out['providers'] ) as $provider_id ) {
+		$api_key  = $env( 'WPMIND_CAT_KEY_' . strtoupper( $provider_id ) );
+		$base_url = $env( 'WPMIND_CAT_URL_' . strtoupper( $provider_id ) );
+		if ( '' === $base_url ) {
+			$base_url = \WPMind\Provider\ProviderDefinitions::default_base_url( $provider_id );
+		}
+		if ( '' === $api_key || '' === $base_url ) {
+			fwrite( STDERR, "skip {$provider_id}: no key or base url\n" );
 			continue;
 		}
-		$models[ $id ] = [
-			'name'         => $id,
-			'status'       => 'active',
-			// No capabilities: consumers fall back to the name heuristic.
-			'remote_seen'  => true,
-		];
-		$added++;
-	}
-	if ( $added > 0 ) {
-		$block['models']          = $models;
-		$out['providers'][ $provider_id ] = $block;
-	}
-	fwrite( STDERR, "{$provider_id}: +{$added} models\n" );
-}
 
-echo wp_json_encode( $out, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . "\n";
+		$rows = $fetch( untrailingslashit( $base_url ) . '/models', $api_key );
+		if ( [] === $rows ) {
+			fwrite( STDERR, "skip {$provider_id}: empty /models\n" );
+			continue;
+		}
+
+		$block  = $out['providers'][ $provider_id ];
+		$models = isset( $block['models'] ) && is_array( $block['models'] ) ? $block['models'] : [];
+		$added  = 0;
+		foreach ( $rows as $row ) {
+			$model_id = is_array( $row ) && isset( $row['id'] ) && is_string( $row['id'] ) ? trim( $row['id'] ) : '';
+			if ( '' === $model_id || isset( $models[ $model_id ] ) ) {
+				continue;
+			}
+			// No capabilities: consumers fall back to the name heuristic.
+			$models[ $model_id ] = [
+				'name'        => $model_id,
+				'status'      => 'active',
+				'remote_seen' => true,
+			];
+			++$added;
+		}
+		if ( $added > 0 ) {
+			$block['models']                  = $models;
+			$out['providers'][ $provider_id ] = $block;
+		}
+		fwrite( STDERR, "{$provider_id}: +{$added} models\n" );
+	}
+
+	echo wp_json_encode( $out, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . "\n";
+} )();

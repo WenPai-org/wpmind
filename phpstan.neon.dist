@@ -10,6 +10,8 @@ parameters:
         - templates
         - wpmind.php
         - uninstall.php
+    scanDirectories:
+        - lib/wenpai-admin-ui/php
     excludePaths:
         analyseAndScan:
             - vendor (?)
