@@ -646,4 +646,86 @@ final class EngineAndCloudRegressionTest extends TestCase {
 		self::assertStringNotContainsString( "empty( \$endpoints[ \$key ]['enabled'] )", $registrar_src );
 		self::assertStringContainsString( "empty( \$endpoints[ \$key ]['custom_base_url'] )", $registrar_src );
 	}
+
+	/**
+	 * 8. 方案 A 绑定与充值：WPCY 优先（未绑定但有预生成 UUID 时不得误判已绑定）、独立站网页授权换票、留空不清空令牌与带参充值链接。
+	 */
+	public function test_plan_a_binding_sources_connect_exchange_and_topup_url(): void {
+		// 8a. 安装 WPCY 但尚未绑定：WPCY 已预生成 site_uuid 但 bound=false，此时不得误判已绑定，且 bind_url 指向 WPCY manage_url。
+		$GLOBALS['wpmind_test_filters']['wenpai_site_binding'] = static fn() => [
+			'managed'    => true,
+			'bound'      => false,
+			'site_uuid'  => '11111111-2222-4333-8444-555555555555',
+			'manage_url' => 'https://example.org/wp-admin/admin.php?page=wpcy-services',
+		];
+
+		$status_wpcy_unbound = WenpaiCloud::get_status();
+		self::assertTrue( $status_wpcy_unbound['managed_by_suite'] );
+		self::assertFalse( $status_wpcy_unbound['bound'] );
+		self::assertSame( 'none', $status_wpcy_unbound['binding_source'] );
+		self::assertSame( 'https://example.org/wp-admin/admin.php?page=wpcy-services', $status_wpcy_unbound['bind_url'] );
+
+		// 8b. 未安装 WPCY（独立站）：生成 connect_url、保存独立令牌（autoload=false）、识别为 standalone、解除绑定后恢复 none。
+		unset( $GLOBALS['wpmind_test_filters']['wenpai_site_binding'] );
+		$connect_url = WenpaiCloud::connect_url( 'state-xyz-123', 'https://example.org/wp-admin/admin-post.php?action=wpmind_cloud_callback' );
+		self::assertStringStartsWith( 'https://wenpai.net/connect/wpmind', $connect_url );
+		self::assertStringContainsString( 'state=state-xyz-123', $connect_url );
+		self::assertStringContainsString( 'plugin=wpmind', $connect_url );
+		self::assertFalse( $GLOBALS['wpmind_test_autoload'][ WenpaiCloud::OPTION_SITE_UUID ] );
+
+		$status_unbound = WenpaiCloud::get_status();
+		self::assertFalse( $status_unbound['managed_by_suite'] );
+		self::assertFalse( $status_unbound['bound'] );
+		self::assertSame( 'none', $status_unbound['binding_source'] );
+
+		self::assertTrue( WenpaiCloud::save_standalone_token( self::FAKE_CLOUD_TOKEN ) );
+		self::assertFalse( $GLOBALS['wpmind_test_autoload'][ WenpaiCloud::OPTION_TOKEN ] );
+
+		$status_standalone = WenpaiCloud::get_status();
+		self::assertTrue( $status_standalone['bound'] );
+		self::assertSame( 'standalone', $status_standalone['binding_source'] );
+		self::assertNotSame( '', $status_standalone['token_fingerprint'] );
+		self::assertStringNotContainsString( self::FAKE_CLOUD_TOKEN, $status_standalone['token_fingerprint'] );
+
+		// 8c. AdminPage::sanitize_cloud_token 留空保留原有令牌，非空覆盖。
+		$admin_page = \WPMind\Admin\AdminPage::instance();
+		self::assertSame( self::FAKE_CLOUD_TOKEN, $admin_page->sanitize_cloud_token( '' ) );
+		self::assertSame( 'wmc_new_token_999', $admin_page->sanitize_cloud_token( '  wmc_new_token_999  ' ) );
+
+		// 8d. 授权码换票 POST {base_url}/auth/exchange 并解析返回令牌与余额。
+		$captured_url = '';
+		$GLOBALS['wpmind_test_http_handler'] = static function ( string $url ) use ( &$captured_url ) {
+			$captured_url = $url;
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => wp_json_encode(
+					[
+						'token'               => 'wmc_exchanged_token_777',
+						'site_uuid'           => 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee',
+						'credits_balance'     => 500,
+						'credits_limit_month' => 5000,
+					]
+				),
+				'headers'  => [],
+			];
+		};
+
+		$exchanged = WenpaiCloud::exchange_connect_code( 'auth-code-abc' );
+		self::assertIsArray( $exchanged );
+		self::assertSame( 'https://mind-api.wenpai.net/v1/auth/exchange', $captured_url );
+		self::assertSame( 'wmc_exchanged_token_777', $exchanged['token'] );
+		self::assertSame( 500, $exchanged['credits_balance'] );
+		self::assertSame( 5000, $exchanged['credits_limit_month'] );
+
+		// 8e. 充值地址一律跳 wenpai.net 并携带 from=wpmind 与 site_uuid。
+		$topup = WenpaiCloud::topup_url( 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee' );
+		self::assertStringStartsWith( 'https://wenpai.net/mind-credits', $topup );
+		self::assertStringContainsString( 'from=wpmind', $topup );
+		self::assertStringContainsString( 'site_uuid=aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee', $topup );
+
+		// 8f. 解除绑定后清空独立令牌与点数缓存。
+		WenpaiCloud::clear_standalone_binding();
+		self::assertFalse( WenpaiCloud::has_standalone_token() );
+		self::assertSame( 'none', WenpaiCloud::get_status()['binding_source'] );
+	}
 }

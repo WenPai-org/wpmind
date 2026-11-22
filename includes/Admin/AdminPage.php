@@ -14,6 +14,7 @@ use WPMind\Provider\EndpointRepository;
 use WPMind\Provider\KeyRotation;
 use WPMind\Provider\Secrets;
 use WPMind\Provider\ProviderDefinitions;
+use WPMind\Provider\WenpaiCloud;
 use WPMind\WPMind;
 
 /**
@@ -266,6 +267,16 @@ final class AdminPage {
 			[
 				'type'              => 'string',
 				'sanitize_callback' => [ $this, 'sanitize_cloud_base_url' ],
+				'default'           => '',
+			]
+		);
+
+		register_setting(
+			'wpmind_cloud_settings',
+			'wpmind_cloud_token',
+			[
+				'type'              => 'string',
+				'sanitize_callback' => [ $this, 'sanitize_cloud_token' ],
 				'default'           => '',
 			]
 		);
@@ -618,6 +629,165 @@ final class AdminPage {
 		}
 
 		return min( 50000, max( 100, $entries ) );
+	}
+
+	/**
+	 * 清理独立授权令牌：表单留空时保留原有令牌，避免简单模式保存或未改密码框时被清空。
+	 *
+	 * @param mixed $input 输入值.
+	 * @return string
+	 */
+	public function sanitize_cloud_token( $input ): string {
+		$trimmed = is_string( $input ) ? trim( $input ) : '';
+		if ( '' === $trimmed ) {
+			$existing = get_option( WenpaiCloud::OPTION_TOKEN, '' );
+			return is_string( $existing ) ? trim( $existing ) : '';
+		}
+		return sanitize_text_field( $trimmed );
+	}
+
+	/**
+	 * 发起独立站点网页授权绑定：生成一次性 state 并跳转 wenpai.net 授权页。
+	 *
+	 * @return void
+	 */
+	public function handle_cloud_connect(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( '权限不足。', 'wpmind' ), 403 );
+		}
+		check_admin_referer( 'wpmind_cloud_connect' );
+
+		$user_id = get_current_user_id();
+		$state   = bin2hex( random_bytes( 16 ) );
+		set_transient( WenpaiCloud::CONNECT_STATE_PREFIX . $user_id, $state, 10 * MINUTE_IN_SECONDS );
+
+		$return_url  = admin_url( 'admin-post.php?action=wpmind_cloud_callback' );
+		$connect_url = WenpaiCloud::connect_url( $state, $return_url );
+
+		// phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- Intentional external redirect to wenpai.net OAuth connect page.
+		wp_redirect( esc_url_raw( $connect_url ) );
+		exit;
+	}
+
+	/**
+	 * 处理文派云授权回调：校验一次性 state、换取或接收令牌、写入本地 option 并跳回心思 AI 页。
+	 *
+	 * @return void
+	 */
+	public function handle_cloud_callback(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( '权限不足。', 'wpmind' ), 403 );
+		}
+
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Protected by one-time cryptographic state bound to user_id.
+		$state     = isset( $_GET['state'] ) ? sanitize_text_field( wp_unslash( $_GET['state'] ) ) : '';
+		$code      = isset( $_GET['code'] ) ? sanitize_text_field( wp_unslash( $_GET['code'] ) ) : '';
+		$raw_token = isset( $_GET['token'] ) ? sanitize_text_field( wp_unslash( $_GET['token'] ) ) : '';
+		$site_uuid = isset( $_GET['site_uuid'] ) ? sanitize_text_field( wp_unslash( $_GET['site_uuid'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+		$user_id   = get_current_user_id();
+		$state_key = WenpaiCloud::CONNECT_STATE_PREFIX . $user_id;
+		$expected  = get_transient( $state_key );
+		delete_transient( $state_key );
+
+		if ( ! is_string( $expected ) || '' === $expected || '' === $state || ! hash_equals( $expected, $state ) ) {
+			wp_safe_redirect(
+				self::url(
+					[
+						'tab'          => 'cloud',
+						'cloud_notice' => 'state_invalid',
+					]
+				)
+			);
+			exit;
+		}
+
+		$token = '';
+		if ( '' !== $code ) {
+			$exchanged = WenpaiCloud::exchange_connect_code( $code, $site_uuid );
+			if ( is_wp_error( $exchanged ) ) {
+				wp_safe_redirect(
+					self::url(
+						[
+							'tab'          => 'cloud',
+							'cloud_notice' => 'exchange_failed',
+						]
+					)
+				);
+				exit;
+			}
+			$token = $exchanged['token'];
+			if ( '' !== $exchanged['site_uuid'] ) {
+				update_option( WenpaiCloud::OPTION_SITE_UUID, $exchanged['site_uuid'], false );
+			}
+			if ( null !== $exchanged['credits_balance'] || null !== $exchanged['credits_limit_month'] ) {
+				$credits = [
+					'updated_at' => time(),
+				];
+				if ( null !== $exchanged['credits_balance'] ) {
+					$credits['remaining'] = $exchanged['credits_balance'];
+				}
+				if ( null !== $exchanged['credits_limit_month'] ) {
+					$credits['limit'] = $exchanged['credits_limit_month'];
+				}
+				update_option( WenpaiCloud::OPTION_CREDITS, $credits, false );
+			}
+		} elseif ( '' !== $raw_token ) {
+			$token = $raw_token;
+			if ( '' !== $site_uuid ) {
+				update_option( WenpaiCloud::OPTION_SITE_UUID, $site_uuid, false );
+			}
+		}
+
+		if ( '' === $token ) {
+			wp_safe_redirect(
+				self::url(
+					[
+						'tab'          => 'cloud',
+						'cloud_notice' => 'missing_token',
+					]
+				)
+			);
+			exit;
+		}
+
+		WenpaiCloud::save_standalone_token( $token );
+		update_option( WenpaiCloud::OPTION_ENABLED, '1' );
+
+		wp_safe_redirect(
+			self::url(
+				[
+					'tab'          => 'cloud',
+					'cloud_notice' => 'connected',
+				]
+			)
+		);
+		exit;
+	}
+
+	/**
+	 * 解除独立站点授权绑定（仅作用于非 WPCY 托管的独立令牌）。
+	 *
+	 * @return void
+	 */
+	public function handle_cloud_disconnect(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( '权限不足。', 'wpmind' ), 403 );
+		}
+		check_admin_referer( 'wpmind_cloud_disconnect' );
+
+		WenpaiCloud::clear_standalone_binding();
+
+		wp_safe_redirect(
+			self::url(
+				[
+					'tab'          => 'cloud',
+					'cloud_notice' => 'disconnected',
+				]
+			)
+		);
+		exit;
 	}
 
 	/**

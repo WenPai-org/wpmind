@@ -14,10 +14,12 @@ use WPMind\Provider\WenpaiCloud;
 
 ( static function (): void {
 	$mode            = class_exists( 'Wenpai_Admin_UI', false ) ? Wenpai_Admin_UI::mode() : 'simple';
+	$display         = SuiteIntegration::display();
 	$cloud           = SuiteIntegration::cloud_status();
 	$cloud_on        = ! empty( $cloud['enabled'] );
 	$cloud_mode      = (string) ( $cloud['mode'] ?? get_option( 'wpmind_cloud_mode', 'primary' ) );
 	$cloud_bound     = ! empty( $cloud['bound'] );
+	$binding_source  = (string) ( $cloud['binding_source'] ?? ( $cloud_bound ? 'suite' : 'none' ) );
 	$cloud_ready     = $cloud_on && $cloud_bound;
 	$cloud_managed   = ! empty( $cloud['managed_by_suite'] );
 	$starter_credits = (int) ( $cloud['starter_credits'] ?? 500 );
@@ -25,9 +27,17 @@ use WPMind\Provider\WenpaiCloud;
 	$base_url        = (string) ( $cloud['base_url'] ?? 'https://mind-api.wenpai.net/v1' );
 	$saved_base      = (string) get_option( 'wpmind_cloud_base_url', '' );
 	$bind_url        = (string) ( $cloud['bind_url'] ?? '' );
-	$topup_url       = (string) ( $cloud['topup_url'] ?? 'https://wenpai.net/mind-credits' );
 	$site_uuid       = (string) ( $cloud['site_uuid'] ?? '' );
-	$is_const        = defined( 'WPMIND_CLOUD_BASE_URL' ) && '' !== trim( (string) constant( 'WPMIND_CLOUD_BASE_URL' ) );
+	$token_fp        = (string) ( $cloud['token_fingerprint'] ?? '' );
+	$topup_url       = WenpaiCloud::topup_url( $site_uuid );
+	if ( ! empty( $display['whitelabel'] ) && 0 === strpos( $topup_url, 'https://wenpai.net/' ) ) {
+		$topup_url = '';
+	}
+	$is_const       = defined( 'WPMIND_CLOUD_BASE_URL' ) && '' !== trim( (string) constant( 'WPMIND_CLOUD_BASE_URL' ) );
+	$is_token_const = defined( 'WPMIND_CLOUD_TOKEN' ) && '' !== trim( (string) constant( 'WPMIND_CLOUD_TOKEN' ) );
+
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only status notice banner.
+	$cloud_notice = isset( $_GET['cloud_notice'] ) ? sanitize_key( wp_unslash( $_GET['cloud_notice'] ) ) : '';
 
 	$gateway_host = (string) wp_parse_url( $base_url, PHP_URL_HOST );
 	if ( '' === $gateway_host ) {
@@ -144,10 +154,16 @@ use WPMind\Provider\WenpaiCloud;
 		)
 		: $unit_label;
 
-	$site_val = $cloud_bound ? __( '已绑定', 'wpmind' ) : __( '未绑定', 'wpmind' );
-	$site_sub = $cloud_bound && '' !== $site_uuid
-		? substr( $site_uuid, 0, 8 ) . '…'
-		: __( '文派云', 'wpmind' );
+	if ( 'suite' === $binding_source ) {
+		$site_val = __( '已绑定', 'wpmind' );
+		$site_sub = '' !== $site_uuid ? substr( $site_uuid, 0, 8 ) . '…' : __( 'WPCY 托管', 'wpmind' );
+	} elseif ( 'standalone' === $binding_source ) {
+		$site_val = __( '已连接', 'wpmind' );
+		$site_sub = __( '独立授权', 'wpmind' );
+	} else {
+		$site_val = __( '未绑定', 'wpmind' );
+		$site_sub = $cloud_managed ? __( '文派叶子', 'wpmind' ) : __( '文派云', 'wpmind' );
+	}
 
 	$stat_cells = [
 		[
@@ -208,6 +224,24 @@ use WPMind\Provider\WenpaiCloud;
 
 <div class="wenpai-stack" data-wenpai-mode-scope="<?php echo esc_attr( $mode ); ?>">
 	<?php
+	if ( '' !== $cloud_notice ) {
+		$notice_map = [
+			'connected'       => [ 'ok', __( '站点已授权连接到文派云，心思 AI 已自动启用。', 'wpmind' ) ],
+			'disconnected'    => [ 'info', __( '已解除当前站点的独立授权令牌。', 'wpmind' ) ],
+			'state_invalid'   => [ 'bad', __( '授权校验已过期或无效，请重新发起绑定。', 'wpmind' ) ],
+			'exchange_failed' => [ 'bad', __( '向文派云换取授权令牌失败，请稍后重试。', 'wpmind' ) ],
+			'missing_token'   => [ 'bad', __( '回调未包含有效授权令牌，请重新绑定。', 'wpmind' ) ],
+		];
+		if ( isset( $notice_map[ $cloud_notice ] ) ) {
+			wpmind_notice(
+				[
+					'level' => $notice_map[ $cloud_notice ][0],
+					'text'  => $notice_map[ $cloud_notice ][1],
+				]
+			);
+		}
+	}
+
 	// ---- 1. 顶部四格状态条 ----
 	Wenpai_Admin_UI::card_open();
 	?>
@@ -292,16 +326,54 @@ use WPMind\Provider\WenpaiCloud;
 			</div>
 		</div>
 
+		<?php if ( ! $cloud_managed ) : ?>
+			<div class="wenpai-field wenpai-field--row field"<?php echo Wenpai_Admin_UI::mode_attrs( 'advanced' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+				<div class="field-label"><label class="wenpai-field__label" for="wpmind_cloud_token"><?php esc_html_e( '独立授权令牌', 'wpmind' ); ?></label></div>
+				<div class="field-ctl">
+					<?php
+					$token_placeholder = '' !== $token_fp
+						? sprintf(
+							/* translators: %s: masked token fingerprint */
+							__( '已保存（指纹 %s），留空保持不变', 'wpmind' ),
+							$token_fp
+						)
+						: __( '内网或本地站可在此手动粘贴文派云站点令牌', 'wpmind' );
+					?>
+					<input type="password" id="wpmind_cloud_token" name="wpmind_cloud_token" value="" autocomplete="new-password" placeholder="<?php echo esc_attr( $token_placeholder ); ?>" <?php disabled( $is_token_const ); ?>>
+					<p class="wenpai-field__desc">
+						<?php
+						if ( $is_token_const ) {
+							esc_html_e( '当前由 wp-config.php 常量 WPMIND_CLOUD_TOKEN 锁定。', 'wpmind' );
+						} else {
+							esc_html_e( '常规站点点击下方「前往文派云授权」即可自动回写，安装文派叶子后会自动切换为套件托管。', 'wpmind' );
+						}
+						?>
+					</p>
+				</div>
+			</div>
+		<?php endif; ?>
+
 		<?php
 		$cloud_actions = '<span class="wenpai-actions">';
 		if ( ! $cloud_bound && '' !== $bind_url ) {
 			$cloud_actions .= Wenpai_Admin_UI::button_html(
 				[
-					'label'   => __( '绑定站点领体验点', 'wpmind' ),
+					'label'   => $cloud_managed
+						? __( '前往文派叶子绑定', 'wpmind' )
+						: __( '前往文派云授权', 'wpmind' ),
 					'href'    => $bind_url,
 					'variant' => 'secondary',
 				]
 			);
+		}
+		if ( 'standalone' === $binding_source && ! $is_token_const && function_exists( 'admin_url' ) && function_exists( 'wp_nonce_url' ) ) {
+			$disconnect_url = wp_nonce_url(
+				admin_url( 'admin-post.php?action=wpmind_cloud_disconnect' ),
+				'wpmind_cloud_disconnect'
+			);
+			$cloud_actions .= '<a class="btn btn-ghost" href="' . esc_url( $disconnect_url ) . '"'
+				. wpmind_confirm_attrs( __( '确定解除当前站点的独立授权令牌？解除后将停止通过心思 AI 发起请求。', 'wpmind' ) )
+				. '>' . esc_html__( '解除绑定', 'wpmind' ) . '</a>';
 		}
 		if ( '' !== $topup_url ) {
 			$cloud_actions .= Wenpai_Admin_UI::button_html(

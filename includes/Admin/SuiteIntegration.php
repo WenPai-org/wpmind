@@ -174,6 +174,7 @@ final class SuiteIntegration {
 			}
 		}
 
+		$cloud_url    = AdminPage::url( [ 'tab' => 'cloud' ] );
 		$services_url = AdminPage::url( [ 'tab' => 'services' ] );
 		$overview_url = AdminPage::url( [ 'tab' => 'overview' ] );
 
@@ -183,7 +184,7 @@ final class SuiteIntegration {
 				'pill'         => __( '待配置', 'wpmind' ),
 				'state'        => 'warn',
 				'action_label' => __( '配置服务', 'wpmind' ),
-				'action_url'   => $services_url,
+				'action_url'   => $cloud_url,
 			];
 		} elseif ( $down > 0 && 0 === $healthy && ! $cloud_ready ) {
 			$entry = [
@@ -217,7 +218,7 @@ final class SuiteIntegration {
 				'pill'         => __( '待绑定', 'wpmind' ),
 				'state'        => 'warn',
 				'action_label' => __( '去绑定', 'wpmind' ),
-				'action_url'   => $services_url,
+				'action_url'   => $cloud_url,
 			];
 		} else {
 			$online  = $healthy + ( $cloud_ready ? 1 : 0 );
@@ -291,7 +292,7 @@ final class SuiteIntegration {
 	 */
 	public static function build_quota_item(): array {
 		$name          = __( '心思 AI 接口服务', 'wpmind' );
-		$services_url  = AdminPage::url( [ 'tab' => 'services' ] );
+		$services_url  = AdminPage::url( [ 'tab' => 'cloud' ] );
 		$analytics_url = AdminPage::url( [ 'tab' => 'analytics' ] );
 
 		$cloud = self::cloud_status();
@@ -430,17 +431,17 @@ final class SuiteIntegration {
 			'enabled'             => get_option( 'wpmind_cloud_enabled', '0' ) === '1',
 			'mode'                => (string) get_option( 'wpmind_cloud_mode', 'primary' ),
 			'bound'               => false,
+			'binding_source'      => 'none',
 			'managed_by_suite'    => false,
 			'site_uuid'           => '',
+			'token_fingerprint'   => '',
 			'credits_balance'     => null,
 			'credits_used_month'  => 0,
 			'credits_limit_month' => null,
 			'starter_credits'     => 500,
 			'unit_label'          => __( '心思点数', 'wpmind' ),
 			'base_url'            => 'https://mind-api.wenpai.net/v1',
-			'bind_url'            => class_exists( 'Wenpai_Admin_Menu', false )
-				? \Wenpai_Admin_Menu::url( 'wpcy-connect' )
-				: '',
+			'bind_url'            => 'https://wenpai.net/connect/wpmind',
 			'topup_url'           => 'https://wenpai.net/mind-credits',
 		];
 

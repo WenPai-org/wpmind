@@ -63,6 +63,9 @@ final class AdminBoot {
 		add_action( 'admin_menu', [ $page, 'add_admin_menu' ] );
 		add_action( 'admin_init', [ $page, 'register_settings' ] );
 		add_action( 'admin_enqueue_scripts', [ $assets, 'enqueue_admin_assets' ] );
+		add_action( 'admin_post_wpmind_cloud_connect', [ $page, 'handle_cloud_connect' ] );
+		add_action( 'admin_post_wpmind_cloud_callback', [ $page, 'handle_cloud_callback' ] );
+		add_action( 'admin_post_wpmind_cloud_disconnect', [ $page, 'handle_cloud_disconnect' ] );
 
 		$ajax->register_hooks();
 

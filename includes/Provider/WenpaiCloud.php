@@ -36,6 +36,11 @@ final class WenpaiCloud {
 	public const TOPUP_URL = 'https://wenpai.net/mind-credits';
 
 	/**
+	 * 独立站点网页授权绑定入口地址（未安装 WPCY 时使用）。
+	 */
+	public const CONNECT_URL = 'https://wenpai.net/connect/wpmind';
+
+	/**
 	 * 启用状态 option 名。
 	 */
 	public const OPTION_ENABLED = 'wpmind_cloud_enabled';
@@ -49,6 +54,16 @@ final class WenpaiCloud {
 	 * 自定义网关地址 option 名。
 	 */
 	public const OPTION_BASE_URL = 'wpmind_cloud_base_url';
+
+	/**
+	 * 独立站点 UUID option 名（未安装 WPCY 时按需生成）。
+	 */
+	public const OPTION_SITE_UUID = 'wpmind_cloud_site_uuid';
+
+	/**
+	 * 独立授权一次性 state transient 前缀。
+	 */
+	public const CONNECT_STATE_PREFIX = 'wpmind_cloud_connect_state_';
 
 	/**
 	 * 混用模式：全托管优先（优先走心思 AI，异常可回退自备 Key）。
@@ -204,6 +219,239 @@ final class WenpaiCloud {
 	}
 
 	/**
+	 * 判断是否存在独立站点授权令牌（常量或本地 option）。
+	 *
+	 * @return bool
+	 */
+	public static function has_standalone_token(): bool {
+		if ( defined( 'WPMIND_CLOUD_TOKEN' ) ) {
+			$const_token = constant( 'WPMIND_CLOUD_TOKEN' );
+			if ( is_string( $const_token ) && '' !== trim( $const_token ) ) {
+				return true;
+			}
+		}
+
+		$option_token = get_option( self::OPTION_TOKEN, '' );
+		return is_string( $option_token ) && '' !== trim( $option_token );
+	}
+
+	/**
+	 * 返回独立授权令牌的脱敏指纹（不包含原文）。
+	 *
+	 * @return string
+	 */
+	public static function standalone_token_fingerprint(): string {
+		$raw = '';
+		if ( defined( 'WPMIND_CLOUD_TOKEN' ) ) {
+			$const_token = constant( 'WPMIND_CLOUD_TOKEN' );
+			if ( is_string( $const_token ) && '' !== trim( $const_token ) ) {
+				$raw = trim( $const_token );
+			}
+		}
+		if ( '' === $raw ) {
+			$opt = get_option( self::OPTION_TOKEN, '' );
+			if ( is_string( $opt ) && '' !== trim( $opt ) ) {
+				$raw = trim( $opt );
+			}
+		}
+
+		return '' !== $raw ? Secrets::fingerprint( $raw ) : '';
+	}
+
+	/**
+	 * 保存独立站点授权令牌（禁止 autoload，避免敏感信息常驻全站内存）。
+	 *
+	 * @param string $token 授权令牌原文.
+	 * @return bool
+	 */
+	public static function save_standalone_token( string $token ): bool {
+		$token = trim( $token );
+		if ( '' === $token ) {
+			return false;
+		}
+		update_option( self::OPTION_TOKEN, $token, false );
+		return true;
+	}
+
+	/**
+	 * 清除独立站点授权令牌与点数缓存。
+	 *
+	 * @return void
+	 */
+	public static function clear_standalone_binding(): void {
+		delete_option( self::OPTION_TOKEN );
+		delete_option( self::OPTION_CREDITS );
+	}
+
+	/**
+	 * 获取或生成独立站点 UUID（优先复用 WPCY 套件提供的 UUID）。
+	 *
+	 * @param string $suite_uuid WPCY 提供的 site_uuid（可为空）.
+	 * @return string
+	 */
+	public static function ensure_site_uuid( string $suite_uuid = '' ): string {
+		$suite_uuid = trim( $suite_uuid );
+		if ( '' !== $suite_uuid ) {
+			return $suite_uuid;
+		}
+
+		$stored = get_option( self::OPTION_SITE_UUID, '' );
+		if ( is_string( $stored ) && '' !== trim( $stored ) ) {
+			return trim( $stored );
+		}
+
+		$uuid = self::generate_uuid_v4();
+		update_option( self::OPTION_SITE_UUID, $uuid, false );
+		return $uuid;
+	}
+
+	/**
+	 * 构造独立站点跳转 wenpai.net 网页授权绑定地址。
+	 *
+	 * @param string $state      一次性防 CSRF 状态值.
+	 * @param string $return_url WP 后台回调地址.
+	 * @return string
+	 */
+	public static function connect_url( string $state, string $return_url ): string {
+		$base = apply_filters( 'wpmind_cloud_connect_url', self::CONNECT_URL );
+		$base = is_string( $base ) && '' !== trim( $base ) ? trim( $base ) : self::CONNECT_URL;
+
+		$site_uuid = self::ensure_site_uuid();
+		$site_url  = function_exists( 'home_url' ) ? (string) home_url( '/' ) : '';
+		$site_name = function_exists( 'get_bloginfo' ) ? (string) get_bloginfo( 'name' ) : '';
+		$version   = defined( 'WPMIND_VERSION' ) ? (string) constant( 'WPMIND_VERSION' ) : '';
+
+		$params = [
+			'plugin'         => 'wpmind',
+			'site_url'       => $site_url,
+			'site_uuid'      => $site_uuid,
+			'site_name'      => $site_name,
+			'return_url'     => $return_url,
+			'state'          => $state,
+			'plugin_version' => $version,
+		];
+
+		if ( function_exists( 'add_query_arg' ) ) {
+			return (string) add_query_arg( $params, $base );
+		}
+
+		$sep = false === strpos( $base, '?' ) ? '?' : '&';
+		return $base . $sep . http_build_query( $params );
+	}
+
+	/**
+	 * 构造带站点上下文的心思点数充值/了解网址（一律跳转 wenpai.net 网站）。
+	 *
+	 * @param string $site_uuid 当前站点 UUID（可选）.
+	 * @return string
+	 */
+	public static function topup_url( string $site_uuid = '' ): string {
+		$base = apply_filters( 'wpmind_cloud_topup_url', self::TOPUP_URL );
+		$base = is_string( $base ) && '' !== trim( $base ) ? trim( $base ) : '';
+		if ( '' === $base ) {
+			return '';
+		}
+
+		$params = [ 'from' => 'wpmind' ];
+		$uuid   = trim( $site_uuid );
+		if ( '' !== $uuid ) {
+			$params['site_uuid'] = $uuid;
+		}
+
+		if ( function_exists( 'add_query_arg' ) ) {
+			return (string) add_query_arg( $params, $base );
+		}
+
+		$sep = false === strpos( $base, '?' ) ? '?' : '&';
+		return $base . $sep . http_build_query( $params );
+	}
+
+	/**
+	 * 用网站授权回调的临时 code 向官方网关换取站点长期令牌（服务端直连，令牌不落浏览器地址栏）。
+	 *
+	 * @param string $code      一次性授权码.
+	 * @param string $site_uuid 站点 UUID（可选）.
+	 * @return array{token: string, site_uuid: string, credits_balance: ?int, credits_limit_month: ?int}|\WP_Error
+	 */
+	public static function exchange_connect_code( string $code, string $site_uuid = '' ) {
+		$code = trim( $code );
+		if ( '' === $code ) {
+			return new \WP_Error( 'wpmind_cloud_missing_code', __( '缺少授权码。', 'wpmind' ) );
+		}
+
+		$endpoint = self::base_url() . '/auth/exchange';
+		$payload  = [
+			'code'           => $code,
+			'site_uuid'      => self::ensure_site_uuid( $site_uuid ),
+			'site_url'       => function_exists( 'home_url' ) ? (string) home_url( '/' ) : '',
+			'plugin_version' => defined( 'WPMIND_VERSION' ) ? (string) constant( 'WPMIND_VERSION' ) : '',
+		];
+
+		$response = wp_remote_post(
+			$endpoint,
+			[
+				'timeout' => 15,
+				'headers' => [
+					'Content-Type' => 'application/json',
+					'Accept'       => 'application/json',
+				],
+				'body'    => wp_json_encode( $payload ),
+			]
+		);
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$status_code = (int) wp_remote_retrieve_response_code( $response );
+		$body        = json_decode( (string) wp_remote_retrieve_body( $response ), true );
+		if ( $status_code < 200 || $status_code >= 300 || ! is_array( $body ) ) {
+			return new \WP_Error(
+				'wpmind_cloud_exchange_failed',
+				__( '文派云授权换取令牌失败，请重试。', 'wpmind' ),
+				[ 'status' => $status_code ]
+			);
+		}
+
+		$token = isset( $body['token'] ) && is_string( $body['token'] ) ? trim( $body['token'] ) : '';
+		if ( '' === $token ) {
+			return new \WP_Error( 'wpmind_cloud_empty_token', __( '文派云未返回有效令牌。', 'wpmind' ) );
+		}
+
+		return [
+			'token'               => $token,
+			'site_uuid'           => isset( $body['site_uuid'] ) && is_string( $body['site_uuid'] ) ? trim( $body['site_uuid'] ) : '',
+			'credits_balance'     => isset( $body['credits_balance'] ) && is_numeric( $body['credits_balance'] ) ? max( 0, (int) $body['credits_balance'] ) : null,
+			'credits_limit_month' => isset( $body['credits_limit_month'] ) && is_numeric( $body['credits_limit_month'] ) ? max( 0, (int) $body['credits_limit_month'] ) : null,
+		];
+	}
+
+	/**
+	 * 生成 RFC 4122 UUID v4。
+	 *
+	 * @return string
+	 */
+	private static function generate_uuid_v4(): string {
+		if ( function_exists( 'wp_generate_uuid4' ) ) {
+			return (string) wp_generate_uuid4();
+		}
+
+		$bytes    = random_bytes( 16 );
+		$bytes[6] = chr( ( ord( $bytes[6] ) & 0x0f ) | 0x40 );
+		$bytes[8] = chr( ( ord( $bytes[8] ) & 0x3f ) | 0x80 );
+		$hex      = bin2hex( $bytes );
+
+		return sprintf(
+			'%s-%s-%s-%s-%s',
+			substr( $hex, 0, 8 ),
+			substr( $hex, 8, 4 ),
+			substr( $hex, 12, 4 ),
+			substr( $hex, 16, 4 ),
+			substr( $hex, 20, 12 )
+		);
+	}
+
+	/**
 	 * 判断官方算力当前是否可用（已启用且有可用令牌）。
 	 *
 	 * @return bool
@@ -237,8 +485,10 @@ final class WenpaiCloud {
 	 *     enabled: bool,
 	 *     mode: string,
 	 *     bound: bool,
+	 *     binding_source: string,
 	 *     managed_by_suite: bool,
 	 *     site_uuid: string,
+	 *     token_fingerprint: string,
 	 *     credits_balance: ?int,
 	 *     credits_used_month: int,
 	 *     credits_limit_month: ?int,
@@ -259,9 +509,29 @@ final class WenpaiCloud {
 		$credits      = get_option( self::OPTION_CREDITS, [] );
 		$credits      = is_array( $credits ) ? $credits : [];
 
-		$site_uuid        = isset( $binding['site_uuid'] ) && is_string( $binding['site_uuid'] ) ? trim( $binding['site_uuid'] ) : '';
-		$bound            = ! empty( $binding['bound'] ) || '' !== $site_uuid;
+		$suite_uuid       = isset( $binding['site_uuid'] ) && is_string( $binding['site_uuid'] ) ? trim( $binding['site_uuid'] ) : '';
 		$managed_by_suite = ! empty( $binding['managed'] ) || ! empty( $binding['managed_by_suite'] );
+		$suite_bound      = array_key_exists( 'bound', $binding )
+			? (bool) $binding['bound']
+			: '' !== $suite_uuid;
+
+		$standalone_token = self::has_standalone_token();
+		if ( $managed_by_suite && $suite_bound ) {
+			$binding_source = 'suite';
+		} elseif ( ! $managed_by_suite && $standalone_token ) {
+			$binding_source = 'standalone';
+		} elseif ( $suite_bound ) {
+			$binding_source = 'suite';
+		} else {
+			$binding_source = 'none';
+		}
+
+		$bound = 'none' !== $binding_source;
+
+		$stored_uuid = get_option( self::OPTION_SITE_UUID, '' );
+		$site_uuid   = '' !== $suite_uuid
+			? $suite_uuid
+			: ( is_string( $stored_uuid ) ? trim( $stored_uuid ) : '' );
 
 		$entitlement_mind = is_array( $entitlements['wpmind'] ?? null ) ? $entitlements['wpmind'] : [];
 
@@ -299,19 +569,27 @@ final class WenpaiCloud {
 		);
 		$credits_used_month = null !== $used_raw ? max( 0, $used_raw ) : 0;
 
-		if ( class_exists( 'Wenpai_Admin_Menu' ) ) {
-			$default_bind_url = \Wenpai_Admin_Menu::url( 'wpcy-connect' );
-		} elseif ( function_exists( 'menu_page_url' ) ) {
-			$default_bind_url = (string) menu_page_url( 'wpcy-connect', false );
+		if ( $managed_by_suite && isset( $binding['manage_url'] ) && is_string( $binding['manage_url'] ) && '' !== trim( $binding['manage_url'] ) ) {
+			$bind_url = trim( $binding['manage_url'] );
+		} elseif ( isset( $binding['manage_url'] ) && is_string( $binding['manage_url'] ) && '' !== trim( $binding['manage_url'] ) ) {
+			$bind_url = trim( $binding['manage_url'] );
+		} elseif ( $managed_by_suite ) {
+			if ( class_exists( 'Wenpai_Admin_Menu' ) ) {
+				$bind_url = \Wenpai_Admin_Menu::url( 'wpcy-services' );
+			} elseif ( function_exists( 'menu_page_url' ) ) {
+				$bind_url = (string) menu_page_url( 'wpcy-services', false );
+			} else {
+				$bind_url = '';
+			}
+		} elseif ( function_exists( 'admin_url' ) && function_exists( 'wp_nonce_url' ) ) {
+			// 未安装 WPCY：走本插件 admin-post 发起 wenpai.net 一次性 state 授权回跳.
+			$bind_url = (string) wp_nonce_url(
+				admin_url( 'admin-post.php?action=wpmind_cloud_connect' ),
+				'wpmind_cloud_connect'
+			);
 		} else {
-			$default_bind_url = '';
+			$bind_url = self::CONNECT_URL;
 		}
-		if ( '' === $default_bind_url && function_exists( 'add_query_arg' ) ) {
-			$default_bind_url = add_query_arg( 'page', 'wpcy-connect', function_exists( 'self_admin_url' ) ? self_admin_url() : '' );
-		}
-		$bind_url = isset( $binding['manage_url'] ) && is_string( $binding['manage_url'] ) && '' !== trim( $binding['manage_url'] )
-			? trim( $binding['manage_url'] )
-			: $default_bind_url;
 
 		$starter_credits = (int) apply_filters( 'wpmind_cloud_starter_credits', 500 );
 
@@ -319,8 +597,10 @@ final class WenpaiCloud {
 			'enabled'             => self::is_enabled(),
 			'mode'                => self::routing_mode(),
 			'bound'               => $bound,
+			'binding_source'      => $binding_source,
 			'managed_by_suite'    => $managed_by_suite,
 			'site_uuid'           => $site_uuid,
+			'token_fingerprint'   => 'standalone' === $binding_source ? self::standalone_token_fingerprint() : '',
 			'credits_balance'     => $credits_balance,
 			'credits_used_month'  => $credits_used_month,
 			'credits_limit_month' => $credits_limit_month,

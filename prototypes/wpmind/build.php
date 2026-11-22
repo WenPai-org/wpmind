@@ -434,10 +434,16 @@ namespace WPMind\Provider {
 				],
 			];
 		}
+		public static function topup_url( string $site_uuid = '' ): string {
+			$base = 'https://wenpai.net/mind-credits?from=wpmind';
+			return '' !== trim( $site_uuid ) ? $base . '&site_uuid=' . rawurlencode( trim( $site_uuid ) ) : $base;
+		}
 		public static function get_status(): array {
 			return [
 				'enabled'             => true,
 				'bound'               => true,
+				'binding_source'      => 'suite',
+				'token_fingerprint'   => '',
 				'managed_by_suite'    => true,
 				'site_uuid'           => 'site_demo_wpcy_01',
 				'credits_balance'     => 4820,
