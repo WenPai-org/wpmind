@@ -435,7 +435,7 @@ namespace WPMind\Provider {
 			];
 		}
 		public static function topup_url( string $site_uuid = '' ): string {
-			$base = 'https://wenpai.net/mind-credits?from=wpmind';
+			$base = 'https://wenpai.net/mind-credits?from=mind';
 			return '' !== trim( $site_uuid ) ? $base . '&site_uuid=' . rawurlencode( trim( $site_uuid ) ) : $base;
 		}
 		public static function get_status(): array {

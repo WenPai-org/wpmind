@@ -38,7 +38,7 @@ final class WenpaiCloud {
 	/**
 	 * 独立站点网页授权绑定入口地址（未安装 WPCY 时使用）。
 	 */
-	public const CONNECT_URL = 'https://wenpai.net/connect/wpmind';
+	public const CONNECT_URL = 'https://wenpai.net/connect/mind';
 
 	/**
 	 * 启用状态 option 名。
@@ -201,7 +201,7 @@ final class WenpaiCloud {
 			'wenpai_sign_cloud_request',
 			'',
 			[
-				'scope'  => 'wpmind:gateway',
+				'scope'  => 'mind:gateway',
 				'target' => self::base_url(),
 			]
 		);
@@ -352,7 +352,7 @@ final class WenpaiCloud {
 			return '';
 		}
 
-		$params = [ 'from' => 'wpmind' ];
+		$params = [ 'from' => 'mind' ];
 		$uuid   = trim( $site_uuid );
 		if ( '' !== $uuid ) {
 			$params['site_uuid'] = $uuid;
@@ -533,7 +533,9 @@ final class WenpaiCloud {
 			? $suite_uuid
 			: ( is_string( $stored_uuid ) ? trim( $stored_uuid ) : '' );
 
-		$entitlement_mind = is_array( $entitlements['wpmind'] ?? null ) ? $entitlements['wpmind'] : [];
+		$entitlement_mind = is_array( $entitlements['mind'] ?? null )
+			? $entitlements['mind']
+			: ( is_array( $entitlements['wpmind'] ?? null ) ? $entitlements['wpmind'] : [] );
 
 		$credits_balance = self::extract_nullable_int(
 			[
@@ -623,22 +625,35 @@ final class WenpaiCloud {
 	public static function update_balance_from_headers( $headers ): void {
 		$map = self::normalize_headers( $headers );
 
-		$has_remaining = array_key_exists( 'x-wpmind-credits-remaining', $map ) && is_numeric( $map['x-wpmind-credits-remaining'] );
-		$has_limit     = array_key_exists( 'x-wpmind-credits-limit', $map ) && is_numeric( $map['x-wpmind-credits-limit'] );
+		$remaining_val = null;
+		foreach ( [ 'x-mind-credits-remaining', 'x-wpmind-credits-remaining' ] as $rkey ) {
+			if ( array_key_exists( $rkey, $map ) && is_numeric( $map[ $rkey ] ) ) {
+				$remaining_val = max( 0, (int) $map[ $rkey ] );
+				break;
+			}
+		}
 
-		if ( ! $has_remaining && ! $has_limit ) {
+		$limit_val = null;
+		foreach ( [ 'x-mind-credits-limit', 'x-wpmind-credits-limit' ] as $lkey ) {
+			if ( array_key_exists( $lkey, $map ) && is_numeric( $map[ $lkey ] ) ) {
+				$limit_val = max( 0, (int) $map[ $lkey ] );
+				break;
+			}
+		}
+
+		if ( null === $remaining_val && null === $limit_val ) {
 			return;
 		}
 
 		$stored = get_option( self::OPTION_CREDITS, [] );
 		$stored = is_array( $stored ) ? $stored : [];
 
-		if ( $has_remaining ) {
-			$stored['remaining'] = max( 0, (int) $map['x-wpmind-credits-remaining'] );
+		if ( null !== $remaining_val ) {
+			$stored['remaining'] = $remaining_val;
 		}
 
-		if ( $has_limit ) {
-			$stored['limit'] = max( 0, (int) $map['x-wpmind-credits-limit'] );
+		if ( null !== $limit_val ) {
+			$stored['limit'] = $limit_val;
 		}
 
 		$stored['updated_at'] = time();
@@ -810,7 +825,7 @@ final class WenpaiCloud {
 
 		// 兜底：若对象仅实现了 ArrayAccess（如部分自定义字典桩），直接按目标键读取.
 		if ( [] === $map && $headers instanceof \ArrayAccess ) {
-			foreach ( [ 'x-wpmind-credits-remaining', 'x-wpmind-credits-limit' ] as $target ) {
+			foreach ( [ 'x-mind-credits-remaining', 'x-mind-credits-limit', 'x-wpmind-credits-remaining', 'x-wpmind-credits-limit' ] as $target ) {
 				if ( isset( $headers[ $target ] ) ) {
 					$val = $headers[ $target ];
 					if ( is_array( $val ) ) {

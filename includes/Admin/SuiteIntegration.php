@@ -441,7 +441,7 @@ final class SuiteIntegration {
 			'starter_credits'     => 500,
 			'unit_label'          => __( '心思点数', 'wpmind' ),
 			'base_url'            => 'https://mind-api.wenpai.net/v1',
-			'bind_url'            => 'https://wenpai.net/connect/wpmind',
+			'bind_url'            => 'https://wenpai.net/connect/mind',
 			'topup_url'           => 'https://wenpai.net/mind-credits',
 		];
 

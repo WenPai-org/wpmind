@@ -367,7 +367,7 @@ final class EngineAndCloudRegressionTest extends TestCase {
 		self::assertSame( 'wmc_option_fallback', WenpaiCloud::derive_request_token() );
 
 		$GLOBALS['wpmind_test_filters']['wenpai_sign_cloud_request'] = static function ( $token, $args ) {
-			self::assertSame( 'wpmind:gateway', $args['scope'] ?? '' );
+			self::assertSame( 'mind:gateway', $args['scope'] ?? '' );
 			self::assertSame( 'https://custom-mind.wenpai.net/v1', $args['target'] ?? '' );
 			return self::FAKE_CLOUD_TOKEN;
 		};
@@ -375,14 +375,15 @@ final class EngineAndCloudRegressionTest extends TestCase {
 		self::assertTrue( WenpaiCloud::is_available() );
 		self::assertArrayHasKey( WenpaiCloud::PROVIDER_ID, ( new EndpointRepository() )->enabled() );
 
-		// 响应头解析：同时验证数组与类似 CaseInsensitiveDictionary 的对象，且 autoload=false。
+		// 响应头解析：同时验证标准 X-Mind-Credits-* 与兼容 X-WPMind-Credits-*（数组与对象），且 autoload=false。
 		WenpaiCloud::update_balance_from_headers(
 			[
-				'X-WPMind-Credits-Remaining' => '4200',
-				'X-WPMind-Credits-Limit'     => '10000',
+				'X-Mind-Credits-Remaining' => '4200',
+				'X-Mind-Credits-Limit'     => '10000',
 			]
 		);
 		self::assertFalse( $GLOBALS['wpmind_test_autoload'][ WenpaiCloud::OPTION_CREDITS ] );
+		self::assertSame( 4200, WenpaiCloud::get_status()['credits_balance'] );
 
 		$dict_stub = new ArrayObject(
 			[
@@ -668,7 +669,7 @@ final class EngineAndCloudRegressionTest extends TestCase {
 		// 8b. 未安装 WPCY（独立站）：生成 connect_url、保存独立令牌（autoload=false）、识别为 standalone、解除绑定后恢复 none。
 		unset( $GLOBALS['wpmind_test_filters']['wenpai_site_binding'] );
 		$connect_url = WenpaiCloud::connect_url( 'state-xyz-123', 'https://example.org/wp-admin/admin-post.php?action=wpmind_cloud_callback' );
-		self::assertStringStartsWith( 'https://wenpai.net/connect/wpmind', $connect_url );
+		self::assertStringStartsWith( 'https://wenpai.net/connect/mind', $connect_url );
 		self::assertStringContainsString( 'state=state-xyz-123', $connect_url );
 		self::assertStringContainsString( 'plugin=wpmind', $connect_url );
 		self::assertFalse( $GLOBALS['wpmind_test_autoload'][ WenpaiCloud::OPTION_SITE_UUID ] );
@@ -717,11 +718,23 @@ final class EngineAndCloudRegressionTest extends TestCase {
 		self::assertSame( 500, $exchanged['credits_balance'] );
 		self::assertSame( 5000, $exchanged['credits_limit_month'] );
 
-		// 8e. 充值地址一律跳 wenpai.net 并携带 from=wpmind 与 site_uuid。
+		// 8e. 充值地址一律跳 wenpai.net 并携带 from=mind 与 site_uuid，且 entitlements['mind'] 生效。
 		$topup = WenpaiCloud::topup_url( 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee' );
 		self::assertStringStartsWith( 'https://wenpai.net/mind-credits', $topup );
-		self::assertStringContainsString( 'from=wpmind', $topup );
+		self::assertStringContainsString( 'from=mind', $topup );
 		self::assertStringContainsString( 'site_uuid=aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee', $topup );
+
+		$GLOBALS['wpmind_test_filters']['wenpai_site_entitlements'] = static fn() => [
+			'mind' => [
+				'credits_balance'     => 1200,
+				'credits_limit_month' => 5000,
+			],
+		];
+		delete_option( WenpaiCloud::OPTION_CREDITS );
+		$status_ent = WenpaiCloud::get_status();
+		self::assertSame( 1200, $status_ent['credits_balance'] );
+		self::assertSame( 5000, $status_ent['credits_limit_month'] );
+		unset( $GLOBALS['wpmind_test_filters']['wenpai_site_entitlements'] );
 
 		// 8f. 解除绑定后清空独立令牌与点数缓存。
 		WenpaiCloud::clear_standalone_binding();
