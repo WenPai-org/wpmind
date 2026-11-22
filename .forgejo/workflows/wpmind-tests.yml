@@ -172,8 +172,18 @@ jobs:
           set -euo pipefail
           ASSET_DIR=$(mktemp -d /tmp/wpmind-wp-env.XXXXXX)
           CORE_DIR="${ASSET_DIR}/wordpress-core"
-          git clone --quiet --depth=1 --branch "${WP_CORE_TAG}" \
-            https://github.com/WordPress/WordPress.git "${CORE_DIR}"
+          for attempt in 1 2 3; do
+            rm -rf "${CORE_DIR}"
+            if git clone --quiet --depth=1 --branch "${WP_CORE_TAG}" \
+              https://github.com/WordPress/WordPress.git "${CORE_DIR}"; then
+              break
+            fi
+            echo "WordPress core clone 失败（第 ${attempt} 次）"
+            if [ "${attempt}" -eq 3 ]; then
+              exit 1
+            fi
+            sleep $(( attempt * 10 ))
+          done
           test "$(git -C "${CORE_DIR}" rev-parse HEAD)" = "${WP_CORE_SHA}"
           grep -Fq "\$wp_version = '${WP_CORE_TAG}';" "${CORE_DIR}/wp-includes/version.php"
           jq --arg core "${CORE_DIR}" --arg plugin "${PWD}" \
