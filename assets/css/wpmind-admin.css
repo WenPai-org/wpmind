@@ -119,11 +119,10 @@
 	margin-bottom: var(--wenpai-space-4);
 }
 
-/* ---- 概览页（按 2026-11-16 过审原型：四格带图标指标条 + AI 服务动态双栏 + 单行活动流） ---- */
+/* ---- 概览页（按 2026-11-16 过审原型：内缩分隔四格指标条 + AI 服务动态双栏 + 单行活动流 + 卡级折叠） ---- */
 .wpmind-ov__stats {
 	display: flex;
 	align-items: stretch;
-	margin: calc(var(--wenpai-space-5) * -1);
 }
 
 .wpmind-ov__stat {
@@ -132,11 +131,19 @@
 	display: flex;
 	align-items: flex-start;
 	gap: var(--wenpai-space-3);
-	padding: var(--wenpai-space-4) var(--wenpai-space-5);
+	padding: var(--wenpai-space-2) var(--wenpai-space-5);
+}
+
+.wpmind-ov__stat:first-child {
+	padding-inline-start: var(--wenpai-space-1);
+}
+
+.wpmind-ov__stat:last-child {
+	padding-inline-end: var(--wenpai-space-1);
 }
 
 .wpmind-ov__stat + .wpmind-ov__stat {
-	border-inline-start: 1px solid var(--wenpai-line-soft);
+	border-inline-start: 1px solid var(--wenpai-line-card);
 }
 
 .wpmind-ov__stat-ico {
@@ -147,8 +154,8 @@
 }
 
 .wpmind-ov__stat-ico .wenpai-ico {
-	width: 20px;
-	height: 20px;
+	width: 22px;
+	height: 22px;
 }
 
 .wpmind-ov__stat-text {
@@ -163,8 +170,8 @@
 
 .wpmind-ov__stat-v {
 	margin-top: var(--wenpai-space-0-5);
-	font-size: var(--wenpai-text-h1);
-	line-height: var(--wenpai-leading-h1);
+	font-size: var(--wenpai-text-brand);
+	line-height: var(--wenpai-leading-title);
 	font-weight: var(--wenpai-weight-regular);
 	color: var(--wenpai-ink);
 	font-variant-numeric: tabular-nums;
@@ -419,6 +426,52 @@
 	.wpmind-ov__ftime {
 		width: auto;
 	}
+}
+
+.wpmind-ov__fold > summary {
+	list-style: none;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: var(--wenpai-space-2-5);
+}
+
+.wpmind-ov__fold > summary::-webkit-details-marker {
+	display: none;
+}
+
+.wpmind-ov__fold-ico {
+	color: var(--wenpai-ink-3);
+	flex: none;
+	display: inline-flex;
+	transition: transform var(--wenpai-motion-base) var(--wenpai-motion-ease);
+}
+
+.wpmind-ov__fold-ico .wenpai-ico {
+	width: 16px;
+	height: 16px;
+}
+
+.wpmind-ov__fold[open] > summary .wpmind-ov__fold-ico {
+	transform: rotate(180deg);
+}
+
+.wpmind-ov__fold > summary .section-title {
+	margin: 0;
+	flex: none;
+}
+
+.wpmind-ov__fold > summary .meta {
+	margin-inline-start: auto;
+}
+
+.wpmind-ov__fold[open] > summary {
+	margin-bottom: var(--wenpai-space-4);
+}
+
+.wpmind-ov__fold-body {
+	display: grid;
+	gap: var(--wenpai-space-3);
 }
 
 /* ---- 兜底轻提示容器（kit wenpaiToast 不可用时使用） ---- */
