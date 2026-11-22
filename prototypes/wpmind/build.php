@@ -358,6 +358,9 @@ namespace {
 	function wp_json_encode( $d, $flags = 0 ) {
 		return (string) json_encode( $d, $flags );
 	}
+	function wp_parse_url( $url, $component = -1 ) {
+		return parse_url( (string) $url, (int) $component );
+	}
 	function add_query_arg( $args, $url = '' ) {
 		if ( ! is_array( $args ) ) {
 			return (string) $url;
@@ -365,6 +368,7 @@ namespace {
 		$tab_files = [
 			'overview'  => 'overview.html',
 			'services'  => 'services.html',
+			'cloud'     => 'cloud.html',
 			'routing'   => 'routing.html',
 			'modules'   => 'modules.html',
 			'analytics' => 'analytics.html',
@@ -1121,22 +1125,27 @@ namespace {
 	$catalog = [
 		'overview.html'       => [
 			'title' => '概览',
-			'desc'  => 'v0.13.7 四段式总览：stat_hub、双列 view_tabs（各插件调用 / 近期活动 + 测速 / 额度）与模块折叠列表。',
+			'desc'  => '1:1 过审版概览：内缩四格带蓝图标统计条、AI 服务动态对称双栏（Provider 健康 + 单行最近活动）与底部卡级模块健康折叠。',
 			'get'   => [ 'tab' => 'overview' ],
 		],
 		'services.html'       => [
-			'title' => 'AI 服务',
-			'desc'  => '官方算力卡、URL 驱动简化/高级模式、文本与图像服务商折叠清单、站点锁定态与底部 savebar。',
+			'title' => 'AI 服务 · Provider 服务',
+			'desc'  => '清爽渐进式披露：已配置文本/图像 Provider 置顶，未配置服务默认收纳折叠，支持简单/高级模式与底部 savebar。',
 			'get'   => [ 'tab' => 'services', 'mode' => 'simple' ],
 		],
+		'cloud.html'          => [
+			'title' => 'AI 服务 · 心思 AI',
+			'desc'  => '独立心思 AI 标签页：四格点数状态条、官方算力开关、托管模型档位矩阵与三步生态共用清单。',
+			'get'   => [ 'tab' => 'cloud', 'mode' => 'simple' ],
+		],
 		'routing.html'        => [
-			'title' => '智能路由（二级页）',
-			'desc'  => 'subpage_head + 路由策略 seg_radio + 故障转移链 + sortable 优先级排序 + ranked meter 评分。',
+			'title' => 'AI 服务 · 智能路由',
+			'desc'  => '顶部策略条 + 路由参数卡 + 运行状态（当前路由与故障转移链）+ 优先级排序与策略得分排名。',
 			'get'   => [ 'tab' => 'routing' ],
 		],
 		'modules.html'        => [
 			'title' => '模块',
-			'desc'  => '已开启模块 module_grid 卡片网格 + 可选模块开关清单。',
+			'desc'  => '上方内置模块 module_grid 三列卡片网格 + 下方生态联动插件列表卡。',
 			'get'   => [ 'tab' => 'modules' ],
 		],
 		'module-geo.html'     => [

@@ -112,8 +112,10 @@ if ( $wpmind_show_workflow_tab ) {
 	$wpmind_tabs[] = [ 'id' => 'workflow', 'label' => __( '任务', 'wpmind' ), 'url' => $wpmind_url( 'workflow' ), 'icon' => 'workflow' ];
 }
 
-// 二级页不进顶栏：路由归 AI 服务、模块设置归模块。
-$wpmind_current = 'routing' === $wpmind_view ? 'services' : ( 'module' === $wpmind_view ? 'modules' : $wpmind_view );
+// 二级页不进顶栏：心思 AI、路由归 AI 服务，模块设置归模块。
+$wpmind_current = in_array( $wpmind_view, [ 'cloud', 'routing' ], true )
+	? 'services'
+	: ( 'module' === $wpmind_view ? 'modules' : $wpmind_view );
 
 $wpmind_shell_args = [
 	'slug'           => 'wpmind',

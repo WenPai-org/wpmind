@@ -15,10 +15,6 @@ use WPMind\Admin\SuiteIntegration;
 	$wpmind_instance  = \WPMind\wpmind();
 	$endpoints        = $wpmind_instance->get_custom_endpoints();
 	$default_provider = (string) get_option( 'wpmind_default_provider', '' );
-	$request_timeout  = (int) get_option( 'wpmind_request_timeout', 60 );
-	$display          = SuiteIntegration::display();
-	$cloud            = SuiteIntegration::cloud_status();
-	$cloud_locked     = defined( 'WPMIND_CLOUD_ENABLED' );
 	$mode             = class_exists( 'Wenpai_Admin_UI', false ) ? Wenpai_Admin_UI::mode() : 'simple';
 
 	$image_endpoints = get_option( 'wpmind_image_endpoints', [] );
@@ -87,9 +83,17 @@ use WPMind\Admin\SuiteIntegration;
 	];
 
 	$wpmind_mark = static function ( string $pid ): string {
-		$svg = WPMIND_PLUGIN_DIR . 'assets/images/providers/' . $pid . '.svg';
+		$alias = [
+			'openai_gpt_image'    => 'openai',
+			'google_gemini_image' => 'google',
+			'qwen_image'          => 'qwen',
+			'bytedance_seedream'  => 'doubao',
+			'bytedance_reve'      => 'doubao',
+		];
+		$slug  = $alias[ $pid ] ?? $pid;
+		$svg   = WPMIND_PLUGIN_DIR . 'assets/images/providers/' . $slug . '.svg';
 		if ( file_exists( $svg ) ) {
-			return '<img src="' . esc_url( WPMIND_PLUGIN_URL . 'assets/images/providers/' . $pid . '.svg' ) . '" alt="" width="20" height="20">';
+			return '<img src="' . esc_url( WPMIND_PLUGIN_URL . 'assets/images/providers/' . $slug . '.svg' ) . '" alt="" width="20" height="20">';
 		}
 		return AdminIcons::svg( 'robot' );
 	};
@@ -133,7 +137,7 @@ use WPMind\Admin\SuiteIntegration;
 
 	wpmind_page_head(
 		__( 'AI 服务', 'wpmind' ),
-		__( '管理官方算力、文本与图像接口。', 'wpmind' ),
+		__( '配置文本与图像 Provider。简单模式只留启用、Key 与测试；高级模式展开全部配置。', 'wpmind' ),
 		$wpmind_mode_switch
 	);
 
@@ -142,9 +146,8 @@ use WPMind\Admin\SuiteIntegration;
 			'label' => __( 'AI 服务子导航', 'wpmind' ),
 			'items' => [
 				[
-					'id'      => 'services',
 					'label'   => __( 'Provider 服务', 'wpmind' ),
-					'url'     => AdminPage::url(
+					'href'    => AdminPage::url(
 						[
 							'tab'  => 'services',
 							'mode' => $mode,
@@ -153,53 +156,18 @@ use WPMind\Admin\SuiteIntegration;
 					'current' => true,
 				],
 				[
-					'id'    => 'routing',
-					'label' => __( '智能路由', 'wpmind' ),
-					'url'   => AdminPage::url( [ 'tab' => 'routing' ] ),
+					'label'   => __( '心思 AI', 'wpmind' ),
+					'href'    => AdminPage::url( [ 'tab' => 'cloud' ] ),
+					'current' => false,
+				],
+				[
+					'label'   => __( '智能路由', 'wpmind' ),
+					'href'    => AdminPage::url( [ 'tab' => 'routing' ] ),
+					'current' => false,
 				],
 			],
 		]
 	);
-
-	$cloud_unit         = (string) ( $cloud['unit_label'] ?? __( '心思点数', 'wpmind' ) );
-	$cloud_enabled      = ! empty( $cloud['enabled'] );
-	$cloud_bound        = ! empty( $cloud['bound'] );
-	$cloud_balance      = $cloud['credits_balance'];
-	$cloud_used         = (int) ( $cloud['credits_used_month'] ?? 0 );
-	$cloud_limit        = $cloud['credits_limit_month'];
-	$cloud_balance_text = null !== $cloud_balance
-	? sprintf(
-		/* translators: 1: formatted balance, 2: unit label */
-		__( '%1$s %2$s', 'wpmind' ),
-		number_format_i18n( (int) $cloud_balance ),
-		$cloud_unit
-	)
-	: ( $cloud_bound ? __( '首次调用后同步余额', 'wpmind' ) : __( '绑定站点后同步余额', 'wpmind' ) );
-	if ( null !== $cloud_limit && (int) $cloud_limit > 0 ) {
-		$cloud_balance_text .= sprintf(
-		/* translators: 1: used this month, 2: monthly limit */
-			__( '（本月已用 %1$s / %2$s）', 'wpmind' ),
-			number_format_i18n( $cloud_used ),
-			number_format_i18n( (int) $cloud_limit )
-		);
-	}
-
-	$cloud_actions = [];
-	if ( ! $cloud_bound && ! empty( $cloud['bind_url'] ) ) {
-		$cloud_actions[] = [
-			'label'   => __( '去绑定站点', 'wpmind' ),
-			'href'    => (string) $cloud['bind_url'],
-			'variant' => 'secondary',
-		];
-	}
-	if ( empty( $display['whitelabel'] ) && ! empty( $cloud['topup_url'] ) ) {
-		$cloud_actions[] = [
-			'label'   => sprintf( /* translators: %s: unit label */ __( '补充%s', 'wpmind' ), $cloud_unit ),
-			'href'    => (string) $cloud['topup_url'],
-			'variant' => 'ghost',
-			'target'  => '_blank',
-		];
-	}
 	?>
 
 <div class="wenpai-stack">
@@ -208,86 +176,6 @@ use WPMind\Admin\SuiteIntegration;
 
 		<div class="wenpai-stack">
 			<?php
-			// ---- 首屏置顶卡：文派心思官方算力 ----
-			Wenpai_Admin_UI::card_open(
-				[
-					'title'             => __( '文派心思官方算力', 'wpmind' ),
-					'icon'              => 'sparkle',
-					'state'             => $cloud_enabled ? 'ok' : '',
-					'head_actions_html' => Wenpai_Admin_UI::pill_html(
-						[
-							'text'  => $cloud_bound ? __( '已绑定站点', 'wpmind' ) : __( '未绑定站点', 'wpmind' ),
-							'state' => $cloud_bound ? 'ok' : 'mute',
-						]
-					),
-				]
-			);
-			?>
-			<div class="wenpai-field wenpai-field--toggle wenpai-field--row field">
-				<div class="field-label"><label class="wenpai-field__label" for="wpmind_cloud_enabled"><?php esc_html_e( '启用官方算力', 'wpmind' ); ?></label></div>
-				<div class="field-ctl">
-					<?php
-					$cloud_switch_html = Wenpai_Admin_Settings::switch_html(
-						[
-							'id'       => 'wpmind_cloud_enabled',
-							'name'     => 'wpmind_cloud_enabled',
-							'checked'  => $cloud_enabled,
-							'disabled' => $cloud_locked,
-							'on'       => __( '已开启', 'wpmind' ),
-							'off'      => __( '未开启', 'wpmind' ),
-						]
-					);
-					echo $cloud_switch_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit helper escapes internally.
-					?>
-					<p class="wenpai-field__desc">
-						<?php
-						echo esc_html(
-							$cloud_locked
-								? __( '已由站点配置锁定开关状态。', 'wpmind' )
-								: __( '免配第三方密钥，统一按心思点数结算。', 'wpmind' )
-						);
-						?>
-					</p>
-				</div>
-			</div>
-
-			<div class="wenpai-field wenpai-field--row field">
-				<div class="field-label"><span class="wenpai-field__label"><?php echo esc_html( sprintf( /* translators: %s: unit label */ __( '剩余%s', 'wpmind' ), $cloud_unit ) ); ?></span></div>
-				<div class="field-ctl">
-					<div class="wenpai-row wenpai-row--tight">
-						<span><?php echo esc_html( $cloud_balance_text ); ?></span>
-						<?php
-						if ( ! empty( $cloud['managed_by_suite'] ) ) {
-							Wenpai_Admin_UI::pill(
-								[
-									'text'  => __( '套件托管', 'wpmind' ),
-									'state' => 'ok',
-								]
-							);
-						}
-						?>
-					</div>
-				</div>
-			</div>
-
-			<div class="wenpai-field wenpai-field--row field"<?php echo Wenpai_Admin_UI::mode_attrs( 'advanced' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
-				<div class="field-label"><span class="wenpai-field__label"><?php esc_html_e( '网关地址', 'wpmind' ); ?></span></div>
-				<div class="field-ctl">
-					<?php echo wpmind_code_inline_html( [ 'code' => (string) $cloud['base_url'] ] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				</div>
-			</div>
-			<?php
-			Wenpai_Admin_UI::card_foot(
-				[
-					'start'   => true,
-					'meta'    => $cloud_bound
-						? __( '站点通行证已连接，可直接参与智能路由。', 'wpmind' )
-						: __( '绑定文派云通行证后即可免密钥调用。', 'wpmind' ),
-					'actions' => $cloud_actions,
-				]
-			);
-			Wenpai_Admin_UI::card_close();
-
 			// ---- 文本服务 Provider 卡（渐进式披露：已配置置顶，未配置默认折叠收纳） ----
 			$byok_endpoints = array_filter(
 				$endpoints,
@@ -586,7 +474,7 @@ use WPMind\Admin\SuiteIntegration;
 						count( $byok_endpoints ),
 						'' !== $default_provider && isset( $endpoints[ $default_provider ] )
 							? (string) $endpoints[ $default_provider ]['name']
-							: __( '未设置', 'wpmind' )
+							: __( '自动按路由选择', 'wpmind' )
 					),
 					'tile'              => false,
 					'head_actions_html' => Wenpai_Admin_UI::pill_html(
@@ -597,32 +485,9 @@ use WPMind\Admin\SuiteIntegration;
 					),
 				]
 			);
-	?>
-			<div class="wenpai-field wenpai-field--row field">
-				<div class="field-label"><label class="wenpai-field__label" for="wpmind_default_provider"><?php esc_html_e( '默认服务', 'wpmind' ); ?></label></div>
-				<div class="field-ctl">
-					<select id="wpmind_default_provider" name="wpmind_default_provider">
-						<option value=""><?php esc_html_e( '— 自动按路由选择 —', 'wpmind' ); ?></option>
-						<?php foreach ( $endpoints as $key => $endpoint ) : ?>
-							<option value="<?php echo esc_attr( (string) $key ); ?>" <?php selected( $default_provider, $key ); ?>><?php echo esc_html( (string) $endpoint['name'] ); ?></option>
-						<?php endforeach; ?>
-					</select>
-					<p class="wenpai-field__desc"><?php esc_html_e( '路由策略未命中时的兜底服务。', 'wpmind' ); ?></p>
-				</div>
-			</div>
-
-			<div class="wenpai-field wenpai-field--row field"<?php echo Wenpai_Admin_UI::mode_attrs( 'advanced' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
-				<div class="field-label"><label class="wenpai-field__label" for="wpmind_request_timeout"><?php esc_html_e( '请求超时', 'wpmind' ); ?></label></div>
-				<div class="field-ctl">
-					<input type="number" class="wpmind-num" id="wpmind_request_timeout" name="wpmind_request_timeout" value="<?php echo esc_attr( (string) $request_timeout ); ?>" min="10" max="300" step="1">
-					<p class="wenpai-field__desc"><?php esc_html_e( '单位秒（建议 60–120），超时自动故障转移。', 'wpmind' ); ?></p>
-				</div>
-			</div>
-
-			<?php
-			if ( ! empty( $configured_text_items ) ) {
-				Wenpai_Admin_UI::fold_list( [ 'items' => $configured_text_items ] );
-			}
+	if ( ! empty( $configured_text_items ) ) {
+		Wenpai_Admin_UI::fold_list( [ 'items' => $configured_text_items ] );
+	}
 			$render_unconfigured_drawer(
 				'wpmind-unconfigured-text',
 				empty( $configured_text_items )
@@ -647,7 +512,7 @@ use WPMind\Admin\SuiteIntegration;
 				]
 			);
 			Wenpai_Admin_UI::card_close();
-			?>
+	?>
 		</div>
 	</form>
 
@@ -742,7 +607,7 @@ use WPMind\Admin\SuiteIntegration;
 		$img_body  = (string) ob_get_clean();
 		$img_entry = [
 			'id'        => 'image-endpoint-' . $key,
-			'icon'      => 'image',
+			'logo_html' => $wpmind_mark( $key ),
 			'title'     => (string) $provider['name'],
 			'desc'      => (string) $provider['display_name'],
 			'pill'      => $img_pill,

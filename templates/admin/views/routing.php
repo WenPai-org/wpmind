@@ -99,6 +99,11 @@ use WPMind\Provider\EndpointRepository;
 					'current' => false,
 				],
 				[
+					'label'   => __( '心思 AI', 'wpmind' ),
+					'href'    => AdminPage::url( [ 'tab' => 'cloud' ] ),
+					'current' => false,
+				],
+				[
 					'label'   => __( '智能路由', 'wpmind' ),
 					'href'    => AdminPage::url( [ 'tab' => 'routing' ] ),
 					'current' => true,

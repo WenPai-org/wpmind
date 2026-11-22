@@ -53,6 +53,7 @@ final class AdminPage {
 	private const VIEWS = [
 		'overview',
 		'services',
+		'cloud',
 		'routing',
 		'modules',
 		'module',
@@ -70,6 +71,7 @@ final class AdminPage {
 	private const LEGACY_TAB_MAP = [
 		'overview'          => 'overview',
 		'services'          => 'services',
+		'cloud'             => 'cloud',
 		'images'            => 'services',
 		'routing'           => 'routing',
 		'analytics'         => 'analytics',
@@ -209,16 +211,6 @@ final class AdminPage {
 
 		register_setting(
 			'wpmind_settings',
-			'wpmind_request_timeout',
-			[
-				'type'              => 'integer',
-				'sanitize_callback' => [ $this, 'sanitize_timeout' ],
-				'default'           => 60,
-			]
-		);
-
-		register_setting(
-			'wpmind_settings',
 			'wpmind_exact_cache_enabled',
 			[
 				'type'              => 'string',
@@ -247,23 +239,24 @@ final class AdminPage {
 			]
 		);
 
+		// 心思 AI 官方算力独立设置组（避免覆盖第三方端点与路由参数）.
 		register_setting(
-			'wpmind_settings',
-			'wpmind_default_provider',
-			[
-				'type'              => 'string',
-				'sanitize_callback' => [ $this, 'sanitize_default_provider' ],
-				'default'           => '',
-			]
-		);
-
-		register_setting(
-			'wpmind_settings',
+			'wpmind_cloud_settings',
 			'wpmind_cloud_enabled',
 			[
 				'type'              => 'string',
 				'sanitize_callback' => [ $this, 'sanitize_exact_cache_enabled' ],
 				'default'           => '0',
+			]
+		);
+
+		register_setting(
+			'wpmind_cloud_settings',
+			'wpmind_cloud_base_url',
+			[
+				'type'              => 'string',
+				'sanitize_callback' => [ $this, 'sanitize_cloud_base_url' ],
+				'default'           => '',
 			]
 		);
 
@@ -310,6 +303,21 @@ final class AdminPage {
 		);
 
 		// GEO settings are managed by GeoModule via AJAX.
+	}
+
+	/**
+	 * 清理心思 AI 自定义网关地址.
+	 *
+	 * @param mixed $input 输入值.
+	 * @return string 清理后的 URL（空字符串表示使用默认地址）.
+	 */
+	public function sanitize_cloud_base_url( $input ): string {
+		$raw = trim( (string) $input );
+		if ( '' === $raw ) {
+			return '';
+		}
+		$url = esc_url_raw( $raw, [ 'https', 'http' ] );
+		return '' !== $url ? untrailingslashit( $url ) : '';
 	}
 
 	/**
