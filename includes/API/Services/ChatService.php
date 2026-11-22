@@ -373,11 +373,12 @@ class ChatService extends AbstractService {
 			$api_url  = trailingslashit( $base_url ) . 'chat/completions';
 
 			$request_body = [
-				'model'       => $model,
-				'messages'    => $normalized_messages,
-				'max_tokens'  => $options['max_tokens'],
-				'temperature' => $options['temperature'],
-				'stream'      => true,
+				'model'          => $model,
+				'messages'       => $normalized_messages,
+				'max_tokens'     => $options['max_tokens'],
+				'temperature'    => $options['temperature'],
+				'stream'         => true,
+				'stream_options' => [ 'include_usage' => true ],
 			];
 
 			$stream_context_options = [
@@ -418,6 +419,14 @@ class ChatService extends AbstractService {
 					sprintf( __( '服务商 %s 无法建立流式连接', 'wpmind' ), $try_provider )
 				);
 				continue; // 建连前可回退
+			}
+
+			// 流式响应首包到达后同步心思 AI 响应头点数余额.
+			if ( \WPMind\Provider\WenpaiCloud::PROVIDER_ID === $try_provider ) {
+				$stream_meta = stream_get_meta_data( $stream );
+				if ( isset( $stream_meta['wrapper_data'] ) && is_array( $stream_meta['wrapper_data'] ) ) {
+					\WPMind\Provider\WenpaiCloud::update_balance_from_headers( $stream_meta['wrapper_data'] );
+				}
 			}
 
 			$full_content    = '';

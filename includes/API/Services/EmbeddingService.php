@@ -29,7 +29,7 @@ class EmbeddingService extends AbstractService {
 		'openai'       => 'text-embedding-3-small',
 		'zhipu'        => 'embedding-2',
 		'qwen'         => 'text-embedding-v2',
-		'wenpai_cloud' => 'text-embedding-3-small',
+		'wenpai_cloud' => 'auto',
 	];
 
 	/**

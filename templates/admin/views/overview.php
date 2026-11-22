@@ -63,6 +63,12 @@ use WPMind\Routing\IntelligentRouter;
 		$endpoints_map = ( new EndpointRepository() )->all();
 	}
 	$default_provider = (string) get_option( 'wpmind_default_provider', '' );
+	if ( '' === $default_provider && class_exists( IntelligentRouter::class ) ) {
+		$routed_primary = IntelligentRouter::instance()->route();
+		if ( is_string( $routed_primary ) && '' !== $routed_primary ) {
+			$default_provider = $routed_primary;
+		}
+	}
 	if ( '' === $default_provider && ! empty( $providers ) ) {
 		$default_provider = (string) array_key_first( $providers );
 	}
@@ -216,7 +222,7 @@ use WPMind\Routing\IntelligentRouter;
 	// 按 2026-11-16 原型：页头保持纯净，不放多余动作按钮.
 	wpmind_page_head(
 		__( '概览', 'wpmind' ),
-		__( 'AI 服务中枢一页看状态：熔断、预算、用量、缓存命中。需要处理的事会出现在顶部提示里。', 'wpmind' )
+		__( 'AI 服务中枢：一页查看熔断、预算、用量与缓存命中。需要处理的事会出现在顶部提示里。', 'wpmind' )
 	);
 	?>
 
@@ -285,7 +291,7 @@ use WPMind\Routing\IntelligentRouter;
 
 		$stat_cells = [
 			[
-				'icon'  => 'pulse',
+				'icon'  => 'trend-up',
 				'label' => __( '今日请求', 'wpmind' ),
 				'value' => number_format_i18n( (int) ( $today['requests'] ?? 0 ) ),
 				'unit'  => $today_tok_s,

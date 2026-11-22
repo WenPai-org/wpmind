@@ -662,6 +662,112 @@ final class WenpaiCloud {
 	}
 
 	/**
+	 * 主动向官方网关 GET /account 查询当前心思点数余额与连通性，不扣费并刷新本地缓存。
+	 *
+	 * @param string|null $override_token    可选临时测试令牌（不落库）.
+	 * @param string|null $override_base_url 可选临时网关地址（不落库）.
+	 * @return array{
+	 *     site_uuid: string,
+	 *     credits_balance: int,
+	 *     credits_limit_month: int,
+	 *     credits_used_month: int,
+	 *     status: string,
+	 *     latency_ms: int
+	 * }|\WP_Error
+	 */
+	public static function refresh_balance( ?string $override_token = null, ?string $override_base_url = null ) {
+		$is_override_token = null !== $override_token && '' !== trim( $override_token );
+		$token             = $is_override_token ? trim( $override_token ) : self::derive_request_token();
+		if ( '' === $token ) {
+			return new \WP_Error(
+				'wpmind_cloud_unbound',
+				__( '当前站点尚未绑定文派云或填写独立授权令牌。', 'wpmind' )
+			);
+		}
+
+		$base = null !== $override_base_url && '' !== trim( $override_base_url )
+			? rtrim( trim( $override_base_url ), '/' )
+			: self::base_url();
+
+		$start    = microtime( true );
+		$response = wp_remote_get(
+			$base . '/account',
+			[
+				'timeout' => 15,
+				'headers' => [
+					'Authorization' => 'Bearer ' . $token,
+					'Accept'        => 'application/json',
+				],
+			]
+		);
+		$latency  = (int) round( ( microtime( true ) - $start ) * 1000 );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$status_code = (int) wp_remote_retrieve_response_code( $response );
+		$body        = json_decode( (string) wp_remote_retrieve_body( $response ), true );
+
+		if ( 401 === $status_code || 403 === $status_code ) {
+			return new \WP_Error(
+				'wpmind_cloud_unauthorized',
+				__( '授权令牌无效或已过期，请重新绑定文派云。', 'wpmind' ),
+				[ 'status' => $status_code ]
+			);
+		}
+
+		if ( $status_code < 200 || $status_code >= 300 || ! is_array( $body ) ) {
+			$msg = is_array( $body )
+				? (string) ( $body['error']['message'] ?? $body['message'] ?? __( '无法读取心思点数余额，请稍后重试。', 'wpmind' ) )
+				: __( '无法读取心思点数余额，请稍后重试。', 'wpmind' );
+			return new \WP_Error(
+				'wpmind_cloud_account_failed',
+				$msg,
+				[ 'status' => $status_code ]
+			);
+		}
+
+		$balance    = isset( $body['credits_balance'] ) && is_numeric( $body['credits_balance'] )
+			? max( 0, (int) $body['credits_balance'] )
+			: 0;
+		$limit      = isset( $body['credits_limit_month'] ) && is_numeric( $body['credits_limit_month'] )
+			? max( 0, (int) $body['credits_limit_month'] )
+			: 0;
+		$used_month = isset( $body['credits_used_month'] ) && is_numeric( $body['credits_used_month'] )
+			? max( 0, (int) $body['credits_used_month'] )
+			: 0;
+		$site_uuid  = isset( $body['site_uuid'] ) && is_string( $body['site_uuid'] )
+			? trim( $body['site_uuid'] )
+			: '';
+		$status     = isset( $body['status'] ) && is_string( $body['status'] )
+			? trim( $body['status'] )
+			: 'active';
+
+		// 仅使用已保存凭证时回写缓存；表单临时试连不污染站点缓存.
+		if ( ! $is_override_token ) {
+			$stored               = get_option( self::OPTION_CREDITS, [] );
+			$stored               = is_array( $stored ) ? $stored : [];
+			$stored['remaining']  = $balance;
+			$stored['used_month'] = $used_month;
+			if ( $limit > 0 ) {
+				$stored['limit'] = $limit;
+			}
+			$stored['updated_at'] = time();
+			update_option( self::OPTION_CREDITS, $stored, false );
+		}
+
+		return [
+			'site_uuid'           => $site_uuid,
+			'credits_balance'     => $balance,
+			'credits_limit_month' => $limit,
+			'credits_used_month'  => $used_month,
+			'status'              => $status,
+			'latency_ms'          => $latency,
+		];
+	}
+
+	/**
 	 * 判断指定 Provider 是否被站点配置锁定（代理商/wp-config 锁 Key）。
 	 *
 	 * @param string $id Provider ID.
@@ -814,6 +920,16 @@ final class WenpaiCloud {
 
 		$map = [];
 		foreach ( $entries as $key => $value ) {
+			// 支持 PHP stream_get_meta_data()['wrapper_data'] 原始 HTTP 响应头行.
+			if ( is_int( $key ) && is_string( $value ) ) {
+				$colon = strpos( $value, ':' );
+				if ( false !== $colon ) {
+					$hname         = strtolower( trim( substr( $value, 0, $colon ) ) );
+					$hval          = trim( substr( $value, $colon + 1 ) );
+					$map[ $hname ] = $hval;
+				}
+				continue;
+			}
 			$lower = strtolower( (string) $key );
 			if ( is_array( $value ) ) {
 				$value = end( $value );

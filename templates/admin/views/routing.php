@@ -155,11 +155,18 @@ use WPMind\Provider\EndpointRepository;
 				<div class="field-ctl">
 					<select id="wpmind_default_provider" name="wpmind_default_provider">
 						<option value=""><?php esc_html_e( '— 自动按路由选择 —', 'wpmind' ); ?></option>
-						<?php foreach ( $endpoints as $ep_key => $ep_info ) : ?>
-							<option value="<?php echo esc_attr( (string) $ep_key ); ?>" <?php selected( $default_provider, $ep_key ); ?>><?php echo esc_html( (string) ( $ep_info['name'] ?? $ep_key ) ); ?></option>
+						<?php
+						foreach ( $endpoints as $ep_key => $ep_info ) :
+							$ep_id         = (string) $ep_key;
+							$is_configured = isset( $provider_scores[ $ep_id ] ) || ( ! empty( $ep_info['enabled'] ) && ! empty( $ep_info['api_key'] ) );
+							if ( ! $is_configured && $default_provider !== $ep_id ) {
+								continue;
+							}
+							?>
+							<option value="<?php echo esc_attr( $ep_id ); ?>" <?php selected( $default_provider, $ep_id ); ?>><?php echo esc_html( $provider_name( $ep_id ) ); ?></option>
 						<?php endforeach; ?>
 					</select>
-					<p class="wenpai-field__desc"><?php esc_html_e( '未命中策略排序时的兜底 Provider。', 'wpmind' ); ?></p>
+					<p class="wenpai-field__desc"><?php esc_html_e( '未命中策略排序时的兜底 Provider（仅列已配置服务）。', 'wpmind' ); ?></p>
 				</div>
 			</div>
 			<?php

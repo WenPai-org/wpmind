@@ -707,7 +707,8 @@ class UsageTracker {
 			$parts[] = self::format_cost( $cost_cny, 'CNY' );
 		}
 		if ( empty( $parts ) ) {
-			return '$0.00';
+			$locale = function_exists( 'get_locale' ) ? (string) get_locale() : '';
+			return 0 === strpos( $locale, 'zh_' ) ? '¥0.00' : '$0.00';
 		}
 		return implode( ' / ', $parts );
 	}

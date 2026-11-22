@@ -79,7 +79,54 @@ final class AjaxController {
 		add_action( 'wp_ajax_wpmind_export_provider_config', [ $this, 'ajax_export_provider_config' ] );
 		add_action( 'wp_ajax_wpmind_import_provider_config', [ $this, 'ajax_import_provider_config' ] );
 		add_action( 'wp_ajax_wpmind_fetch_models', [ $this, 'ajax_fetch_models' ] );
+		add_action( 'wp_ajax_wpmind_cloud_refresh', [ $this, 'ajax_cloud_refresh' ] );
 		// GEO settings are handled by GeoModule.
+	}
+
+	/**
+	 * AJAX 刷新心思点数余额并检测官方网关连通性（不扣费）。
+	 *
+	 * @since 0.14.0
+	 */
+	public function ajax_cloud_refresh(): void {
+		check_ajax_referer( 'wpmind_ajax', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+		}
+
+		$posted_token = isset( $_POST['token'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['token'] ) ) : '';
+		$posted_url   = isset( $_POST['base_url'] ) ? esc_url_raw( trim( (string) wp_unslash( $_POST['base_url'] ) ) ) : '';
+
+		$res = \WPMind\Provider\WenpaiCloud::refresh_balance(
+			'' !== $posted_token ? $posted_token : null,
+			'' !== $posted_url ? $posted_url : null
+		);
+
+		if ( is_wp_error( $res ) ) {
+			wp_send_json_error(
+				[
+					'code'    => $res->get_error_code(),
+					'message' => $res->get_error_message(),
+				]
+			);
+		}
+
+		wp_send_json_success(
+			array_merge(
+				$res,
+				[
+					'formatted_balance' => number_format_i18n( (int) $res['credits_balance'] ),
+					'formatted_used'    => number_format_i18n( (int) $res['credits_used_month'] ),
+					'message'           => sprintf(
+						/* translators: 1: balance formatted, 2: latency in ms */
+						__( '连接正常（%2$d ms），剩余 %1$s 心思点数。', 'wpmind' ),
+						number_format_i18n( (int) $res['credits_balance'] ),
+						(int) $res['latency_ms']
+					),
+				]
+			)
+		);
 	}
 
 	/**

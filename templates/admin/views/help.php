@@ -34,8 +34,8 @@ use WPMind\Admin\SuiteIntegration;
 			'icon_html'  => AdminIcons::svg( 'key' ),
 			'state'      => 'accent',
 			'title'      => __( '配置 AI 服务', 'wpmind' ),
-			'desc'       => __( '开启官方算力或填入密钥并测试连接。', 'wpmind' ),
-			'href'       => AdminPage::url( [ 'tab' => 'services' ] ),
+			'desc'       => __( '开启文派心思官方算力，或在 Provider 服务页填入自有密钥并测试连接。', 'wpmind' ),
+			'href'       => AdminPage::url( [ 'tab' => 'cloud' ] ),
 			'right_html' => AdminIcons::svg( 'arrow-right' ),
 		]
 	);
@@ -79,7 +79,7 @@ use WPMind\Admin\SuiteIntegration;
 					'icon'        => 'help',
 					'collapsible' => true,
 					'open'        => true,
-					'numbered'    => false,
+					'numbered'    => true,
 					'steps'       => [
 						[
 							'title' => __( '官方算力与自有 API Key 可以同时启用吗？', 'wpmind' ),
@@ -91,7 +91,7 @@ use WPMind\Admin\SuiteIntegration;
 						],
 						[
 							'title' => __( '如何排查某项服务熔断或连接失败？', 'wpmind' ),
-							'body'  => __( '在「AI 服务」页展开对应端点点击「测试连接」，或到「工具」页导出脱敏诊断包提交支持。', 'wpmind' ),
+							'body'  => __( '在「AI 服务 → Provider 服务」页展开对应端点点击「测试连接」，或到「工具」页导出脱敏诊断包提交支持。', 'wpmind' ),
 						],
 					],
 				],

@@ -167,6 +167,7 @@ use WPMind\Provider\WenpaiCloud;
 
 	$stat_cells = [
 		[
+			'id'    => 'balance',
 			'icon'  => 'sparkle',
 			'label' => sprintf(
 				/* translators: %s: billing unit label */
@@ -177,18 +178,21 @@ use WPMind\Provider\WenpaiCloud;
 			'unit'  => $balance_sub,
 		],
 		[
+			'id'    => 'used',
 			'icon'  => 'pulse',
 			'label' => __( '本月消耗', 'wpmind' ),
 			'value' => number_format_i18n( $used_month ),
 			'unit'  => $used_sub,
 		],
 		[
+			'id'    => 'gateway',
 			'icon'  => 'globe',
 			'label' => __( '托管网关', 'wpmind' ),
 			'value' => __( '国内直连', 'wpmind' ),
 			'unit'  => 'mind-api.wenpai.net' === $gateway_host ? 'mind-api' : $gateway_host,
 		],
 		[
+			'id'    => 'site',
 			'icon'  => 'lock',
 			'label' => __( '站点通行证', 'wpmind' ),
 			'value' => $site_val,
@@ -251,7 +255,7 @@ use WPMind\Provider\WenpaiCloud;
 				<span class="wpmind-ov__stat-ico"><?php echo AdminIcons::svg( $cell['icon'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG. ?></span>
 				<div class="wpmind-ov__stat-text">
 					<div class="wpmind-ov__stat-k"><?php echo esc_html( $cell['label'] ); ?></div>
-					<div class="wpmind-ov__stat-v"><?php echo esc_html( $cell['value'] ); ?><small><?php echo esc_html( $cell['unit'] ); ?></small></div>
+					<div class="wpmind-ov__stat-v"><span id="<?php echo esc_attr( 'wpmind-cloud-stat-' . $cell['id'] ); ?>"><?php echo esc_html( $cell['value'] ); ?></span><small id="<?php echo esc_attr( 'wpmind-cloud-stat-' . $cell['id'] . '-unit' ); ?>"><?php echo esc_html( $cell['unit'] ); ?></small></div>
 				</div>
 			</div>
 		<?php endforeach; ?>
@@ -297,6 +301,10 @@ use WPMind\Provider\WenpaiCloud;
 			<div class="field-label"><span class="wenpai-field__label"><?php esc_html_e( '混用策略', 'wpmind' ); ?></span></div>
 			<div class="field-ctl">
 				<?php
+				$mode_desc_map = [];
+				foreach ( $mode_defs as $mkey => $mdef ) {
+					$mode_desc_map[ $mkey ] = $mdef['desc'];
+				}
 				Wenpai_Admin_UI::seg_radio(
 					[
 						'name'  => 'wpmind_cloud_mode',
@@ -306,7 +314,7 @@ use WPMind\Provider\WenpaiCloud;
 					]
 				);
 				?>
-				<p class="wenpai-field__desc"><?php echo esc_html( $mode_defs[ $cloud_mode ]['desc'] ); ?></p>
+				<p class="wenpai-field__desc" id="wpmind-cloud-mode-desc" data-mode-descs="<?php echo esc_attr( (string) wp_json_encode( $mode_desc_map ) ); ?>"><?php echo esc_html( $mode_defs[ $cloud_mode ]['desc'] ); ?></p>
 			</div>
 		</div>
 
@@ -339,7 +347,7 @@ use WPMind\Provider\WenpaiCloud;
 						)
 						: __( '内网或本地站可在此手动粘贴文派云站点令牌', 'wpmind' );
 					?>
-					<input type="password" id="wpmind_cloud_token" name="wpmind_cloud_token" value="" autocomplete="new-password" placeholder="<?php echo esc_attr( $token_placeholder ); ?>" <?php disabled( $is_token_const ); ?>>
+					<input type="password" id="wpmind_cloud_token" name="wpmind_cloud_token" value="" autocomplete="one-time-code" data-lpignore="true" data-1p-ignore="true" placeholder="<?php echo esc_attr( $token_placeholder ); ?>" <?php disabled( $is_token_const ); ?>>
 					<p class="wenpai-field__desc">
 						<?php
 						if ( $is_token_const ) {
@@ -355,6 +363,16 @@ use WPMind\Provider\WenpaiCloud;
 
 		<?php
 		$cloud_actions = '<span class="wenpai-actions">';
+		if ( $cloud_bound || 'advanced' === $mode ) {
+			$cloud_actions .= Wenpai_Admin_UI::button_html(
+				[
+					'label'   => $cloud_bound ? __( '刷新点数', 'wpmind' ) : __( '测试连接', 'wpmind' ),
+					'type'    => 'button',
+					'variant' => 'secondary',
+					'class'   => 'wpmind-cloud-refresh',
+				]
+			);
+		}
 		if ( ! $cloud_bound && '' !== $bind_url ) {
 			$cloud_actions .= Wenpai_Admin_UI::button_html(
 				[
@@ -516,7 +534,7 @@ use WPMind\Provider\WenpaiCloud;
 						'icon_html'    => AdminIcons::svg( 'modules' ),
 						'state'        => $eco_count > 0 ? 'ok' : '',
 						'title'        => __( '全站文派生态插件共用点数', 'wpmind' ),
-						'desc'         => __( '文派别名、笔笙、文派合规、文派文档与文派智储共享同一额度，按插件独立记账。', 'wpmind' ),
+						'desc'         => __( '文派别名、笔笙、文派合规、文派文档与文派智储共享额度，按插件独立记账。', 'wpmind' ),
 						'control_html' => '<div class="wenpai-row wenpai-row--tight">'
 							. Wenpai_Admin_UI::pill_html(
 								[

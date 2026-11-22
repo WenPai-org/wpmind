@@ -94,6 +94,14 @@ class ImageRouter {
 			$custom_url              = $settings['custom_base_url'] ?? '';
 			$this->providers[ $key ] = new $class( $settings['api_key'], $custom_url );
 		}
+
+		// 文派心思官方算力：启用且存在有效授权令牌时自动注册为可用图像 Provider.
+		if ( class_exists( '\\WPMind\\Provider\\WenpaiCloud' )
+			&& \WPMind\Provider\WenpaiCloud::is_available()
+			&& class_exists( WenpaiCloudImageProvider::class )
+		) {
+			$this->providers[ \WPMind\Provider\WenpaiCloud::PROVIDER_ID ] = new WenpaiCloudImageProvider();
+		}
 	}
 
 	/**
@@ -102,6 +110,7 @@ class ImageRouter {
 	 * @var array<string, string>
 	 */
 	public const DISPLAY_NAMES = [
+		'wenpai_cloud'        => '文派心思官方算力',
 		'openai_gpt_image'    => 'GPT Image',
 		'google_gemini_image' => 'Gemini Image',
 		'tencent_hunyuan'     => '混元图像',
@@ -186,10 +195,28 @@ class ImageRouter {
 	 * @return string
 	 */
 	private function getDefaultProvider(): string {
-		$default = get_option( 'wpmind_default_image_provider', '' );
+		$default  = get_option( 'wpmind_default_image_provider', '' );
+		$cloud_id = class_exists( '\\WPMind\\Provider\\WenpaiCloud' )
+			? \WPMind\Provider\WenpaiCloud::PROVIDER_ID
+			: 'wenpai_cloud';
+
+		if ( isset( $this->providers[ $cloud_id ] ) && class_exists( '\\WPMind\\Provider\\WenpaiCloud' ) ) {
+			$cloud_mode = \WPMind\Provider\WenpaiCloud::routing_mode();
+			if ( \WPMind\Provider\WenpaiCloud::MODE_PRIMARY === $cloud_mode
+				|| \WPMind\Provider\WenpaiCloud::MODE_CAPABILITY === $cloud_mode
+			) {
+				return $cloud_id;
+			}
+		}
 
 		if ( ! empty( $default ) && isset( $this->providers[ $default ] ) ) {
 			return $default;
+		}
+
+		foreach ( array_keys( $this->providers ) as $pid ) {
+			if ( $pid !== $cloud_id ) {
+				return (string) $pid;
+			}
 		}
 
 		return array_key_first( $this->providers ) ?? '';

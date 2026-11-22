@@ -28,6 +28,16 @@ $wpmind_name = (string) ( $wpmind_module['name'] ?? $wpmind_module_id );
 $wpmind_desc = (string) ( $wpmind_module['description'] ?? '' );
 $wpmind_on   = ! empty( $wpmind_module['enabled'] );
 
+$wpmind_pill_text  = $wpmind_on ? __( '已开启', 'wpmind' ) : __( '未开启', 'wpmind' );
+$wpmind_pill_state = $wpmind_on ? 'ok' : 'mute';
+if ( $wpmind_on && 'api-gateway' === $wpmind_module_id && '1' !== get_option( 'wpmind_gateway_enabled', '0' ) ) {
+	$wpmind_pill_text  = __( '已加载 · 网关未启用', 'wpmind' );
+	$wpmind_pill_state = 'warn';
+} elseif ( $wpmind_on && 'exact-cache' === $wpmind_module_id && '0' === (string) get_option( 'wpmind_exact_cache_enabled', '1' ) ) {
+	$wpmind_pill_text  = __( '已加载 · 缓存未启用', 'wpmind' );
+	$wpmind_pill_state = 'warn';
+}
+
 // 二级详情页头统一放在 .wenpai-stack 外侧，保持 1120px 满宽与顶栏、页脚对齐。
 Wenpai_Admin_Shell::subpage_head(
 	[
@@ -37,8 +47,8 @@ Wenpai_Admin_Shell::subpage_head(
 		'lede'       => $wpmind_desc,
 		'aside_html' => Wenpai_Admin_UI::pill_html(
 			[
-				'text'  => $wpmind_on ? __( '已开启', 'wpmind' ) : __( '未开启', 'wpmind' ),
-				'state' => $wpmind_on ? 'ok' : 'mute',
+				'text'  => $wpmind_pill_text,
+				'state' => $wpmind_pill_state,
 			]
 		),
 	]

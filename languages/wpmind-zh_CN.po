@@ -641,7 +641,7 @@ msgstr "今日"
 #: templates/tabs/dashboard.php:119 templates/tabs/dashboard.php:139
 #: templates/tabs/dashboard.php:175
 msgid "Tokens"
-msgstr "令牌"
+msgstr "Tokens"
 
 #: modules/analytics/templates/dashboard.php:83
 #: modules/analytics/templates/dashboard.php:103

@@ -226,9 +226,19 @@ class IntelligentRouter {
 			$candidates = $this->providers;
 		}
 
+		// 手动优先级启用时，严格按手动顺序命中首个可用候选项（避免与「优先级与排名」状态冲突）.
+		$manual_priority = $this->get_manual_priority();
+		if ( ! empty( $manual_priority ) ) {
+			foreach ( $manual_priority as $pid ) {
+				if ( isset( $candidates[ $pid ] ) ) {
+					return $pid;
+				}
+			}
+		}
+
 		// 心思 AI 与自备 Key 混用策略：无显式首选且无手动优先级强制覆盖时生效.
 		$cloud_id = \WPMind\Provider\WenpaiCloud::PROVIDER_ID;
-		if ( isset( $candidates[ $cloud_id ] ) && empty( $this->get_manual_priority() ) ) {
+		if ( isset( $candidates[ $cloud_id ] ) && empty( $manual_priority ) ) {
 			$cloud_mode = \WPMind\Provider\WenpaiCloud::routing_mode();
 			$byok_only  = $candidates;
 			unset( $byok_only[ $cloud_id ] );
@@ -270,11 +280,28 @@ class IntelligentRouter {
 			return array_keys( $this->providers );
 		}
 
-		$ranked = $strategy->rank_providers( $context, $this->providers );
+		$ranked          = $strategy->rank_providers( $context, $this->providers );
+		$manual_priority = $this->get_manual_priority();
+
+		// 手动优先级启用时，故障转移链遵循手动顺序，未列出的已启用服务追加在末尾.
+		if ( ! empty( $manual_priority ) ) {
+			$ordered = [];
+			foreach ( $manual_priority as $pid ) {
+				if ( isset( $this->providers[ $pid ] ) && ! in_array( $pid, $ordered, true ) ) {
+					$ordered[] = $pid;
+				}
+			}
+			foreach ( $ranked as $pid ) {
+				if ( ! in_array( $pid, $ordered, true ) ) {
+					$ordered[] = $pid;
+				}
+			}
+			$ranked = $ordered;
+		}
 
 		// 按心思 AI 混用模式调整故障转移链位置（仅在未启用手动优先级时生效）.
 		$cloud_id = \WPMind\Provider\WenpaiCloud::PROVIDER_ID;
-		if ( in_array( $cloud_id, $ranked, true ) && empty( $this->get_manual_priority() ) ) {
+		if ( in_array( $cloud_id, $ranked, true ) && empty( $manual_priority ) ) {
 			$cloud_mode = \WPMind\Provider\WenpaiCloud::routing_mode();
 			$without    = array_values( array_diff( $ranked, [ $cloud_id ] ) );
 			if ( \WPMind\Provider\WenpaiCloud::MODE_PRIMARY === $cloud_mode ) {
@@ -374,12 +401,27 @@ class IntelligentRouter {
 	 * @return array<string> Provider ID 列表，按优先级排序
 	 */
 	public function get_manual_priority(): array {
+		$raw   = [];
 		$order = get_option( 'wpmind_failover_order', null );
 		if ( is_array( $order ) && [] !== $order ) {
-			return array_values( array_filter( $order, 'is_string' ) );
+			$raw = array_values( array_filter( $order, 'is_string' ) );
+		} else {
+			$settings = get_option( 'wpmind_routing_settings', [] );
+			if ( is_array( $settings ) && ! empty( $settings['provider_priority'] ) && is_array( $settings['provider_priority'] ) ) {
+				$raw = array_values( array_filter( $settings['provider_priority'], 'is_string' ) );
+			}
 		}
-		$settings = get_option( 'wpmind_routing_settings', [] );
-		return $settings['provider_priority'] ?? [];
+
+		if ( [] === $raw || [] === $this->providers ) {
+			return $raw;
+		}
+
+		return array_values(
+			array_filter(
+				$raw,
+				fn( string $id ): bool => isset( $this->providers[ $id ] )
+			)
+		);
 	}
 
 	/**

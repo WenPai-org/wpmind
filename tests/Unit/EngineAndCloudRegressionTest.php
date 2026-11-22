@@ -54,6 +54,13 @@ if ( ! function_exists( 'wp_remote_post' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wp_remote_get' ) ) {
+	function wp_remote_get( string $url, array $args = [] ) {
+		$args['method'] = 'GET';
+		return wp_remote_request( $url, $args );
+	}
+}
+
 if ( ! function_exists( 'wp_rand' ) ) {
 	function wp_rand( int $min = 0, int $max = 0 ): int {
 		return $min;
@@ -740,5 +747,119 @@ final class EngineAndCloudRegressionTest extends TestCase {
 		WenpaiCloud::clear_standalone_binding();
 		self::assertFalse( WenpaiCloud::has_standalone_token() );
 		self::assertSame( 'none', WenpaiCloud::get_status()['binding_source'] );
+	}
+
+	/**
+	 * 9. 刷新点数 GET /account、流式原始响应头行解析、心思 AI 生图 Provider 与手动路由优先级一致。
+	 */
+	public function test_cloud_refresh_stream_headers_image_provider_and_manual_priority(): void {
+		// 9a. 原始 HTTP 头行（stream_get_meta_data()['wrapper_data']）同步点数余额。
+		delete_option( WenpaiCloud::OPTION_CREDITS );
+		WenpaiCloud::update_balance_from_headers(
+			[
+				'HTTP/1.1 200 OK',
+				'Content-Type: text/event-stream; charset=utf-8',
+				'X-Mind-Credits-Remaining: 420',
+				'X-Mind-Credits-Limit: 5000',
+			]
+		);
+		$credits = get_option( WenpaiCloud::OPTION_CREDITS, [] );
+		self::assertSame( 420, $credits['remaining'] ?? null );
+		self::assertSame( 5000, $credits['limit'] ?? null );
+
+		// 9b. refresh_balance() 请求 GET /account 并回写缓存。
+		update_option( WenpaiCloud::OPTION_ENABLED, '1' );
+		WenpaiCloud::save_standalone_token( self::FAKE_CLOUD_TOKEN );
+		$account_url = '';
+		$GLOBALS['wpmind_test_http_handler'] = static function ( string $url ) use ( &$account_url ) {
+			$account_url = $url;
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => wp_json_encode(
+					[
+						'site_uuid'           => 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee',
+						'credits_balance'     => 1880,
+						'credits_limit_month' => 5000,
+						'credits_used_month'  => 120,
+						'status'              => 'active',
+					]
+				),
+				'headers'  => [],
+			];
+		};
+
+		$refreshed = WenpaiCloud::refresh_balance();
+		self::assertIsArray( $refreshed );
+		self::assertSame( 'https://mind-api.wenpai.net/v1/account', $account_url );
+		self::assertSame( 1880, $refreshed['credits_balance'] );
+		self::assertSame( 120, $refreshed['credits_used_month'] );
+		$after_refresh = WenpaiCloud::get_status();
+		self::assertSame( 1880, $after_refresh['credits_balance'] );
+		self::assertSame( 120, $after_refresh['credits_used_month'] );
+
+		// 9c. WenpaiCloudImageProvider 注册与图像生成并回写余额头。
+		$img_url = '';
+		$GLOBALS['wpmind_test_http_handler'] = static function ( string $url ) use ( &$img_url ) {
+			$img_url = $url;
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => wp_json_encode(
+					[
+						'data' => [
+							[ 'url' => 'https://cdn.example/mind-img-1.png' ],
+						],
+					]
+				),
+				'headers'  => [
+					'X-Mind-Credits-Remaining' => '1855',
+					'X-Mind-Credits-Limit'     => '5000',
+				],
+			];
+		};
+
+		// 重置单例以确保重新扫描启用态。
+		$ref = new \ReflectionProperty( \WPMind\Providers\Image\ImageRouter::class, 'instance' );
+		$ref->setAccessible( true );
+		$ref->setValue( null, null );
+
+		$img_router = \WPMind\Providers\Image\ImageRouter::instance();
+		$img_res    = $img_router->generate( 'a blue cat', [ 'size' => '1024x1024' ] );
+		self::assertIsArray( $img_res );
+		self::assertTrue( ! empty( $img_res['success'] ) );
+		self::assertSame( 'wenpai_cloud', $img_res['provider'] ?? '' );
+		self::assertSame( 'https://mind-api.wenpai.net/v1/images/generations', $img_url );
+		self::assertSame( 'https://cdn.example/mind-img-1.png', $img_res['url'] ?? '' );
+		self::assertSame( 1855, WenpaiCloud::get_status()['credits_balance'] );
+
+		// 9d. IntelligentRouter 手动优先级必须同时作用于 route() 与 get_failover_chain()。
+		update_option( WenpaiCloud::OPTION_ENABLED, '0' );
+		$this->seed_endpoints(
+			[
+				'qwen'  => [
+					'enabled' => true,
+					'api_key' => 'sk-qwen-test-key',
+					'models'  => [ 'qwen-plus' ],
+				],
+				'zhipu' => [
+					'enabled' => true,
+					'api_key' => 'sk-zhipu-test-key',
+					'models'  => [ 'glm-4-flash' ],
+				],
+			]
+		);
+		update_option( 'wpmind_failover_order', [ 'openai', 'qwen', 'zhipu' ] );
+		$router_ref = new \ReflectionProperty( \WPMind\Routing\IntelligentRouter::class, 'instance' );
+		$router_ref->setAccessible( true );
+		$router_ref->setValue( null, null );
+
+		$router = \WPMind\Routing\IntelligentRouter::instance();
+		self::assertSame( [ 'qwen', 'zhipu' ], $router->get_manual_priority() );
+		self::assertSame( 'qwen', $router->route() );
+		self::assertSame( [ 'qwen', 'zhipu' ], $router->get_failover_chain() );
+
+		// 反向设置手动优先级后必须立即切换首选与转移链。
+		update_option( 'wpmind_failover_order', [ 'zhipu', 'qwen' ] );
+		self::assertSame( 'zhipu', $router->route() );
+		self::assertSame( [ 'zhipu', 'qwen' ], $router->get_failover_chain() );
 	}
 }
