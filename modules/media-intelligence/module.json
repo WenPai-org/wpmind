@@ -1,7 +1,7 @@
 {
     "id": "media-intelligence",
-    "name": "Media Intelligence",
-    "description": "AI 媒体智能 - 自动生成 alt text、标题、描述，NSFW 检测",
+    "name": "媒体智能",
+    "description": "自动生成图片 Alt 文本、标题与内容安全检测",
     "version": "1.0.0",
     "author": "WPMind",
     "icon": "image",

@@ -1,7 +1,7 @@
 {
     "id": "auto-meta",
-    "name": "Auto-Meta",
-    "description": "发布时自动生成摘要、标签、分类、FAQ Schema、SEO 描述",
+    "name": "自动元数据",
+    "description": "发布时自动生成摘要、标签、分类与 SEO 描述",
     "version": "1.0.0",
     "author": "WPMind",
     "icon": "sparkle",

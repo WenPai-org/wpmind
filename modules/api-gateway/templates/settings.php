@@ -87,11 +87,11 @@ use WPMind\Modules\ApiGateway\Auth\ApiKeyRepository;
 		[
 			'items' => [
 				[
-					'label' => 'API Keys',
+					'label' => __( '密钥总数', 'wpmind' ),
 					'value' => (string) $total_keys,
 				],
 				[
-					'label' => __( '活跃 Keys', 'wpmind' ),
+					'label' => __( '活跃密钥', 'wpmind' ),
 					'value' => (string) $active_keys,
 				],
 				[
@@ -99,8 +99,8 @@ use WPMind\Modules\ApiGateway\Auth\ApiKeyRepository;
 					'value' => number_format( $month_requests ),
 				],
 				[
-					'label' => __( '默认 RPM', 'wpmind' ),
-					'value' => (string) $default_rpm,
+					'label' => __( '默认速率上限', 'wpmind' ),
+					'value' => $default_rpm . ' / 分',
 				],
 			],
 		]

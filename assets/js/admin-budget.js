@@ -31,14 +31,36 @@
 	}
 
 	/**
-	 * 格式化成本
+	 * 格式化成本（支持 USD/CNY 双币种）
 	 */
-	function formatCost( cost ) {
-		cost = cost || 0;
-		if ( cost < 0.01 ) {
-			return '$' + cost.toFixed( 4 );
+	function formatCost( cost, currency ) {
+		cost = parseFloat( cost || 0 );
+		var sym = currency === 'CNY' ? '¥' : '$';
+		if ( cost > 0 && cost < 0.01 ) {
+			return sym + cost.toFixed( 4 );
 		}
-		return '$' + cost.toFixed( 2 );
+		return sym + cost.toFixed( 2 );
+	}
+
+	function formatCostByCurrency( bucket ) {
+		bucket = bucket || {};
+		var usd = parseFloat( bucket.cost_usd || 0 );
+		var cny = parseFloat( bucket.cost_cny || 0 );
+		var parts = [];
+		if ( usd > 0 ) {
+			parts.push( formatCost( usd, 'USD' ) );
+		}
+		if ( cny > 0 ) {
+			parts.push( formatCost( cny, 'CNY' ) );
+		}
+		if ( parts.length ) {
+			return parts.join( ' / ' );
+		}
+		if ( bucket.cost && parseFloat( bucket.cost ) > 0 ) {
+			return formatCost( bucket.cost, 'USD' );
+		}
+		var isZh = ( document.documentElement.lang || '' ).toLowerCase().indexOf( 'zh' ) === 0;
+		return isZh ? '¥0.00' : '$0.00';
 	}
 
 	/**
@@ -50,15 +72,15 @@
 		var total = ( data.stats && data.stats.total ) || {};
 
 		$( '#today-tokens' ).text( formatTokens( ( today.input_tokens || 0 ) + ( today.output_tokens || 0 ) ) );
-		$( '#today-cost' ).text( formatCost( today.cost || 0 ) );
+		$( '#today-cost' ).text( formatCostByCurrency( today ) );
 		$( '#today-requests' ).text( today.requests || 0 );
 
 		$( '#month-tokens' ).text( formatTokens( ( month.input_tokens || 0 ) + ( month.output_tokens || 0 ) ) );
-		$( '#month-cost' ).text( formatCost( month.cost || 0 ) );
+		$( '#month-cost' ).text( formatCostByCurrency( month ) );
 		$( '#month-requests' ).text( month.requests || 0 );
 
 		$( '#total-tokens' ).text( formatTokens( ( total.input_tokens || 0 ) + ( total.output_tokens || 0 ) ) );
-		$( '#total-cost' ).text( formatCost( total.cost || 0 ) );
+		$( '#total-cost' ).text( formatCostByCurrency( total ) );
 		$( '#total-requests' ).text( total.requests || 0 );
 	}
 

@@ -47,7 +47,7 @@ final class AutoMetaModule implements ModuleInterface {
 	 * @return string
 	 */
 	public function get_name(): string {
-		return __( 'Auto-Meta', 'wpmind' );
+		return __( '自动元数据', 'wpmind' );
 	}
 
 	/**

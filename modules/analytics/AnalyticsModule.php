@@ -40,7 +40,7 @@ class AnalyticsModule implements ModuleInterface {
 	 * 获取模块名称
 	 */
 	public function get_name(): string {
-		return $this->config['name'] ?? 'Analytics';
+		return $this->config['name'] ?? __( '数据分析', 'wpmind' );
 	}
 
 	/**

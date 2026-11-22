@@ -49,7 +49,7 @@ class CostControlModule implements ModuleInterface {
 	 * @return string
 	 */
 	public function get_name(): string {
-		return __( 'Cost Control', 'wpmind' );
+		return __( '费用控制', 'wpmind' );
 	}
 
 	/**

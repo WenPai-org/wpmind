@@ -68,7 +68,15 @@
 			var rate = total > 0 ? ( hits / total * 100 ).toFixed( 1 ) : '0';
 			var usd = parseFloat( ( savings && ( savings.saved_usd != null ? savings.saved_usd : savings.total_usd ) ) || 0 );
 			var cny = parseFloat( ( savings && savings.saved_cny ) || 0 );
-			var savedLabel = '$' + usd.toFixed( 2 ) + ( cny > 0 ? ' / ¥' + cny.toFixed( 2 ) : '' );
+			var parts = [];
+			if ( usd > 0 ) {
+				parts.push( '$' + usd.toFixed( 2 ) );
+			}
+			if ( cny > 0 ) {
+				parts.push( '¥' + cny.toFixed( 2 ) );
+			}
+			var isZh = ( document.documentElement.lang || '' ).toLowerCase().indexOf( 'zh' ) === 0;
+			var savedLabel = parts.length ? parts.join( ' / ' ) : ( isZh ? '¥0.00' : '$0.00' );
 
 			$( '#wpmind-cache-hit-rate' ).text( rate + '%' );
 			$( '#wpmind-cache-entries' ).text( stats.entries || 0 );

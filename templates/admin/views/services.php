@@ -170,11 +170,11 @@ use WPMind\Admin\SuiteIntegration;
 	);
 	?>
 
-<div class="wenpai-stack">
+<div class="wenpai-stack" data-wenpai-mode-scope="<?php echo esc_attr( $mode ); ?>">
 	<form method="post" action="options.php" id="wpmind-settings-form">
 		<?php settings_fields( 'wpmind_settings' ); ?>
 
-		<div class="wenpai-stack">
+		<div class="wenpai-stack" data-wenpai-mode-scope="<?php echo esc_attr( $mode ); ?>">
 			<?php
 			// ---- 文本服务 Provider 卡（渐进式披露：已配置置顶，未配置默认折叠收纳） ----
 			$byok_endpoints = array_filter(
@@ -359,7 +359,7 @@ use WPMind\Admin\SuiteIntegration;
 								</div>
 							<?php else : ?>
 								<div class="wpmind-key">
-									<input type="password" id="api_key_<?php echo esc_attr( $key ); ?>" name="wpmind_custom_endpoints[<?php echo esc_attr( $key ); ?>][api_key]" value="" autocomplete="new-password" placeholder="<?php echo $has_api_key ? '••••••••••••••••' : esc_attr__( '请输入 API Key', 'wpmind' ); ?>">
+									<input type="password" id="api_key_<?php echo esc_attr( $key ); ?>" name="wpmind_custom_endpoints[<?php echo esc_attr( $key ); ?>][api_key]" value="" autocomplete="one-time-code" data-lpignore="true" data-1p-ignore="true" placeholder="<?php echo $has_api_key ? '••••••••••••••••' : esc_attr__( '请输入 API Key', 'wpmind' ); ?>">
 									<button type="button" class="btn btn-sm btn-ghost wpmind-toggle-key" data-target="api_key_<?php echo esc_attr( $key ); ?>" aria-label="<?php esc_attr_e( '切换密码显示', 'wpmind' ); ?>">
 										<span class="wpmind-key__eye-on"><?php echo AdminIcons::svg( 'eye' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 										<span class="wpmind-key__eye-off" hidden><?php echo AdminIcons::svg( 'eye-off' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
@@ -392,9 +392,9 @@ use WPMind\Admin\SuiteIntegration;
 								<?php endif; ?>
 								<div class="wenpai-actions">
 									<button type="button" class="btn btn-sm btn-secondary wpmind-test-connection" data-provider="<?php echo esc_attr( $key ); ?>" <?php echo $enabled ? '' : 'disabled'; ?>><?php esc_html_e( '测试连接', 'wpmind' ); ?></button>
-									<button type="button" class="btn btn-sm btn-ghost wpmind-rotate-key" data-provider="<?php echo esc_attr( $key ); ?>"><?php esc_html_e( '验证并替换', 'wpmind' ); ?></button>
-									<button type="button" class="btn btn-sm btn-ghost wpmind-reset-breaker" data-provider="<?php echo esc_attr( $key ); ?>"><?php esc_html_e( '重置状态', 'wpmind' ); ?></button>
-									<span class="chk"><label><input type="checkbox" class="wpmind-deep-test" value="1"> <?php esc_html_e( '深度测试', 'wpmind' ); ?></label></span>
+									<button type="button" class="btn btn-sm btn-ghost wpmind-rotate-key" data-provider="<?php echo esc_attr( $key ); ?>"<?php echo Wenpai_Admin_UI::mode_attrs( 'advanced' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php esc_html_e( '验证并替换', 'wpmind' ); ?></button>
+									<button type="button" class="btn btn-sm btn-ghost wpmind-reset-breaker" data-provider="<?php echo esc_attr( $key ); ?>"<?php echo Wenpai_Admin_UI::mode_attrs( 'advanced' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?php esc_html_e( '重置状态', 'wpmind' ); ?></button>
+									<span class="chk"<?php echo Wenpai_Admin_UI::mode_attrs( 'advanced' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><label><input type="checkbox" class="wpmind-deep-test" value="1"> <?php esc_html_e( '深度测试', 'wpmind' ); ?></label></span>
 									<span class="wpmind-key__result" aria-live="polite"></span>
 								</div>
 							<?php endif; ?>
@@ -418,7 +418,7 @@ use WPMind\Admin\SuiteIntegration;
 						</div>
 					<?php endif; ?>
 
-					<div class="wenpai-field wenpai-field--row field">
+					<div class="wenpai-field wenpai-field--row field"<?php echo Wenpai_Admin_UI::mode_attrs( 'advanced' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 						<div class="field-label"><label class="wenpai-field__label" for="models_<?php echo esc_attr( $key ); ?>"><?php esc_html_e( '支持的模型', 'wpmind' ); ?></label></div>
 						<div class="field-ctl">
 							<input type="text" id="models_<?php echo esc_attr( $key ); ?>" name="wpmind_custom_endpoints[<?php echo esc_attr( $key ); ?>][models]" value="<?php echo esc_attr( implode( ', ', (array) $endpoint['models'] ) ); ?>" placeholder="<?php esc_attr_e( '留空使用目录推荐模型', 'wpmind' ); ?>">
@@ -426,7 +426,7 @@ use WPMind\Admin\SuiteIntegration;
 						</div>
 					</div>
 
-					<div class="wenpai-field wenpai-field--row field">
+					<div class="wenpai-field wenpai-field--row field"<?php echo Wenpai_Admin_UI::mode_attrs( 'advanced' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 						<div class="field-label"><label class="wenpai-field__label" for="default_model_<?php echo esc_attr( $key ); ?>"><?php esc_html_e( '默认模型', 'wpmind' ); ?></label></div>
 						<div class="field-ctl">
 							<input type="text" id="default_model_<?php echo esc_attr( $key ); ?>" name="wpmind_custom_endpoints[<?php echo esc_attr( $key ); ?>][default_model]" value="<?php echo esc_attr( (string) ( $endpoint['default_model'] ?? '' ) ); ?>" placeholder="auto">
@@ -568,7 +568,7 @@ use WPMind\Admin\SuiteIntegration;
 				<div class="field-label"><label class="wenpai-field__label" for="image_api_key_<?php echo esc_attr( $key ); ?>"><?php esc_html_e( 'API Key', 'wpmind' ); ?></label></div>
 				<div class="field-ctl">
 					<div class="wpmind-key">
-						<input type="password" id="image_api_key_<?php echo esc_attr( $key ); ?>" name="wpmind_image_endpoints[<?php echo esc_attr( $key ); ?>][api_key]" value="" autocomplete="new-password" placeholder="<?php echo $has_api_key ? '••••••••••••••••' : esc_attr__( '请输入 API Key', 'wpmind' ); ?>">
+						<input type="password" id="image_api_key_<?php echo esc_attr( $key ); ?>" name="wpmind_image_endpoints[<?php echo esc_attr( $key ); ?>][api_key]" value="" autocomplete="one-time-code" data-lpignore="true" data-1p-ignore="true" placeholder="<?php echo $has_api_key ? '••••••••••••••••' : esc_attr__( '请输入 API Key', 'wpmind' ); ?>">
 						<button type="button" class="btn btn-sm btn-ghost wpmind-toggle-key" data-target="image_api_key_<?php echo esc_attr( $key ); ?>" aria-label="<?php esc_attr_e( '切换密码显示', 'wpmind' ); ?>">
 							<span class="wpmind-key__eye-on"><?php echo AdminIcons::svg( 'eye' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 							<span class="wpmind-key__eye-off" hidden><?php echo AdminIcons::svg( 'eye-off' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
@@ -585,7 +585,7 @@ use WPMind\Admin\SuiteIntegration;
 				</div>
 			</div>
 
-			<div class="wenpai-field wenpai-field--row field">
+			<div class="wenpai-field wenpai-field--row field"<?php echo Wenpai_Admin_UI::mode_attrs( 'advanced' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 				<div class="field-label"><span class="wenpai-field__label"><?php esc_html_e( '支持模型', 'wpmind' ); ?></span></div>
 				<div class="field-ctl">
 					<div class="wenpai-row wenpai-row--tight">
@@ -625,6 +625,15 @@ use WPMind\Admin\SuiteIntegration;
 		<?php settings_fields( 'wpmind_image_settings' ); ?>
 
 		<?php
+		$cloud_image_ready = class_exists( '\WPMind\Provider\WenpaiCloud' ) && \WPMind\Provider\WenpaiCloud::is_available();
+		$default_img_label = __( '未设置', 'wpmind' );
+		if ( 'wenpai_cloud' === $default_image_provider ) {
+			$default_img_label = __( '文派心思官方算力', 'wpmind' );
+		} elseif ( '' !== $default_image_provider && isset( $available_image_providers[ $default_image_provider ] ) ) {
+			$default_img_label = (string) $available_image_providers[ $default_image_provider ]['name'];
+		} elseif ( $cloud_image_ready ) {
+			$default_img_label = __( '文派心思官方算力（自动）', 'wpmind' );
+		}
 		Wenpai_Admin_UI::card_open(
 			[
 				'title'             => __( '图像服务', 'wpmind' ),
@@ -633,9 +642,7 @@ use WPMind\Admin\SuiteIntegration;
 					__( '已配置 %1$d / %2$d 个图像端点 · 默认：%3$s', 'wpmind' ),
 					count( $configured_image_items ),
 					count( $available_image_providers ),
-					'' !== $default_image_provider && isset( $available_image_providers[ $default_image_provider ] )
-						? (string) $available_image_providers[ $default_image_provider ]['name']
-						: __( '未设置', 'wpmind' )
+					$default_img_label
 				),
 				'tile'              => false,
 				'head_actions_html' => Wenpai_Admin_UI::pill_html(
@@ -647,12 +654,22 @@ use WPMind\Admin\SuiteIntegration;
 			]
 		);
 		?>
-		<div class="wenpai-field wenpai-field--row field"<?php echo empty( $configured_image_items ) ? Wenpai_Admin_UI::mode_attrs( 'advanced' ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<div class="wenpai-field wenpai-field--row field"<?php echo ( empty( $configured_image_items ) && ! $cloud_image_ready ) ? Wenpai_Admin_UI::mode_attrs( 'advanced' ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<div class="field-label"><label class="wenpai-field__label" for="wpmind_default_image_provider"><?php esc_html_e( '默认图像服务', 'wpmind' ); ?></label></div>
 			<div class="field-ctl">
 				<select id="wpmind_default_image_provider" name="wpmind_default_image_provider">
-					<option value=""><?php esc_html_e( '— 选择默认图像服务 —', 'wpmind' ); ?></option>
-					<?php foreach ( $available_image_providers as $key => $provider ) : ?>
+					<option value=""><?php esc_html_e( '— 自动按路由选择 —', 'wpmind' ); ?></option>
+					<?php if ( $cloud_image_ready || 'wenpai_cloud' === $default_image_provider ) : ?>
+						<option value="wenpai_cloud" <?php selected( $default_image_provider, 'wenpai_cloud' ); ?>><?php esc_html_e( '文派心思官方算力', 'wpmind' ); ?></option>
+					<?php endif; ?>
+					<?php
+					foreach ( $available_image_providers as $key => $provider ) :
+						$saved_img = isset( $image_endpoints[ $key ] ) && is_array( $image_endpoints[ $key ] ) ? $image_endpoints[ $key ] : [];
+						$img_ready = ! empty( $saved_img['enabled'] ) && ! empty( $saved_img['api_key'] );
+						if ( ! $img_ready && $default_image_provider !== $key ) {
+							continue;
+						}
+						?>
 						<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $default_image_provider, $key ); ?>><?php echo esc_html( (string) $provider['name'] ); ?></option>
 					<?php endforeach; ?>
 				</select>

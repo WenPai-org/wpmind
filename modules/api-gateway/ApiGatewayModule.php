@@ -73,7 +73,7 @@ class ApiGatewayModule implements ModuleInterface {
 	 * @return string
 	 */
 	public function get_name(): string {
-		return __( 'API Gateway', 'wpmind' );
+		return __( 'API 网关', 'wpmind' );
 	}
 
 	/**

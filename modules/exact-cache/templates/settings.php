@@ -23,10 +23,9 @@ defined( 'ABSPATH' ) || exit;
 	$savings     = \WPMind\Modules\ExactCache\CostEstimator::get_estimated_savings();
 	$saved_usd   = (float) $savings['saved_usd'];
 	$saved_cny   = (float) $savings['saved_cny'];
-	$saved_label = '$' . number_format( $saved_usd, 2 );
-	if ( $saved_cny > 0 ) {
-		$saved_label .= ' / ¥' . number_format( $saved_cny, 2 );
-	}
+	$saved_label = class_exists( \WPMind\Modules\CostControl\UsageTracker::class )
+		? \WPMind\Modules\CostControl\UsageTracker::format_cost_by_currency( $saved_usd, $saved_cny )
+		: '¥0.00';
 
 	Wenpai_Admin_UI::card_open();
 	Wenpai_Admin_UI::statbar(

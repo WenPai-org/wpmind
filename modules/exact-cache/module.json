@@ -1,7 +1,7 @@
 {
     "id": "exact-cache",
-    "name": "Exact Cache",
-    "description": "AI 请求精确缓存 - 降低 API 成本、加速重复请求",
+    "name": "精确缓存",
+    "description": "AI 请求精确匹配缓存，降低成本并加速重复调用",
     "version": "1.0.0",
     "author": "WPMind",
     "icon": "database",
