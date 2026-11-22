@@ -941,4 +941,61 @@ final class EngineAndCloudRegressionTest extends TestCase {
 		self::assertSame( 3, $stats['providers']['wenpai_cloud']['total_credits'] ?? 0 );
 		self::assertSame( 3, $stats['total']['credits'] ?? 0 );
 	}
+
+	/**
+	 * 11. TextProcessingService 在上游返回空内容时返回 WP_Error 且绝不缓存空串.
+	 */
+	public function test_text_processing_empty_response_returns_error_and_never_caches(): void {
+		$this->seed_endpoints(
+			[
+				'openai' => [
+					'enabled' => true,
+					'api_key' => 'sk-openai-empty-test',
+					'models'  => [ 'gpt-4o-mini' ],
+				],
+			]
+		);
+
+		$calls = 0;
+		$GLOBALS['wpmind_test_http_handler'] = static function () use ( &$calls ) {
+			++$calls;
+			return [
+				'response' => [ 'code' => 200 ],
+				'body'     => wp_json_encode(
+					[
+						'model'   => 'gpt-4o-mini',
+						'choices' => [
+							[
+								'finish_reason' => 'length',
+								'message'       => [
+									'role'    => 'assistant',
+									'content' => '',
+								],
+							],
+						],
+						'usage'   => [
+							'prompt_tokens'     => 10,
+							'completion_tokens' => 100,
+							'total_tokens'      => 110,
+						],
+					]
+				),
+				'headers'  => [],
+			];
+		};
+
+		$chat_svc = new ChatService();
+		$svc      = new \WPMind\API\Services\TextProcessingService(
+			$chat_svc,
+			new \WPMind\API\Services\StructuredOutputService( $chat_svc )
+		);
+		$res1 = $svc->translate( '测试空返回不缓存', 'zh', 'en', [ 'format' => 'slug', 'cache_ttl' => 86400 ] );
+		self::assertInstanceOf( \WP_Error::class, $res1 );
+		self::assertSame( 'wpmind_empty_response', $res1->get_error_code() );
+
+		// 二次调用必须仍命中上游，证明空串未被写入缓存.
+		$res2 = $svc->translate( '测试空返回不缓存', 'zh', 'en', [ 'format' => 'slug', 'cache_ttl' => 86400 ] );
+		self::assertInstanceOf( \WP_Error::class, $res2 );
+		self::assertSame( 2, $calls );
+	}
 }

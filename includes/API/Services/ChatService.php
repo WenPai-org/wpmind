@@ -264,7 +264,9 @@ class ChatService extends AbstractService {
 		$usage = $result['usage'] ?? [];
 		do_action( 'wpmind_after_request', 'chat', $result, $args, $usage );
 
-		if ( ! is_wp_error( $result ) ) {
+		$has_cacheable_payload = ! is_wp_error( $result ) && is_array( $result )
+			&& ( '' !== trim( (string) ( $result['content'] ?? '' ) ) || ! empty( $result['tool_calls'] ) );
+		if ( $has_cacheable_payload ) {
 			$this->set_cached_value(
 				$cache_key,
 				$result,

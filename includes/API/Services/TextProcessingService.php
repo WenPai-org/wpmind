@@ -56,7 +56,7 @@ class TextProcessingService extends AbstractService {
 		$args = apply_filters( 'wpmind_translate_args', $args, $context );
 
 		$cache_provider = 'auto' === $options['provider']
-			? (string) get_option( 'wpmind_default_provider', 'openai' )
+			? $this->resolve_provider( 'auto', $context )
 			: (string) $options['provider'];
 		$cache_model    = 'auto' === $options['model']
 			? $this->get_current_model( $cache_provider )
@@ -93,13 +93,31 @@ class TextProcessingService extends AbstractService {
 			return $result;
 		}
 
-		$translated = trim( $result['content'] );
+		$translated = trim( (string) ( $result['content'] ?? '' ) );
+
+		if ( '' === $translated ) {
+			$empty_err = new \WP_Error(
+				'wpmind_empty_response',
+				__( 'AI 服务返回了空内容，请检查模型配置或适当提高 max_tokens。', 'wpmind' )
+			);
+			do_action( 'wpmind_error', $empty_err, 'translate', $args );
+			return $empty_err;
+		}
 
 		if ( $options['format'] === 'slug' ) {
 			$translated = sanitize_title_with_dashes( $translated, '', 'save' );
 		}
 
 		$translated = apply_filters( 'wpmind_translate_response', $translated, $text, $from, $to );
+
+		if ( '' === trim( (string) $translated ) ) {
+			$empty_err = new \WP_Error(
+				'wpmind_empty_response',
+				__( 'AI 翻译结果为空，未写入缓存。', 'wpmind' )
+			);
+			do_action( 'wpmind_error', $empty_err, 'translate', $args );
+			return $empty_err;
+		}
 
 		do_action( 'wpmind_after_request', 'translate', $translated, $args, $result['usage'] ?? [] );
 
@@ -141,7 +159,7 @@ class TextProcessingService extends AbstractService {
 		$context = (string) $options['context'];
 
 		$cache_provider = 'auto' === $options['provider']
-			? (string) get_option( 'wpmind_default_provider', 'openai' )
+			? $this->resolve_provider( 'auto', $context )
 			: (string) $options['provider'];
 		$cache_model    = 'auto' === $options['model']
 			? $this->get_current_model( $cache_provider )
@@ -189,7 +207,16 @@ class TextProcessingService extends AbstractService {
 			return $result;
 		}
 
-		$summary = trim( $result['content'] );
+		$summary = trim( (string) ( $result['content'] ?? '' ) );
+
+		if ( '' === $summary ) {
+			$empty_err = new \WP_Error(
+				'wpmind_empty_response',
+				__( 'AI 摘要返回了空内容，未写入缓存。', 'wpmind' )
+			);
+			do_action( 'wpmind_error', $empty_err, 'summarize', compact( 'text', 'options' ) );
+			return $empty_err;
+		}
 
 		do_action( 'wpmind_after_request', 'summarize', $summary, compact( 'text', 'options' ), $result['usage'] );
 
@@ -230,7 +257,7 @@ class TextProcessingService extends AbstractService {
 		$context = (string) $options['context'];
 
 		$cache_provider = 'auto' === $options['provider']
-			? (string) get_option( 'wpmind_default_provider', 'openai' )
+			? $this->resolve_provider( 'auto', $context )
 			: (string) $options['provider'];
 		$cache_model    = 'auto' === $options['model']
 			? $this->get_current_model( $cache_provider )
