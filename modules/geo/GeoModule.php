@@ -70,7 +70,7 @@ class GeoModule implements ModuleInterface {
 	 * @return string
 	 */
 	public function get_description(): string {
-		return __( 'AI 搜索引擎优化 - Markdown Feeds, llms.txt, Schema.org', 'wpmind' );
+		return __( 'AI 搜索引擎优化：Markdown、llms.txt 与结构化数据', 'wpmind' );
 	}
 
 	/**

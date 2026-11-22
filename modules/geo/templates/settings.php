@@ -112,7 +112,12 @@ use WPMind\Admin\SuiteIntegration;
 				'title' => $line,
 			];
 		}
-		Wenpai_Admin_UI::tag_feed( [ 'items' => $feed_items ] );
+		Wenpai_Admin_UI::tag_feed(
+			[
+				'class' => 'wpmind-info-feed',
+				'items' => $feed_items,
+			]
+		);
 		if ( '' !== $more_url ) {
 			Wenpai_Admin_UI::card_foot(
 				[

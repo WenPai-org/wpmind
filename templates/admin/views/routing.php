@@ -40,7 +40,7 @@ use WPMind\Provider\EndpointRepository;
 		if ( '' !== $safe && '' !== $plugin_url && file_exists( $plugin_dir . 'assets/images/providers/' . $safe . '.svg' ) ) {
 			return '<img class="wpmind-logo" src="' . esc_url( $plugin_url . 'assets/images/providers/' . $safe . '.svg' ) . '" alt="" width="14" height="14">';
 		}
-		return AdminIcons::svg( 'wenpai_cloud' === $pid ? 'cloud' : 'robot' );
+		return AdminIcons::svg( 'wenpai_cloud' === $pid ? 'cloud' : 'robot', 'wpmind-logo' );
 	};
 
 	$provider_name = static function ( string $pid ) use ( $provider_scores ): string {
@@ -322,7 +322,12 @@ use WPMind\Provider\EndpointRepository;
 		);
 
 	if ( ! empty( $provider_scores ) ) {
-		$display_order  = $has_manual ? $manual_priority : array_keys( $provider_scores );
+		$display_order = ! empty( $failover_chain ) ? $failover_chain : array_keys( $provider_scores );
+		foreach ( array_keys( $provider_scores ) as $score_pid ) {
+			if ( ! in_array( $score_pid, $display_order, true ) ) {
+				$display_order[] = $score_pid;
+			}
+		}
 		$sortable_items = [];
 		foreach ( $display_order as $provider_id ) {
 			$pid        = (string) $provider_id;

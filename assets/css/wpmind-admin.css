@@ -26,6 +26,17 @@
 	margin-inline-end: var(--wenpai-space-1-5);
 }
 
+/* ---- 侧边信息列表允许多行折行，避免窄栏截断 ---- */
+.wpmind-info-feed li {
+	align-items: flex-start;
+}
+
+.wpmind-info-feed .wenpai-tag-feed__text > span {
+	white-space: normal;
+	overflow: visible;
+	text-overflow: clip;
+}
+
 /* ---- 紧凑数字/短选择控件 ---- */
 .wenpai-app .wpmind-num {
 	max-width: 10rem;

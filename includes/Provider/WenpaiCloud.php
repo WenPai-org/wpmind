@@ -648,12 +648,18 @@ final class WenpaiCloud {
 		$stored = get_option( self::OPTION_CREDITS, [] );
 		$stored = is_array( $stored ) ? $stored : [];
 
+		$charged_val = self::extract_charged_credits( $headers );
+
 		if ( null !== $remaining_val ) {
 			$stored['remaining'] = $remaining_val;
 		}
 
 		if ( null !== $limit_val ) {
 			$stored['limit'] = $limit_val;
+		}
+
+		if ( $charged_val > 0 ) {
+			$stored['used_month'] = (int) ( $stored['used_month'] ?? 0 ) + $charged_val;
 		}
 
 		$stored['updated_at'] = time();
