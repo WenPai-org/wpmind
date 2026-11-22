@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace WPMind\Admin;
 
 use WPMind\Provider\EndpointRepository;
+use WPMind\Provider\Catalog\RemoteModelLister;
 use WPMind\Provider\Secrets;
 use WPMind\Provider\Health\HealthChecker;
 use WPMind\Provider\KeyRotation;
@@ -77,6 +78,7 @@ final class AjaxController {
 		add_action( 'wp_ajax_wpmind_export_diagnostics', [ $this, 'ajax_export_diagnostics' ] );
 		add_action( 'wp_ajax_wpmind_export_provider_config', [ $this, 'ajax_export_provider_config' ] );
 		add_action( 'wp_ajax_wpmind_import_provider_config', [ $this, 'ajax_import_provider_config' ] );
+		add_action( 'wp_ajax_wpmind_fetch_models', [ $this, 'ajax_fetch_models' ] );
 		// GEO settings are handled by GeoModule.
 	}
 
@@ -176,6 +178,77 @@ final class AjaxController {
 				'message'     => $result['message'],
 				'error_class' => $result['error_class'],
 				'latency'     => $result['latency_ms'],
+			]
+		);
+	}
+
+	/**
+	 * AJAX：拉取端点远程模型列表（服务页「拉取远程模型」按钮）.
+	 *
+	 * 地址和 key 的解析复用 connection_test_target 的 B13 规则：已保存 key 只能
+	 * 配已保存地址；表单里未保存的新地址需要同时提交新 key。命中 transient
+	 * 缓存时直接返回，不重复请求上游。
+	 *
+	 * @since 0.14.0
+	 */
+	public function ajax_fetch_models(): void {
+		check_ajax_referer( 'wpmind_ajax', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( '权限不足', 'wpmind' ) ] );
+		}
+
+		$provider   = sanitize_text_field( wp_unslash( $_POST['provider'] ?? '' ) );
+		$posted_key = sanitize_text_field( wp_unslash( $_POST['api_key'] ?? '' ) );
+		$posted_url = trim( (string) wp_unslash( $_POST['custom_url'] ?? '' ) );
+
+		if ( '' === $provider ) {
+			wp_send_json_error( [ 'message' => __( '缺少服务标识', 'wpmind' ) ] );
+		}
+
+		$repo   = new EndpointRepository();
+		$target = $repo->connection_test_target( $provider, $posted_key, $posted_url );
+		if ( is_wp_error( $target ) ) {
+			wp_send_json_error( [ 'message' => $target->get_error_message() ] );
+		}
+
+		$same_url = untrailingslashit( $target['base_url'] ) === untrailingslashit( $repo->resolved_base_url( $provider ) );
+
+		$lister = new RemoteModelLister();
+		$ids    = $same_url ? $lister->ids_if_valid( $provider, $target['api_key'] ) : [];
+		$cached = [] !== $ids;
+		if ( ! $cached ) {
+			$result = $lister->refresh(
+				$provider,
+				$target['api_key'],
+				$same_url ? null : $target['base_url'],
+				$same_url
+			);
+			if ( empty( $result['ok'] ) ) {
+				wp_send_json_error(
+					[
+						'message' => sprintf(
+							/* translators: %s: upstream error code */
+							__( '拉取失败（%s），请检查 Key 和 Base URL', 'wpmind' ),
+							(string) ( $result['error'] ?? 'unknown' )
+						),
+					]
+				);
+			}
+			$ids = $result['ids'];
+		}
+
+		$chat = $lister->chat_candidates( $ids, $provider );
+		if ( [] === $chat ) {
+			wp_send_json_error( [ 'message' => __( '未获取到可用的 chat 模型', 'wpmind' ) ] );
+		}
+
+		wp_send_json_success(
+			[
+				'ids'        => $chat,
+				'total'      => count( $ids ),
+				'filtered'   => count( $ids ) - count( $chat ),
+				'from_cache' => $cached,
 			]
 		);
 	}
@@ -563,8 +636,11 @@ final class AjaxController {
 			'openai_gpt_image'    => 'https://api.openai.com/v1/models',
 			'google_gemini_image' => 'https://generativelanguage.googleapis.com/v1beta/models',
 			'tencent_hunyuan'     => 'https://hunyuan.tencentcloudapi.com/',
+			'bytedance_reve'      => 'https://api.reve.com/v1/models',
+			'bytedance_seedream'  => 'https://ark.cn-beijing.volces.com/api/v3/models',
 			'bytedance_doubao'    => 'https://ark.cn-beijing.volces.com/api/v3/models',
 			'flux'                => 'https://fal.run/fal-ai/flux/dev',
+			'midjourney'          => 'https://api.midjourney.com/v1/models',
 			'qwen_image'          => 'https://dashscope.aliyuncs.com/api/v1/models',
 		];
 

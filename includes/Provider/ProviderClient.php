@@ -48,7 +48,7 @@ final class ProviderClient {
 
 		$api_key = isset( $args['api_key'] ) && is_string( $args['api_key'] )
 			? $args['api_key']
-			: (string) $repo->get( $provider )->api_key;
+			: $repo->get_api_key( $provider );
 
 		if ( '' === $api_key && empty( $args['allow_empty_key'] ) ) {
 			$err = new WP_Error(
@@ -127,6 +127,9 @@ final class ProviderClient {
 		$raw     = (string) wp_remote_retrieve_body( $response );
 		$headers = array();
 		$raw_h   = wp_remote_retrieve_headers( $response );
+		if ( WenpaiCloud::PROVIDER_ID === $provider ) {
+			WenpaiCloud::update_balance_from_headers( $raw_h );
+		}
 		if ( is_array( $raw_h ) ) {
 			$headers = $raw_h;
 		} elseif ( is_object( $raw_h ) ) {
@@ -136,7 +139,7 @@ final class ProviderClient {
 
 		if ( $status < 200 || $status >= 300 ) {
 			$error_classified = ErrorClassifier::classify( $response, $status, $raw, $headers );
-			$wp_error   = new WP_Error(
+			$wp_error         = new WP_Error(
 				'wpmind_api_error',
 				/* translators: 1: HTTP status 2: error message */
 				sprintf( __( 'API 错误 (%1$d): %2$s', 'wpmind' ), $status, $error_classified['message'] ),
@@ -147,7 +150,7 @@ final class ProviderClient {
 					'retry_after' => $error_classified['retry_after'],
 				)
 			);
-			$this->record( $provider, false, $latency, $error_classified['class'], $error_classified['retry_after'] );
+			$this->record( $provider, false, $latency, $error_classified['class'], $error_classified['retry_after'], $skip_record, $status );
 			return array(
 				'ok'          => false,
 				'status'      => $status,
@@ -163,11 +166,17 @@ final class ProviderClient {
 		}
 
 		$data = json_decode( $raw, true );
-		$this->record( $provider, true, $latency, null, 0, $skip_record );
+		$this->record( $provider, true, $latency, null, 0, $skip_record, $status );
 
 		$record_usage = ! isset( $args['record_usage'] ) || (bool) $args['record_usage'];
 		if ( $record_usage && is_array( $data ) ) {
-			$this->fire_usage( $provider, $data, (string) ( $args['model'] ?? '' ), $latency );
+			$this->fire_usage(
+				$provider,
+				$data,
+				(string) ( $args['model'] ?? '' ),
+				$latency,
+				(string) ( $args['context'] ?? '' )
+			);
 		}
 
 		return array(
@@ -211,8 +220,9 @@ final class ProviderClient {
 	 * @param ErrorClass|null $error_class Classified error or null.
 	 * @param int             $retry_after Retry-After seconds.
 	 * @param bool            $skip        When true, do not touch FailoverManager.
+	 * @param int             $status      HTTP status code (0 for transport errors).
 	 */
-	private function record( string $provider, bool $success, int $latency, ?ErrorClass $error_class, int $retry_after, bool $skip = false ): void {
+	private function record( string $provider, bool $success, int $latency, ?ErrorClass $error_class, int $retry_after, bool $skip = false, int $status = 0 ): void {
 		if ( $skip ) {
 			return;
 		}
@@ -225,7 +235,7 @@ final class ProviderClient {
 				array(
 					'provider' => $provider,
 					'class'    => $error_class->value,
-					'status'   => 0,
+					'status'   => $status,
 					'message'  => $entry['message'],
 					'at'       => time(),
 				)
@@ -234,9 +244,15 @@ final class ProviderClient {
 	}
 
 	/**
-	 * @param array<string, mixed> $data Response JSON.
+	 * Fire unified 7-argument usage record action.
+	 *
+	 * @param string               $provider   Provider id.
+	 * @param array<string, mixed> $data       Response JSON.
+	 * @param string               $model_hint Fallback model name.
+	 * @param int                  $latency    Latency in ms.
+	 * @param string               $context    Request context.
 	 */
-	private function fire_usage( string $provider, array $data, string $model_hint, int $latency ): void {
+	private function fire_usage( string $provider, array $data, string $model_hint, int $latency, string $context = '' ): void {
 		$usage = $data['usage'] ?? null;
 		if ( ! is_array( $usage ) ) {
 			return;
@@ -252,6 +268,15 @@ final class ProviderClient {
 		if ( '' === $model ) {
 			$model = 'unknown';
 		}
-		do_action( 'wpmind_usage_record', $provider, $model, $input, $output, $latency );
+		do_action(
+			'wpmind_usage_record',
+			$provider,
+			$model,
+			$input,
+			$output,
+			$latency,
+			$context,
+			WenpaiCloud::payer_for( $provider )
+		);
 	}
 }

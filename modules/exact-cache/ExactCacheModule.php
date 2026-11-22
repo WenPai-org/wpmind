@@ -84,8 +84,6 @@ final class ExactCacheModule implements ModuleInterface {
 	 * Initialize the module.
 	 */
 	public function init(): void {
-		// 1. Register settings tab (vestigial filter, actual tab rendered statically by settings-page.php).
-		add_filter( 'wpmind_settings_tabs', [ $this, 'register_settings_tab' ] );
 
 		// 2. Hook scope_mode option into ExactCache core filter.
 		// When module is disabled this filter won't fire, core falls back to default 'role'.
@@ -110,36 +108,17 @@ final class ExactCacheModule implements ModuleInterface {
 	}
 
 	/**
-	 * Register settings tab.
-	 *
-	 * @param array $tabs Existing tabs.
-	 * @return array Modified tabs.
-	 */
-	public function register_settings_tab( array $tabs ): array {
-		$tabs['exact-cache'] = [
-			'title'    => __( '精确缓存', 'wpmind' ),
-			'icon'     => 'ri-database-2-line',
-			'template' => __DIR__ . '/templates/settings.php',
-			'priority' => 20,
-		];
-		return $tabs;
-	}
-
-	/**
 	 * Enqueue admin assets for the Exact Cache tab.
 	 *
 	 * @param string $hook_suffix Current page hook suffix.
 	 */
 	public function enqueue_admin_assets( string $hook_suffix ): void {
-		if ( 'toplevel_page_wpmind' !== $hook_suffix ) {
+		if ( ! $this->is_wpmind_admin_page( $hook_suffix ) ) {
 			return;
 		}
-		wp_enqueue_style(
-			'wpmind-exact-cache',
-			WPMIND_PLUGIN_URL . 'assets/css/pages/exact-cache.css',
-			[ 'wpmind-admin' ],
-			WPMIND_VERSION
-		);
+		if ( 'module' !== \WPMind\Admin\AdminPage::current_view() || 'exact-cache' !== \WPMind\Admin\AdminPage::current_module() ) {
+			return;
+		}
 		wp_enqueue_script(
 			'wpmind-admin-exact-cache',
 			WPMIND_PLUGIN_URL . 'assets/js/admin-exact-cache.js',
@@ -147,5 +126,20 @@ final class ExactCacheModule implements ModuleInterface {
 			WPMIND_VERSION,
 			true
 		);
+	}
+
+	/**
+	 * Check whether the current admin page belongs to WPMind.
+	 *
+	 * @param string $hook_suffix Current page hook suffix.
+	 * @return bool
+	 */
+	private function is_wpmind_admin_page( string $hook_suffix ): bool {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only page scope check.
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( (string) $_GET['page'] ) ) : '';
+		if ( '' !== $page && class_exists( 'Wenpai_Admin_Menu' ) && \Wenpai_Admin_Menu::owns_page( 'wpmind' ) ) {
+			return 'wpmind' === $page || str_starts_with( $page, 'wpmind-' ) || str_starts_with( $page, 'wpmind_' );
+		}
+		return str_ends_with( $hook_suffix, '_page_wpmind' );
 	}
 }

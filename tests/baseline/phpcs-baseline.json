@@ -5,8 +5,8 @@
         "tests/phpcs-compat.xml"
     ],
     "totals": {
-        "errors": 2177,
-        "warnings": 130
+        "errors": 2219,
+        "warnings": 1362
     },
     "files": {
         "includes/API/ErrorHandler.php": {
@@ -91,12 +91,21 @@
         },
         "includes/Admin/AdminAssets.php": {
             "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 1,
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 5
+            "Squiz.Commenting.InlineComment.InvalidEndChar": 7
+        },
+        "includes/Admin/AdminIcons.php": {
+            "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 2,
+            "Squiz.Commenting.InlineComment.InvalidEndChar": 22,
+            "Universal.NamingConventions.NoReservedKeywordParameterNames.classFound": 1,
+            "WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned": 26
         },
         "includes/Admin/AdminPage.php": {
+            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 2,
             "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 14,
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 8,
-            "WordPress.PHP.YodaConditions.NotYoda": 3
+            "Squiz.Commenting.InlineComment.InvalidEndChar": 9,
+            "WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned": 19,
+            "WordPress.PHP.YodaConditions.NotYoda": 3,
+            "WordPress.WhiteSpace.OperatorSpacing.NoSpaceBefore": 1
         },
         "includes/Admin/AjaxController.php": {
             "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 2,
@@ -378,6 +387,62 @@
             "Squiz.Commenting.ClassComment.Missing": 1,
             "Squiz.Commenting.FunctionComment.MissingParamTag": 6
         },
+        "includes/Workflow/AltBulkService.php": {
+            "WordPress.DB.PreparedSQLPlaceholders.LikeWildcardsInQuery": 1
+        },
+        "lib/wenpai-admin-ui/css/wenpai-admin-wp.css": {
+            "Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed": 36,
+            "Universal.WhiteSpace.PrecisionAlignment.Found": 269
+        },
+        "lib/wenpai-admin-ui/css/wenpai-admin.css": {
+            "Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed": 44,
+            "Universal.WhiteSpace.PrecisionAlignment.Found": 626
+        },
+        "lib/wenpai-admin-ui/css/wenpai-tokens.css": {
+            "Universal.WhiteSpace.PrecisionAlignment.Found": 101
+        },
+        "lib/wenpai-admin-ui/css/wpcy-tokens.css": {
+            "Universal.WhiteSpace.PrecisionAlignment.Found": 100
+        },
+        "lib/wenpai-admin-ui/icons/paths.php": {
+            "WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned": 19
+        },
+        "lib/wenpai-admin-ui/php/class-wenpai-admin-action.php": {
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound": 1
+        },
+        "lib/wenpai-admin-ui/php/class-wenpai-admin-capability.php": {
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound": 1,
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound": 2
+        },
+        "lib/wenpai-admin-ui/php/class-wenpai-admin-collection.php": {
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound": 1
+        },
+        "lib/wenpai-admin-ui/php/class-wenpai-admin-icons.php": {
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound": 1
+        },
+        "lib/wenpai-admin-ui/php/class-wenpai-admin-loader.php": {
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound": 1
+        },
+        "lib/wenpai-admin-ui/php/class-wenpai-admin-menu.php": {
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound": 1
+        },
+        "lib/wenpai-admin-ui/php/class-wenpai-admin-settings.php": {
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound": 1,
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound": 1
+        },
+        "lib/wenpai-admin-ui/php/class-wenpai-admin-shell.php": {
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound": 1
+        },
+        "lib/wenpai-admin-ui/php/class-wenpai-admin-tools.php": {
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound": 1
+        },
+        "lib/wenpai-admin-ui/php/class-wenpai-admin-ui.php": {
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound": 1
+        },
+        "lib/wenpai-admin-ui/php/load.php": {
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound": 7,
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 5
+        },
         "modules/analytics/AnalyticsModule.php": {
             "Squiz.Commenting.ClassComment.Missing": 1,
             "Squiz.Commenting.FunctionComment.MissingParamTag": 2,
@@ -394,11 +459,7 @@
             "WordPress.PHP.YodaConditions.NotYoda": 5
         },
         "modules/analytics/templates/dashboard.php": {
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 3,
-            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 15,
-            "WordPress.PHP.YodaConditions.NotYoda": 1,
-            "WordPress.WP.GlobalVariablesOverride.Prohibited": 1,
-            "WordPress.WP.I18n.MissingTranslatorsComment": 1
+            "PEAR.Files.IncludingFile.UseRequire": 1
         },
         "modules/api-gateway/includes/Admin/AuditLogRepository.php": {
             "WordPress.DB.PreparedSQL.NotPrepared": 1
@@ -507,6 +568,8 @@
             "Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed": 1
         },
         "modules/api-gateway/templates/settings.php": {
+            "Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace": 1,
+            "WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound": 2,
             "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 11
         },
         "modules/auto-meta/includes/AutoMetaAjaxController.php": {
@@ -516,10 +579,10 @@
             "Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed": 1,
             "Generic.Commenting.DocComment.MissingShort": 1,
             "Universal.NamingConventions.NoReservedKeywordParameterNames.newFound": 1,
-            "WordPress.PHP.YodaConditions.NotYoda": 6
+            "WordPress.PHP.YodaConditions.NotYoda": 5
         },
         "modules/auto-meta/templates/settings.php": {
-            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 14
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 13
         },
         "modules/cost-control/includes/BudgetAlert.php": {
             "Squiz.Commenting.ClassComment.Missing": 1,
@@ -527,7 +590,7 @@
             "Squiz.Commenting.InlineComment.InvalidEndChar": 1,
             "Squiz.Commenting.VariableComment.MissingVar": 1,
             "WordPress.NamingConventions.ValidVariableName.VariableNotSnakeCase": 2,
-            "WordPress.PHP.YodaConditions.NotYoda": 3,
+            "WordPress.PHP.YodaConditions.NotYoda": 2,
             "WordPress.WP.I18n.MissingTranslatorsComment": 4
         },
         "modules/cost-control/includes/BudgetChecker.php": {
@@ -561,10 +624,11 @@
             "WordPress.PHP.YodaConditions.NotYoda": 4
         },
         "modules/cost-control/templates/settings.php": {
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 5,
+            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 3,
             "Universal.NamingConventions.NoReservedKeywordParameterNames.arrayFound": 1,
             "Universal.NamingConventions.NoReservedKeywordParameterNames.defaultFound": 1,
-            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 18,
+            "WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound": 1,
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 16,
             "WordPress.WP.GlobalVariablesOverride.Prohibited": 1
         },
         "modules/exact-cache/includes/CostEstimator.php": {
@@ -576,6 +640,7 @@
             "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 11
         },
         "modules/geo/GeoModule.php": {
+            "PSR2.Methods.FunctionClosingBrace.SpacingBeforeClose": 1,
             "Universal.NamingConventions.NoReservedKeywordParameterNames.defaultFound": 1,
             "WordPress.PHP.YodaConditions.NotYoda": 11
         },
@@ -610,9 +675,13 @@
             "Universal.NamingConventions.NoReservedKeywordParameterNames.publicFound": 1
         },
         "modules/geo/templates/settings.php": {
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 5,
+            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 5,
+            "Generic.WhiteSpace.ScopeIndent.Incorrect": 2,
+            "Squiz.Commenting.InlineComment.InvalidEndChar": 2,
+            "Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace": 1,
             "Universal.NamingConventions.NoReservedKeywordParameterNames.defaultFound": 1,
-            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 50,
+            "WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound": 3,
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 49,
             "WordPress.PHP.YodaConditions.NotYoda": 3,
             "WordPress.WP.GlobalVariablesOverride.Prohibited": 1
         },
@@ -628,50 +697,67 @@
             "PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket": 1,
             "Squiz.Commenting.FileComment.Missing": 1
         },
-        "templates/settings-page.php": {
+        "templates/admin/page.php": {
+            "Squiz.Commenting.FunctionComment.Missing": 4,
+            "Squiz.Commenting.InlineComment.InvalidEndChar": 3,
+            "Universal.WhiteSpace.CommaSpacing.TooMuchSpaceAfter": 15,
+            "WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound": 8,
+            "WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned": 12
+        },
+        "templates/admin/partials/analytics.php": {
+            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 5,
+            "Generic.WhiteSpace.ScopeIndent.Incorrect": 1,
+            "Generic.WhiteSpace.ScopeIndent.IncorrectExact": 1,
             "Squiz.Commenting.InlineComment.InvalidEndChar": 1,
-            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 20
-        },
-        "templates/tabs/budget.php": {
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 2,
-            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 5,
+            "Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace": 1,
+            "Squiz.PHP.EmbeddedPhp.ContentAfterEnd": 1,
+            "Squiz.PHP.EmbeddedPhp.ContentBeforeOpen": 1,
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 13,
+            "WordPress.Security.EscapeOutput.OutputNotEscaped": 1,
             "WordPress.WP.GlobalVariablesOverride.Prohibited": 1
         },
-        "templates/tabs/dashboard.php": {
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 3,
-            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 15,
-            "WordPress.PHP.YodaConditions.NotYoda": 1,
-            "WordPress.WP.GlobalVariablesOverride.Prohibited": 1,
-            "WordPress.WP.I18n.MissingTranslatorsComment": 1
+        "templates/admin/views/analytics.php": {
+            "PEAR.Files.IncludingFile.UseRequire": 1
         },
-        "templates/tabs/geo.php": {
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 3,
-            "Universal.NamingConventions.NoReservedKeywordParameterNames.defaultFound": 1,
-            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 16,
-            "WordPress.PHP.YodaConditions.NotYoda": 3
+        "templates/admin/views/module.php": {
+            "PEAR.Files.IncludingFile.UseRequire": 1,
+            "Squiz.Commenting.InlineComment.InvalidEndChar": 2
         },
-        "templates/tabs/images.php": {
-            "Squiz.Commenting.FunctionComment.MissingParamTag": 2,
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 4,
-            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 14
+        "templates/admin/views/modules.php": {
+            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 2,
+            "Squiz.Commenting.InlineComment.InvalidEndChar": 1,
+            "WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound": 1
         },
-        "templates/tabs/modules.php": {
-            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 4
-        },
-        "templates/tabs/overview.php": {
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 4,
-            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 56,
+        "templates/admin/views/overview.php": {
+            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 4,
+            "Squiz.Commenting.InlineComment.InvalidEndChar": 2,
+            "Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace": 2,
+            "WordPress.Arrays.ArrayDeclarationSpacing.AssociativeArrayFound": 1,
+            "WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned": 12,
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 34,
             "WordPress.WP.GlobalVariablesOverride.Prohibited": 1
         },
-        "templates/tabs/routing.php": {
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 10,
-            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 43,
-            "WordPress.PHP.YodaConditions.NotYoda": 3
+        "templates/admin/views/routing.php": {
+            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 5,
+            "Squiz.Commenting.InlineComment.InvalidEndChar": 1,
+            "Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace": 1,
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 21,
+            "WordPress.Security.EscapeOutput.OutputNotEscaped": 1
         },
-        "templates/tabs/services.php": {
-            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 6,
+        "templates/admin/views/services.php": {
+            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 15,
             "Squiz.Commenting.InlineComment.InvalidEndChar": 2,
-            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 11
+            "Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace": 7,
+            "WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound": 21
+        },
+        "templates/admin/views/workflow.php": {
+            "Generic.Formatting.MultipleStatementAlignment.NotSameWarning": 4,
+            "Generic.WhiteSpace.ScopeIndent.Incorrect": 3,
+            "Generic.WhiteSpace.ScopeIndent.IncorrectExact": 2,
+            "Squiz.Commenting.InlineComment.InvalidEndChar": 1,
+            "Squiz.PHP.EmbeddedPhp.ContentAfterEnd": 1,
+            "Squiz.PHP.EmbeddedPhp.ContentBeforeOpen": 1,
+            "WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned": 6
         },
         "uninstall.php": {
             "Squiz.Commenting.InlineComment.InvalidEndChar": 14
@@ -679,13 +765,10 @@
         "wpmind.php": {
             "Squiz.Commenting.FunctionComment.ParamCommentFullStop": 16,
             "Squiz.Commenting.FunctionComment.ThrowsNoFullStop": 1,
-            "Squiz.Commenting.InlineComment.InvalidEndChar": 35,
+            "Squiz.Commenting.InlineComment.InvalidEndChar": 36,
             "Universal.Files.SeparateFunctionsFromOO.Mixed": 1,
             "Universal.NamingConventions.NoReservedKeywordParameterNames.classFound": 2,
             "WordPress.PHP.YodaConditions.NotYoda": 3
-        },
-        "includes/Workflow/AltBulkService.php": {
-            "WordPress.DB.PreparedSQLPlaceholders.LikeWildcardsInQuery": 1
         }
     }
 }

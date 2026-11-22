@@ -27,22 +27,29 @@ jobs:
 
       - name: 工具链与 PHP 最低版本
         run: |
-          # Host runner 上 /usr/bin/php 偶发切到 8.5（run 377 / 471），phpstan 会卡死无输出。
-          # 本 job 固定走 8.3，与日常绿跑一致。
+          # Host runner 优先使用 PHP 8.3/8.4（与日常绿跑一致）；若仅提供 PHP 8.5+ 则在 phpstan 步骤禁并行防挂死。
           SHIM="${RUNNER_TEMP:-/tmp}/wpmind-php-shim"
           mkdir -p "$SHIM"
-          if [ -x /usr/bin/php8.3 ]; then
-            ln -sfn /usr/bin/php8.3 "$SHIM/php"
-          elif [ -x /www/server/php/83/bin/php ]; then
-            ln -sfn /www/server/php/83/bin/php "$SHIM/php"
-          fi
+          for candidate in \
+            /usr/bin/php8.3 \
+            /usr/bin/php83 \
+            /opt/remi/php83/root/usr/bin/php \
+            /www/server/php/83/bin/php \
+            /usr/bin/php8.4 \
+            /usr/bin/php84 \
+            /opt/remi/php84/root/usr/bin/php \
+            /www/server/php/84/bin/php; do
+            if [ -x "$candidate" ]; then
+              ln -sfn "$candidate" "$SHIM/php"
+              break
+            fi
+          done
           if [ -x "$SHIM/php" ]; then
             echo "$SHIM" >> "$GITHUB_PATH"
             export PATH="$SHIM:$PATH"
           fi
           php -v | head -1
           php -r 'exit(version_compare(PHP_VERSION, "8.1", ">=") ? 0 : 1);'
-          php -r 'exit(version_compare(PHP_VERSION, "8.5", "<") ? 0 : 1);'             || { echo "PHP >= 8.5 在本 runner 上会挂死 phpstan，请改用 8.3"; exit 1; }
           composer --version
 
       - name: composer install（网络抖动重试 3 次）
@@ -74,7 +81,13 @@ jobs:
         timeout-minutes: 5
         run: |
           echo "::group::composer analyze"
-          composer analyze
+          if php -r 'exit(version_compare(PHP_VERSION, "8.5", ">=") ? 0 : 1);'; then
+            TMP_NEON="${RUNNER_TEMP:-/tmp}/phpstan-php85.neon"
+            printf "includes:\n\t- %s/phpstan.neon.dist\nparameters:\n\tparallel:\n\t\tmaximumNumberOfProcesses: 1\n" "$PWD" > "$TMP_NEON"
+            ./vendor/bin/phpstan analyse --memory-limit=1G --no-progress -c "$TMP_NEON"
+          else
+            composer analyze
+          fi
           echo "::endgroup::"
 
       - name: phpcs baseline gate

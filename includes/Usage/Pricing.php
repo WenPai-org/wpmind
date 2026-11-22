@@ -237,6 +237,24 @@ class Pricing {
 	}
 
 	/**
+	 * Resolve currency for a provider/model pair, preferring ModelCatalog metadata.
+	 *
+	 * @param string $provider Provider ID.
+	 * @param string $model    Model ID.
+	 * @return string Currency code (USD or CNY).
+	 */
+	public static function resolve_currency( string $provider, string $model = '' ): string {
+		if ( '' !== $model && class_exists( \WPMind\Provider\Catalog\ModelCatalog::class ) ) {
+			$catalog_pricing = \WPMind\Provider\Catalog\ModelCatalog::instance()->pricing( $provider, $model );
+			if ( is_array( $catalog_pricing ) && ! empty( $catalog_pricing['currency'] ) ) {
+				return strtoupper( (string) $catalog_pricing['currency'] );
+			}
+		}
+
+		return strtoupper( self::get_currency( $provider ) );
+	}
+
+	/**
 	 * Calculate cost for a request.
 	 */
 	public static function calculate_cost(
@@ -262,6 +280,37 @@ class Pricing {
 		$output_cost = ( $output_tokens / 1_000_000 ) * $output_rate;
 
 		return round( $input_cost + $output_cost, 6 );
+	}
+
+	/**
+	 * Calculate cost normalized to USD (converts CNY using filterable rate).
+	 *
+	 * @param string $provider      Provider ID.
+	 * @param string $model         Model identifier.
+	 * @param int    $input_tokens  Input token count.
+	 * @param int    $output_tokens Output token count.
+	 * @return float Cost in USD.
+	 */
+	public static function calculate_cost_usd(
+		string $provider,
+		string $model,
+		int $input_tokens,
+		int $output_tokens
+	): float {
+		$cost     = self::calculate_cost( $provider, $model, $input_tokens, $output_tokens );
+		$currency = self::resolve_currency( $provider, $model );
+
+		if ( 'CNY' === $currency && $cost > 0.0 ) {
+			$rate = function_exists( 'apply_filters' )
+				? (float) apply_filters( 'wpmind_usd_cny_rate', 7.2 )
+				: 7.2;
+			if ( $rate <= 0.0 ) {
+				$rate = 7.2;
+			}
+			return round( $cost / $rate, 6 );
+		}
+
+		return $cost;
 	}
 
 	/**

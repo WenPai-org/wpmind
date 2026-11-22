@@ -41,7 +41,7 @@ class QwenProvider extends AbstractOpenAiCompatibleProvider {
 	 * {@inheritDoc}
 	 */
 	protected static function providerName(): string {
-		return '通义千问';
+		return '千问';
 	}
 
 	/**

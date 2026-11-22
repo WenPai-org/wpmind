@@ -33,8 +33,8 @@ class BudgetAlert {
 	 * 私有构造函数
 	 */
 	private function __construct() {
-		// 注册管理员通知钩子
-		add_action( 'admin_notices', [ $this, 'display_admin_notices' ] );
+		// Only render inside WPMind admin pages (never as global WP admin_notices banner).
+		add_action( 'wpmind_admin_notices', [ $this, 'display_admin_notices' ] );
 	}
 
 	/**
@@ -181,29 +181,65 @@ class BudgetAlert {
 	}
 
 	/**
-	 * 显示管理员通知
+	 * 获取待展示的预算告警列表（供心思后台页面内渲染）.
+	 *
+	 * @param bool $consume 读取后是否清除 transient.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function get_pending_notices( bool $consume = false ): array {
+		$notices = get_transient( 'wpmind_budget_notices' );
+		if ( ! is_array( $notices ) || empty( $notices ) ) {
+			return [];
+		}
+
+		if ( $consume ) {
+			delete_transient( 'wpmind_budget_notices' );
+		}
+
+		return $notices;
+	}
+
+	/**
+	 * 检查当前是否处于文派心思后台页面.
+	 *
+	 * @return bool
+	 */
+	private function is_wpmind_admin_page(): bool {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only page scope check.
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( (string) $_GET['page'] ) ) : '';
+		if ( '' !== $page && class_exists( 'Wenpai_Admin_Menu' ) && \Wenpai_Admin_Menu::owns_page( 'wpmind' ) ) {
+			return 'wpmind' === $page || str_starts_with( $page, 'wpmind-' ) || str_starts_with( $page, 'wpmind_' );
+		}
+
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen || empty( $screen->id ) ) {
+			return false;
+		}
+
+		return str_ends_with( (string) $screen->id, '_page_wpmind' );
+	}
+
+	/**
+	 * 显示管理员通知（仅在心思页面内渲染）.
 	 */
 	public function display_admin_notices(): void {
-		$screen = get_current_screen();
-		if ( ! $screen || $screen->id !== 'toplevel_page_wpmind' ) {
+		if ( ! $this->is_wpmind_admin_page() ) {
 			return;
 		}
 
-		$notices = get_transient( 'wpmind_budget_notices' );
-		if ( ! is_array( $notices ) || empty( $notices ) ) {
+		$notices = self::get_pending_notices( true );
+		if ( empty( $notices ) ) {
 			return;
 		}
 
 		foreach ( $notices as $notice ) {
-			$class = ( $notice['type'] ?? '' ) === 'error' ? 'notice-error' : 'notice-warning';
+			$tone = ( $notice['type'] ?? '' ) === 'error' ? 'bad' : 'warn';
 			printf(
-				'<div class="notice %s is-dismissible"><p>%s</p></div>',
-				esc_attr( $class ),
-				esc_html( $notice['message'] ?? '' )
+				'<div class="wenpai-banner wenpai-banner--%s"><p>%s</p></div>',
+				esc_attr( $tone ),
+				esc_html( (string) ( $notice['message'] ?? '' ) )
 			);
 		}
-
-		delete_transient( 'wpmind_budget_notices' );
 	}
 
 	/**
@@ -244,6 +280,10 @@ class BudgetAlert {
 
 	/**
 	 * 获取进度条 HTML
+	 *
+	 * @param float  $percentage 百分比.
+	 * @param string $status     状态.
+	 * @return string
 	 */
 	public static function get_progress_bar( float $percentage, string $status ): string {
 		$class = BudgetChecker::get_status_class( $status );
@@ -251,11 +291,11 @@ class BudgetAlert {
 
 		return sprintf(
 			'<div class="wpmind-budget-progress">
-                <div class="wpmind-budget-progress-bar %s" style="width: %s%%"></div>
-            </div>
-            <span class="wpmind-budget-percentage">%s%%</span>',
+				<progress class="wpmind-budget-progress-bar %s" value="%s" max="100"></progress>
+			</div>
+			<span class="wpmind-budget-percentage">%s%%</span>',
 			esc_attr( $class ),
-			esc_attr( $width ),
+			esc_attr( (string) $width ),
 			esc_html( number_format( $percentage, 1 ) )
 		);
 	}

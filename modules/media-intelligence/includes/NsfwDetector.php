@@ -20,11 +20,37 @@ namespace WPMind\Modules\MediaIntelligence;
 class NsfwDetector {
 
 	/**
-	 * Constructor — register WordPress hooks.
+	 * Constructor — register async WordPress hooks.
+	 *
+	 * @param bool $register_hooks When false, skip hook registration (tests/manual calls).
 	 */
-	public function __construct() {
-		// Check on upload (priority 15, before AltTextGenerator at 20).
-		add_action( 'add_attachment', [ $this, 'check_attachment' ], 15 );
+	public function __construct( bool $register_hooks = true ) {
+		if ( ! $register_hooks ) {
+			return;
+		}
+
+		// Schedule async check on upload so uploads are never blocked by upstream Vision API calls.
+		add_action( 'add_attachment', [ $this, 'schedule_check' ], 15 );
+
+		// WP-Cron single event handler.
+		add_action( 'wpmind_check_nsfw_attachment', [ $this, 'check_attachment' ] );
+	}
+
+	/**
+	 * Schedule async NSFW detection for an uploaded image attachment.
+	 *
+	 * @param int $attachment_id Attachment post ID.
+	 */
+	public function schedule_check( int $attachment_id ): void {
+		if ( ! wp_attachment_is_image( $attachment_id ) ) {
+			return;
+		}
+
+		if ( wp_next_scheduled( 'wpmind_check_nsfw_attachment', [ $attachment_id ] ) ) {
+			return;
+		}
+
+		wp_schedule_single_event( time(), 'wpmind_check_nsfw_attachment', [ $attachment_id ] );
 	}
 
 	/**
@@ -41,13 +67,13 @@ class NsfwDetector {
 			return;
 		}
 
-		$image_url = wp_get_attachment_url( $attachment_id );
-		if ( ! $image_url ) {
+		$image_input = $this->resolve_vision_image( $attachment_id );
+		if ( ! $image_input ) {
 			return;
 		}
 
 		$result = wpmind_vision(
-			$image_url,
+			$image_input,
 			'Is this image NSFW? Reply only "safe" or "nsfw".',
 			[
 				'max_tokens'  => 10,
@@ -71,5 +97,23 @@ class NsfwDetector {
 			 */
 			do_action( 'wpmind_nsfw_detected', $attachment_id );
 		}
+	}
+
+	/**
+	 * Resolve image input for Vision API: prefer base64 data URI for local readable files.
+	 *
+	 * @param int $attachment_id Attachment post ID.
+	 * @return string|null Data URI or image URL, or null if unavailable.
+	 */
+	private function resolve_vision_image( int $attachment_id ): ?string {
+		if ( class_exists( \WPMind\API\Services\VisionHelper::class ) ) {
+			$data_uri = \WPMind\API\Services\VisionHelper::attachment_to_data_uri( $attachment_id );
+			if ( is_string( $data_uri ) && '' !== $data_uri ) {
+				return $data_uri;
+			}
+		}
+
+		$url = wp_get_attachment_url( $attachment_id );
+		return $url ?: null;
 	}
 }

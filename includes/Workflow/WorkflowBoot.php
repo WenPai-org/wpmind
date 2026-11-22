@@ -47,7 +47,7 @@ final class WorkflowBoot {
 	 * @return void
 	 */
 	public static function enqueue_admin_assets( string $hook_suffix ): void {
-		if ( 'toplevel_page_wpmind' !== $hook_suffix ) {
+		if ( ! self::is_wpmind_admin_page( $hook_suffix ) ) {
 			return;
 		}
 
@@ -71,12 +71,12 @@ final class WorkflowBoot {
 				'i18n'              => array(
 					'creating'       => __( '正在创建任务…', 'wpmind' ),
 					'dryRunning'     => __( '预览生成中…', 'wpmind' ),
-					'done'           => __( 'Dry-run 完成', 'wpmind' ),
+					'done'           => __( '预演完成', 'wpmind' ),
 					'empty'          => __( '没有缺少 Alt 的图片', 'wpmind' ),
 					'metaEmpty'      => __( '没有缺少 Meta 的文章', 'wpmind' ),
 					'metaCreating'   => __( '正在创建 Meta 任务…', 'wpmind' ),
 					'metaDryRunning' => __( 'Meta 预览生成中…', 'wpmind' ),
-					'metaDone'       => __( 'Meta Dry-run 完成', 'wpmind' ),
+					'metaDone'       => __( 'Meta 预演完成', 'wpmind' ),
 					'submitting'     => __( '提交审核中…', 'wpmind' ),
 					'reviewing'      => __( '保存审核决定…', 'wpmind' ),
 					'applying'       => __( '写入已通过项…', 'wpmind' ),
@@ -98,5 +98,20 @@ final class WorkflowBoot {
 				),
 			)
 		);
+	}
+
+	/**
+	 * Check whether the current admin page belongs to WPMind.
+	 *
+	 * @param string $hook_suffix Current page hook suffix.
+	 * @return bool
+	 */
+	private static function is_wpmind_admin_page( string $hook_suffix ): bool {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only page scope check.
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( (string) $_GET['page'] ) ) : '';
+		if ( '' !== $page && class_exists( 'Wenpai_Admin_Menu' ) && \Wenpai_Admin_Menu::owns_page( 'wpmind' ) ) {
+			return 'wpmind' === $page || str_starts_with( $page, 'wpmind-' ) || str_starts_with( $page, 'wpmind_' );
+		}
+		return str_ends_with( $hook_suffix, '_page_wpmind' );
 	}
 }

@@ -27,6 +27,13 @@ class ApiKeyAuthResult {
 	public readonly string $key_id;
 
 	/**
+	 * The key display prefix (e.g. first 8 chars).
+	 *
+	 * @var string
+	 */
+	public readonly string $key_prefix;
+
+	/**
 	 * WordPress user ID of the key owner, or null.
 	 *
 	 * @var int|null
@@ -75,6 +82,9 @@ class ApiKeyAuthResult {
 	 */
 	public function __construct( array $row ) {
 		$this->key_id             = (string) $row['key_id'];
+		$this->key_prefix         = isset( $row['key_prefix'] ) && '' !== (string) $row['key_prefix']
+			? (string) $row['key_prefix']
+			: substr( $this->key_id, 0, 8 );
 		$this->owner_user_id      = isset( $row['owner_user_id'] ) ? (int) $row['owner_user_id'] : null;
 		$this->allowed_providers  = self::decode_json_array( $row['allowed_providers'] ?? null );
 		$this->rpm_limit          = (int) ( $row['rpm_limit'] ?? 60 );
@@ -90,6 +100,15 @@ class ApiKeyAuthResult {
 	 */
 	public function get_key_id(): string {
 		return $this->key_id;
+	}
+
+	/**
+	 * Get the key prefix.
+	 *
+	 * @return string
+	 */
+	public function get_key_prefix(): string {
+		return $this->key_prefix;
 	}
 
 	/**

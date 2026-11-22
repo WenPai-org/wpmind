@@ -100,7 +100,6 @@ class AnalyticsModule implements ModuleInterface {
 		$this->load_classes();
 
 		// 注册设置标签页
-		add_filter( 'wpmind_settings_tabs', [ $this, 'register_settings_tab' ], 10 );
 
 		// 注册 AJAX 处理器
 		add_action( 'wp_ajax_wpmind_get_analytics', [ $this, 'ajax_get_analytics' ] );
@@ -114,22 +113,6 @@ class AnalyticsModule implements ModuleInterface {
 	 */
 	private function load_classes(): void {
 		require_once __DIR__ . '/includes/AnalyticsManager.php';
-	}
-
-	/**
-	 * 注册设置标签页
-	 */
-	public function register_settings_tab( array $tabs ): array {
-		$tab_config = $this->config['settings_tab'] ?? [];
-
-		$tabs['analytics'] = [
-			'label'    => $tab_config['label'] ?? __( '数据分析', 'wpmind' ),
-			'icon'     => $tab_config['icon'] ?? 'dashicons-chart-area',
-			'priority' => $tab_config['priority'] ?? 10,
-			'template' => __DIR__ . '/templates/dashboard.php',
-		];
-
-		return $tabs;
 	}
 
 	/**

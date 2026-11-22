@@ -80,8 +80,8 @@ final class ErrorCatalog {
 			),
 			ErrorClass::QuotaExhausted->value   => array(
 				'label'    => __( '额度不足', 'wpmind' ),
-				'message'  => __( '账户余额或配额已用尽', 'wpmind' ),
-				'recovery' => __( '请到服务商控制台充值或提升配额；冷却结束后会自动探测。', 'wpmind' ),
+				'message'  => __( '账户余额或额度已用尽', 'wpmind' ),
+				'recovery' => __( '请到服务商控制台充值或提升额度；冷却结束后会自动探测。', 'wpmind' ),
 			),
 			ErrorClass::RateLimited->value      => array(
 				'label'    => __( '速率限制', 'wpmind' ),

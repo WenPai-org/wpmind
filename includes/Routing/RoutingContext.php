@@ -173,7 +173,7 @@ class RoutingContext {
 	 */
 	public function get_usage_stats(): array {
 		if ( $this->usageStats === null ) {
-			$this->usageStats = UsageTracker::get_stats();
+			$this->usageStats = class_exists( UsageTracker::class ) ? UsageTracker::get_stats() : [];
 		}
 		return $this->usageStats;
 	}
@@ -194,12 +194,42 @@ class RoutingContext {
 	/**
 	 * 计算指定 Provider 的预估成本
 	 */
-	public function estimate_cost( string $providerId, string $model = 'default' ): float {
-		return UsageTracker::calculate_cost(
-			$providerId,
-			$model,
-			$this->estimatedInputTokens,
-			$this->estimatedOutputTokens
-		);
+	public function estimate_cost( string $provider_id, string $model = 'default' ): float {
+		if ( '' === $model || 'default' === $model || 'auto' === $model ) {
+			if ( class_exists( '\\WPMind\\Provider\\Catalog\\ModelCatalog' ) ) {
+				$catalog_default = \WPMind\Provider\Catalog\ModelCatalog::instance()->default_model( $provider_id );
+				if ( '' !== $catalog_default ) {
+					$model = $catalog_default;
+				}
+			}
+		}
+
+		// 当调用方未传入 token 估算时，使用标准基准样本（1000 输入 + 500 输出）以便按策略拉开成本差异.
+		$input_tokens  = $this->estimatedInputTokens;
+		$output_tokens = $this->estimatedOutputTokens;
+		if ( 0 === $input_tokens && 0 === $output_tokens ) {
+			$input_tokens  = 1000;
+			$output_tokens = 500;
+		}
+
+		if ( class_exists( UsageTracker::class ) ) {
+			return UsageTracker::calculate_cost(
+				$provider_id,
+				$model,
+				$input_tokens,
+				$output_tokens
+			);
+		}
+
+		if ( class_exists( '\\WPMind\\Usage\\Pricing' ) ) {
+			return \WPMind\Usage\Pricing::calculate_cost(
+				$provider_id,
+				$model,
+				$input_tokens,
+				$output_tokens
+			);
+		}
+
+		return 0.0;
 	}
 }

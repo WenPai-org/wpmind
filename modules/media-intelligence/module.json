@@ -4,7 +4,7 @@
     "description": "AI 媒体智能 - 自动生成 alt text、标题、描述，NSFW 检测",
     "version": "1.0.0",
     "author": "WPMind",
-    "icon": "ri-image-ai-line",
+    "icon": "image",
     "class": "WPMind\\Modules\\MediaIntelligence\\MediaIntelligenceModule",
     "can_disable": true,
     "settings_tab": "media-intelligence",

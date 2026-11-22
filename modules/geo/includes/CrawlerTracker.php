@@ -56,8 +56,10 @@ class CrawlerTracker {
 			return;
 		}
 
-		// Track markdown feed access.
+		// Track markdown feed, llms.txt, and ai-sitemap.xml access.
 		add_action( 'wpmind_markdown_feed_accessed', array( $this, 'track_access' ) );
+		add_action( 'wpmind_llms_txt_accessed', array( $this, 'track_access' ) );
+		add_action( 'wpmind_ai_sitemap_accessed', array( $this, 'track_access' ) );
 
 		// Hook into feed rendering.
 		add_action( 'do_feed_markdown', array( $this, 'on_feed_access' ), 1 );
@@ -71,7 +73,7 @@ class CrawlerTracker {
 	}
 
 	/**
-	 * Track crawler access.
+	 * Track crawler access (with transient throttle before option writes).
 	 */
 	public function track_access(): void {
 		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] )
@@ -82,6 +84,18 @@ class CrawlerTracker {
 
 		if ( ! $crawler_info ) {
 			return;
+		}
+
+		$throttle_seconds = (int) apply_filters( 'wpmind_crawler_track_throttle_seconds', 60 );
+		if ( $throttle_seconds > 0 ) {
+			$uri          = isset( $_SERVER['REQUEST_URI'] )
+				? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) )
+				: '';
+			$throttle_key = 'wpmind_crawler_hit_' . md5( $crawler_info['pattern'] . '|' . $uri . '|' . $this->get_client_ip() );
+			if ( false !== get_transient( $throttle_key ) ) {
+				return;
+			}
+			set_transient( $throttle_key, 1, $throttle_seconds );
 		}
 
 		// Log the access.

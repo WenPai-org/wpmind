@@ -105,7 +105,13 @@ class GeoModule implements ModuleInterface {
 	 * Initialize the module.
 	 */
 	public function init(): void {
-		// Check if GEO is globally enabled.
+		// Always register admin save AJAX, deferred rewrite flush, and admin assets
+		// so the module cannot lock itself out when wpmind_geo_enabled is '0'.
+		add_action( 'wp_ajax_wpmind_save_geo_settings', array( $this, 'ajax_save_settings' ) );
+		add_action( 'admin_init', array( $this, 'maybe_flush_rewrite_rules' ) );
+		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
+
+		// Check if GEO is globally enabled for frontend output and runtime hooks.
 		// Support both legacy boolean and new string format.
 		$geo_enabled = get_option( 'wpmind_geo_enabled', '1' );
 		if ( $geo_enabled !== '1' && $geo_enabled !== true && $geo_enabled !== 1 ) {
@@ -114,18 +120,6 @@ class GeoModule implements ModuleInterface {
 
 		// Initialize components.
 		$this->init_components();
-
-		// Register settings tab.
-		add_filter( 'wpmind_settings_tabs', array( $this, 'register_settings_tab' ) );
-
-		// Register AJAX handlers.
-		add_action( 'wp_ajax_wpmind_save_geo_settings', array( $this, 'ajax_save_settings' ) );
-
-		// Deferred rewrite flush (set by AJAX save, executed on next page load).
-		add_action( 'admin_init', array( $this, 'maybe_flush_rewrite_rules' ) );
-
-		// Admin assets (only on WPMind settings page).
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
 
 		/**
 		 * Fires when GEO module is initialized.
@@ -203,31 +197,24 @@ class GeoModule implements ModuleInterface {
 	 * @param string $hook_suffix Current page hook suffix.
 	 */
 	public function enqueue_admin_assets( string $hook_suffix ): void {
-		if ( 'toplevel_page_wpmind' !== $hook_suffix ) {
+		if ( ! $this->is_wpmind_admin_page( $hook_suffix ) ) {
 			return;
 		}
-		wp_enqueue_style(
-			'wpmind-geo',
-			WPMIND_PLUGIN_URL . 'assets/css/pages/geo.css',
-			[ 'wpmind-admin' ],
-			WPMIND_VERSION
-		);
 	}
 
 	/**
-	 * Register settings tab.
+	 * Check whether the current admin page belongs to WPMind.
 	 *
-	 * @param array $tabs Existing tabs.
-	 * @return array Modified tabs.
+	 * @param string $hook_suffix Current page hook suffix.
+	 * @return bool
 	 */
-	public function register_settings_tab( array $tabs ): array {
-		$tabs['geo'] = array(
-			'title'    => __( 'GEO', 'wpmind' ),
-			'icon'     => 'ri-search-eye-line',
-			'template' => WPMIND_PATH . 'modules/geo/templates/settings.php',
-			'priority' => 30,
-		);
-		return $tabs;
+	private function is_wpmind_admin_page( string $hook_suffix ): bool {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only page scope check.
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( (string) $_GET['page'] ) ) : '';
+		if ( '' !== $page && class_exists( 'Wenpai_Admin_Menu' ) && \Wenpai_Admin_Menu::owns_page( 'wpmind' ) ) {
+			return 'wpmind' === $page || str_starts_with( $page, 'wpmind-' ) || str_starts_with( $page, 'wpmind_' );
+		}
+		return str_ends_with( $hook_suffix, '_page_wpmind' );
 	}
 
 	/**

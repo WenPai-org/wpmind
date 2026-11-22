@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
 class GeminiImageProvider extends AbstractImageProvider {
 
 	protected string $id       = 'google_gemini_image';
-	protected string $name     = 'Gemini Pro Image';
+	protected string $name     = 'Gemini Image';
 	protected string $base_url = 'https://generativelanguage.googleapis.com/v1/';
 	protected array $models    = [ 'gemini-3-pro-image', 'imagen-3' ];
 

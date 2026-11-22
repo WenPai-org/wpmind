@@ -24,17 +24,118 @@ use WPMind\Provider\EndpointRepository;
 abstract class AbstractService {
 
 	/**
-	 * 解析 Provider（'auto' -> 默认值，应用 filter）
+	 * 解析 Provider（保留 'auto' 交由 wpmind_select_provider 路由过滤，再按需回退）。
 	 *
-	 * @param string $provider 原始 provider 值
-	 * @param string $context  上下文
+	 * @param string $provider 原始 provider 值.
+	 * @param string $context  上下文.
 	 * @return string
 	 */
 	protected function resolve_provider( string $provider, string $context = '' ): string {
-		if ( $provider === 'auto' ) {
-			$provider = get_option( 'wpmind_default_provider', 'openai' );
+		$selected = trim( (string) apply_filters( 'wpmind_select_provider', $provider, $context ) );
+
+		if ( '' !== $selected && 'auto' !== $selected && $this->is_provider_usable( $selected ) ) {
+			return $selected;
 		}
-		return apply_filters( 'wpmind_select_provider', $provider, $context );
+
+		// 回退 1：站点默认 Provider（若已配置可用）.
+		$default = trim( (string) get_option( 'wpmind_default_provider', '' ) );
+		if ( '' !== $default && 'auto' !== $default && $this->is_provider_usable( $default ) ) {
+			return $default;
+		}
+
+		// 回退 2：首个可用端点.
+		$first_usable = $this->first_usable_provider();
+		if ( '' !== $first_usable ) {
+			return $first_usable;
+		}
+
+		// 兜底（无任何可用端点时保留语义，交给后续错误路径返回明确错误）.
+		if ( '' !== $selected && 'auto' !== $selected ) {
+			return $selected;
+		}
+		if ( '' !== $default && 'auto' !== $default ) {
+			return $default;
+		}
+
+		return 'openai';
+	}
+
+	/**
+	 * 判断指定 Provider 当前是否已配置且可用。
+	 *
+	 * @param string $provider Provider ID.
+	 * @return bool
+	 */
+	protected function is_provider_usable( string $provider ): bool {
+		if ( '' === $provider || 'auto' === $provider ) {
+			return false;
+		}
+
+		$endpoint = ( new EndpointRepository() )->get( $provider );
+		return $endpoint->is_usable();
+	}
+
+	/**
+	 * 获取首个已启用且有可用凭证的 Provider ID。
+	 *
+	 * @return string
+	 */
+	protected function first_usable_provider(): string {
+		$enabled = ( new EndpointRepository() )->enabled();
+		$first   = array_key_first( $enabled );
+		return is_string( $first ) ? $first : '';
+	}
+
+	/**
+	 * 发起上游请求前执行站内预算检查。
+	 *
+	 * @param string $provider Provider ID.
+	 * @param string $context  请求上下文.
+	 * @return array{allowed:bool, fallback_model:string}|WP_Error
+	 */
+	protected function check_budget_before_request( string $provider, string $context = '' ) {
+		if ( ! class_exists( '\\WPMind\\Modules\\CostControl\\BudgetChecker' ) ) {
+			return [
+				'allowed'        => true,
+				'fallback_model' => '',
+			];
+		}
+
+		$checker = \WPMind\Modules\CostControl\BudgetChecker::instance();
+		$check   = $checker->can_make_request( $provider, $context );
+
+		if ( empty( $check['allowed'] ) ) {
+			/**
+			 * 当请求被站内预算策略拦截时触发。
+			 *
+			 * @since 0.14.0
+			 * @param array  $check   预算检查结果.
+			 * @param string $context 请求上下文.
+			 */
+			do_action( 'wpmind_budget_exceeded', $check, $context );
+
+			$reason = is_string( $check['reason'] ?? null ) && '' !== trim( $check['reason'] )
+				? trim( $check['reason'] )
+				: __( '已超出预算限额，请求已被阻止', 'wpmind' );
+
+			return new WP_Error(
+				'wpmind_budget_exceeded',
+				$reason,
+				[
+					'budget'  => $check,
+					'context' => $context,
+				]
+			);
+		}
+
+		$fallback_model = is_string( $check['fallback_model'] ?? null )
+			? trim( $check['fallback_model'] )
+			: '';
+
+		return [
+			'allowed'        => true,
+			'fallback_model' => $fallback_model,
+		];
 	}
 
 	/**
@@ -53,15 +154,45 @@ abstract class AbstractService {
 	}
 
 	/**
-	 * 获取端点配置
+	 * 获取端点配置（实时通过 EndpointRepository 解析，识别锁 Key、Connectors 回退与官方算力）。
 	 *
-	 * @return array
+	 * @return array<string, array<string, mixed>>
 	 */
 	protected function get_endpoints(): array {
-		if ( ! class_exists( '\\WPMind\\WPMind' ) ) {
-			return [];
+		$repository = new EndpointRepository();
+		$catalog    = \WPMind\Provider\Catalog\ModelCatalog::instance();
+		$endpoints  = [];
+
+		foreach ( \WPMind\Provider\ProviderDefinitions::all() as $key => $definition ) {
+			$endpoint       = $repository->get( $key );
+			$default_models = $catalog->recommended_ids( $key );
+
+			$entry = [
+				'name'              => $definition['name'],
+				'display_name'      => $definition['display_name'],
+				'icon'              => $definition['icon'],
+				'base_url'          => $definition['base_url'],
+				'models'            => [] !== $endpoint->models ? $endpoint->models : $default_models,
+				'enabled'           => $endpoint->enabled,
+				'api_key'           => $endpoint->api_key,
+				'custom_base_url'   => $endpoint->custom_base_url,
+				'default_model'     => $endpoint->default_model,
+				'key_meta'          => $endpoint->key_meta,
+				'needs_reconfigure' => $endpoint->needs_reconfigure,
+				'resolved_base_url' => $repository->resolved_base_url( $key ),
+			];
+
+			if ( ! empty( $definition['is_official'] ) ) {
+				$entry['is_official'] = true;
+			}
+			if ( ! empty( $definition['is_cloud'] ) ) {
+				$entry['is_cloud'] = true;
+			}
+
+			$endpoints[ $key ] = $entry;
 		}
-		return \WPMind\WPMind::instance()->get_custom_endpoints();
+
+		return $endpoints;
 	}
 
 	/**

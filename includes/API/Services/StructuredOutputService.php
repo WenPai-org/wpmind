@@ -43,10 +43,12 @@ class StructuredOutputService extends AbstractService {
 			'max_tokens'  => 2000,
 			'temperature' => 0.3,
 			'retries'     => 3,
+			'provider'    => 'auto',
+			'model'       => 'auto',
 		];
 		$options  = wp_parse_args( $options, $defaults );
 
-		$context = $options['context'];
+		$context = (string) $options['context'];
 
 		$schema_json   = wp_json_encode( $schema, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT );
 		$schema_prompt = "你必须返回严格符合以下 JSON Schema 的 JSON 对象。不要返回其他内容，只返回 JSON：\n\n```json\n{$schema_json}\n```";
@@ -82,6 +84,8 @@ class StructuredOutputService extends AbstractService {
 					'context'     => $context,
 					'max_tokens'  => $options['max_tokens'],
 					'temperature' => $options['temperature'],
+					'provider'    => $options['provider'],
+					'model'       => $options['model'],
 					'json_mode'   => true,
 					'cache_ttl'   => 0,
 				]
@@ -141,10 +145,12 @@ class StructuredOutputService extends AbstractService {
 			'concurrency'   => 1,
 			'delay_ms'      => 100,
 			'stop_on_error' => false,
+			'provider'      => 'auto',
+			'model'         => 'auto',
 		];
 		$options  = wp_parse_args( $options, $defaults );
 
-		$context = $options['context'];
+		$context = (string) $options['context'];
 		$results = [];
 		$errors  = [];
 
@@ -161,6 +167,8 @@ class StructuredOutputService extends AbstractService {
 					'context'     => $context . '_item_' . $index,
 					'max_tokens'  => $options['max_tokens'],
 					'temperature' => $options['temperature'],
+					'provider'    => $options['provider'],
+					'model'       => $options['model'],
 					'cache_ttl'   => 0,
 				]
 			);

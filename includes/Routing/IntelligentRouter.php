@@ -69,15 +69,32 @@ class IntelligentRouter {
 	}
 
 	/**
-	 * 加载 Provider 配置
+	 * 加载 Provider 配置（统一走 EndpointRepository，识别锁 Key、Connectors 回退与官方算力）。
 	 */
 	private function load_providers(): void {
-		if ( function_exists( 'WPMind\\wpmind' ) ) {
+		$endpoints = [];
+		if ( class_exists( '\\WPMind\\Provider\\EndpointRepository' ) ) {
+			$repo = new \WPMind\Provider\EndpointRepository();
+			foreach ( $repo->enabled() as $id => $endpoint ) {
+				$def              = \WPMind\Provider\ProviderDefinitions::get( $id ) ?? [];
+				$endpoints[ $id ] = [
+					'name'            => $def['name'] ?? $id,
+					'display_name'    => $def['display_name'] ?? $id,
+					'enabled'         => $endpoint->enabled,
+					'api_key'         => $endpoint->api_key,
+					'custom_base_url' => $endpoint->custom_base_url,
+					'models'          => $endpoint->models,
+					'default_model'   => $endpoint->default_model,
+					'is_cloud'        => ! empty( $def['is_cloud'] ),
+				];
+			}
+		} elseif ( function_exists( 'WPMind\\wpmind' ) ) {
 			$endpoints = \WPMind\wpmind()->get_custom_endpoints();
-			foreach ( $endpoints as $id => $config ) {
-				if ( ! empty( $config['enabled'] ) && ! empty( $config['api_key'] ) ) {
-					$this->providers[ $id ] = $config;
-				}
+		}
+
+		foreach ( $endpoints as $id => $config ) {
+			if ( ! empty( $config['enabled'] ) && ! empty( $config['api_key'] ) ) {
+				$this->providers[ $id ] = $config;
 			}
 		}
 	}
@@ -198,7 +215,43 @@ class IntelligentRouter {
 			}
 		}
 
-		return $strategy->select_provider( $context, $this->providers );
+		// Filter out circuit-broken providers when healthy candidates exist.
+		$candidates = array_filter(
+			$this->providers,
+			fn( array $config, string $id ): bool => ! $context->is_excluded( $id ) && $this->is_provider_available( $id ),
+			ARRAY_FILTER_USE_BOTH
+		);
+
+		if ( [] === $candidates ) {
+			$candidates = $this->providers;
+		}
+
+		// 心思 AI 与自备 Key 混用策略：无显式首选且无手动优先级强制覆盖时生效.
+		$cloud_id = \WPMind\Provider\WenpaiCloud::PROVIDER_ID;
+		if ( isset( $candidates[ $cloud_id ] ) && empty( $this->get_manual_priority() ) ) {
+			$cloud_mode = \WPMind\Provider\WenpaiCloud::routing_mode();
+			$byok_only  = $candidates;
+			unset( $byok_only[ $cloud_id ] );
+
+			if ( \WPMind\Provider\WenpaiCloud::MODE_PRIMARY === $cloud_mode ) {
+				return $cloud_id;
+			}
+
+			if ( \WPMind\Provider\WenpaiCloud::MODE_FALLBACK === $cloud_mode && ! empty( $byok_only ) ) {
+				$candidates = $byok_only;
+			} elseif ( \WPMind\Provider\WenpaiCloud::MODE_CAPABILITY === $cloud_mode ) {
+				$model_type = strtolower( (string) ( $context->get_model_type() ?? '' ) );
+				$advanced   = in_array( $model_type, [ 'vision', 'image', 'reasoning', 'multimodal', 'overseas' ], true );
+				if ( $advanced ) {
+					return $cloud_id;
+				}
+				if ( ! empty( $byok_only ) ) {
+					$candidates = $byok_only;
+				}
+			}
+		}
+
+		return $strategy->select_provider( $context, $candidates );
 	}
 
 	/**
@@ -218,6 +271,28 @@ class IntelligentRouter {
 		}
 
 		$ranked = $strategy->rank_providers( $context, $this->providers );
+
+		// 按心思 AI 混用模式调整故障转移链位置（仅在未启用手动优先级时生效）.
+		$cloud_id = \WPMind\Provider\WenpaiCloud::PROVIDER_ID;
+		if ( in_array( $cloud_id, $ranked, true ) && empty( $this->get_manual_priority() ) ) {
+			$cloud_mode = \WPMind\Provider\WenpaiCloud::routing_mode();
+			$without    = array_values( array_diff( $ranked, [ $cloud_id ] ) );
+			if ( \WPMind\Provider\WenpaiCloud::MODE_PRIMARY === $cloud_mode ) {
+				array_unshift( $without, $cloud_id );
+				$ranked = $without;
+			} elseif ( \WPMind\Provider\WenpaiCloud::MODE_FALLBACK === $cloud_mode ) {
+				$without[] = $cloud_id;
+				$ranked    = $without;
+			} elseif ( \WPMind\Provider\WenpaiCloud::MODE_CAPABILITY === $cloud_mode ) {
+				$model_type = strtolower( (string) ( $context->get_model_type() ?? '' ) );
+				if ( in_array( $model_type, [ 'vision', 'image', 'reasoning', 'multimodal', 'overseas' ], true ) ) {
+					array_unshift( $without, $cloud_id );
+				} else {
+					$without[] = $cloud_id;
+				}
+				$ranked = $without;
+			}
+		}
 
 		// 如果有首选 Provider，放在最前面
 		$preferred = $context->get_preferred_provider();

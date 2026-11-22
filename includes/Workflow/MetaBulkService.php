@@ -221,7 +221,7 @@ final class MetaBulkService {
 					'before'        => $before,
 					'proposed'      => array(),
 					'item_status'   => TaskRepository::ITEM_ERROR,
-					'error_message' => __( 'Dry-run 意外改写了文章 Meta，已还原', 'wpmind' ),
+					'error_message' => __( '预演意外改写了文章 Meta，已还原', 'wpmind' ),
 				);
 				continue;
 			}
@@ -488,7 +488,7 @@ final class MetaBulkService {
 			return $task;
 		}
 		if ( TaskRepository::STATUS_DRY_RUN !== $status ) {
-			return new \WP_Error( 'wpmind_task_bad_status', __( '仅 dry_run 任务可提交审核', 'wpmind' ) );
+			return new \WP_Error( 'wpmind_task_bad_status', __( '仅预演完成的任务可提交审核', 'wpmind' ) );
 		}
 
 		foreach ( $task['items'] as $item ) {

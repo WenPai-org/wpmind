@@ -149,7 +149,8 @@ final class EndpointRepositoryTest extends TestCase {
 					'custom_base_url' => ' https://proxy.example.com/v1/ ',
 					'name'            => 'Hijacked',
 					'base_url'        => 'https://evil.example.com',
-					'models'          => [ 'gpt-3.5-turbo' ],
+					'models'          => 'gpt-3.5-turbo, my-finetune ,, gpt-3.5-turbo',
+					'default_model'   => '  my-finetune  ',
 				],
 			]
 		);
@@ -162,11 +163,12 @@ final class EndpointRepositoryTest extends TestCase {
 		self::assertArrayNotHasKey( 'key_meta', $out['deepseek'], 'v2-only metadata stays out of the mirror' );
 		self::assertTrue( $out['deepseek']['enabled'] );
 		self::assertSame( self::FAKE_KEY, $out['deepseek']['api_key'], 'blank input keeps the saved key' );
-		self::assertSame( [ 'my-finetune' ], $out['deepseek']['models'], 'submitted models are not stored' );
+		self::assertSame( [ 'gpt-3.5-turbo', 'my-finetune' ], $out['deepseek']['models'], 'comma-separated models are normalized and deduped' );
 
 		$v2 = $GLOBALS['wpmind_test_options'][ EndpointRepository::V2_OPTION ]['providers']['deepseek'];
 		self::assertSame( 'https://proxy.example.com/v1', $v2['custom_base_url'] );
-		self::assertSame( [ 'my-finetune' ], $v2['models'] );
+		self::assertSame( [ 'gpt-3.5-turbo', 'my-finetune' ], $v2['models'] );
+		self::assertSame( 'my-finetune', $v2['default_model'] );
 		self::assertArrayNotHasKey( 'api_key', $v2 );
 	}
 

@@ -39,6 +39,12 @@ final class MetaGenerator {
 
 		// FAQ Schema injection into GEO module.
 		add_filter( 'wpmind_article_schema', [ $this, 'inject_faq_schema' ], 15, 2 );
+
+		// Output meta description when no third-party SEO plugin manages it.
+		add_action( 'wp_head', [ $this, 'output_meta_description' ], 5 );
+
+		// Slim SEO fallback integration.
+		add_filter( 'slim_seo_meta_description', [ $this, 'filter_slim_seo_description' ], 10, 2 );
 	}
 
 	/**
@@ -405,6 +411,99 @@ final class MetaGenerator {
 		}
 
 		return $schema;
+	}
+
+	/**
+	 * Output <meta name="description"> in wp_head when no third-party SEO plugin is active.
+	 */
+	public function output_meta_description(): void {
+		if ( get_option( 'wpmind_auto_meta_seo_desc', '1' ) !== '1' ) {
+			return;
+		}
+		if ( ! function_exists( 'is_singular' ) || ! is_singular() ) {
+			return;
+		}
+		if ( $this->has_third_party_seo_plugin() ) {
+			return;
+		}
+
+		$post_id = function_exists( 'get_queried_object_id' ) ? (int) get_queried_object_id() : 0;
+		if ( $post_id <= 0 ) {
+			return;
+		}
+
+		$description = trim( (string) get_post_meta( $post_id, '_wpmind_seo_description', true ) );
+		if ( '' === $description ) {
+			return;
+		}
+
+		echo '<meta name="description" content="' . esc_attr( $description ) . '">' . "\n";
+	}
+
+	/**
+	 * Provide _wpmind_seo_description as a fallback for Slim SEO when Slim SEO has no custom description.
+	 *
+	 * @param mixed $description Existing Slim SEO meta description.
+	 * @param int   $post_id     Optional post ID passed by Slim SEO.
+	 * @return mixed Fallback description or original value.
+	 */
+	public function filter_slim_seo_description( $description, int $post_id = 0 ) {
+		if ( get_option( 'wpmind_auto_meta_seo_desc', '1' ) !== '1' ) {
+			return $description;
+		}
+		if ( is_string( $description ) && '' !== trim( $description ) ) {
+			return $description;
+		}
+
+		if ( $post_id <= 0 && function_exists( 'get_queried_object_id' ) ) {
+			$post_id = (int) get_queried_object_id();
+		}
+		if ( $post_id <= 0 ) {
+			return $description;
+		}
+
+		$fallback = trim( (string) get_post_meta( $post_id, '_wpmind_seo_description', true ) );
+		return '' !== $fallback ? $fallback : $description;
+	}
+
+	/**
+	 * Detect whether a third-party SEO plugin is active to avoid duplicate meta description tags.
+	 *
+	 * @return bool True if a third-party SEO plugin is detected.
+	 */
+	private function has_third_party_seo_plugin(): bool {
+		$detected = defined( 'WPSEO_VERSION' )
+			|| defined( 'RANK_MATH_VERSION' )
+			|| defined( 'AIOSEO_VERSION' )
+			|| defined( 'THE_SEO_FRAMEWORK_VERSION' )
+			|| defined( 'SLIM_SEO_VER' )
+			|| defined( 'SEOPRESS_VERSION' )
+			|| class_exists( 'SlimSEO\\Plugin', false );
+
+		if ( ! $detected ) {
+			if ( ! function_exists( 'is_plugin_active' ) && file_exists( ABSPATH . 'wp-admin/includes/plugin.php' ) ) {
+				include_once ABSPATH . 'wp-admin/includes/plugin.php';
+			}
+			if ( function_exists( 'is_plugin_active' ) ) {
+				$seo_plugins = [
+					'wordpress-seo/wp-seo.php',
+					'seo-by-rank-math/rank-math.php',
+					'all-in-one-seo-pack/all_in_one_seo_pack.php',
+					'the-seo-framework/autodescription.php',
+					'squirrly-seo/squirrly.php',
+					'slim-seo/slim-seo.php',
+					'wp-seopress/seopress.php',
+				];
+				foreach ( $seo_plugins as $plugin ) {
+					if ( is_plugin_active( $plugin ) ) {
+						$detected = true;
+						break;
+					}
+				}
+			}
+		}
+
+		return (bool) apply_filters( 'wpmind_auto_meta_has_seo_plugin', $detected );
 	}
 
 	/**

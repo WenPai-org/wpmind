@@ -141,38 +141,27 @@ class PublicAPI {
 	// ============================================
 
 	/**
-	 * 检查 WPMind 是否可用
+	 * 检查 WPMind 是否可用（统一走 EndpointRepository，识别锁 Key、Connectors 回退与官方算力）。
 	 *
 	 * @return bool
 	 */
 	public function is_available(): bool {
-		static $cached_result = null;
-
-		if ( $cached_result !== null ) {
-			return $cached_result;
+		if ( class_exists( '\\WPMind\\Provider\\EndpointRepository' ) ) {
+			$repo = new \WPMind\Provider\EndpointRepository();
+			return [] !== $repo->enabled();
 		}
 
 		if ( ! class_exists( '\\WPMind\\WPMind' ) ) {
-			$cached_result = false;
 			return false;
 		}
 
-		$wpmind    = \WPMind\WPMind::instance();
-		$endpoints = $wpmind->get_custom_endpoints();
-
-		if ( empty( $endpoints ) ) {
-			$cached_result = false;
-			return false;
-		}
-
+		$endpoints = \WPMind\WPMind::instance()->get_custom_endpoints();
 		foreach ( $endpoints as $endpoint ) {
 			if ( ! empty( $endpoint['enabled'] ) && ! empty( $endpoint['api_key'] ) ) {
-				$cached_result = true;
 				return true;
 			}
 		}
 
-		$cached_result = false;
 		return false;
 	}
 
@@ -354,11 +343,16 @@ class PublicAPI {
 
 		if ( 'auto' === $options['provider'] ) {
 			$options['provider'] = VisionHelper::get_vision_provider();
-			$options['model']    = VisionHelper::get_vision_model( $options['provider'] );
+			if ( empty( $options['model'] ) || 'auto' === $options['model'] ) {
+				$options['model'] = VisionHelper::get_vision_model( $options['provider'] );
+			}
+		} elseif ( empty( $options['model'] ) || 'auto' === $options['model'] ) {
+			$options['model'] = VisionHelper::get_vision_model( (string) $options['provider'] );
 		}
 
-		$messages = VisionHelper::build_vision_messages( $image_url, $prompt, $options['system'] );
-		unset( $options['system'] );
+		$attachment_id = isset( $options['attachment_id'] ) ? (int) $options['attachment_id'] : 0;
+		$messages      = VisionHelper::build_vision_messages( $image_url, $prompt, (string) $options['system'], $attachment_id );
+		unset( $options['system'], $options['attachment_id'] );
 
 		// Constrain failover chain to vision-capable providers only.
 		$options['failover_providers'] = VisionHelper::get_configured_vision_providers();

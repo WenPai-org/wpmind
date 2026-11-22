@@ -96,6 +96,9 @@ add_action(
 	5
 );
 
+// 远程模型目录：admin_init 低频刷新，transient 兜底，前台零网络开销.
+\WPMind\Provider\Catalog\RemoteCatalog::boot();
+
 /**
  * 获取 WPMind 配置的 API Key 凭据
  */
@@ -116,8 +119,23 @@ function get_wpmind_credentials(): array {
 	$endpoints = $plugin->get_custom_endpoints();
 
 	foreach ( $endpoints as $provider_id => $endpoint ) {
+		if ( \WPMind\Provider\WenpaiCloud::PROVIDER_ID === $provider_id ) {
+			continue;
+		}
 		if ( ! empty( $endpoint['enabled'] ) && ! empty( $endpoint['api_key'] ) ) {
 			$cache[ $provider_id ] = $endpoint['api_key'];
+		}
+	}
+
+	// WP 7.x: fall back to the Connectors-stored key (read-only) when the
+	// wpmind option has no key for a provider.
+	foreach ( ProviderRegistrar::getSupportedProviderIds() as $provider_id ) {
+		if ( isset( $cache[ $provider_id ] ) && '' !== (string) $cache[ $provider_id ] ) {
+			continue;
+		}
+		$connector_key = \WPMind\Provider\ConnectorCredentials::key_for( $provider_id );
+		if ( '' !== $connector_key ) {
+			$cache[ $provider_id ] = $connector_key;
 		}
 	}
 

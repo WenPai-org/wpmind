@@ -12,6 +12,15 @@ module.exports = async (config) => {
 	const page = await browser.newPage({ baseURL });
 	page.setDefaultNavigationTimeout(60_000);
 	await page.goto('/wp-login.php', { waitUntil: 'domcontentloaded' });
+
+	// playground runtime auto-logs visitors in as admin and redirects away from
+	// the login form; in that case the session is already usable.
+	if ( /\/wp-admin\//.test( page.url() ) ) {
+		await page.context().storageState({ path: storageState } );
+		await browser.close();
+		return;
+	}
+
 	await page.fill('#user_login', user);
 	await page.fill('#user_pass', pass);
 	await Promise.all([

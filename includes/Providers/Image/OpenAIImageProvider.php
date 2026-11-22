@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
 class OpenAIImageProvider extends AbstractImageProvider {
 
 	protected string $id       = 'openai_gpt_image';
-	protected string $name     = 'GPT-Image 1.5';
+	protected string $name     = 'GPT Image';
 	protected string $base_url = 'https://api.openai.com/v1/';
 	protected array $models    = [ 'gpt-image-1.5', 'dall-e-3' ];
 

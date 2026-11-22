@@ -159,11 +159,12 @@ final class SseStreamController {
 			/**
 			 * Fires after an SSE stream completes successfully.
 			 *
-			 * @param string       $request_id Request ID.
-			 * @param string       $key_id     API key ID.
-			 * @param StreamResult $result     Stream result.
+			 * @param string                $request_id Request ID.
+			 * @param string                $key_id     API key ID.
+			 * @param StreamResult          $result     Stream result.
+			 * @param GatewayRequestContext $context    Pipeline request context.
 			 */
-			do_action( 'wpmind_gateway_sse_complete', $request_id, $key_id, $result );
+			do_action( 'wpmind_gateway_sse_complete', $request_id, $key_id, $result, $context );
 		} finally {
 			// Step 11: Always release the SSE slot.
 			$this->guard->release_slot( $slot );

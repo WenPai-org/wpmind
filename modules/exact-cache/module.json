@@ -4,7 +4,7 @@
     "description": "AI 请求精确缓存 - 降低 API 成本、加速重复请求",
     "version": "1.0.0",
     "author": "WPMind",
-    "icon": "ri-database-2-line",
+    "icon": "database",
     "class": "WPMind\\Modules\\ExactCache\\ExactCacheModule",
     "can_disable": true,
     "settings_tab": "exact-cache",

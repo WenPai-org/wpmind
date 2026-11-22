@@ -157,24 +157,27 @@ class EntityLinker {
 		if ( ! is_string( $entity_name ) ) {
 			$entity_name = '';
 		}
+		$wrapper_class = class_exists( 'Wenpai_Admin_UI' )
+			? 'wenpai-native wpmind-entity-linker-metabox'
+			: 'wpmind-entity-linker-metabox';
 		?>
-		<div class="wpmind-entity-linker-metabox">
-			<p class="description" style="margin-bottom:8px;">
+		<div class="<?php echo esc_attr( $wrapper_class ); ?>">
+			<p class="description">
 				<?php esc_html_e( '关联 Wikidata/Wikipedia 实体，帮助 AI 消除歧义。', 'wpmind' ); ?>
 			</p>
 			<p>
 				<label for="wpmind_entity_name"><?php esc_html_e( '实体名称：', 'wpmind' ); ?></label>
 				<input type="text" name="wpmind_entity_name" id="wpmind_entity_name"
+					class="widefat"
 					value="<?php echo esc_attr( $entity_name ); ?>"
-					placeholder="<?php esc_attr_e( '例如：WordPress', 'wpmind' ); ?>"
-					style="width:100%;margin-top:4px;">
+					placeholder="<?php esc_attr_e( '例如：WordPress', 'wpmind' ); ?>">
 			</p>
 			<p>
 				<label for="wpmind_entity_url"><?php esc_html_e( '实体 URL：', 'wpmind' ); ?></label>
 				<input type="url" name="wpmind_entity_url" id="wpmind_entity_url"
+					class="widefat"
 					value="<?php echo esc_attr( $entity_url ); ?>"
-					placeholder="<?php esc_attr_e( 'https://www.wikidata.org/wiki/Q13166 或 Wikipedia URL', 'wpmind' ); ?>"
-					style="width:100%;margin-top:4px;">
+					placeholder="<?php esc_attr_e( 'https://www.wikidata.org/wiki/Q13166 或 Wikipedia URL', 'wpmind' ); ?>">
 			</p>
 			<p class="description">
 				<?php esc_html_e( '输入 Wikidata 或 Wikipedia 链接，将作为 Schema.org about.sameAs 输出。', 'wpmind' ); ?>

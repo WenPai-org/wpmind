@@ -19,27 +19,15 @@ parameters:
 			path: ../../includes/API/Services/AudioService.php
 
 		-
-			message: '#^Call to function is_wp_error\(\) with array will always evaluate to false\.$#'
-			identifier: function.impossibleType
-			count: 1
-			path: ../../includes/API/Services/ImageService.php
-
-		-
 			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
 			identifier: constant.notFound
-			count: 17
+			count: 10
 			path: ../../includes/Admin/AdminAssets.php
-
-		-
-			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
-			identifier: constant.notFound
-			count: 1
-			path: ../../includes/Workflow/WorkflowBoot.php
 
 		-
 			message: '#^Constant WPMIND_PLUGIN_DIR not found\.$#'
 			identifier: constant.notFound
-			count: 1
+			count: 3
 			path: ../../includes/Admin/AdminPage.php
 
 		-
@@ -192,7 +180,11 @@ parameters:
 			count: 1
 			path: ../../includes/Routing/Strategies/LoadBalancedStrategy.php
 
-
+		-
+			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: ../../includes/Workflow/WorkflowBoot.php
 
 		-
 			message: '#^Offset ''AuthorName'' on array\{Name\: string, PluginURI\: string, Version\: string, Description\: string, Author\: string, AuthorURI\: string, TextDomain\: string, DomainPath\: string, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
@@ -243,14 +235,14 @@ parameters:
 			path: ../../modules/analytics/includes/AnalyticsManager.php
 
 		-
-			message: '#^@param tag must not be named \$this\. Choose a descriptive alias, for example \$instance\.$#'
-			identifier: phpDoc.parseError
+			message: '#^Constant WPMIND_PLUGIN_DIR not found\.$#'
+			identifier: constant.notFound
 			count: 1
-			path: ../../modules/api-gateway/ApiGatewayModule.php
+			path: ../../modules/analytics/templates/dashboard.php
 
 		-
-			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
-			identifier: constant.notFound
+			message: '#^@param tag must not be named \$this\. Choose a descriptive alias, for example \$instance\.$#'
+			identifier: phpDoc.parseError
 			count: 1
 			path: ../../modules/api-gateway/ApiGatewayModule.php
 
@@ -305,7 +297,7 @@ parameters:
 		-
 			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
 			identifier: constant.notFound
-			count: 2
+			count: 1
 			path: ../../modules/auto-meta/AutoMetaModule.php
 
 		-
@@ -321,33 +313,27 @@ parameters:
 			path: ../../modules/cost-control/CostControlModule.php
 
 		-
-			message: '#^Parameter \#1 \$text of function esc_attr expects string, float\|int given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../modules/cost-control/includes/BudgetAlert.php
-
-		-
 			message: '#^Constant WPMind\\Modules\\CostControl\\UsageTracker\:\:PRICING is unused\.$#'
 			identifier: classConstant.unused
 			count: 1
 			path: ../../modules/cost-control/includes/UsageTracker.php
 
 		-
-			message: '#^Offset ''daily'' on non\-empty\-array\<mixed\> on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
+			message: '#^Constant WPMIND_PLUGIN_DIR not found\.$#'
+			identifier: constant.notFound
 			count: 1
-			path: ../../modules/cost-control/includes/UsageTracker.php
-
-		-
-			message: '#^Offset ''monthly'' on non\-empty\-array\<mixed\> on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: ../../modules/cost-control/includes/UsageTracker.php
+			path: ../../modules/cost-control/templates/settings.php
 
 		-
 			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
 			identifier: constant.notFound
-			count: 2
+			count: 1
+			path: ../../modules/cost-control/templates/settings.php
+
+		-
+			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
+			identifier: constant.notFound
+			count: 1
 			path: ../../modules/exact-cache/ExactCacheModule.php
 
 		-
@@ -363,26 +349,8 @@ parameters:
 			path: ../../modules/exact-cache/includes/DailyStats.php
 
 		-
-			message: '#^Parameter \#1 \$text of function esc_attr expects string, int given\.$#'
-			identifier: argument.type
-			count: 2
-			path: ../../modules/exact-cache/templates/settings.php
-
-		-
-			message: '#^Parameter \#1 \$text of function esc_html expects string, int given\.$#'
-			identifier: argument.type
-			count: 2
-			path: ../../modules/exact-cache/templates/settings.php
-
-		-
 			message: '#^@param tag must not be named \$this\. Choose a descriptive alias, for example \$instance\.$#'
 			identifier: phpDoc.parseError
-			count: 1
-			path: ../../modules/geo/GeoModule.php
-
-		-
-			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
-			identifier: constant.notFound
 			count: 1
 			path: ../../modules/geo/GeoModule.php
 
@@ -429,12 +397,6 @@ parameters:
 			path: ../../modules/geo/includes/SchemaGenerator.php
 
 		-
-			message: '#^Parameter \#1 \$text of function esc_html expects string, int\<0, max\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../modules/geo/templates/settings.php
-
-		-
 			message: '#^@param tag must not be named \$this\. Choose a descriptive alias, for example \$instance\.$#'
 			identifier: phpDoc.parseError
 			count: 1
@@ -443,7 +405,7 @@ parameters:
 		-
 			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
 			identifier: constant.notFound
-			count: 2
+			count: 1
 			path: ../../modules/media-intelligence/MediaIntelligenceModule.php
 
 		-
@@ -455,56 +417,50 @@ parameters:
 		-
 			message: '#^Constant WPMIND_PLUGIN_DIR not found\.$#'
 			identifier: constant.notFound
-			count: 8
-			path: ../../templates/settings-page.php
+			count: 2
+			path: ../../templates/admin/page.php
+
+		-
+			message: '#^Constant WPMIND_PLUGIN_DIR not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: ../../templates/admin/partials/analytics.php
 
 		-
 			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
 			identifier: constant.notFound
 			count: 1
-			path: ../../templates/settings-page.php
+			path: ../../templates/admin/partials/analytics.php
 
 		-
-			message: '#^Parameter \#1 \$text of function esc_html expects string, int\<0, max\> given\.$#'
-			identifier: argument.type
+			message: '#^Constant WPMIND_PLUGIN_DIR not found\.$#'
+			identifier: constant.notFound
 			count: 1
-			path: ../../templates/tabs/geo.php
+			path: ../../templates/admin/views/analytics.php
 
 		-
-			message: '#^Offset ''color'' on array\{icon\: ''ri\-cloud\-line''\|''ri\-fire\-line''\|''ri\-gemini\-line''\|''ri\-openai\-line''\|''ri\-rainbow\-line''\|''ri\-sparkling\-2\-line'', color\: ''\#50575e''\} on left side of \?\? always exists and is not nullable\.$#'
+			message: '#^Constant WPMIND_PLUGIN_DIR not found\.$#'
+			identifier: constant.notFound
+			count: 3
+			path: ../../templates/admin/views/module.php
+
+		-
+			message: '#^Offset ''display_name'' on array\{name\: string, display_name\: string, description\: string\} on left side of \?\? always exists and is not nullable\.$#'
 			identifier: nullCoalesce.offset
 			count: 1
-			path: ../../templates/tabs/images.php
+			path: ../../templates/admin/views/routing.php
 
 		-
-			message: '#^Offset ''icon'' on array\{icon\: ''ri\-cloud\-line''\|''ri\-fire\-line''\|''ri\-gemini\-line''\|''ri\-openai\-line''\|''ri\-rainbow\-line''\|''ri\-sparkling\-2\-line'', color\: ''\#50575e''\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
+			message: '#^Constant WPMIND_PLUGIN_DIR not found\.$#'
+			identifier: constant.notFound
 			count: 1
-			path: ../../templates/tabs/images.php
+			path: ../../templates/admin/views/services.php
 
 		-
-			message: '#^Parameter \#1 \$text of function esc_html expects string, int\<0, max\> given\.$#'
-			identifier: argument.type
-			count: 5
-			path: ../../templates/tabs/overview.php
-
-		-
-			message: '#^Parameter \#1 \$text of function esc_html expects string, float\|int given\.$#'
-			identifier: argument.type
+			message: '#^Constant WPMIND_PLUGIN_URL not found\.$#'
+			identifier: constant.notFound
 			count: 1
-			path: ../../templates/tabs/routing.php
-
-		-
-			message: '#^Parameter \#1 \$text of function esc_html expects string, int\<0, max\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../templates/tabs/routing.php
-
-		-
-			message: '#^Parameter \#1 \$text of function esc_html expects string, int\<1, max\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: ../../templates/tabs/routing.php
+			path: ../../templates/admin/views/services.php
 
 		-
 			message: '#^Action callback returns WPMind\\WPMind but should not return anything\.$#'

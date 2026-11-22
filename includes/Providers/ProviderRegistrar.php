@@ -38,19 +38,47 @@ class ProviderRegistrar {
 		 */
 		$map = apply_filters( 'wpmind_provider_map', self::PROVIDER_MAP );
 
-		foreach ( $map as $key => $providerClass ) {
-			if ( empty( $endpoints[ $key ]['enabled'] ) || empty( $endpoints[ $key ]['api_key'] ) ) {
+		foreach ( $map as $key => $provider_class ) {
+			// 官方算力走独立 OpenAI 兼容网关，不注册 WP 7 SDK provider。
+			if ( \WPMind\Provider\WenpaiCloud::PROVIDER_ID === $key ) {
 				continue;
 			}
 
-			// 注册 Provider
-			$registry->registerProvider( $providerClass );
+			// custom_base_url is only honored by the native HTTP path; SDK provider
+			// classes use vendor default endpoints. Skip SDK registration when a
+			// custom base URL is configured to avoid wrong-endpoint requests.
+			if ( ! empty( $endpoints[ $key ]['custom_base_url'] ) ) {
+				continue;
+			}
 
-			// 设置 API Key 认证
-			$registry->setProviderRequestAuthentication(
-				$providerClass,
-				new ApiKeyRequestAuthentication( $endpoints[ $key ]['api_key'] )
-			);
+			if ( ! class_exists( $provider_class ) ) {
+				continue;
+			}
+
+			// Register built-in providers without custom_base_url by default
+			// (no enabled+key prerequisite) so WP 7.x Connectors can discover
+			// and list them for credential setup.
+			$registry->registerProvider( $provider_class );
+
+			// Credential resolution: locked key > wpmind option > WP 7.x Connectors fallback.
+			$api_key = \WPMind\Provider\WenpaiCloud::locked_api_key( (string) $key );
+			if ( '' === $api_key ) {
+				$api_key = isset( $endpoints[ $key ]['api_key'] ) && is_string( $endpoints[ $key ]['api_key'] )
+					? trim( $endpoints[ $key ]['api_key'] )
+					: '';
+			}
+			if ( '' === $api_key ) {
+				$api_key = \WPMind\Provider\ConnectorCredentials::key_for( (string) $key );
+			}
+
+			// Inject API key auth only when a key exists; otherwise Connectors UI
+			// or env vars can still supply credentials later.
+			if ( '' !== $api_key ) {
+				$registry->setProviderRequestAuthentication(
+					$provider_class,
+					new ApiKeyRequestAuthentication( $api_key )
+				);
+			}
 		}
 	}
 
@@ -80,7 +108,7 @@ class ProviderRegistrar {
 					'credentials_url' => 'https://platform.deepseek.com/api_keys',
 				],
 				'qwen'        => [
-					'name'            => 'Qwen (通义千问)',
+					'name'            => 'Qwen (千问)',
 					'description'     => __( 'Text generation with Alibaba Qwen models.', 'wpmind' ),
 					'credentials_url' => 'https://dashscope.console.aliyun.com/apiKey',
 				],

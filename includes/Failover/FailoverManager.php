@@ -34,13 +34,30 @@ class FailoverManager {
 	}
 
 	private function __construct() {
-		if ( function_exists( 'WPMind\\wpmind' ) ) {
+		$endpoints = array();
+		if ( class_exists( '\\WPMind\\Provider\\EndpointRepository' ) ) {
+			$repo = new \WPMind\Provider\EndpointRepository();
+			foreach ( $repo->enabled() as $id => $endpoint ) {
+				$def              = \WPMind\Provider\ProviderDefinitions::get( $id ) ?? array();
+				$endpoints[ $id ] = array(
+					'name'            => $def['name'] ?? $id,
+					'display_name'    => $def['display_name'] ?? $id,
+					'enabled'         => $endpoint->enabled,
+					'api_key'         => $endpoint->api_key,
+					'custom_base_url' => $endpoint->custom_base_url,
+					'models'          => $endpoint->models,
+					'default_model'   => $endpoint->default_model,
+					'is_cloud'        => ! empty( $def['is_cloud'] ),
+				);
+			}
+		} elseif ( function_exists( 'WPMind\\wpmind' ) ) {
 			$endpoints = \WPMind\wpmind()->get_custom_endpoints();
-			foreach ( $endpoints as $id => $config ) {
-				if ( ! empty( $config['enabled'] ) && ! empty( $config['api_key'] ) ) {
-					$this->providers[ $id ]       = $config;
-					$this->circuitBreakers[ $id ] = new CircuitBreaker( $id );
-				}
+		}
+
+		foreach ( $endpoints as $id => $config ) {
+			if ( ! empty( $config['enabled'] ) && ! empty( $config['api_key'] ) ) {
+				$this->providers[ $id ]       = $config;
+				$this->circuitBreakers[ $id ] = new CircuitBreaker( $id );
 			}
 		}
 	}

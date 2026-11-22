@@ -130,7 +130,7 @@ final class ConfigTransfer {
 		if ( ! $confirm ) {
 			return array(
 				'ok'      => true,
-				'message' => __( '预检通过，请确认后导入', 'wpmind' ),
+				'message' => __( '校验通过，请确认后导入', 'wpmind' ),
 				'errors'  => array(),
 				'diff'    => $dry['diff'],
 			);

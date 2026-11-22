@@ -66,10 +66,17 @@ final class RouteMiddleware implements GatewayStageInterface {
 		$options  = $payload['options'] ?? [];
 		$stream   = $payload['stream'] ?? false;
 
-		// For 'auto' provider, omit provider from options to let WPMind route.
-		if ( ( $options['provider'] ?? '' ) === 'auto' ) {
-			unset( $options['provider'], $options['model'] );
+		$options = $this->apply_provider_policy( $context, $options );
+		if ( null === $options ) {
+			return;
 		}
+
+		// Attach gateway caller context so site-wide usage ledger attributes this call without double-counting.
+		$options['context'] = $this->build_gateway_context( $context );
+
+		// Persist normalized options back onto payload (used by SseStreamController and LogMiddleware).
+		$payload['options'] = $options;
+		$context->set_internal_payload( $payload );
 
 		if ( $stream ) {
 			// Phase 6: SSE streaming via SseStreamController.
@@ -107,10 +114,14 @@ final class RouteMiddleware implements GatewayStageInterface {
 		$input   = $payload['input'] ?? '';
 		$options = $payload['options'] ?? [];
 
-		// For 'auto' provider, omit provider from options.
-		if ( ( $options['provider'] ?? '' ) === 'auto' ) {
-			unset( $options['provider'], $options['model'] );
+		$options = $this->apply_provider_policy( $context, $options );
+		if ( null === $options ) {
+			return;
 		}
+
+		$options['context'] = $this->build_gateway_context( $context );
+		$payload['options'] = $options;
+		$context->set_internal_payload( $payload );
 
 		$api = \WPMind\API\PublicAPI::instance();
 
@@ -123,6 +134,75 @@ final class RouteMiddleware implements GatewayStageInterface {
 		}
 
 		$context->set_internal_result( $result );
+	}
+
+	/**
+	 * Enforce per-key allowed_providers whitelist and normalize auto provider options.
+	 *
+	 * @param GatewayRequestContext $context Pipeline context.
+	 * @param array<string, mixed>  $options Provider options.
+	 * @return array<string, mixed>|null Normalized options, or null when request is rejected with error.
+	 */
+	private function apply_provider_policy( GatewayRequestContext $context, array $options ): ?array {
+		$auth_result       = $context->auth_result();
+		$allowed_providers = [];
+
+		if ( is_object( $auth_result ) && isset( $auth_result->allowed_providers ) && is_array( $auth_result->allowed_providers ) ) {
+			$allowed_providers = array_values(
+				array_filter(
+					array_map( 'strval', $auth_result->allowed_providers ),
+					static fn ( string $p ): bool => '' !== $p
+				)
+			);
+		}
+
+		$requested_provider = isset( $options['provider'] ) ? (string) $options['provider'] : 'auto';
+		$is_auto            = ( '' === $requested_provider || 'auto' === $requested_provider );
+
+		if ( ! empty( $allowed_providers ) ) {
+			if ( ! $is_auto && ! in_array( $requested_provider, $allowed_providers, true ) ) {
+				$context->set_error(
+					new \WP_Error(
+						'provider_not_allowed',
+						sprintf(
+							'Provider "%s" is not allowed for this API key.',
+							sanitize_text_field( $requested_provider )
+						),
+						[ 'status' => 403 ]
+					)
+				);
+				return null;
+			}
+
+			$options['failover_providers'] = $allowed_providers;
+		}
+
+		// For 'auto' provider, omit provider/model so WPMind routes dynamically.
+		if ( $is_auto ) {
+			unset( $options['provider'], $options['model'] );
+		}
+
+		return $options;
+	}
+
+	/**
+	 * Build the UsageTracker context identifier for a gateway request.
+	 *
+	 * @param GatewayRequestContext $context Pipeline context.
+	 * @return string Context tag (e.g. api_gateway:sk_abcd1).
+	 */
+	private function build_gateway_context( GatewayRequestContext $context ): string {
+		$auth_result = $context->auth_result();
+		$prefix      = '';
+		if ( is_object( $auth_result ) && isset( $auth_result->key_prefix ) && '' !== (string) $auth_result->key_prefix ) {
+			$prefix = (string) $auth_result->key_prefix;
+		} elseif ( null !== $context->key_id() ) {
+			$prefix = substr( $context->key_id(), 0, 8 );
+		} else {
+			$prefix = 'anonymous';
+		}
+
+		return 'api_gateway:' . $prefix;
 	}
 
 	/**

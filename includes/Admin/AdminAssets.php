@@ -46,67 +46,42 @@ final class AdminAssets {
 	 * @since 1.1.0
 	 */
 	public function enqueue_admin_assets( string $hook_suffix ): void {
-		// 一级菜单的 hook suffix 是 toplevel_page_{menu_slug}
-		if ( 'toplevel_page_wpmind' !== $hook_suffix ) {
-			return;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only admin page check.
+		$current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( (string) $_GET['page'] ) ) : '';
+		$owns_page    = 'wpmind' === $current_page
+			&& class_exists( 'Wenpai_Admin_Menu', false )
+			&& \Wenpai_Admin_Menu::owns_page( 'wpmind' );
+
+		if ( ! $owns_page ) {
+			$kit_hook = class_exists( 'Wenpai_Admin_Menu', false )
+				? \Wenpai_Admin_Menu::hook( 'wpmind' )
+				: 'toplevel_page_wpmind';
+			if ( ! in_array( $hook_suffix, [ $kit_hook, 'toplevel_page_wpmind', 'settings_page_wpmind' ], true ) ) {
+				return;
+			}
 		}
 
-		// Remixicon 图标库（本地打包）
-		wp_enqueue_style(
-			'remixicon',
-			WPMIND_PLUGIN_URL . 'assets/vendor/remixicon/remixicon.css',
-			[],
-			'4.9.1'
-		);
+		// wenpai-admin-ui kit（与其它文派插件共享同一份 CSS/JS，版本最高者生效）
+		$css_deps = [];
+		if ( class_exists( 'Wenpai_Admin_Loader', false ) ) {
+			\Wenpai_Admin_Loader::enqueue(
+				[
+					'full' => true,
+					'body' => 'wpmind-admin',
+				]
+			);
+			$css_deps[] = \Wenpai_Admin_Loader::STYLE_HANDLE;
+		}
 
+		// 产品补充样式（在 kit 组件之上；仅保留产品专属轻量样式）
 		wp_enqueue_style(
-			'wpmind-admin',
-			WPMIND_PLUGIN_URL . 'assets/css/admin.css',
-			[ 'remixicon' ],
+			'wpmind-admin-ui',
+			WPMIND_PLUGIN_URL . 'assets/css/wpmind-admin.css',
+			$css_deps,
 			WPMIND_VERSION
 		);
 
-		wp_enqueue_style(
-			'wpmind-modules',
-			WPMIND_PLUGIN_URL . 'assets/css/modules.css',
-			[ 'wpmind-admin' ],
-			WPMIND_VERSION
-		);
-
-		wp_enqueue_style(
-			'wpmind-overview',
-			WPMIND_PLUGIN_URL . 'assets/css/overview.css',
-			[ 'wpmind-admin' ],
-			WPMIND_VERSION
-		);
-
-		wp_enqueue_style(
-			'wpmind-panels',
-			WPMIND_PLUGIN_URL . 'assets/css/panels.css',
-			[ 'wpmind-admin' ],
-			WPMIND_VERSION
-		);
-
-		wp_enqueue_style(
-			'wpmind-routing',
-			WPMIND_PLUGIN_URL . 'assets/css/pages/routing.css',
-			[ 'wpmind-panels' ],
-			WPMIND_VERSION
-		);
-
-		wp_enqueue_style(
-			'wpmind-module-layout',
-			WPMIND_PLUGIN_URL . 'assets/css/components/module-layout.css',
-			[ 'wpmind-admin' ],
-			WPMIND_VERSION
-		);
-
-		wp_enqueue_style(
-			'wpmind-responsive',
-			WPMIND_PLUGIN_URL . 'assets/css/responsive.css',
-			[ 'wpmind-panels', 'wpmind-routing' ],
-			WPMIND_VERSION
-		);
+		// JS 行为层（admin-*.js）按元素 ID 绑定，随视图加载。
 
 		// Chart.js 图表库（本地打包，无外部 CDN 依赖）
 		wp_register_script(

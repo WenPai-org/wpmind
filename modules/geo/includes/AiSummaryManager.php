@@ -139,12 +139,15 @@ class AiSummaryManager {
 		if ( ! is_string( $summary ) ) {
 			$summary = '';
 		}
+		$wrapper_class = class_exists( 'Wenpai_Admin_UI' )
+			? 'wenpai-native wpmind-ai-summary-metabox'
+			: 'wpmind-ai-summary-metabox';
 		?>
-		<div class="wpmind-ai-summary-metabox">
-			<p class="description" style="margin-bottom:8px;">
+		<div class="<?php echo esc_attr( $wrapper_class ); ?>">
+			<p class="description">
 				<?php esc_html_e( '控制 AI 如何描述这篇文章。留空则使用摘要。', 'wpmind' ); ?>
 			</p>
-			<textarea name="wpmind_ai_summary" rows="4" style="width:100%;"
+			<textarea name="wpmind_ai_summary" rows="4" class="widefat"
 				placeholder="<?php esc_attr_e( '为 AI 爬虫提供简洁的内容摘要...', 'wpmind' ); ?>"
 			><?php echo esc_textarea( $summary ); ?></textarea>
 			<p class="description">

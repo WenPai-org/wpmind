@@ -23,17 +23,11 @@
 
 		init: function() {
 			this.bindEvents();
-			this.restoreSubTab();
 			this.loadStats();
 		},
 
 		bindEvents: function() {
 			var self = this;
-
-			// Sub-tab switching (scoped to auto-meta panel).
-			$( '.wpmind-auto-meta-panel .wpmind-module-subtab' ).on( 'click', function() {
-				self.switchTab( $( this ).data( 'tab' ) );
-			} );
 
 			$( '#wpmind-save-am-settings' ).on( 'click', function() {
 				self.saveSettings( $( this ) );
@@ -41,29 +35,6 @@
 			$( '#wpmind-am-generate' ).on( 'click', function() {
 				self.manualGenerate();
 			} );
-		},
-
-		switchTab: function( tab ) {
-			$( '.wpmind-auto-meta-panel .wpmind-module-subtab' ).removeClass( 'active' );
-			$( '.wpmind-auto-meta-panel .wpmind-module-subtab[data-tab="' + tab + '"]' ).addClass( 'active' );
-
-			$( '.wpmind-auto-meta-panel .wpmind-module-tab-panel' ).removeClass( 'active' );
-			$( '.wpmind-auto-meta-panel .wpmind-module-tab-panel[data-panel="' + tab + '"]' ).addClass( 'active' );
-
-			try {
-				sessionStorage.setItem( 'wpmind_am_subtab', tab );
-			} catch ( e ) {}
-		},
-
-		restoreSubTab: function() {
-			var tab = 'am-settings';
-			try {
-				var saved = sessionStorage.getItem( 'wpmind_am_subtab' );
-				if ( saved && $( '.wpmind-auto-meta-panel .wpmind-module-subtab[data-tab="' + saved + '"]' ).length ) {
-					tab = saved;
-				}
-			} catch ( e ) {}
-			this.switchTab( tab );
 		},
 
 		loadStats: function() {
@@ -84,8 +55,8 @@
 		},
 
 		saveSettings: function( $button ) {
-			var originalText = $button.html();
-			$button.html( '<span class="dashicons ri-loader-4-line"></span> 保存中...' ).prop( 'disabled', true );
+			var originalHtml = $button.html();
+			$button.addClass( 'is-busy' ).text( '保存中…' ).prop( 'disabled', true );
 
 			var postTypes = [];
 			$( 'input[name="wpmind_auto_meta_post_types[]"]:checked' ).each( function() {
@@ -108,20 +79,20 @@
 				},
 				success: function( response ) {
 					if ( response.success ) {
-						$button.html( '<span class="dashicons ri-check-line"></span> 已保存' );
+						$button.removeClass( 'is-busy' ).text( '已保存' );
 						Toast.success( 'Auto-Meta 设置已保存' );
 					} else {
-						$button.html( '<span class="dashicons ri-error-warning-line"></span> 保存失败' );
+						$button.removeClass( 'is-busy' ).text( '保存失败' );
 						Toast.error( response.data && response.data.message || '保存失败' );
 					}
 					setTimeout( function() {
-						$button.html( originalText ).prop( 'disabled', false );
+						$button.html( originalHtml ).prop( 'disabled', false );
 					}, 1500 );
 				},
 				error: function() {
-					$button.html( '<span class="dashicons ri-error-warning-line"></span> 网络错误' );
+					$button.removeClass( 'is-busy' ).text( '网络错误' );
 					setTimeout( function() {
-						$button.html( originalText ).prop( 'disabled', false );
+						$button.html( originalHtml ).prop( 'disabled', false );
 					}, 2000 );
 				}
 			} );
@@ -135,8 +106,8 @@
 			}
 
 			var $button = $( '#wpmind-am-generate' );
-			var originalText = $button.html();
-			$button.html( '<span class="dashicons ri-loader-4-line"></span> 生成中...' ).prop( 'disabled', true );
+			var originalHtml = $button.html();
+			$button.addClass( 'is-busy' ).text( '生成中…' ).prop( 'disabled', true );
 
 			$.ajax( {
 				url: wpmindData.ajaxurl,
@@ -165,16 +136,16 @@
 						}
 						$( '#wpmind-am-result-faq' ).html( faqHtml );
 
-						$( '.wpmind-am-result' ).show();
+						$( '.wpmind-am-result' ).prop( 'hidden', false );
 						Toast.success( d.message || '生成成功' );
 					} else {
 						Toast.error( response.data && response.data.message || '生成失败' );
 					}
-					$button.html( originalText ).prop( 'disabled', false );
+					$button.html( originalHtml ).prop( 'disabled', false );
 				},
 				error: function() {
 					Toast.error( '网络错误' );
-					$button.html( originalText ).prop( 'disabled', false );
+					$button.html( originalHtml ).prop( 'disabled', false );
 				}
 			} );
 		}

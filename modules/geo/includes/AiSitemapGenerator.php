@@ -33,7 +33,7 @@ class AiSitemapGenerator {
 	/**
 	 * Custom XML namespace for AI metadata.
 	 */
-	private const AI_NS = 'https://wpmind.com/ai-sitemap/1.0';
+	private const AI_NS = 'https://wpcy.com/mind/ai-sitemap/1.0';
 
 	/**
 	 * Constructor.
@@ -106,6 +106,8 @@ class AiSitemapGenerator {
 	 * Render the AI sitemap XML.
 	 */
 	public function render(): void {
+		do_action( 'wpmind_ai_sitemap_accessed' );
+
 		// Explicit 200; /ai-sitemap.xml/ is answered here too (no 301).
 		status_header( 200 );
 		header( 'Content-Type: application/xml; charset=utf-8' );
@@ -128,9 +130,8 @@ class AiSitemapGenerator {
 	 *
 	 * @return string XML content.
 	 */
-	private function generate_xml(): string {
+	public function generate_xml(): string {
 		$max_entries = (int) get_option( 'wpmind_ai_sitemap_max_entries', 500 );
-		$ai_indexing = $this->get_ai_indexing_manager();
 
 		$posts = get_posts(
 			[
@@ -147,12 +148,12 @@ class AiSitemapGenerator {
 		$xml .= '        xmlns:ai="' . self::AI_NS . '">' . "\n";
 
 		foreach ( $posts as $post ) {
-			// Skip posts excluded from AI indexing.
-			if ( $ai_indexing && $ai_indexing->is_excluded( $post->ID ) ) {
+			// Skip posts excluded from AI indexing (read post meta directly).
+			if ( $this->is_post_excluded( $post ) ) {
 				continue;
 			}
 
-			$xml .= $this->build_url_entry( $post, $ai_indexing );
+			$xml .= $this->build_url_entry( $post );
 		}
 
 		$xml .= '</urlset>' . "\n";
@@ -164,11 +165,10 @@ class AiSitemapGenerator {
 	/**
 	 * Build a single <url> entry.
 	 *
-	 * @param \WP_Post               $post        Post object.
-	 * @param AiIndexingManager|null $ai_indexing AI indexing manager.
+	 * @param \WP_Post $post Post object.
 	 * @return string XML fragment.
 	 */
-	private function build_url_entry( \WP_Post $post, ?AiIndexingManager $ai_indexing ): string {
+	private function build_url_entry( \WP_Post $post ): string {
 		$loc     = esc_url( get_permalink( $post ) );
 		$lastmod = get_the_modified_date( 'c', $post );
 
@@ -176,10 +176,8 @@ class AiSitemapGenerator {
 		$xml .= "\t\t<loc>{$loc}</loc>\n";
 		$xml .= "\t\t<lastmod>{$lastmod}</lastmod>\n";
 
-		// AI declaration.
-		$declaration = $ai_indexing
-			? $ai_indexing->get_declaration( $post->ID )
-			: get_option( 'wpmind_ai_default_declaration', 'original' );
+		// AI declaration (read post meta directly with global fallback).
+		$declaration = $this->get_post_declaration( $post->ID );
 		$xml        .= "\t\t<ai:declaration>" . esc_xml( $declaration ) . "</ai:declaration>\n";
 
 		// AI summary (excerpt, max 200 chars).
@@ -191,6 +189,47 @@ class AiSitemapGenerator {
 		$xml .= "\t</url>\n";
 
 		return $xml;
+	}
+
+	/**
+	 * Check whether a post is excluded from AI sitemap by post meta or global post-type rule.
+	 *
+	 * @param \WP_Post $post Post object.
+	 * @return bool True if excluded.
+	 */
+	private function is_post_excluded( \WP_Post $post ): bool {
+		if ( 'noai' === get_post_meta( $post->ID, '_wpmind_ai_indexing', true ) ) {
+			return true;
+		}
+		if ( '1' === get_post_meta( $post->ID, '_wpmind_ai_noindex', true ) ) {
+			return true;
+		}
+		if ( '1' === get_post_meta( $post->ID, '_wpmind_ai_nollm', true ) ) {
+			return true;
+		}
+
+		$excluded_types = get_option( 'wpmind_ai_excluded_post_types', [] );
+		if ( is_array( $excluded_types ) && in_array( $post->post_type, $excluded_types, true ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Resolve AI content declaration directly from post meta with global fallback.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return string Declaration value.
+	 */
+	private function get_post_declaration( int $post_id ): string {
+		$valid       = [ 'original', 'ai-assisted', 'ai-generated' ];
+		$declaration = (string) get_post_meta( $post_id, '_wpmind_ai_declaration', true );
+		if ( '' !== $declaration && in_array( $declaration, $valid, true ) ) {
+			return $declaration;
+		}
+
+		return (string) get_option( 'wpmind_ai_default_declaration', 'original' );
 	}
 
 	/**
@@ -222,35 +261,6 @@ class AiSitemapGenerator {
 
 		/** @var array */
 		return apply_filters( 'wpmind_ai_sitemap_post_types', array_values( $types ) );
-	}
-
-	/**
-	 * Get the AiIndexingManager instance from the GEO module.
-	 *
-	 * @return AiIndexingManager|null
-	 */
-	private function get_ai_indexing_manager(): ?AiIndexingManager {
-		if ( ! function_exists( 'wpmind' ) ) {
-			return null;
-		}
-
-		$plugin = wpmind();
-		if ( ! method_exists( $plugin, 'get_module_loader' ) ) {
-			return null;
-		}
-
-		$loader = $plugin->get_module_loader();
-		if ( ! $loader ) {
-			return null;
-		}
-
-		$geo = $loader->get_module( 'geo' );
-		if ( ! $geo instanceof GeoModule ) {
-			return null;
-		}
-
-		$component = $geo->get_component( 'ai_indexing' );
-		return $component instanceof AiIndexingManager ? $component : null;
 	}
 
 	/**

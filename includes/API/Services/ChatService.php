@@ -106,6 +106,18 @@ class ChatService extends AbstractService {
 			return $cache_lookup['value'];
 		}
 
+		// 缓存未命中、发上游请求前执行站内预算强控.
+		$budget_check = $this->check_budget_before_request( $provider, (string) $context );
+		if ( is_wp_error( $budget_check ) ) {
+			do_action( 'wpmind_error', $budget_check, 'chat', $args );
+			return $budget_check;
+		}
+		$budget_fallback_model = $budget_check['fallback_model'];
+		if ( '' !== $budget_fallback_model ) {
+			$model         = $budget_fallback_model;
+			$model_is_auto = false;
+		}
+
 		do_action( 'wpmind_before_request', 'chat', $args, $context );
 
 		$result          = null;
@@ -124,19 +136,9 @@ class ChatService extends AbstractService {
 
 			$tried_providers[] = $try_provider;
 
-			if ( $model_is_auto ) {
-				$try_model = $this->get_current_model( $try_provider );
-			} else {
-				$try_model       = $model;
-				$endpoints       = $this->get_endpoints();
-				$provider_models = $endpoints[ $try_provider ]['models'] ?? [];
-				if ( ! empty( $provider_models ) && ! in_array( $try_model, $provider_models, true ) ) {
-					$try_model = $this->get_current_model( $try_provider );
-				}
-			}
-
-			$resolution = \WPMind\Provider\Catalog\ModelCatalog::instance()->resolve( $try_provider, (string) $try_model );
-			$try_model  = $resolution->model;
+			$try_model = '' !== $budget_fallback_model
+				? $budget_fallback_model
+				: $this->resolve_attempt_model( $try_provider, (string) $model, $model_is_auto );
 
 			$provider_attempts = 0;
 			$max_attempts      = 2; // 每家最多 2 次
@@ -150,7 +152,7 @@ class ChatService extends AbstractService {
 				$hop_timeout = max( 1, (int) floor( min( $remaining, $hop_cap_ms ) / 1000 ) );
 
 				++$provider_attempts;
-				$result = $this->execute_chat_request( $args, $try_provider, $try_model, $hop_timeout );
+				$result = $this->execute_chat_request( $args, $try_provider, $try_model, $hop_timeout, (string) $context );
 
 				if ( ! is_wp_error( $result ) ) {
 					$failover_meta = [
@@ -312,6 +314,18 @@ class ChatService extends AbstractService {
 			do_action( 'wpmind_provider_failover', $provider, $failover_chain[0], $context, 'preferred_unavailable' );
 		}
 
+		// 发上游请求前执行站内预算强控.
+		$budget_check = $this->check_budget_before_request( $provider, (string) $context );
+		if ( is_wp_error( $budget_check ) ) {
+			do_action( 'wpmind_error', $budget_check, 'stream', compact( 'messages', 'options' ) );
+			return $budget_check;
+		}
+		$budget_fallback_model = $budget_check['fallback_model'];
+		if ( '' !== $budget_fallback_model ) {
+			$original_model = $budget_fallback_model;
+			$model_is_auto  = false;
+		}
+
 		do_action( 'wpmind_before_request', 'stream', compact( 'messages', 'options' ), $context );
 
 		$endpoints             = $this->get_endpoints();
@@ -338,14 +352,22 @@ class ChatService extends AbstractService {
 				continue;
 			}
 
-			$model = $model_is_auto
-				? $this->get_current_model( $try_provider )
-				: $original_model;
+			$custom_url = '' !== trim( (string) ( $endpoint['custom_base_url'] ?? '' ) );
+			if ( '' !== $budget_fallback_model ) {
+				$model = $budget_fallback_model;
+			} elseif ( $custom_url ) {
+				// Custom endpoint: foreign model namespace, skip catalog resolution.
+				$model = $this->resolve_attempt_model( $try_provider, (string) $original_model, $model_is_auto );
+			} else {
+				$model = $model_is_auto
+					? $this->get_current_model( $try_provider )
+					: $original_model;
 
-			if ( $model === 'auto' || $model === 'default' ) {
-				$model = $this->get_current_model( $try_provider );
+				if ( $model === 'auto' || $model === 'default' ) {
+					$model = $this->get_current_model( $try_provider );
+				}
+				$model = \WPMind\Provider\Catalog\ModelCatalog::instance()->resolve( $try_provider, (string) $model )->model;
 			}
-			$model = \WPMind\Provider\Catalog\ModelCatalog::instance()->resolve( $try_provider, (string) $model )->model;
 
 			$base_url = $this->resolve_base_url( $try_provider );
 			$api_url  = trailingslashit( $base_url ) . 'chat/completions';
@@ -398,8 +420,12 @@ class ChatService extends AbstractService {
 				continue; // 建连前可回退
 			}
 
-			$full_content     = '';
-			$content_started  = false;
+			$full_content    = '';
+			$content_started = false;
+			$stream_usage    = [
+				'prompt_tokens'     => 0,
+				'completion_tokens' => 0,
+			];
 
 			while ( ! feof( $stream ) ) {
 				$line = fgets( $stream );
@@ -422,6 +448,11 @@ class ChatService extends AbstractService {
 					continue;
 				}
 
+				if ( isset( $json['usage'] ) && is_array( $json['usage'] ) ) {
+					$stream_usage['prompt_tokens']     = max( 0, (int) ( $json['usage']['prompt_tokens'] ?? $json['usage']['input_tokens'] ?? $stream_usage['prompt_tokens'] ) );
+					$stream_usage['completion_tokens'] = max( 0, (int) ( $json['usage']['completion_tokens'] ?? $json['usage']['output_tokens'] ?? $stream_usage['completion_tokens'] ) );
+				}
+
 				$delta = $json['choices'][0]['delta']['content'] ?? '';
 				if ( ! empty( $delta ) ) {
 					$content_started        = true;
@@ -437,7 +468,37 @@ class ChatService extends AbstractService {
 
 			if ( $stream_output_started || '' !== $full_content ) {
 				$this->record_result( $try_provider, true, $latency_ms );
-				do_action( 'wpmind_after_request', 'stream', [ 'content' => $full_content ], compact( 'messages', 'options' ), [] );
+
+				$in_tokens  = $stream_usage['prompt_tokens'];
+				$out_tokens = $stream_usage['completion_tokens'];
+				if ( 0 === $in_tokens && 0 === $out_tokens ) {
+					$prompt_text = wp_json_encode( $normalized_messages );
+					$in_tokens   = max( 1, (int) ceil( mb_strlen( is_string( $prompt_text ) ? $prompt_text : '' ) / 3 ) );
+					$out_tokens  = max( 1, (int) ceil( mb_strlen( $full_content ) / 3 ) );
+				}
+
+				do_action(
+					'wpmind_usage_record',
+					$try_provider,
+					$model,
+					$in_tokens,
+					$out_tokens,
+					$latency_ms,
+					(string) $context,
+					\WPMind\Provider\WenpaiCloud::payer_for( $try_provider )
+				);
+
+				do_action(
+					'wpmind_after_request',
+					'stream',
+					[ 'content' => $full_content ],
+					compact( 'messages', 'options' ),
+					[
+						'prompt_tokens'     => $in_tokens,
+						'completion_tokens' => $out_tokens,
+						'total_tokens'      => $in_tokens + $out_tokens,
+					]
+				);
 				return true;
 			}
 
@@ -520,12 +581,14 @@ class ChatService extends AbstractService {
 	 * 执行 Chat 请求（路由方法）
 	 *
 	 * @since 3.6.0
-	 * @param array  $args     请求参数
-	 * @param string $provider 服务商
-	 * @param string $model    模型
+	 * @param array  $args     请求参数.
+	 * @param string $provider 服务商.
+	 * @param string $model    模型.
+	 * @param int    $timeout  超时秒数.
+	 * @param string $context  调用上下文.
 	 * @return array|WP_Error
 	 */
-	private function execute_chat_request( array $args, string $provider, string $model, int $timeout = 0 ) {
+	private function execute_chat_request( array $args, string $provider, string $model, int $timeout = 0, string $context = '' ) {
 		if ( $this->should_use_sdk( $provider, $args ) ) {
 			$sdk        = new \WPMind\SDK\SDKAdapter();
 			$start_time = microtime( true );
@@ -547,19 +610,21 @@ class ChatService extends AbstractService {
 			}
 		}
 
-		return $this->execute_chat_request_native( $args, $provider, $model, $timeout );
+		return $this->execute_chat_request_native( $args, $provider, $model, $timeout, $context );
 	}
 
 	/**
 	 * 通过原生 HTTP 执行 chat 请求
 	 *
 	 * @since 3.6.0
-	 * @param array  $args     请求参数
-	 * @param string $provider 服务商
-	 * @param string $model    模型
+	 * @param array  $args     请求参数.
+	 * @param string $provider 服务商.
+	 * @param string $model    模型.
+	 * @param int    $timeout  超时秒数.
+	 * @param string $context  调用上下文.
 	 * @return array|WP_Error
 	 */
-	private function execute_chat_request_native( array $args, string $provider, string $model, int $timeout = 0 ) {
+	private function execute_chat_request_native( array $args, string $provider, string $model, int $timeout = 0, string $context = '' ) {
 		$endpoints = $this->get_endpoints();
 
 		if ( ! isset( $endpoints[ $provider ] ) ) {
@@ -580,10 +645,16 @@ class ChatService extends AbstractService {
 			);
 		}
 
-		if ( $model === 'auto' || empty( $model ) || $model === 'default' ) {
-			$model = $this->get_current_model( $provider );
+		$custom_url = '' !== trim( (string) ( $endpoint['custom_base_url'] ?? '' ) );
+		if ( $custom_url ) {
+			// Custom endpoint: foreign model namespace, skip catalog resolution.
+			$model = $this->resolve_attempt_model( $provider, (string) $model, false );
+		} else {
+			if ( 'auto' === $model || empty( $model ) || 'default' === $model ) {
+				$model = $this->get_current_model( $provider );
+			}
+			$model = \WPMind\Provider\Catalog\ModelCatalog::instance()->resolve( $provider, (string) $model )->model;
 		}
-		$model = \WPMind\Provider\Catalog\ModelCatalog::instance()->resolve( $provider, (string) $model )->model;
 
 		$request_body = [
 			'model'       => $model,
@@ -616,6 +687,7 @@ class ChatService extends AbstractService {
 				'body'    => $request_body,
 				'timeout' => $timeout,
 				'model'   => $model,
+				'context' => $context,
 			]
 		);
 
@@ -706,9 +778,77 @@ class ChatService extends AbstractService {
 	}
 
 	/**
+	 * 解析一次尝试要发给 provider 的模型 ID。
+	 *
+	 * 配置了 custom_base_url 的端点不走静态模型目录：显式模型原样透传
+	 * （中转站/Token Plan 的模型命名与官方目录无关），auto/default 回落到
+	 * 端点自己配置的 default_model，未配置则传字面量 'auto' 由 provider 决定。
+	 * 官方端点维持原有行为：auto 取当前模型，显式模型不在已选列表时回落默认。
+	 *
+	 * @param string $provider  服务商.
+	 * @param string $requested 请求的模型（可能是 'auto'/'default'）.
+	 * @param bool   $is_auto   是否 auto 模式.
+	 * @return string
+	 */
+	private function resolve_attempt_model( string $provider, string $requested, bool $is_auto ): string {
+		$endpoints = $this->get_endpoints();
+		$endpoint  = $endpoints[ $provider ] ?? [];
+		$custom    = '' !== trim( (string) ( $endpoint['custom_base_url'] ?? '' ) );
+
+		if ( $custom ) {
+			if ( $is_auto || 'auto' === $requested || 'default' === $requested || '' === $requested ) {
+				$default_model = trim( (string) ( $endpoint['default_model'] ?? '' ) );
+				if ( '' !== $default_model ) {
+					return $default_model;
+				}
+				return $this->remote_fallback_model( $provider, (string) ( $endpoint['api_key'] ?? '' ) );
+			}
+			return $requested;
+		}
+
+		if ( $is_auto ) {
+			$try_model = $this->get_current_model( $provider );
+		} else {
+			$try_model       = $requested;
+			$provider_models = $endpoint['models'] ?? [];
+			if ( is_array( $provider_models ) && [] !== $provider_models && ! in_array( $requested, $provider_models, true ) ) {
+				$try_model = $this->get_current_model( $provider );
+			}
+		}
+
+		return \WPMind\Provider\Catalog\ModelCatalog::instance()->resolve( $provider, (string) $try_model )->model;
+	}
+
+	/**
+	 * Custom endpoint auto 模式的兜底模型：查远端 /models 列表取第一个可用 ID。
+	 *
+	 * 先读 transient 缓存（key/base_url 指纹校验），未命中时实时拉一次
+	 * （RemoteModelLister 内部 5s 超时、跳过用量记账，12h 缓存）。
+	 * 全部失败回落字面量 'auto'，由 provider 自行决定或报错。
+	 *
+	 * @param string $provider Provider id.
+	 * @param string $api_key  Endpoint API key.
+	 * @return string
+	 */
+	private function remote_fallback_model( string $provider, string $api_key ): string {
+		if ( '' === $api_key ) {
+			return 'auto';
+		}
+
+		$lister = new \WPMind\Provider\Catalog\RemoteModelLister();
+		$ids    = $lister->chat_candidates( $lister->ids_if_valid( $provider, $api_key ), $provider );
+		if ( [] === $ids ) {
+			$refresh = $lister->refresh( $provider, $api_key );
+			$ids     = ! empty( $refresh['ok'] ) ? $lister->chat_candidates( $refresh['ids'], $provider ) : [];
+		}
+
+		return [] !== $ids ? (string) $ids[0] : 'auto';
+	}
+
+	/**
 	 * 公共访问器：获取当前模型（供 Facade 的 get_status() 使用）
 	 *
-	 * @param string $provider 服务商
+	 * @param string $provider 服务商.
 	 * @return string
 	 */
 	public function get_current_model_public( string $provider ): string {

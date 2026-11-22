@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<!-- 由 prototypes/wpmind/build.php 经真实 templates/admin/page.php 生成，请勿手工修改。 -->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模块：API 网关 — 文派心思</title>
+<link rel="stylesheet" href="../../lib/wenpai-admin-ui/css/wenpai-tokens.css">
+<link rel="stylesheet" href="../../lib/wenpai-admin-ui/css/wenpai-admin.css">
+<link rel="stylesheet" href="../../lib/wenpai-admin-ui/css/wenpai-admin-wp.css">
+<link rel="stylesheet" href="../../assets/css/wpmind-admin.css">
+</head>
+<body class="wp-admin wp-core-ui wenpai-ui-page wpmind-admin">
+<div class="wenpai-app" data-wenpai-product="wpmind"><div class="wenpai-top"><div class="wenpai-wrap"><div class="wenpai-head"><a class="wenpai-brand" href="overview.html"><span class="wenpai-mark"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4"/><circle cx="12" cy="3" r="1"/><circle cx="9" cy="13" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1" fill="currentColor" stroke="none"/><path d="M9 17h6"/></svg></span><span class="wenpai-name">文派心思</span></a><nav class="wenpai-tabs" aria-label="文派心思"><a class="wenpai-tab" href="overview.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>概览</a><a class="wenpai-tab" href="cloud.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4"/><circle cx="12" cy="3" r="1"/><circle cx="9" cy="13" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1" fill="currentColor" stroke="none"/><path d="M9 17h6"/></svg>AI 服务</a><a class="wenpai-tab is-active" href="modules.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>模块</a><a class="wenpai-tab" href="analytics.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6" rx="0.5"/><rect x="12" y="8" width="3" height="10" rx="0.5"/><rect x="17" y="5" width="3" height="13" rx="0.5"/></svg>分析</a><a class="wenpai-tab" href="tools.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4.5 4.5 0 0 0-6 5.6L3 17.6V21h3.4l5.7-5.7a4.5 4.5 0 0 0 5.6-6l-3 3-2.5-.5-.5-2.5 3-3Z"/></svg>工具</a><a class="wenpai-tab" href="workflow.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 5.5 1.2 1.2L7 4.5M3.5 11.5l1.2 1.2L7 10.5M3.5 17.5l1.2 1.2L7 16.5"/></svg>任务</a></nav><div class="wenpai-head-right"><a class="btn btn-ghost wenpai-head-action" href="help.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22ZM12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20ZM11 15H13V17H11V15ZM13 13.3551V14H11V12.5C11 11.9477 11.4477 11.5 12 11.5C12.8284 11.5 13.5 10.8284 13.5 10C13.5 9.17157 12.8284 8.5 12 8.5C11.2723 8.5 10.6656 9.01823 10.5288 9.70577L8.56731 9.31346C8.88637 7.70919 10.302 6.5 12 6.5C13.933 6.5 15.5 8.067 15.5 10C15.5 11.5855 14.4457 12.9248 13 13.3551Z"/></svg><span class="wenpai-head-label">帮助</span></a><a class="btn btn-ghost wenpai-head-action" href="https://wpcy.com/support" target="_blank" rel="noopener noreferrer"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.29117 20.8242L2 22L3.17581 16.7088C2.42544 15.3056 2 13.7025 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C10.2975 22 8.6944 21.5746 7.29117 20.8242ZM7.58075 18.711L8.23428 19.0605C9.38248 19.6745 10.6655 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12C4 13.3345 4.32549 14.6175 4.93949 15.7657L5.28896 16.4192L4.63416 19.3658L7.58075 18.711Z"/></svg><span class="wenpai-head-label">反馈</span><span class="screen-reader-text">（在新标签页打开）</span></a></div></div></div></div><main class="wenpai-main wenpai-wrap wenpai-measure-wide"><div class="wenpai-subhead"><a class="wenpai-back" href="modules.html"><svg class="wenpai-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7.82843 11H20V13H7.82843L13.1924 18.364L11.7782 19.7782L4 12L11.7782 4.22183L13.1924 5.63604L7.82843 11Z"/></svg><span>返回模块列表</span></a><div class="wenpai-page-head"><div><h1 class="wenpai-h1">API 网关</h1><p class="wenpai-lede">对外提供 OpenAI 兼容 REST 接口、密钥管理与限流日志。</p></div><div class="mode"><span class="pill ok">已开启</span></div></div></div>
+<div class="wenpai-stack">
+	<nav class="wenpai-subnav" aria-label="API 网关分区"><span class="seg"><a href="module-gateway.html?section=settings" class="on" aria-current="page">基础设置</a><a href="module-gateway.html?section=keys">API Key 管理</a><a href="module-gateway.html?section=docs">接入文档</a><a href="module-gateway.html?section=logs">请求日志</a></span></nav><section class="card"><dl class="wenpai-statbar"><div class="wenpai-statbar__item"><dt>API Keys</dt><dd>3</dd></div><div class="wenpai-statbar__item"><dt>活跃 Keys</dt><dd>2</dd></div><div class="wenpai-statbar__item"><dt>本月请求</dt><dd>1,284</dd></div><div class="wenpai-statbar__item"><dt>默认 RPM</dt><dd>60</dd></div></dl></section>
+<div class="wenpai-stack">
+	<!-- Panel 1: Settings -->
+	<div data-wenpai-group="settings">
+		<section class="card"><div class="card-head"><div><h2 class="card-title">网关设置</h2><p class="card-sub">OpenAI 兼容接口：Bearer 鉴权、限流与 SSE 流式。</p></div><span class="head-actions"><span class="pill ok">已开启</span></span></div><div class="wenpai-field wenpai-field--toggle wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="gw-enabled">启用网关</label></div><div class="field-ctl"><span class="wenpai-switch"><input type="checkbox" role="switch" class="wenpai-switch__input" id="gw-enabled" checked="checked"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span><p class="wenpai-field__desc">关闭后 REST 网关接口停止响应。</p></div></div><div class="wenpai-field wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="gw-rpm">默认 RPM 限制</label></div><div class="field-ctl"><input type="number" class="wpmind-num" id="gw-rpm" value="60" min="1" max="10000"></div></div><div class="wenpai-field wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="gw-tpm">默认 TPM 限制</label></div><div class="field-ctl"><input type="number" class="wpmind-num" id="gw-tpm" value="100000" min="1000" max="10000000"></div></div><div class="wenpai-field wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="gw-sse">SSE 全局并发</label></div><div class="field-ctl"><input type="number" class="wpmind-num" id="gw-sse" value="20" min="1" max="200"></div></div><div class="wenpai-field wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="gw-body-mb">请求体上限 (MB)</label></div><div class="field-ctl"><input type="number" class="wpmind-num" id="gw-body-mb" value="10" min="1" max="100"></div></div><div class="wenpai-field wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="gw-tokens-cap">Max Tokens 上限</label></div><div class="field-ctl"><input type="number" class="wpmind-num" id="gw-tokens-cap" value="16384" min="256" max="1000000"></div></div><div class="wenpai-field wenpai-field--toggle wenpai-field--row field"><div class="field-label"><label class="wenpai-field__label" for="gw-log-prompts">记录 Prompt 内容</label></div><div class="field-ctl"><span class="wenpai-switch"><input type="checkbox" role="switch" class="wenpai-switch__input" id="gw-log-prompts"><span class="wenpai-switch__track" aria-hidden="true"></span><span class="wenpai-switch__state" aria-hidden="true"><span class="wenpai-switch__on">已开启</span><span class="wenpai-switch__off">未开启</span></span></span><p class="wenpai-field__desc">仅在排查问题时开启，将原文记入审计日志。</p></div></div>		<div class="card-foot">
+			<span class="wenpai-actions">
+				<button type="button" class="btn btn-primary" id="gw-save-settings">保存网关设置</button>
+				<span id="gw-save-msg" class="meta" hidden></span>
+			</span>
+		</div>
+		</section>	</div>
+
+	<!-- Panel 2: API Key Management -->
+	<div data-wenpai-group="keys" data-wenpai-view-hidden hidden>
+		<section class="card"><div class="card-head"><div><h2 class="card-title">API Key 管理</h2><p class="card-sub">创建、调整限额与吊销网关访问密钥。</p></div><div class="head-actions"><button type="button" class="btn btn-primary btn-sm" id="gw-show-create">创建 API Key</button></div></div>		<div id="gw-create-form" class="wpmind-gw__panel" hidden>
+			<h2 class="section-title">创建新 API Key</h2>			<div class="wenpai-grid-auto">
+				<div class="wpmind-gw__field">
+					<label for="ck-name">名称</label>
+					<input type="text" id="ck-name" placeholder="My App">
+				</div>
+				<div class="wpmind-gw__field">
+					<label for="ck-rpm">RPM</label>
+					<input type="number" id="ck-rpm" value="60" min="1">
+				</div>
+				<div class="wpmind-gw__field">
+					<label for="ck-tpm">TPM</label>
+					<input type="number" id="ck-tpm" value="100000" min="1000">
+				</div>
+				<div class="wpmind-gw__field">
+					<label for="ck-concurrency">并发限制</label>
+					<input type="number" id="ck-concurrency" value="2" min="1" max="100">
+				</div>
+				<div class="wpmind-gw__field">
+					<label for="ck-budget">月预算 (USD)</label>
+					<input type="number" id="ck-budget" value="0" min="0" step="0.01">
+				</div>
+				<div class="wpmind-gw__field">
+					<label for="ck-ips">IP 白名单</label>
+					<input type="text" id="ck-ips" placeholder="1.2.3.4, 5.6.7.8">
+				</div>
+				<div class="wpmind-gw__field">
+					<label for="ck-expires">过期时间</label>
+					<input type="date" id="ck-expires">
+				</div>
+			</div>
+			<div class="wenpai-actions wpmind-gw__actions">
+				<button type="button" class="btn btn-sm btn-primary" id="gw-create-key">确认创建</button>
+				<button type="button" class="btn btn-sm btn-ghost" id="gw-cancel-create">取消</button>
+			</div>
+		</div>
+
+		<div id="gw-new-key-box" class="wpmind-gw__keybox" hidden>
+			<p class="meta">API Key 已创建，请立即复制保存，页面刷新后不再显示完整密钥。</p>
+			<div class="wenpai-row wenpai-row--tight">
+				<code class="wenpai-code" id="gw-raw-key"></code>
+				<button type="button" class="btn btn-sm btn-secondary" id="gw-copy-key">复制密钥</button>
+			</div>
+		</div>
+
+		<div class="wenpai-table-wrap">
+			<table class="tbl">
+				<thead>
+					<tr>
+						<th>Key Prefix</th>
+						<th>名称</th>
+						<th>状态</th>
+						<th>RPM / TPM</th>
+						<th class="num">本月请求</th>
+						<th class="num">Tokens</th>
+						<th>最后使用</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody id="gw-keys-tbody">
+					<tr><td colspan="8" class="meta">正在读取 API Key 列表…</td></tr>
+				</tbody>
+			</table>
+		</div>
+		</section>	</div>
+
+	<!-- Panel 3: API Docs -->
+	<div data-wenpai-group="docs" data-wenpai-view-hidden hidden>
+		<section class="card"><div class="card-head"><div><h2 class="card-title">接入文档</h2><p class="card-sub">OpenAI 兼容接口地址与调用示例。</p></div></div>		<div class="wenpai-stack wenpai-stack--sm">
+			<h2 class="section-title">Base URL</h2><div class="wenpai-code"><div class="wenpai-code__bar"><span class="wenpai-code__lang">text</span><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-target="self:code" data-label="复制" data-done-label="已复制">复制</button></div><pre><code class="language-text">https://example.com/wp-json/mind/v1</code></pre></div><h2 class="section-title">可用端点</h2>			<div class="wenpai-table-wrap">
+				<table class="tbl">
+					<thead>
+						<tr>
+							<th>方法</th>
+							<th>路径</th>
+							<th>说明</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr><td><code class="wenpai-code">POST</code></td><td><code class="wenpai-code">/chat/completions</code></td><td>对话补全（兼容 OpenAI）</td></tr>
+						<tr><td><code class="wenpai-code">GET</code></td><td><code class="wenpai-code">/models</code></td><td>列出可用模型</td></tr>
+						<tr><td><code class="wenpai-code">POST</code></td><td><code class="wenpai-code">/embeddings</code></td><td>文本向量化</td></tr>
+						<tr><td><code class="wenpai-code">POST</code></td><td><code class="wenpai-code">/responses</code></td><td>Responses 接口（兼容 OpenAI）</td></tr>
+						<tr><td><code class="wenpai-code">GET</code></td><td><code class="wenpai-code">/status</code></td><td>网关健康状态</td></tr>
+					</tbody>
+				</table>
+			</div>
+			<h2 class="section-title">curl 调用示例</h2><div class="wenpai-code"><div class="wenpai-code__bar"><span class="wenpai-code__lang">bash</span><button type="button" class="btn btn-ghost wenpai-copy" data-wenpai-copy-target="self:code" data-label="复制" data-done-label="已复制">复制</button></div><pre><code class="language-bash">curl https://example.com/wp-json/mind/v1/chat/completions \
+  -H &quot;Authorization: Bearer sk_mind_YOUR_KEY&quot; \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#039;{
+    &quot;model&quot;: &quot;deepseek-chat&quot;,
+    &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Hello&quot;}],
+    &quot;stream&quot;: true
+  }&#039;</code></pre></div>			<p class="meta">认证方式：请求头携带 Authorization: Bearer sk_mind_YOUR_KEY。</p>
+		</div>
+		</section>	</div>
+
+	<!-- Panel 4: Audit Logs -->
+	<div data-wenpai-group="logs" data-wenpai-view-hidden hidden>
+		<section class="card"><div class="card-head"><div><h2 class="card-title">请求日志</h2><p class="card-sub">按密钥、事件类型与日期筛选审计记录。</p></div></div>		<div class="wenpai-row wpmind-gw__filters">
+			<div class="wpmind-gw__field">
+				<label for="log-filter-key">Key</label>
+				<select id="log-filter-key">
+					<option value="">全部</option>
+				</select>
+			</div>
+			<div class="wpmind-gw__field">
+				<label for="log-filter-event">事件类型</label>
+				<select id="log-filter-event">
+					<option value="">全部</option>
+					<option value="api_request">api_request</option>
+					<option value="api_stream_request">api_stream_request</option>
+					<option value="key_created">key_created</option>
+					<option value="key_revoked">key_revoked</option>
+				</select>
+			</div>
+			<div class="wpmind-gw__field">
+				<label for="log-filter-from">开始日期</label>
+				<input type="date" id="log-filter-from">
+			</div>
+			<div class="wpmind-gw__field">
+				<label for="log-filter-to">结束日期</label>
+				<input type="date" id="log-filter-to">
+			</div>
+			<div class="wpmind-gw__field">
+				<button type="button" class="btn btn-sm btn-primary" id="log-filter-apply">筛选日志</button>
+			</div>
+		</div>
+
+		<div class="wenpai-table-wrap">
+			<table class="tbl">
+				<thead>
+					<tr>
+						<th>时间</th>
+						<th>Key</th>
+						<th>事件</th>
+						<th>详情</th>
+					</tr>
+				</thead>
+				<tbody id="gw-logs-tbody">
+					<tr><td colspan="4" class="meta">点击「筛选日志」加载网关请求记录。</td></tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="card-foot start" id="gw-logs-pagination" hidden>
+			<span id="gw-logs-info" class="meta"></span>
+			<span class="wenpai-actions">
+				<button type="button" class="btn btn-sm btn-ghost" id="log-prev" disabled>上一页</button>
+				<button type="button" class="btn btn-sm btn-ghost" id="log-next" disabled>下一页</button>
+			</span>
+		</div>
+		</section>	</div>
+</div>
+
+<script>
+( function( $ ) {
+	'use strict';
+	var ajaxurl = 'admin-ajax.php';
+	var nonce   = 'proto';
+	var logPage = 1;
+
+	function toast( msg, tone ) {
+		if ( typeof window.wenpaiToast === 'function' ) {
+			window.wenpaiToast( msg, tone || 'ok' );
+		} else if ( window.WPMindAdmin && window.WPMindAdmin.Toast ) {
+			window.WPMindAdmin.Toast[ tone === 'bad' ? 'error' : 'success' ]( msg );
+		}
+	}
+
+	function esc( text ) {
+		return $( '<div/>' ).text( text == null ? '' : String( text ) ).html();
+	}
+
+	/* ---- Save settings ---- */
+	$( '#gw-save-settings' ).on( 'click', function() {
+		var $btn = $( this );
+		var $msg = $( '#gw-save-msg' );
+		$btn.prop( 'disabled', true );
+		$.post( ajaxurl, {
+			action: 'wpmind_save_gateway_settings',
+			nonce: nonce,
+			gateway_enabled: $( '#gw-enabled' ).is( ':checked' ) ? '1' : '',
+			sse_global_limit: $( '#gw-sse' ).val(),
+			default_rpm: $( '#gw-rpm' ).val(),
+			default_tpm: $( '#gw-tpm' ).val(),
+			max_body_bytes: String( parseInt( $( '#gw-body-mb' ).val() || '10', 10 ) * 1048576 ),
+			max_tokens_cap: $( '#gw-tokens-cap' ).val(),
+			log_prompts: $( '#gw-log-prompts' ).is( ':checked' ) ? '1' : ''
+		}, function( r ) {
+			var m = ( r && r.data && r.data.message ) || ( r && r.success ? '已保存' : '保存失败' );
+			$msg.text( m ).prop( 'hidden', false );
+			toast( m, r && r.success ? 'ok' : 'bad' );
+			setTimeout( function() { $msg.prop( 'hidden', true ); }, 3000 );
+		} ).always( function() { $btn.prop( 'disabled', false ); } );
+	} );
+
+	/* ---- Create key form toggle ---- */
+	$( '#gw-show-create' ).on( 'click', function() { $( '#gw-create-form' ).prop( 'hidden', false ); } );
+	$( '#gw-cancel-create' ).on( 'click', function() { $( '#gw-create-form' ).prop( 'hidden', true ); } );
+
+	/* ---- Create key ---- */
+	$( '#gw-create-key' ).on( 'click', function() {
+		var $btn = $( this );
+		$btn.prop( 'disabled', true );
+		$.post( ajaxurl, {
+			action: 'wpmind_create_api_key',
+			nonce: nonce,
+			name: $( '#ck-name' ).val(),
+			rpm_limit: $( '#ck-rpm' ).val(),
+			tpm_limit: $( '#ck-tpm' ).val(),
+			concurrency_limit: $( '#ck-concurrency' ).val(),
+			monthly_budget_usd: $( '#ck-budget' ).val(),
+			ip_whitelist: $( '#ck-ips' ).val(),
+			expires_at: $( '#ck-expires' ).val()
+		}, function( r ) {
+			if ( r && r.success ) {
+				$( '#gw-raw-key' ).text( r.data.raw_key );
+				$( '#gw-new-key-box' ).prop( 'hidden', false );
+				$( '#gw-create-form' ).prop( 'hidden', true );
+				$( '#ck-name' ).val( '' );
+				toast( 'API Key 已创建', 'ok' );
+				loadKeys();
+			} else {
+				toast( ( r && r.data && r.data.message ) || '创建失败', 'bad' );
+			}
+		} ).always( function() { $btn.prop( 'disabled', false ); } );
+	} );
+
+	/* ---- Copy key ---- */
+	$( '#gw-copy-key' ).on( 'click', function() {
+		var text = $( '#gw-raw-key' ).text();
+		var $btn = $( this );
+		if ( navigator.clipboard ) {
+			navigator.clipboard.writeText( text ).then( function() {
+				var orig = $btn.text();
+				$btn.text( '已复制' );
+				setTimeout( function() { $btn.text( orig ); }, 2000 );
+			} );
+		}
+	} );
+
+	function editField( label, type, id, val ) {
+		var step = type === 'number' ? ' step="any"' : '';
+		return '<div class="wpmind-gw__field"><label for="' + esc( id ) + '">' + esc( label ) + '</label><input type="' + esc( type ) + '" id="' + esc( id ) + '" value="' + esc( val ) + '"' + step + '></div>';
+	}
+
+	/* ---- Load keys ---- */
+	function loadKeys() {
+		$.post( ajaxurl, { action: 'wpmind_list_api_keys', nonce: nonce }, function( r ) {
+			var $tb = $( '#gw-keys-tbody' );
+			$tb.empty();
+			if ( ! r || ! r.success || ! r.data || ! r.data.keys || ! r.data.keys.length ) {
+				$tb.html( '<tr><td colspan="8" class="meta">还没有 API Key，点击「创建 API Key」生成访问凭证。</td></tr>' );
+				return;
+			}
+			var $sel = $( '#log-filter-key' );
+			$sel.find( 'option:gt(0)' ).remove();
+			$.each( r.data.keys, function( i, k ) {
+				$sel.append( '<option value="' + esc( k.key_id ) + '">sk_mind_' + esc( k.key_prefix ) + '… (' + esc( k.name || '-' ) + ')</option>' );
+				var stateCls = k.status === 'active' ? 'ok' : 'mute';
+				var stateTxt = k.status === 'active' ? '启用' : esc( k.status );
+				var lastUsed = k.last_used_at || '—';
+				var actions = '—';
+				if ( k.status === 'active' ) {
+					actions = '<span class="wenpai-actions">'
+						+ '<button type="button" class="btn btn-sm btn-ghost gw-edit-key" data-kid="' + esc( k.key_id ) + '">编辑</button>'
+						+ '<button type="button" class="btn btn-sm btn-danger gw-revoke" data-kid="' + esc( k.key_id ) + '" data-wenpai-confirm="确定要吊销此 API Key？吊销后立即失效且不可恢复。" data-wenpai-confirm-title="吊销 API Key" data-wenpai-confirm-danger="1" data-wenpai-confirm-ok="确认吊销">吊销</button>'
+						+ '</span>';
+				}
+				var ipw = '';
+				try {
+					ipw = k.ip_whitelist ? ( typeof k.ip_whitelist === 'string' ? ( k.ip_whitelist.charAt( 0 ) === '[' ? JSON.parse( k.ip_whitelist ).join( ', ' ) : k.ip_whitelist ) : '' ) : '';
+				} catch ( e ) {
+					ipw = k.ip_whitelist || '';
+				}
+				$tb.append(
+					'<tr data-key-id="' + esc( k.key_id ) + '">' +
+					'<td><code class="wenpai-code">sk_mind_' + esc( k.key_prefix ) + '…</code></td>' +
+					'<td>' + esc( k.name || '—' ) + '</td>' +
+					'<td><span class="wenpai-micro-tag is-' + stateCls + '">' + stateTxt + '</span></td>' +
+					'<td>' + esc( k.rpm_limit ) + ' / ' + esc( k.tpm_limit ) + '</td>' +
+					'<td class="num">' + esc( k.usage_request_count || 0 ) + '</td>' +
+					'<td class="num">' + Number( k.usage_total_tokens || 0 ).toLocaleString() + '</td>' +
+					'<td>' + esc( lastUsed ) + '</td>' +
+					'<td>' + actions + '</td>' +
+					'</tr>'
+				);
+				if ( k.status === 'active' ) {
+					$tb.append(
+						'<tr class="wpmind-gw__editrow" data-edit-for="' + esc( k.key_id ) + '" hidden><td colspan="8">' +
+						'<div class="wpmind-gw__panel">' +
+						'<div class="wenpai-grid-auto">' +
+						editField( '名称', 'text', 'ek-name-' + k.key_id, k.name || '' ) +
+						editField( 'RPM', 'number', 'ek-rpm-' + k.key_id, k.rpm_limit ) +
+						editField( 'TPM', 'number', 'ek-tpm-' + k.key_id, k.tpm_limit ) +
+						editField( '并发', 'number', 'ek-conc-' + k.key_id, k.concurrency_limit ) +
+						editField( '月预算 (USD)', 'number', 'ek-budget-' + k.key_id, k.monthly_budget_usd || 0 ) +
+						editField( 'IP 白名单', 'text', 'ek-ips-' + k.key_id, ipw ) +
+						editField( '过期时间', 'date', 'ek-exp-' + k.key_id, k.expires_at ? k.expires_at.substring( 0, 10 ) : '' ) +
+						'</div>' +
+						'<div class="wenpai-actions wpmind-gw__actions">' +
+						'<button type="button" class="btn btn-sm btn-primary gw-save-edit" data-kid="' + esc( k.key_id ) + '">保存修改</button>' +
+						'<button type="button" class="btn btn-sm btn-ghost gw-cancel-edit" data-kid="' + esc( k.key_id ) + '">取消</button>' +
+						'</div></div></td></tr>'
+					);
+				}
+			} );
+		} );
+	}
+
+	/* ---- Toggle inline edit ---- */
+	$( document ).on( 'click', '.gw-edit-key', function() {
+		var kid = $( this ).data( 'kid' );
+		var $row = $( '[data-edit-for="' + kid + '"]' );
+		var wasHidden = $row.prop( 'hidden' );
+		$( '.wpmind-gw__editrow' ).prop( 'hidden', true );
+		$row.prop( 'hidden', ! wasHidden );
+	} );
+
+	$( document ).on( 'click', '.gw-cancel-edit', function() {
+		$( '[data-edit-for="' + $( this ).data( 'kid' ) + '"]' ).prop( 'hidden', true );
+	} );
+
+	/* ---- Save edit ---- */
+	$( document ).on( 'click', '.gw-save-edit', function() {
+		var $btn = $( this );
+		var kid = $btn.data( 'kid' );
+		$btn.prop( 'disabled', true );
+		$.post( ajaxurl, {
+			action: 'wpmind_update_api_key',
+			nonce: nonce,
+			key_id: kid,
+			name: $( '#ek-name-' + kid ).val(),
+			rpm_limit: $( '#ek-rpm-' + kid ).val(),
+			tpm_limit: $( '#ek-tpm-' + kid ).val(),
+			concurrency_limit: $( '#ek-conc-' + kid ).val(),
+			monthly_budget_usd: $( '#ek-budget-' + kid ).val(),
+			ip_whitelist: $( '#ek-ips-' + kid ).val(),
+			expires_at: $( '#ek-exp-' + kid ).val()
+		}, function( r ) {
+			if ( r && r.success ) {
+				toast( '密钥配置已更新', 'ok' );
+				loadKeys();
+			} else {
+				toast( ( r && r.data && r.data.message ) || '更新失败', 'bad' );
+			}
+		} ).always( function() { $btn.prop( 'disabled', false ); } );
+	} );
+
+	/* ---- Revoke key (confirmed via kit [data-wenpai-confirm]) ---- */
+	$( document ).on( 'click', '.gw-revoke', function() {
+		var $btn = $( this );
+		var kid = $btn.data( 'kid' );
+		$btn.prop( 'disabled', true );
+		$.post( ajaxurl, { action: 'wpmind_revoke_api_key', nonce: nonce, key_id: kid }, function( r ) {
+			if ( r && r.success ) {
+				toast( 'API Key 已吊销', 'ok' );
+				loadKeys();
+			} else {
+				toast( ( r && r.data && r.data.message ) || '吊销失败', 'bad' );
+			}
+		} ).always( function() { $btn.prop( 'disabled', false ); } );
+	} );
+
+	/* ---- Audit logs ---- */
+	$( '#log-filter-apply' ).on( 'click', function() { logPage = 1; loadLogs(); } );
+	$( '#log-prev' ).on( 'click', function() { if ( logPage > 1 ) { logPage--; loadLogs(); } } );
+	$( '#log-next' ).on( 'click', function() { logPage++; loadLogs(); } );
+
+	function loadLogs() {
+		$.post( ajaxurl, {
+			action: 'wpmind_list_audit_logs',
+			nonce: nonce,
+			page: logPage,
+			key_id: $( '#log-filter-key' ).val(),
+			event_type: $( '#log-filter-event' ).val(),
+			date_from: $( '#log-filter-from' ).val(),
+			date_to: $( '#log-filter-to' ).val()
+		}, function( r ) {
+			var $tb = $( '#gw-logs-tbody' );
+			$tb.empty();
+			if ( ! r || ! r.success || ! r.data || ! r.data.logs || ! r.data.logs.length ) {
+				$tb.html( '<tr><td colspan="4" class="meta">还没有符合条件的请求日志。</td></tr>' );
+				$( '#gw-logs-pagination' ).prop( 'hidden', true );
+				return;
+			}
+			$.each( r.data.logs, function( i, log ) {
+				var detail = '';
+				try {
+					var d = JSON.parse( log.detail_json || '{}' );
+					var parts = [];
+					if ( d.model ) parts.push( d.model );
+					if ( d.tokens_used ) parts.push( d.tokens_used + ' tokens' );
+					if ( d.finish_reason ) parts.push( d.finish_reason );
+					if ( d.status_code ) parts.push( 'HTTP ' + d.status_code );
+					detail = parts.join( ' | ' );
+				} catch ( e ) {
+					detail = log.detail_json || '';
+				}
+				$tb.append(
+					'<tr>' +
+					'<td>' + esc( log.created_at || '—' ) + '</td>' +
+					'<td><code class="wenpai-code">' + esc( log.key_id || '—' ) + '</code></td>' +
+					'<td>' + esc( log.event_type || '—' ) + '</td>' +
+					'<td>' + esc( detail ) + '</td>' +
+					'</tr>'
+				);
+			} );
+			var d = r.data;
+			$( '#gw-logs-pagination' ).prop( 'hidden', false );
+			$( '#gw-logs-info' ).text( '共 ' + d.total + ' 条，第 ' + d.page + ' / ' + d.total_pages + ' 页' );
+			$( '#log-prev' ).prop( 'disabled', d.page <= 1 );
+			$( '#log-next' ).prop( 'disabled', d.page >= d.total_pages );
+		} );
+	}
+
+	loadKeys();
+} )( jQuery );
+</script>
+	</div>
+<footer class="foot"><span>文派心思 v0.14.0</span><span class="r"><a href="https://wpcy.com/document" target="_blank" rel="noopener noreferrer">文档<span class="screen-reader-text">（在新标签页打开）</span></a><a href="https://github.com/WenPai-org/wpmind" target="_blank" rel="noopener noreferrer">GitHub<span class="screen-reader-text">（在新标签页打开）</span></a></span></footer></main></div>
+<script src="../../lib/wenpai-admin-ui/js/wenpai-admin.js"></script>
+</body>
+</html>

@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "description": "数据分析 - 用量趋势、服务商对比、成本分析",
     "author": "WPMind",
-    "icon": "ri-bar-chart-box-line",
+    "icon": "analytics",
     "class": "WPMind\\Modules\\Analytics\\AnalyticsModule",
     "can_disable": true,
     "settings_tab": "analytics",

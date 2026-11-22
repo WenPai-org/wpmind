@@ -97,43 +97,86 @@ class ImageRouter {
 	}
 
 	/**
+	 * 图像 Provider 显示名映射。
+	 *
+	 * @var array<string, string>
+	 */
+	public const DISPLAY_NAMES = [
+		'openai_gpt_image'    => 'GPT Image',
+		'google_gemini_image' => 'Gemini Image',
+		'tencent_hunyuan'     => '混元图像',
+		'bytedance_reve'      => 'Reve Image',
+		'flux'                => 'Flux',
+		'bytedance_seedream'  => 'Seedream',
+		'midjourney'          => 'Midjourney',
+		'qwen_image'          => '千问图像',
+	];
+
+	/**
+	 * 获取图像 Provider 显示名。
+	 *
+	 * @param string $provider_id Provider ID.
+	 * @return string
+	 */
+	public static function get_display_name( string $provider_id ): string {
+		return self::DISPLAY_NAMES[ $provider_id ] ?? $provider_id;
+	}
+
+	/**
 	 * 生成图像
 	 *
-	 * @param string $prompt 提示词
-	 * @param array  $options 选项
-	 * @return array
+	 * @param string $prompt 提示词.
+	 * @param array  $options 选项.
+	 * @return array|\WP_Error
 	 */
-	public function generate( string $prompt, array $options = [] ): array {
-		$provider_id = $options['provider'] ?? $this->getDefaultProvider();
+	public function generate( string $prompt, array $options = [] ): array|\WP_Error {
+		$requested_provider = isset( $options['provider'] ) && is_string( $options['provider'] )
+			? trim( $options['provider'] )
+			: '';
+		$provider_id        = ( '' !== $requested_provider && 'auto' !== $requested_provider )
+			? $requested_provider
+			: $this->getDefaultProvider();
 
 		if ( ! isset( $this->providers[ $provider_id ] ) ) {
-			// 尝试使用任何可用的 Provider
-			$provider_id = array_key_first( $this->providers );
+			// 尝试使用任何可用的 Provider.
+			$provider_id = (string) ( array_key_first( $this->providers ) ?? '' );
 		}
 
-		if ( ! $provider_id || ! isset( $this->providers[ $provider_id ] ) ) {
-			return [
-				'success' => false,
-				'error'   => '没有可用的图像生成服务',
-			];
+		if ( '' === $provider_id || ! isset( $this->providers[ $provider_id ] ) ) {
+			return new \WP_Error(
+				'wpmind_image_no_provider',
+				__( '没有可用的图像生成服务', 'wpmind' )
+			);
 		}
 
-		$provider = $this->providers[ $provider_id ];
+		$provider   = $this->providers[ $provider_id ];
+		$start_time = microtime( true );
 
 		try {
-			$result = $provider->generate( $prompt, $options );
+			$result     = $provider->generate( $prompt, $options );
+			$latency_ms = (int) ( ( microtime( true ) - $start_time ) * 1000 );
 
-			// 记录用量
-			if ( $result['success'] ) {
-				$this->trackUsage( $provider_id, $prompt, $options );
+			if ( empty( $result['success'] ) ) {
+				$message = is_string( $result['error'] ?? null ) && '' !== $result['error']
+					? $result['error']
+					: __( '图像生成失败', 'wpmind' );
+				return new \WP_Error(
+					'wpmind_image_generation_failed',
+					$message,
+					[ 'provider' => $provider_id ]
+				);
 			}
 
+			$result['provider'] = $provider_id;
+			$this->trackUsage( $provider_id, $prompt, $options, $latency_ms );
+
 			return $result;
-		} catch ( \Exception $e ) {
-			return [
-				'success' => false,
-				'error'   => $e->getMessage(),
-			];
+		} catch ( \Throwable $e ) {
+			return new \WP_Error(
+				'wpmind_image_generation_exception',
+				$e->getMessage(),
+				[ 'provider' => $provider_id ]
+			);
 		}
 	}
 
@@ -188,14 +231,24 @@ class ImageRouter {
 	}
 
 	/**
-	 * 记录用量
+	 * 记录用量。
 	 *
-	 * @param string $provider_id Provider ID
-	 * @param string $prompt 提示词
-	 * @param array  $options 选项
+	 * @param string $provider_id Provider ID.
+	 * @param string $prompt      提示词.
+	 * @param array  $options     选项.
+	 * @param int    $latency_ms  请求延迟（毫秒）.
 	 */
-	private function trackUsage( string $provider_id, string $prompt, array $options ): void {
-		// TODO: 实现图像生成用量追踪
+	private function trackUsage( string $provider_id, string $prompt, array $options, int $latency_ms = 0 ): void {
+		$model   = isset( $options['model'] ) && is_string( $options['model'] ) && '' !== trim( $options['model'] )
+			? trim( $options['model'] )
+			: $provider_id;
+		$context = isset( $options['context'] ) && is_string( $options['context'] ) && '' !== trim( $options['context'] )
+			? trim( $options['context'] )
+			: 'image_generation';
+		$in      = max( 1, mb_strlen( $prompt ) );
+		$payer   = \WPMind\Provider\WenpaiCloud::payer_for( $provider_id );
+
+		do_action( 'wpmind_usage_record', $provider_id, $model, $in, 0, $latency_ms, $context, $payer );
 		do_action( 'wpmind_image_generated', $provider_id, $prompt, $options );
 	}
 }
