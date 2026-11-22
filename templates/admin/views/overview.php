@@ -736,10 +736,10 @@ use WPMind\Routing\IntelligentRouter;
 							}
 							Wenpai_Admin_UI::row(
 								[
-									'icon'  => 'modules',
-									'title' => $plugin_labels[ $caller_slug ] ?? $caller_slug,
-									'desc'  => implode( ' · ', $desc_parts ),
-									'pill'  => [
+									'icon_html' => AdminIcons::svg( 'modules' ),
+									'title'     => $plugin_labels[ $caller_slug ] ?? $caller_slug,
+									'desc'      => implode( ' · ', $desc_parts ),
+									'pill'      => [
 										'text'  => sprintf(
 											/* translators: %s: request count */
 											__( '%s 次', 'wpmind' ),
