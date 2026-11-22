@@ -94,13 +94,13 @@ use WPMind\Provider\EndpointRepository;
 			'label' => __( 'AI 服务子导航', 'wpmind' ),
 			'items' => [
 				[
-					'label'   => __( 'Provider 服务', 'wpmind' ),
-					'href'    => AdminPage::url( [ 'tab' => 'services' ] ),
+					'label'   => __( '心思 AI', 'wpmind' ),
+					'href'    => AdminPage::url( [ 'tab' => 'cloud' ] ),
 					'current' => false,
 				],
 				[
-					'label'   => __( '心思 AI', 'wpmind' ),
-					'href'    => AdminPage::url( [ 'tab' => 'cloud' ] ),
+					'label'   => __( 'Provider 服务', 'wpmind' ),
+					'href'    => AdminPage::url( [ 'tab' => 'services' ] ),
 					'current' => false,
 				],
 				[

@@ -146,6 +146,11 @@ use WPMind\Admin\SuiteIntegration;
 			'label' => __( 'AI 服务子导航', 'wpmind' ),
 			'items' => [
 				[
+					'label'   => __( '心思 AI', 'wpmind' ),
+					'href'    => AdminPage::url( [ 'tab' => 'cloud' ] ),
+					'current' => false,
+				],
+				[
 					'label'   => __( 'Provider 服务', 'wpmind' ),
 					'href'    => AdminPage::url(
 						[
@@ -154,11 +159,6 @@ use WPMind\Admin\SuiteIntegration;
 						]
 					),
 					'current' => true,
-				],
-				[
-					'label'   => __( '心思 AI', 'wpmind' ),
-					'href'    => AdminPage::url( [ 'tab' => 'cloud' ] ),
-					'current' => false,
 				],
 				[
 					'label'   => __( '智能路由', 'wpmind' ),

@@ -418,6 +418,22 @@ namespace WPMind\Provider {
 		public static function is_enabled(): bool {
 			return true;
 		}
+		public static function mode_options(): array {
+			return [
+				'primary'    => [
+					'label' => '全托管优先',
+					'desc'  => '优先走心思 AI，免维护第三方 Key；异常时自动回退自备 Key。',
+				],
+				'fallback'   => [
+					'label' => '自备优先 · 心思备援',
+					'desc'  => '平时走自备 Key，仅在主服务熔断或限流时由心思 AI 自动顶上。',
+				],
+				'capability' => [
+					'label' => '按能力补充',
+					'desc'  => '常规文本走自备 Key，视觉、生图与深度推理自动走心思 AI。',
+				],
+			];
+		}
 		public static function get_status(): array {
 			return [
 				'enabled'             => true,
@@ -1128,15 +1144,15 @@ namespace {
 			'desc'  => '1:1 过审版概览：内缩四格带蓝图标统计条、AI 服务动态对称双栏（Provider 健康 + 单行最近活动）与底部卡级模块健康折叠。',
 			'get'   => [ 'tab' => 'overview' ],
 		],
+		'cloud.html'          => [
+			'title' => 'AI 服务 · 心思 AI',
+			'desc'  => 'AI 服务默认首屏：四格点数状态条、官方算力开关与混用策略卡、两张折叠式换算与生态说明卡。',
+			'get'   => [ 'tab' => 'cloud', 'mode' => 'simple' ],
+		],
 		'services.html'       => [
 			'title' => 'AI 服务 · Provider 服务',
 			'desc'  => '清爽渐进式披露：已配置文本/图像 Provider 置顶，未配置服务默认收纳折叠，支持简单/高级模式与底部 savebar。',
 			'get'   => [ 'tab' => 'services', 'mode' => 'simple' ],
-		],
-		'cloud.html'          => [
-			'title' => 'AI 服务 · 心思 AI',
-			'desc'  => '独立心思 AI 标签页：四格点数状态条、官方算力开关、托管模型档位矩阵与三步生态共用清单。',
-			'get'   => [ 'tab' => 'cloud', 'mode' => 'simple' ],
 		],
 		'routing.html'        => [
 			'title' => 'AI 服务 · 智能路由',

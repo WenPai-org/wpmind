@@ -128,15 +128,15 @@ final class WenpaiCloud {
 		return [
 			self::MODE_PRIMARY    => [
 				'label' => __( '全托管优先', 'wpmind' ),
-				'desc'  => __( '优先走心思 AI，免维护第三方 Key；异常时自动回退已配自备 Key。', 'wpmind' ),
+				'desc'  => __( '优先走心思 AI，免维护第三方 Key；异常时自动回退自备 Key。', 'wpmind' ),
 			],
 			self::MODE_FALLBACK   => [
-				'label' => __( '自备 Key 优先 · 心思备援', 'wpmind' ),
-				'desc'  => __( '平时用你自备的 Key，仅在主 Key 熔断、限流或欠费时由心思 AI 自动顶上不断服。', 'wpmind' ),
+				'label' => __( '自备优先 · 心思备援', 'wpmind' ),
+				'desc'  => __( '平时走自备 Key，仅在主服务熔断或限流时由心思 AI 自动顶上。', 'wpmind' ),
 			],
 			self::MODE_CAPABILITY => [
-				'label' => __( '仅补齐缺失能力', 'wpmind' ),
-				'desc'  => __( '常规文本走自备 Key，视觉理解、图像生成与深度推理自动交由心思 AI 处理。', 'wpmind' ),
+				'label' => __( '按能力补充', 'wpmind' ),
+				'desc'  => __( '常规文本走自备 Key，视觉、生图与深度推理自动走心思 AI。', 'wpmind' ),
 			],
 		];
 	}

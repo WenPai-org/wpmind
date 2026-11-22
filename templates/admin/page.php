@@ -102,7 +102,7 @@ if ( ! $wpmind_show_workflow_tab && class_exists( TaskRepository::class ) ) {
 
 $wpmind_tabs = [
 	[ 'id' => 'overview',  'label' => __( '概览', 'wpmind' ),  'url' => $wpmind_url( 'overview' ),  'icon' => 'overview' ],
-	[ 'id' => 'services',  'label' => __( 'AI 服务', 'wpmind' ), 'url' => $wpmind_url( 'services' ),  'icon' => 'services' ],
+	[ 'id' => 'services',  'label' => __( 'AI 服务', 'wpmind' ), 'url' => $wpmind_url( 'cloud' ),     'icon' => 'services' ],
 	[ 'id' => 'modules',   'label' => __( '模块', 'wpmind' ),   'url' => $wpmind_url( 'modules' ),   'icon' => 'modules' ],
 	[ 'id' => 'analytics', 'label' => __( '分析', 'wpmind' ),   'url' => $wpmind_url( 'analytics' ), 'icon' => 'analytics' ],
 	[ 'id' => 'tools',     'label' => __( '工具', 'wpmind' ),   'url' => $wpmind_url( 'tools' ),     'icon' => 'tools' ],

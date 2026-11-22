@@ -18,6 +18,7 @@ use WPMind\Provider\EndpointRepository;
 use WPMind\Routing\IntelligentRouter;
 
 ( static function (): void {
+	$cloud_url     = AdminPage::url( [ 'tab' => 'cloud' ] );
 	$services_url  = AdminPage::url( [ 'tab' => 'services' ] );
 	$modules_url   = AdminPage::url( [ 'tab' => 'modules' ] );
 	$analytics_url = AdminPage::url( [ 'tab' => 'analytics' ] );
@@ -158,9 +159,14 @@ use WPMind\Routing\IntelligentRouter;
 			'desc'    => __( '开启文派心思官方算力（心思点数）或填入任意服务商 API Key 后即可使用。', 'wpmind' ),
 			'actions' => [
 				[
-					'label'   => __( '查看 AI 服务', 'wpmind' ),
-					'href'    => $services_url,
+					'label'   => __( '开启心思 AI', 'wpmind' ),
+					'href'    => $cloud_url,
 					'variant' => 'primary',
+				],
+				[
+					'label'   => __( '自备 Key', 'wpmind' ),
+					'href'    => $services_url,
+					'variant' => 'ghost',
 				],
 			],
 		];
@@ -375,7 +381,7 @@ use WPMind\Routing\IntelligentRouter;
 							'actions' => [
 								[
 									'label'   => __( '去配置', 'wpmind' ),
-									'href'    => $services_url,
+									'href'    => $cloud_url,
 									'variant' => 'primary',
 								],
 							],
