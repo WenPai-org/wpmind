@@ -14,7 +14,7 @@ test.afterAll(async () => {
 
 test('新装站点：7 个模块卡片都渲染，默认状态与 manifest 一致', async ({ page }) => {
 	await openModulesTab(page);
-	await expect(page.locator('.wpmind-module-card')).toHaveCount(MODULE_IDS.length);
+	await expect(page.locator('.wpmind-module-item')).toHaveCount(MODULE_IDS.length);
 
 	for (const id of MODULE_IDS) {
 		const c = card(page, id);
@@ -34,7 +34,7 @@ test('新装站点：7 个模块卡片都渲染，默认状态与 manifest 一�
 test('cost-control 是核心模块：「核心」徽章 + 禁用态开关，没有可点的开关', async ({ page }) => {
 	await openModulesTab(page);
 	const c = card(page, 'cost-control');
-	await expect(c.locator('.pill.mute')).toContainText('核心');
+	await expect(c.locator('.wenpai-module-card__status')).toContainText('核心');
 	const sw = c.locator('input.wpmind-module-switch');
 	await expect(sw).toHaveCount(1);
 	await expect(sw).toBeChecked();

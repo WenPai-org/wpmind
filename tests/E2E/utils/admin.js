@@ -3,11 +3,11 @@ const { expect } = require('@playwright/test');
 /** 打开 WPMind 后台「模块」视图（4.0 壳：?page=wpmind&tab=modules）。 */
 async function openModulesTab(page) {
 	await page.goto('/wp-admin/admin.php?page=wpmind&tab=modules');
-	await expect(page.locator('.wenpai-app .wpmind-module-list')).toBeVisible();
+	await expect(page.locator('.wenpai-app .wpmind-module-item').first()).toBeVisible();
 }
 
 function card(page, id) {
-	return page.locator(`.wpmind-module-card:has(input.wpmind-module-switch[data-module-id="${id}"])`);
+	return page.locator(`.wpmind-module-item[data-module-card="${id}"]`);
 }
 
 /**
