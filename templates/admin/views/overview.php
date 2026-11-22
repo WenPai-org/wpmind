@@ -1,6 +1,6 @@
 <?php
 /**
- * 概览视图（WPMind 审定对称双栏版）：next 提示 + statbar + AI 服务动态双栏 + 模块与生态调用折叠卡。
+ * 概览视图（按 2026-11-16 过审原型：顶部 next 提示 + 四格带图标统计条 + AI 服务动态双栏 + 底部折叠明细）。
  *
  * @package WPMind
  */
@@ -12,29 +12,38 @@ use WPMind\Admin\AdminPage;
 use WPMind\Admin\SuiteIntegration;
 use WPMind\Core\ModuleLoader;
 use WPMind\Failover\FailoverManager;
+use WPMind\Modules\CostControl\BudgetManager;
 use WPMind\Modules\CostControl\UsageTracker;
+use WPMind\Provider\EndpointRepository;
+use WPMind\Routing\IntelligentRouter;
 
 ( static function (): void {
-	// ---- 数据准备（纯本地读，render 期零远程请求） ----
-	$today        = class_exists( UsageTracker::class ) ? UsageTracker::get_today_stats() : [];
-	$month        = class_exists( UsageTracker::class ) ? UsageTracker::get_month_stats() : [];
-	$providers    = class_exists( FailoverManager::class ) ? FailoverManager::instance()->get_status_summary() : [];
-	$modules      = class_exists( ModuleLoader::class ) ? ModuleLoader::instance()->get_modules() : [];
-	$active_count = count( array_filter( $modules, static fn( $m ) => ! empty( $m['enabled'] ) ) );
-	$cloud        = SuiteIntegration::cloud_status();
-	$cloud_on     = ! empty( $cloud['enabled'] );
-	$cloud_bound  = ! empty( $cloud['bound'] );
-	$cloud_ready  = $cloud_on && $cloud_bound;
-
 	$services_url  = AdminPage::url( [ 'tab' => 'services' ] );
 	$routing_url   = AdminPage::url( [ 'tab' => 'routing' ] );
-	$analytics_url = AdminPage::url( [ 'tab' => 'analytics' ] );
 	$modules_url   = AdminPage::url( [ 'tab' => 'modules' ] );
+	$analytics_url = AdminPage::url( [ 'tab' => 'analytics' ] );
 	$workflow_url  = AdminPage::url( [ 'tab' => 'workflow' ] );
 
+	$today = class_exists( UsageTracker::class ) ? UsageTracker::get_today_stats() : [];
+	$month = class_exists( UsageTracker::class ) ? UsageTracker::get_month_stats() : [];
+
+	$cloud       = SuiteIntegration::cloud_status();
+	$cloud_on    = ! empty( $cloud['enabled'] );
+	$cloud_bound = ! empty( $cloud['bound'] );
+	$cloud_ready = $cloud_on && $cloud_bound;
+
+	$modules      = class_exists( ModuleLoader::class ) ? ModuleLoader::instance()->get_modules() : [];
+	$active_count = count( array_filter( $modules, static fn( $m ) => ! empty( $m['enabled'] ) ) );
+
+	$providers = class_exists( FailoverManager::class ) ? FailoverManager::instance()->get_status_summary() : [];
+	// 避免官方算力同时出现在 FailoverManager 与 SuiteIntegration 时重复渲染与计数.
+	if ( $cloud_on && isset( $providers['wenpai_cloud'] ) ) {
+		unset( $providers['wenpai_cloud'] );
+	}
+
 	$healthy = 0;
-	$down    = 0;
 	$testing = 0;
+	$down    = 0;
 	foreach ( $providers as $p ) {
 		$state = (string) ( $p['state'] ?? 'unknown' );
 		if ( 'healthy' === $state || 'closed' === $state ) {
@@ -46,6 +55,59 @@ use WPMind\Modules\CostControl\UsageTracker;
 		}
 	}
 	$total_providers = count( $providers );
+
+	// 端点默认模型映射（用于服务健康副文案显示当前模型）.
+	$endpoints_map = [];
+	if ( class_exists( EndpointRepository::class ) ) {
+		$endpoints_map = ( new EndpointRepository() )->all();
+	}
+	$default_provider = (string) get_option( 'wpmind_default_provider', '' );
+	if ( '' === $default_provider && ! empty( $providers ) ) {
+		$default_provider = (string) array_key_first( $providers );
+	}
+	$default_provider_name = '' !== $default_provider
+		? ( class_exists( UsageTracker::class ) ? UsageTracker::get_provider_display_name( $default_provider ) : $default_provider )
+		: '';
+
+	// 智能路由策略名.
+	$strategy_label = '';
+	if ( class_exists( IntelligentRouter::class ) ) {
+		$router     = IntelligentRouter::instance();
+		$cur_strat  = (string) $router->get_current_strategy();
+		$avail_str  = $router->get_available_strategies();
+		$strat_info = $avail_str[ $cur_strat ] ?? null;
+		if ( is_array( $strat_info ) && ! empty( $strat_info['display_name'] ) ) {
+			$strategy_label = (string) $strat_info['display_name'];
+		} elseif ( '' !== $cur_strat ) {
+			$strategy_label = $cur_strat;
+		}
+	}
+
+	// 月度预算使用率（仅在启用预算且设有上限时显示）.
+	$budget_pct_label = '';
+	if ( class_exists( BudgetManager::class ) ) {
+		$bs = BudgetManager::instance()->get_settings();
+		if ( ! empty( $bs['enabled'] ) ) {
+			$gb        = is_array( $bs['global'] ?? null ) ? $bs['global'] : [];
+			$lim_cny   = (float) ( $gb['monthly_limit_cny'] ?? 0 );
+			$lim_usd   = (float) ( $gb['monthly_limit_usd'] ?? 0 );
+			$spent_cny = (float) ( $month['cost_cny'] ?? 0 );
+			$spent_usd = (float) ( $month['cost_usd'] ?? 0 );
+			$pct       = 0.0;
+			if ( $lim_cny > 0 && $spent_cny >= 0 ) {
+				$pct = min( 999.9, ( $spent_cny / $lim_cny ) * 100 );
+			} elseif ( $lim_usd > 0 && $spent_usd >= 0 ) {
+				$pct = min( 999.9, ( $spent_usd / $lim_usd ) * 100 );
+			}
+			if ( $lim_cny > 0 || $lim_usd > 0 ) {
+				$budget_pct_label = sprintf(
+					/* translators: %s: monthly budget usage percentage */
+					__( '预算 %s%%', 'wpmind' ),
+					number_format_i18n( $pct, 1 )
+				);
+			}
+		}
+	}
 
 	$recent_history = class_exists( UsageTracker::class ) ? UsageTracker::get_history( 5 ) : [];
 	$context_stats  = class_exists( UsageTracker::class ) ? UsageTracker::get_context_stats() : [];
@@ -64,10 +126,10 @@ use WPMind\Modules\CostControl\UsageTracker;
 	$plugin_dir = defined( 'WPMIND_PLUGIN_DIR' ) ? (string) WPMIND_PLUGIN_DIR : dirname( __DIR__, 3 ) . '/';
 	$plugin_url = defined( 'WPMIND_PLUGIN_URL' ) ? (string) WPMIND_PLUGIN_URL : '';
 
-	$provider_logo = static function ( string $pid ) use ( $plugin_dir, $plugin_url ): string {
+	$provider_logo = static function ( string $pid, int $size = 18 ) use ( $plugin_dir, $plugin_url ): string {
 		$safe = sanitize_key( $pid );
 		if ( '' !== $safe && '' !== $plugin_url && file_exists( $plugin_dir . 'assets/images/providers/' . $safe . '.svg' ) ) {
-			return '<img src="' . esc_url( $plugin_url . 'assets/images/providers/' . $safe . '.svg' ) . '" alt="" width="20" height="20">';
+			return '<img src="' . esc_url( $plugin_url . 'assets/images/providers/' . $safe . '.svg' ) . '" alt="" width="' . $size . '" height="' . $size . '">';
 		}
 		return AdminIcons::svg( 'wenpai_cloud' === $pid ? 'cloud' : 'robot' );
 	};
@@ -102,14 +164,14 @@ use WPMind\Modules\CostControl\UsageTracker;
 		];
 	} elseif ( $down > 0 ) {
 		$next = [
-			'state'   => 'warn',
+			'state'   => 'bad',
 			'icon'    => 'alert',
 			'title'   => sprintf(
 				/* translators: %d: open circuit breakers */
-				__( '%d 个 AI 服务熔断中', 'wpmind' ),
+				__( '%d 个 AI 服务熔断器已打开', 'wpmind' ),
 				$down
 			),
-			'desc'    => __( '路由已自动切换到可用备选；恢复后自动回切，也可在服务页手动重置。', 'wpmind' ),
+			'desc'    => __( '路由已自动切换到可用备选，待冷却后自动进入恢复测试。', 'wpmind' ),
 			'actions' => [
 				[
 					'label'   => __( '查看 AI 服务', 'wpmind' ),
@@ -162,7 +224,7 @@ use WPMind\Modules\CostControl\UsageTracker;
 
 	wpmind_page_head(
 		__( '概览', 'wpmind' ),
-		__( 'AI 服务健康、用量与心思点数一页查看。', 'wpmind' ),
+		__( 'AI 服务中枢一页看状态：健康度、用量、费用与心思点数。需要处理的事会出现在顶部提示里。', 'wpmind' ),
 		$head_actions
 	);
 	?>
@@ -173,11 +235,16 @@ use WPMind\Modules\CostControl\UsageTracker;
 			Wenpai_Admin_UI::next( $next );
 		}
 
-		// ---- 1. 顶部四格核心指标卡（kit statbar） ----
-		$today_tokens = (int) ( $today['input_tokens'] ?? 0 ) + (int) ( $today['output_tokens'] ?? 0 );
-		$today_tok_s  = class_exists( UsageTracker::class )
+		// ---- 1. 顶部四格带图标统计条（按 2026-11-16 过审原型） ----
+		$today_tokens   = (int) ( $today['input_tokens'] ?? 0 ) + (int) ( $today['output_tokens'] ?? 0 );
+		$today_tok_s    = class_exists( UsageTracker::class )
 			? UsageTracker::format_tokens( $today_tokens ) . ' tok'
 			: number_format_i18n( $today_tokens ) . ' tok';
+		$today_cost_usd = (float) ( $today['cost_usd'] ?? 0 );
+		$today_cost_cny = (float) ( $today['cost_cny'] ?? 0 );
+		if ( ( $today_cost_usd > 0 || $today_cost_cny > 0 ) && class_exists( UsageTracker::class ) ) {
+			$today_tok_s .= ' · ' . UsageTracker::format_cost_by_currency( $today_cost_usd, $today_cost_cny );
+		}
 
 		$health_total = $total_providers + ( $cloud_on ? 1 : 0 );
 		$health_ok    = $healthy + ( $cloud_ready ? 1 : 0 );
@@ -186,7 +253,7 @@ use WPMind\Modules\CostControl\UsageTracker;
 			: ( $down > 0
 				? sprintf(
 					/* translators: %d: breaker count */
-					__( '%d 熔断', 'wpmind' ),
+					__( '在线 · %d 熔断', 'wpmind' ),
 					$down
 				)
 				: __( '全部在线', 'wpmind' ) );
@@ -194,6 +261,13 @@ use WPMind\Modules\CostControl\UsageTracker;
 		$month_cost = class_exists( UsageTracker::class )
 			? UsageTracker::format_cost_by_currency( (float) ( $month['cost_usd'] ?? 0 ), (float) ( $month['cost_cny'] ?? 0 ) )
 			: '¥0.00';
+		$month_unit = '' !== $budget_pct_label
+			? $budget_pct_label
+			: sprintf(
+				/* translators: %s: monthly requests */
+				__( '%s 次调用', 'wpmind' ),
+				number_format_i18n( (int) ( $month['requests'] ?? 0 ) )
+			);
 
 		$unit_label = (string) ( $cloud['unit_label'] ?? __( '心思点数', 'wpmind' ) );
 		if ( $cloud_on && null !== $cloud['credits_balance'] ) {
@@ -214,59 +288,86 @@ use WPMind\Modules\CostControl\UsageTracker;
 			$credits_unit  = __( '未开启', 'wpmind' );
 		}
 
-		Wenpai_Admin_UI::card_open();
-		Wenpai_Admin_UI::statbar(
+		$stat_cells = [
 			[
-				'items' => [
-					[
-						'label' => __( '今日请求', 'wpmind' ),
-						'value' => number_format_i18n( (int) ( $today['requests'] ?? 0 ) ),
-						'unit'  => $today_tok_s,
-					],
-					[
-						'label' => __( 'AI 服务健康度', 'wpmind' ),
-						'value' => $health_ok . '/' . $health_total,
-						'unit'  => $health_unit,
-					],
-					[
-						'label' => __( '本月费用', 'wpmind' ),
-						'value' => $month_cost,
-						'unit'  => sprintf(
-							/* translators: %s: monthly requests */
-							__( '%s 次调用', 'wpmind' ),
-							number_format_i18n( (int) ( $month['requests'] ?? 0 ) )
-						),
-					],
-					[
-						'label' => $unit_label,
-						'value' => $credits_value,
-						'unit'  => $credits_unit,
-					],
-				],
-			]
-		);
+				'icon'  => 'pulse',
+				'label' => __( '今日请求', 'wpmind' ),
+				'value' => number_format_i18n( (int) ( $today['requests'] ?? 0 ) ),
+				'unit'  => $today_tok_s,
+			],
+			[
+				'icon'  => 'pulse',
+				'label' => __( 'AI 服务健康度', 'wpmind' ),
+				'value' => $health_ok . '/' . $health_total,
+				'unit'  => $health_unit,
+			],
+			[
+				'icon'  => 'dollar',
+				'label' => __( '本月费用', 'wpmind' ),
+				'value' => $month_cost,
+				'unit'  => $month_unit,
+			],
+			[
+				'icon'  => 'sparkle',
+				'label' => $unit_label,
+				'value' => $credits_value,
+				'unit'  => $credits_unit,
+			],
+		];
+
+		Wenpai_Admin_UI::card_open();
+		?>
+		<div class="wpmind-ov__stats">
+			<?php foreach ( $stat_cells as $cell ) : ?>
+				<div class="wpmind-ov__stat">
+					<span class="wpmind-ov__stat-ico"><?php echo AdminIcons::svg( $cell['icon'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG. ?></span>
+					<div class="wpmind-ov__stat-text">
+						<div class="wpmind-ov__stat-k"><?php echo esc_html( $cell['label'] ); ?></div>
+						<div class="wpmind-ov__stat-v"><?php echo esc_html( $cell['value'] ); ?><small><?php echo esc_html( $cell['unit'] ); ?></small></div>
+					</div>
+				</div>
+			<?php endforeach; ?>
+		</div>
+		<?php
 		Wenpai_Admin_UI::card_close();
 
-		// ---- 2. 主卡：AI 服务动态（对称双栏 .wenpai-grid-2） ----
-		$activity_sub = sprintf(
-			/* translators: 1: provider count, 2: active module count, 3: total module count */
-			__( '%1$d 个服务 · %2$d/%3$d 模块已开启', 'wpmind' ),
-			$health_total,
-			$active_count,
-			count( $modules )
+		// ---- 2. 主卡：AI 服务动态（蓝底 sparkle 图标 + 路由摘要 + 竖分隔双栏） ----
+		$sub_parts = [];
+		if ( '' !== $default_provider_name ) {
+			$sub_parts[] = sprintf(
+				/* translators: %s: default provider name */
+				__( '默认：%s', 'wpmind' ),
+				$default_provider_name
+			);
+		}
+		if ( '' !== $strategy_label ) {
+			$sub_parts[] = sprintf(
+				/* translators: %s: routing strategy name */
+				__( '智能路由：%s', 'wpmind' ),
+				$strategy_label
+			);
+		}
+		$sub_parts[] = sprintf(
+			/* translators: 1: healthy providers, 2: total providers */
+			__( '%1$d/%2$d 服务在线', 'wpmind' ),
+			$health_ok,
+			$health_total
 		);
 		if ( $cache_enabled ) {
-			$activity_sub .= ' · ' . sprintf(
+			$sub_parts[] = sprintf(
 				/* translators: %s: cache hit rate percentage */
 				__( '缓存命中 %s%%', 'wpmind' ),
 				number_format_i18n( $cache_hit_rate, 1 )
 			);
 		}
+
 		Wenpai_Admin_UI::card_open(
 			[
+				'class'             => 'wpmind-ov__card',
 				'title'             => __( 'AI 服务动态', 'wpmind' ),
-				'sub'               => $activity_sub,
+				'sub'               => implode( ' · ', $sub_parts ),
 				'icon'              => 'sparkle',
+				'state'             => 'accent',
 				'head_actions_html' => Wenpai_Admin_UI::button_html(
 					[
 						'label'   => __( '管理服务', 'wpmind' ),
@@ -277,10 +378,13 @@ use WPMind\Modules\CostControl\UsageTracker;
 			]
 		);
 		?>
-		<div class="wenpai-grid-2">
-			<div class="wenpai-stack wenpai-stack--sm">
+		<div class="wpmind-ov__split">
+			<div class="wpmind-ov__col">
+				<div class="wpmind-ov__colhead">
+					<?php echo AdminIcons::svg( 'pulse' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG. ?>
+					<span><?php esc_html_e( '服务健康', 'wpmind' ); ?></span>
+				</div>
 				<?php
-				Wenpai_Admin_UI::section_title( [ 'title' => __( '服务健康', 'wpmind' ) ] );
 				if ( $unconfigured ) {
 					Wenpai_Admin_UI::empty_state(
 						[
@@ -296,6 +400,7 @@ use WPMind\Modules\CostControl\UsageTracker;
 						]
 					);
 				} else {
+					echo '<div class="wpmind-ov__health">';
 					if ( $cloud_on ) {
 						$cloud_desc = $cloud_bound
 							? ( null !== $cloud['credits_balance']
@@ -307,97 +412,144 @@ use WPMind\Modules\CostControl\UsageTracker;
 								)
 								: __( '站点已绑定 · 等待首次同步余额', 'wpmind' ) )
 							: __( '尚未绑定文派云通行证', 'wpmind' );
-						Wenpai_Admin_UI::row(
+						$cloud_pill = Wenpai_Admin_UI::pill_html(
 							[
-								'logo_html' => $provider_logo( 'wenpai_cloud' ),
-								'title'     => __( '文派心思官方算力', 'wpmind' ),
-								'desc'      => $cloud_desc,
-								'pill'      => [
-									'text'  => $cloud_bound ? __( '已连接', 'wpmind' ) : __( '待绑定', 'wpmind' ),
-									'state' => $cloud_bound ? 'ok' : 'warn',
-								],
+								'text'  => $cloud_bound ? __( '已连接', 'wpmind' ) : __( '待绑定', 'wpmind' ),
+								'state' => $cloud_bound ? 'ok' : 'warn',
 							]
 						);
+						echo '<div class="wpmind-ov__hrow">';
+						echo '<span class="wpmind-ov__avatar">' . $provider_logo( 'wenpai_cloud', 18 ) . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped img/SVG.
+						echo '<div class="wpmind-ov__hmain"><div class="wpmind-ov__htitle">' . esc_html__( '文派心思官方算力', 'wpmind' ) . '</div><div class="wpmind-ov__hdesc">' . esc_html( $cloud_desc ) . '</div></div>';
+						echo $cloud_pill; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit-escaped.
+						echo '</div>';
 					}
 					foreach ( $providers as $pid => $p ) {
-						$pid                       = (string) $pid;
-						$state                     = (string) ( $p['state'] ?? 'unknown' );
+						$pid                        = (string) $pid;
+						$state                      = (string) ( $p['state'] ?? 'unknown' );
 						[ $pill_text, $pill_state ] = $state_pill( $state );
-						$desc                      = (string) ( $p['state_label'] ?? $state );
-						if ( ! empty( $p['recovery_in'] ) && 'half_open' === $state ) {
-							$desc .= ' · ' . sprintf(
+
+						$ep_model = '';
+						if ( isset( $endpoints_map[ $pid ] ) ) {
+							$ep       = $endpoints_map[ $pid ];
+							$ep_model = $ep->default_model;
+							if ( '' === $ep_model && ! empty( $ep->models[0] ) ) {
+								$ep_model = (string) $ep->models[0];
+							}
+						}
+
+						$desc_bits = [];
+						if ( '' !== $ep_model ) {
+							$desc_bits[] = $ep_model;
+						}
+						if ( ! empty( $p['recovery_in'] ) && ( 'half_open' === $state || 'open' === $state ) ) {
+							$desc_bits[] = sprintf(
 								/* translators: %s: recovery time */
 								__( '%s 后恢复测试', 'wpmind' ),
 								(string) $p['recovery_in']
 							);
-						}
-						if ( isset( $p['success_rate'] ) && ( 'healthy' === $state || 'closed' === $state ) ) {
-							$desc .= ' · ' . sprintf(
-								/* translators: %d: rate */
-								__( '成功率 %d%%', 'wpmind' ),
+						} elseif ( $pid === $default_provider && ( 'healthy' === $state || 'closed' === $state ) ) {
+							$desc_bits[] = __( '默认路由首选', 'wpmind' );
+						} elseif ( isset( $p['success_rate'] ) && ( 'healthy' === $state || 'closed' === $state ) ) {
+							$desc_bits[] = sprintf(
+								/* translators: %d: health score percentage */
+								__( '健康分 %d%%', 'wpmind' ),
 								(int) $p['success_rate']
 							);
+						} elseif ( '' === $ep_model ) {
+							$desc_bits[] = $pill_text;
 						}
+
 						$localized = class_exists( UsageTracker::class ) ? UsageTracker::get_provider_display_name( $pid ) : $pid;
 						$pname     = $localized !== $pid ? $localized : (string) ( $p['display_name'] ?? $pid );
-						Wenpai_Admin_UI::row(
+						$row_pill  = Wenpai_Admin_UI::pill_html(
 							[
-								'logo_html' => $provider_logo( $pid ),
-								'title'     => $pname,
-								'desc'      => $desc,
-								'pill'      => [
-									'text'  => $pill_text,
-									'state' => $pill_state,
-								],
+								'text'  => $pill_text,
+								'state' => $pill_state,
 							]
 						);
+						echo '<div class="wpmind-ov__hrow">';
+						echo '<span class="wpmind-ov__avatar">' . $provider_logo( $pid, 18 ) . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped img/SVG.
+						echo '<div class="wpmind-ov__hmain"><div class="wpmind-ov__htitle">' . esc_html( $pname ) . '</div><div class="wpmind-ov__hdesc">' . esc_html( implode( ' · ', $desc_bits ) ) . '</div></div>';
+						echo $row_pill; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit-escaped.
+						echo '</div>';
 					}
+					echo '</div>';
 				}
 				?>
 			</div>
-			<div class="wenpai-stack wenpai-stack--sm">
-				<div class="wenpai-row">
-					<?php
-					Wenpai_Admin_UI::section_title( [ 'title' => __( '最近活动', 'wpmind' ) ] );
-					$recent_all_btn = Wenpai_Admin_UI::button_html(
-						[
-							'label'   => __( '查看全部', 'wpmind' ),
-							'href'    => $analytics_url,
-							'variant' => 'ghost',
-							'class'   => 'wenpai-push',
-						]
-					);
-					echo $recent_all_btn; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit-escaped.
-					?>
+			<div class="wpmind-ov__col wpmind-ov__col--right">
+				<div class="wpmind-ov__colhead">
+					<?php echo AdminIcons::svg( 'pulse' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG. ?>
+					<span><?php esc_html_e( '最近活动', 'wpmind' ); ?></span>
+					<a class="wpmind-ov__more" href="<?php echo esc_url( $analytics_url ); ?>"><?php esc_html_e( '查看全部', 'wpmind' ); ?></a>
 				</div>
 				<?php
 				if ( empty( $recent_history ) ) {
 					echo '<p class="meta">' . esc_html__( '还没有 API 调用记录，使用 AI 功能后显示在这里。', 'wpmind' ) . '</p>';
 				} else {
-					$log_items = [];
+					echo '<div class="wpmind-ov__feed">';
 					foreach ( $recent_history as $record ) {
-						$ts      = (int) ( $record['timestamp'] ?? 0 );
-						$ago     = $ts > 0 ? human_time_diff( $ts, time() ) . __( '前', 'wpmind' ) : '—';
-						$pid     = (string) ( $record['provider'] ?? '' );
-						$pname   = class_exists( UsageTracker::class ) ? UsageTracker::get_provider_display_name( $pid ) : $pid;
-						$model   = (string) ( $record['model'] ?? '—' );
-						$tokens  = (int) ( $record['input_tokens'] ?? 0 ) + (int) ( $record['output_tokens'] ?? 0 );
-						$latency = (int) ( $record['latency_ms'] ?? 0 );
+						$ts       = (int) ( $record['timestamp'] ?? 0 );
+						$ago      = $ts > 0 ? human_time_diff( $ts, time() ) . __( '前', 'wpmind' ) : '—';
+						$pid      = (string) ( $record['provider'] ?? '' );
+						$pname    = class_exists( UsageTracker::class ) ? UsageTracker::get_provider_display_name( $pid ) : $pid;
+						$model    = (string) ( $record['model'] ?? '—' );
+						$tokens   = (int) ( $record['input_tokens'] ?? 0 ) + (int) ( $record['output_tokens'] ?? 0 );
+						$latency  = (int) ( $record['latency_ms'] ?? 0 );
+						$cached   = ! empty( $record['cached'] ) || ! empty( $record['cache_hit'] );
+						$is_error = isset( $record['success'] ) && false === $record['success'];
+						$is_image = 'image' === (string) ( $record['type'] ?? '' )
+							|| false !== stripos( $model, 'image' )
+							|| false !== stripos( $model, 'wanx' )
+							|| false !== stripos( $model, 'flux' )
+							|| false !== stripos( $model, 'seedream' );
+
 						$tok_str = class_exists( UsageTracker::class )
 							? UsageTracker::format_tokens( $tokens )
 							: number_format_i18n( $tokens );
-						$aside   = $tok_str . ' tok' . ( $latency > 0 ? ' · ' . $latency . 'ms' : '' );
+						$lat_str = $latency >= 1000
+							? number_format_i18n( $latency / 1000, 1 ) . 's'
+							: ( $latency > 0 ? $latency . 'ms' : '' );
 
-						$log_items[] = [
-							'when'      => $ago,
-							'logo_html' => $provider_logo( $pid ),
-							'label'     => $pname,
-							'pill'      => false,
-							'detail'    => $model,
-							'aside'     => $aside,
-						];
+						echo '<div class="wpmind-ov__fitem">';
+						echo '<span class="wpmind-ov__ftime">' . esc_html( $ago ) . '</span>';
+						echo '<span class="wpmind-ov__fmain">';
+						echo '<span class="wpmind-ov__fprov">' . $provider_logo( $pid, 14 ) . esc_html( $pname ) . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped img/SVG.
+						echo '<span class="wpmind-ov__fmodel">' . esc_html( $model ) . '</span>';
+						if ( $is_image ) {
+							echo '<span class="wpmind-ov__ftag">' . esc_html__( '图像', 'wpmind' ) . '</span>';
+						}
+						echo '</span>';
+						echo '<span class="wpmind-ov__fmeta">';
+						if ( $is_error ) {
+							$err_code = isset( $record['status_code'] ) && (int) $record['status_code'] > 0
+								? __( '失败 · ', 'wpmind' ) . (int) $record['status_code']
+								: __( '失败', 'wpmind' );
+							$err_pill = Wenpai_Admin_UI::pill_html(
+								[
+									'text'  => $err_code,
+									'state' => 'bad',
+								]
+							);
+							echo $err_pill; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit-escaped.
+						} elseif ( $cached ) {
+							echo '<span>' . esc_html__( 'cache 命中', 'wpmind' ) . '</span>';
+							if ( '' !== $lat_str ) {
+								echo '<span>' . esc_html( $lat_str ) . '</span>';
+							}
+						} else {
+							if ( ! $is_image || $tokens > 0 ) {
+								echo '<span>' . esc_html( $tok_str . ' tok' ) . '</span>';
+							}
+							if ( '' !== $lat_str ) {
+								echo '<span>' . esc_html( $lat_str ) . '</span>';
+							}
+						}
+						echo '</span>';
+						echo '</div>';
 					}
-					Wenpai_Admin_UI::log_list( [ 'items' => $log_items ] );
+					echo '</div>';
 				}
 				?>
 			</div>
@@ -420,7 +572,7 @@ use WPMind\Modules\CostControl\UsageTracker;
 			}
 			$module_rows_html .= Wenpai_Admin_UI::row_html(
 				[
-					'icon_html'  => AdminIcons::svg( (string) ( $m['icon'] ?? 'modules' ) ) ?: AdminIcons::svg( 'modules' ),
+					'icon'       => 'modules',
 					'state'      => $enabled ? 'ok' : '',
 					'title_html' => $title_html,
 					'desc'       => (string) ( $m['description'] ?? '' ),
@@ -433,19 +585,19 @@ use WPMind\Modules\CostControl\UsageTracker;
 		}
 		$module_rows_html .= Wenpai_Admin_UI::card_foot_html(
 			[
-				'start'   => true,
-				'meta'    => __( '模块开关与详细配置在「模块」页。', 'wpmind' ),
-				'actions' => [
+				'start'        => true,
+				'meta'         => __( '模块开关与详细配置在「模块」页。', 'wpmind' ),
+				'actions_html' => Wenpai_Admin_UI::button_html(
 					[
 						'label'   => __( '模块管理', 'wpmind' ),
 						'href'    => $modules_url,
 						'variant' => 'secondary',
-					],
-				],
+					]
+				),
 			]
 		);
 
-		$plugin_labels   = [
+		$plugin_labels    = [
 			'wpslug'      => __( '文派别名（WPSlug）', 'wpmind' ),
 			'bisheng'     => __( '笔笙（Bisheng）', 'wpmind' ),
 			'wpicp'       => __( '文派合规（WPICP）', 'wpmind' ),
@@ -483,22 +635,23 @@ use WPMind\Modules\CostControl\UsageTracker;
 				$tok_fmt           = class_exists( UsageTracker::class )
 					? UsageTracker::format_tokens( (int) $agg['tokens'] )
 					: number_format_i18n( (int) $agg['tokens'] );
-				$desc              = sprintf(
-					/* translators: 1: tokens, 2: credits */
-					__( '%1$s tok%2$s', 'wpmind' ),
-					$tok_fmt,
-					(int) $agg['credits'] > 0
-						? ' · ' . number_format_i18n( (int) $agg['credits'] ) . ' ' . $unit_label
-						: ''
-				);
+				$desc_parts        = [ $tok_fmt . ' tok' ];
+				if ( (int) $agg['credits'] > 0 ) {
+					$desc_parts[] = sprintf(
+						/* translators: 1: credits count, 2: credits unit label */
+						__( '%1$s %2$s', 'wpmind' ),
+						number_format_i18n( (int) $agg['credits'] ),
+						$unit_label
+					);
+				}
 				$caller_rows_html .= Wenpai_Admin_UI::row_html(
 					[
-						'icon_html' => AdminIcons::svg( 'modules' ),
-						'title'     => $plugin_labels[ $caller_slug ] ?? $caller_slug,
-						'desc'      => $desc,
-						'pill'      => [
+						'icon'  => 'modules',
+						'title' => $plugin_labels[ $caller_slug ] ?? $caller_slug,
+						'desc'  => implode( ' · ', $desc_parts ),
+						'pill'  => [
 							'text'  => sprintf(
-								/* translators: %s: call count */
+								/* translators: %s: request count */
 								__( '%s 次', 'wpmind' ),
 								number_format_i18n( (int) $agg['requests'] )
 							),
@@ -508,26 +661,36 @@ use WPMind\Modules\CostControl\UsageTracker;
 				);
 			}
 		} else {
-			$caller_rows_html = '<p class="meta">' . esc_html__( '文派系列插件或站内模块发起 AI 调用后，会按来源自动归因统计。', 'wpmind' ) . '</p>';
+			$caller_rows_html .= '<p class="meta">' . esc_html__( '安装文派别名、笔笙、文派合规或文派文档等插件后，跨插件调用会自动汇总到这里。', 'wpmind' ) . '</p>';
 		}
 		$caller_rows_html .= Wenpai_Admin_UI::card_foot_html(
 			[
-				'start'   => true,
-				'meta'    => __( '全站插件统一经 WPMind PHP 接口调用，共用路由与预算。', 'wpmind' ),
-				'actions' => [
+				'start'        => true,
+				'meta'         => __( '全站插件统一经 WPMind PHP 接口调用，共用路由与预算。', 'wpmind' ),
+				'actions_html' => Wenpai_Admin_UI::button_html(
 					[
 						'label'   => __( '查看分析', 'wpmind' ),
 						'href'    => $analytics_url,
 						'variant' => 'ghost',
-					],
+					]
+				) . Wenpai_Admin_UI::button_html(
 					[
 						'label'   => __( '任务记录', 'wpmind' ),
 						'href'    => $workflow_url,
 						'variant' => 'ghost',
-					],
-				],
+					]
+				),
 			]
 		);
+
+		$caller_desc = $caller_count > 0
+			? sprintf(
+				/* translators: 1: caller count, 2: total requests */
+				__( '%1$d 个来源 · 累计 %2$s 次', 'wpmind' ),
+				$caller_count,
+				number_format_i18n( $caller_total_req )
+			)
+			: __( '暂无跨插件调用记录', 'wpmind' );
 
 		Wenpai_Admin_UI::card_open();
 		Wenpai_Admin_UI::fold_list(
@@ -536,8 +699,8 @@ use WPMind\Modules\CostControl\UsageTracker;
 					[
 						'title'     => __( '模块健康', 'wpmind' ),
 						'desc'      => sprintf(
-							/* translators: 1: active, 2: total */
-							__( '%1$d / %2$d 已开启', 'wpmind' ),
+							/* translators: 1: active count, 2: total count */
+							__( '%1$d / %2$d 已开启 · 按需启用可节省开销', 'wpmind' ),
 							$active_count,
 							count( $modules )
 						),
@@ -545,14 +708,7 @@ use WPMind\Modules\CostControl\UsageTracker;
 					],
 					[
 						'title'     => __( '生态插件调用', 'wpmind' ),
-						'desc'      => $caller_count > 0
-							? sprintf(
-								/* translators: 1: caller count, 2: requests */
-								__( '%1$d 个来源 · 累计 %2$s 次', 'wpmind' ),
-								$caller_count,
-								number_format_i18n( $caller_total_req )
-							)
-							: __( '暂无跨插件调用记录', 'wpmind' ),
+						'desc'      => $caller_desc,
 						'body_html' => $caller_rows_html,
 					],
 				],
