@@ -428,12 +428,14 @@ final class SuiteIntegration {
 	public static function cloud_status(): array {
 		$defaults = [
 			'enabled'             => get_option( 'wpmind_cloud_enabled', '0' ) === '1',
+			'mode'                => (string) get_option( 'wpmind_cloud_mode', 'primary' ),
 			'bound'               => false,
 			'managed_by_suite'    => false,
 			'site_uuid'           => '',
 			'credits_balance'     => null,
 			'credits_used_month'  => 0,
 			'credits_limit_month' => null,
+			'starter_credits'     => 500,
 			'unit_label'          => __( '心思点数', 'wpmind' ),
 			'base_url'            => 'https://mind-api.wenpai.net/v1',
 			'bind_url'            => class_exists( 'Wenpai_Admin_Menu', false )

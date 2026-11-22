@@ -1,6 +1,6 @@
 <?php
 /**
- * 心思 AI 视图（AI 服务独立子标签页）：官方算力状态、心思点数账本、托管模型矩阵与接入进度。
+ * 心思 AI 视图（AI 服务独立子标签页）：体验点数引导、四格状态条、混用策略、任务量换算与生态/代理商托管。
  *
  * @package WPMind
  */
@@ -12,18 +12,21 @@ use WPMind\Admin\AdminPage;
 use WPMind\Admin\SuiteIntegration;
 
 ( static function (): void {
-	$mode        = class_exists( 'Wenpai_Admin_UI', false ) ? Wenpai_Admin_UI::mode() : 'simple';
-	$cloud       = SuiteIntegration::cloud_status();
-	$cloud_on    = ! empty( $cloud['enabled'] );
-	$cloud_bound = ! empty( $cloud['bound'] );
-	$cloud_ready = $cloud_on && $cloud_bound;
-	$unit_label  = (string) ( $cloud['unit_label'] ?? __( '心思点数', 'wpmind' ) );
-	$base_url    = (string) ( $cloud['base_url'] ?? 'https://mind-api.wenpai.net/v1' );
-	$saved_base  = (string) get_option( 'wpmind_cloud_base_url', '' );
-	$bind_url    = (string) ( $cloud['bind_url'] ?? '' );
-	$topup_url   = (string) ( $cloud['topup_url'] ?? 'https://wenpai.net/mind-credits' );
-	$site_uuid   = (string) ( $cloud['site_uuid'] ?? '' );
-	$is_const    = defined( 'WPMIND_CLOUD_BASE_URL' ) && '' !== trim( (string) constant( 'WPMIND_CLOUD_BASE_URL' ) );
+	$mode            = class_exists( 'Wenpai_Admin_UI', false ) ? Wenpai_Admin_UI::mode() : 'simple';
+	$cloud           = SuiteIntegration::cloud_status();
+	$cloud_on        = ! empty( $cloud['enabled'] );
+	$cloud_mode      = (string) ( $cloud['mode'] ?? get_option( 'wpmind_cloud_mode', 'primary' ) );
+	$cloud_bound     = ! empty( $cloud['bound'] );
+	$cloud_ready     = $cloud_on && $cloud_bound;
+	$cloud_managed   = ! empty( $cloud['managed_by_suite'] );
+	$starter_credits = (int) ( $cloud['starter_credits'] ?? 500 );
+	$unit_label      = (string) ( $cloud['unit_label'] ?? __( '心思点数', 'wpmind' ) );
+	$base_url        = (string) ( $cloud['base_url'] ?? 'https://mind-api.wenpai.net/v1' );
+	$saved_base      = (string) get_option( 'wpmind_cloud_base_url', '' );
+	$bind_url        = (string) ( $cloud['bind_url'] ?? '' );
+	$topup_url       = (string) ( $cloud['topup_url'] ?? 'https://wenpai.net/mind-credits' );
+	$site_uuid       = (string) ( $cloud['site_uuid'] ?? '' );
+	$is_const        = defined( 'WPMIND_CLOUD_BASE_URL' ) && '' !== trim( (string) constant( 'WPMIND_CLOUD_BASE_URL' ) );
 
 	$gateway_host = (string) wp_parse_url( $base_url, PHP_URL_HOST );
 	if ( '' === $gateway_host ) {
@@ -34,6 +37,28 @@ use WPMind\Admin\SuiteIntegration;
 	$eco_count   = count( $ecosystems );
 	$modules_url = AdminPage::url( [ 'tab' => 'modules' ] );
 	$routing_url = AdminPage::url( [ 'tab' => 'routing' ] );
+
+	$mode_defs = [
+		'primary'    => [
+			'label' => __( '全托管优先', 'wpmind' ),
+			'desc'  => __( '优先走心思 AI，免维护第三方 Key；异常时自动回退已配自备 Key。', 'wpmind' ),
+		],
+		'fallback'   => [
+			'label' => __( '自备 Key 优先 · 心思备援', 'wpmind' ),
+			'desc'  => __( '平时用你自备的 Key，仅在主 Key 熔断、限流或欠费时由心思 AI 自动顶上不断服。', 'wpmind' ),
+		],
+		'capability' => [
+			'label' => __( '仅补齐缺失能力', 'wpmind' ),
+			'desc'  => __( '常规文本走自备 Key，视觉理解、图像生成与深度推理自动交由心思 AI 处理。', 'wpmind' ),
+		],
+	];
+	if ( ! isset( $mode_defs[ $cloud_mode ] ) ) {
+		$cloud_mode = 'primary';
+	}
+	$mode_items = [];
+	foreach ( $mode_defs as $mkey => $mdef ) {
+		$mode_items[ $mkey ] = $mdef['label'];
+	}
 
 	$mode_switch = Wenpai_Admin_UI::mode_switch_html(
 		[
@@ -66,7 +91,7 @@ use WPMind\Admin\SuiteIntegration;
 
 	wpmind_page_head(
 		__( '心思 AI', 'wpmind' ),
-		__( '文派官方托管算力中心，免自配第三方 API Key，统一按心思点数结算。', 'wpmind' ),
+		__( '文派官方托管算力中心，免自配多平台 API Key，支持与自备 Key 混用及正规国内发票。', 'wpmind' ),
 		$mode_switch
 	);
 
@@ -99,7 +124,7 @@ use WPMind\Admin\SuiteIntegration;
 		: '—';
 	$balance_sub = null !== $cloud['credits_balance']
 		? $unit_label
-		: ( $cloud_bound ? __( '首次调用后同步', 'wpmind' ) : __( '绑定站点后同步', 'wpmind' ) );
+		: ( $cloud_bound ? __( '首次调用后同步', 'wpmind' ) : __( '绑定即领体验点数', 'wpmind' ) );
 
 	$used_month = (int) ( $cloud['credits_used_month'] ?? 0 );
 	$used_limit = $cloud['credits_limit_month'] ?? null;
@@ -171,6 +196,44 @@ use WPMind\Admin\SuiteIntegration;
 
 <div class="wenpai-stack" data-wenpai-mode-scope="<?php echo esc_attr( $mode ); ?>">
 	<?php
+	// ---- 0. 未绑定站点时：新站免费体验点数引导 ----
+	if ( ! $cloud_bound && $starter_credits > 0 ) {
+		$starter_actions = [];
+		if ( '' !== $bind_url ) {
+			$starter_actions[] = [
+				'label'   => __( '绑定站点领取', 'wpmind' ),
+				'href'    => $bind_url,
+				'variant' => 'primary',
+			];
+		}
+		if ( '' !== $topup_url ) {
+			$starter_actions[] = [
+				'label'   => sprintf(
+					/* translators: %s: billing unit label */
+					__( '了解%s', 'wpmind' ),
+					$unit_label
+				),
+				'href'    => $topup_url,
+				'variant' => 'ghost',
+				'target'  => '_blank',
+			];
+		}
+		Wenpai_Admin_UI::next(
+			[
+				'state'   => 'accent',
+				'icon'    => 'sparkle',
+				'title'   => sprintf(
+					/* translators: 1: starter credits count, 2: billing unit label */
+					__( '绑定文派云站点即可领取 %1$s 体验%2$s', 'wpmind' ),
+					number_format_i18n( $starter_credits ),
+					$unit_label
+				),
+				'desc'    => __( '无需信用卡与多平台实名，10 秒跑通文派别名、媒体 Alt、合规复核与笔笙 AI；预付封顶不超扣，支持国内正规发票。', 'wpmind' ),
+				'actions' => $starter_actions,
+			]
+		);
+	}
+
 	// ---- 1. 顶部四格核心指标 ----
 	Wenpai_Admin_UI::card_open();
 	?>
@@ -188,7 +251,7 @@ use WPMind\Admin\SuiteIntegration;
 	<?php
 	Wenpai_Admin_UI::card_close();
 
-	// ---- 2. 主配置卡：官方算力开关与网关 ----
+	// ---- 2. 主配置卡：官方算力开关 + 混用路由策略 ----
 	?>
 	<form method="post" action="options.php" id="wpmind-cloud-settings-form">
 		<?php
@@ -196,7 +259,7 @@ use WPMind\Admin\SuiteIntegration;
 		Wenpai_Admin_UI::card_open(
 			[
 				'title'             => __( '文派心思官方算力', 'wpmind' ),
-				'sub'               => __( '一站接入国内与海外主流模型，免去多平台注册与额度维护', 'wpmind' ),
+				'sub'               => __( '一个点数账户通吃国产与海外主流模型、视觉理解与生图，绝不强制锁定', 'wpmind' ),
 				'icon'              => 'sparkle',
 				'state'             => 'accent',
 				'head_actions_html' => $status_pill,
@@ -218,7 +281,24 @@ use WPMind\Admin\SuiteIntegration;
 				);
 				echo $cloud_sw; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- kit-escaped.
 				?>
-				<p class="wenpai-field__desc"><?php esc_html_e( '开启后心思 AI 将作为免密钥通道加入智能路由，可单独使用或与自备 Key 混用。', 'wpmind' ); ?></p>
+				<p class="wenpai-field__desc"><?php esc_html_e( '开启后即可免自配第三方 Key 调用；自备 Key 功能永久免费开放。', 'wpmind' ); ?></p>
+			</div>
+		</div>
+
+		<div class="wenpai-field wenpai-field--row field">
+			<div class="field-label"><span class="wenpai-field__label"><?php esc_html_e( '与自备 Key 混用策略', 'wpmind' ); ?></span></div>
+			<div class="field-ctl">
+				<?php
+				Wenpai_Admin_UI::seg_radio(
+					[
+						'name'  => 'wpmind_cloud_mode',
+						'value' => $cloud_mode,
+						'items' => $mode_items,
+						'label' => __( '与自备 Key 混用策略', 'wpmind' ),
+					]
+				);
+				?>
+				<p class="wenpai-field__desc"><?php echo esc_html( $mode_defs[ $cloud_mode ]['desc'] ); ?></p>
 			</div>
 		</div>
 
@@ -276,9 +356,7 @@ use WPMind\Admin\SuiteIntegration;
 		Wenpai_Admin_UI::card_foot(
 			[
 				'start'        => true,
-				'meta'         => $cloud_bound
-					? __( '站点已通过文派云通行证鉴权，请求经派生令牌直连网关，密钥不落盘。', 'wpmind' )
-					: __( '绑定文派云通行证（WPCY）后即可免密钥调用，支持按量计费与月度包。', 'wpmind' ),
+				'meta'         => __( '不存站点内容、不用于模型训练 · 预付封顶不超扣 · 支持国内正规发票 · 随时切回自备 Key 无锁定。', 'wpmind' ),
 				'actions_html' => $cloud_actions,
 			]
 		);
@@ -287,11 +365,11 @@ use WPMind\Admin\SuiteIntegration;
 	</form>
 
 	<?php
-	// ---- 3. 托管模型与点数档位 ----
+	// ---- 3. 托管模型与任务量换算（人话标尺） ----
 	Wenpai_Admin_UI::card_open(
 		[
-			'title' => __( '托管模型与点数档位', 'wpmind' ),
-			'sub'   => __( '根据任务复杂度自动选路，兼顾速度、成本与输出质量', 'wpmind' ),
+			'title' => __( '托管模型与任务量换算', 'wpmind' ),
+			'sub'   => __( '按 WordPress 常见任务估算消耗，不再被复杂 Token 单价困扰', 'wpmind' ),
 			'tile'  => false,
 		]
 	);
@@ -302,8 +380,8 @@ use WPMind\Admin\SuiteIntegration;
 			'state' => 'ok',
 			'title' => __( '轻量快速档', 'wpmind' ),
 			'badge' => __( '别名 · 摘要 · 标签 · 审核', 'wpmind' ),
-			'desc'  => __( '覆盖 qwen-flash、deepseek-chat 等高速模型，适合 WPSlug、Auto-Meta 与批量短文本处理。', 'wpmind' ),
-			'pill'  => __( '低耗优先', 'wpmind' ),
+			'desc'  => __( 'qwen-flash / deepseek-chat · 1,000 点约可生成 2,000 条语义别名或 500 篇摘要，适合 WPSlug 与批量短文本。', 'wpmind' ),
+			'pill'  => __( '约 0.5–2 点 / 次', 'wpmind' ),
 			'tone'  => 'ok',
 		],
 		[
@@ -311,8 +389,8 @@ use WPMind\Admin\SuiteIntegration;
 			'state' => 'accent',
 			'title' => __( '主力写作与结构化档', 'wpmind' ),
 			'badge' => __( '笔笙 · GEO · 多语翻译', 'wpmind' ),
-			'desc'  => __( '覆盖 qwen-plus、deepseek-v3、gpt-4o-mini 等主力模型，兼顾长文语境与 JSON 结构稳定度。', 'wpmind' ),
-			'pill'  => __( '默认均衡', 'wpmind' ),
+			'desc'  => __( 'qwen-plus / deepseek-v3 / gpt-4o-mini · 1,000 点约可完成 100 篇长文润色或 80 次笔笙页面生成。', 'wpmind' ),
+			'pill'  => __( '约 8–15 点 / 次', 'wpmind' ),
 			'tone'  => 'mute',
 		],
 		[
@@ -320,8 +398,8 @@ use WPMind\Admin\SuiteIntegration;
 			'state' => '',
 			'title' => __( '深度推理与合规档', 'wpmind' ),
 			'badge' => __( '广告法复核 · 复杂推理', 'wpmind' ),
-			'desc'  => __( '覆盖 claude-sonnet、gpt-4o、deepseek-r1 等旗舰模型，面向高准确率复核与复杂决策。', 'wpmind' ),
-			'pill'  => __( '高精度', 'wpmind' ),
+			'desc'  => __( 'claude-sonnet / gpt-4o / deepseek-r1 · 1,000 点约可完成 150 次整篇广告法极限词语义复核。', 'wpmind' ),
+			'pill'  => __( '约 6–20 点 / 次', 'wpmind' ),
 			'tone'  => 'mute',
 		],
 		[
@@ -329,8 +407,8 @@ use WPMind\Admin\SuiteIntegration;
 			'state' => '',
 			'title' => __( '视觉理解与图像生成', 'wpmind' ),
 			'badge' => __( '媒体智能 · Alt Text · 配图', 'wpmind' ),
-			'desc'  => __( '覆盖 qwen-vl、gpt-image 等多模态接口，直连媒体库 Alt 自动生成与安全检测。', 'wpmind' ),
-			'pill'  => __( '按次结算', 'wpmind' ),
+			'desc'  => __( 'qwen-vl / gpt-image · 1,000 点约可识别 150 张图片 Alt Text 或生成约 40 张高清配图。', 'wpmind' ),
+			'pill'  => __( '按张透明计费', 'wpmind' ),
 			'tone'  => 'mute',
 		],
 	];
@@ -359,16 +437,16 @@ use WPMind\Admin\SuiteIntegration;
 	Wenpai_Admin_UI::card_foot(
 		[
 			'start' => true,
-			'meta'  => __( '实时模型目录与费率由 mind-api.wenpai.net 统一下发；与自备 Key 混用时可到「智能路由」调整优先级。', 'wpmind' ),
+			'meta'  => __( '实际消耗按请求长度实计，预付封顶绝不倒扣；国内节点直连并支持按月对公开具增值税发票。', 'wpmind' ),
 		]
 	);
 	Wenpai_Admin_UI::card_close();
 
-	// ---- 4. 接入进度与生态共用 ----
+	// ---- 4. 生态共用与代理商托管 ----
 	Wenpai_Admin_UI::card_open(
 		[
-			'title' => __( '接入进度与生态共用', 'wpmind' ),
-			'sub'   => __( '一次开启，全站文派生态插件共享同一份心思点数与月度预算', 'wpmind' ),
+			'title' => __( '生态共用与代理商托管', 'wpmind' ),
+			'sub'   => __( '一次开启，全站文派生态插件共享账本；支持建站团队多站额度交付', 'wpmind' ),
 			'tile'  => false,
 		]
 	);
@@ -379,8 +457,8 @@ use WPMind\Admin\SuiteIntegration;
 			'state'        => $cloud_bound ? 'ok' : '',
 			'title'        => __( '1. 绑定文派云站点通行证', 'wpmind' ),
 			'desc'         => $cloud_bound
-				? __( '当前站点已完成通行证关联，可自动签发短期调用凭证。', 'wpmind' )
-				: __( '通过文派叶子（WPCY）关联站点通行证，无需手工维护 API 密钥。', 'wpmind' ),
+				? __( '当前站点已完成通行证关联，自动签发短期派生令牌，密钥不落盘。', 'wpmind' )
+				: __( '通过文派叶子（WPCY）一键关联站点，无需手工复制维护 API 密钥。', 'wpmind' ),
 			'control_html' => '<div class="wenpai-row wenpai-row--tight">'
 				. Wenpai_Admin_UI::pill_html(
 					[
@@ -406,10 +484,14 @@ use WPMind\Admin\SuiteIntegration;
 		[
 			'icon_html' => AdminIcons::svg( 'sparkle' ),
 			'state'     => $cloud_on ? 'ok' : '',
-			'title'     => __( '2. 开启心思 AI 算力通道', 'wpmind' ),
+			'title'     => __( '2. 开启心思 AI 并选择混用策略', 'wpmind' ),
 			'desc'      => $cloud_on
-				? __( '已加入当前站点智能路由，自动承担文本与多模态请求。', 'wpmind' )
-				: __( '打开上方「启用心思 AI」开关并保存，即可启用免密钥通道。', 'wpmind' ),
+				? sprintf(
+					/* translators: %s: active hybrid cloud mode label */
+					__( '当前模式：%s，已实时接入站点智能路由与故障转移链。', 'wpmind' ),
+					$mode_defs[ $cloud_mode ]['label']
+				)
+				: __( '打开上方开关并按需选择全托管、故障备援或能力补缺模式。', 'wpmind' ),
 			'pill'      => [
 				'text'  => $cloud_on ? __( '已开启', 'wpmind' ) : __( '未开启', 'wpmind' ),
 				'state' => $cloud_on ? 'ok' : 'mute',
@@ -422,7 +504,7 @@ use WPMind\Admin\SuiteIntegration;
 			'icon_html'    => AdminIcons::svg( 'modules' ),
 			'state'        => $eco_count > 0 ? 'ok' : '',
 			'title'        => __( '3. 全站文派生态插件共用点数', 'wpmind' ),
-			'desc'         => __( '文派别名、笔笙、文派合规、文派文档与文派智储开启 AI 后，自动汇总消耗与预算。', 'wpmind' ),
+			'desc'         => __( '文派别名、笔笙、文派合规、文派文档与文派智储开启 AI 后，按插件清晰记账、共用月度预算。', 'wpmind' ),
 			'control_html' => '<div class="wenpai-row wenpai-row--tight">'
 				. Wenpai_Admin_UI::pill_html(
 					[
@@ -443,6 +525,19 @@ use WPMind\Admin\SuiteIntegration;
 					]
 				)
 				. '</div>',
+		]
+	);
+
+	Wenpai_Admin_UI::row(
+		[
+			'icon_html' => AdminIcons::svg( 'layers' ),
+			'state'     => $cloud_managed ? 'ok' : '',
+			'title'     => __( '4. 建站工作室多站额度与白标托管', 'wpmind' ),
+			'desc'      => __( '团队可在文派云统一采购点数池并按客户站分配月度上限，客户后台不暴露主密钥，配合 WPCY 白标一键交付。', 'wpmind' ),
+			'pill'      => [
+				'text'  => $cloud_managed ? __( '套件已托管', 'wpmind' ) : __( '适合建站团队', 'wpmind' ),
+				'state' => $cloud_managed ? 'ok' : 'mute',
+			],
 		]
 	);
 

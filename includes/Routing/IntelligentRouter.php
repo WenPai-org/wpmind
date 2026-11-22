@@ -226,6 +226,31 @@ class IntelligentRouter {
 			$candidates = $this->providers;
 		}
 
+		// 心思 AI 与自备 Key 混用策略：无显式首选且无手动优先级强制覆盖时生效.
+		$cloud_id = \WPMind\Provider\WenpaiCloud::PROVIDER_ID;
+		if ( isset( $candidates[ $cloud_id ] ) && empty( $this->get_manual_priority() ) ) {
+			$cloud_mode = \WPMind\Provider\WenpaiCloud::routing_mode();
+			$byok_only  = $candidates;
+			unset( $byok_only[ $cloud_id ] );
+
+			if ( \WPMind\Provider\WenpaiCloud::MODE_PRIMARY === $cloud_mode ) {
+				return $cloud_id;
+			}
+
+			if ( \WPMind\Provider\WenpaiCloud::MODE_FALLBACK === $cloud_mode && ! empty( $byok_only ) ) {
+				$candidates = $byok_only;
+			} elseif ( \WPMind\Provider\WenpaiCloud::MODE_CAPABILITY === $cloud_mode ) {
+				$model_type = strtolower( (string) ( $context->get_model_type() ?? '' ) );
+				$advanced   = in_array( $model_type, [ 'vision', 'image', 'reasoning', 'multimodal', 'overseas' ], true );
+				if ( $advanced ) {
+					return $cloud_id;
+				}
+				if ( ! empty( $byok_only ) ) {
+					$candidates = $byok_only;
+				}
+			}
+		}
+
 		return $strategy->select_provider( $context, $candidates );
 	}
 
@@ -246,6 +271,28 @@ class IntelligentRouter {
 		}
 
 		$ranked = $strategy->rank_providers( $context, $this->providers );
+
+		// 按心思 AI 混用模式调整故障转移链位置（仅在未启用手动优先级时生效）.
+		$cloud_id = \WPMind\Provider\WenpaiCloud::PROVIDER_ID;
+		if ( in_array( $cloud_id, $ranked, true ) && empty( $this->get_manual_priority() ) ) {
+			$cloud_mode = \WPMind\Provider\WenpaiCloud::routing_mode();
+			$without    = array_values( array_diff( $ranked, [ $cloud_id ] ) );
+			if ( \WPMind\Provider\WenpaiCloud::MODE_PRIMARY === $cloud_mode ) {
+				array_unshift( $without, $cloud_id );
+				$ranked = $without;
+			} elseif ( \WPMind\Provider\WenpaiCloud::MODE_FALLBACK === $cloud_mode ) {
+				$without[] = $cloud_id;
+				$ranked    = $without;
+			} elseif ( \WPMind\Provider\WenpaiCloud::MODE_CAPABILITY === $cloud_mode ) {
+				$model_type = strtolower( (string) ( $context->get_model_type() ?? '' ) );
+				if ( in_array( $model_type, [ 'vision', 'image', 'reasoning', 'multimodal', 'overseas' ], true ) ) {
+					array_unshift( $without, $cloud_id );
+				} else {
+					$without[] = $cloud_id;
+				}
+				$ranked = $without;
+			}
+		}
 
 		// 如果有首选 Provider，放在最前面
 		$preferred = $context->get_preferred_provider();

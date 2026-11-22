@@ -252,6 +252,16 @@ final class AdminPage {
 
 		register_setting(
 			'wpmind_cloud_settings',
+			'wpmind_cloud_mode',
+			[
+				'type'              => 'string',
+				'sanitize_callback' => [ $this, 'sanitize_cloud_mode' ],
+				'default'           => 'primary',
+			]
+		);
+
+		register_setting(
+			'wpmind_cloud_settings',
 			'wpmind_cloud_base_url',
 			[
 				'type'              => 'string',
@@ -303,6 +313,17 @@ final class AdminPage {
 		);
 
 		// GEO settings are managed by GeoModule via AJAX.
+	}
+
+	/**
+	 * 清理心思 AI 与自备 Key 混用模式.
+	 *
+	 * @param mixed $input 输入值.
+	 * @return string primary|fallback|capability
+	 */
+	public function sanitize_cloud_mode( $input ): string {
+		$mode = sanitize_key( (string) $input );
+		return in_array( $mode, [ 'primary', 'fallback', 'capability' ], true ) ? $mode : 'primary';
 	}
 
 	/**

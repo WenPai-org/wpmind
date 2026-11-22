@@ -41,6 +41,31 @@ final class WenpaiCloud {
 	public const OPTION_ENABLED = 'wpmind_cloud_enabled';
 
 	/**
+	 * 混用路由策略 option 名（primary / fallback / capability）。
+	 */
+	public const OPTION_MODE = 'wpmind_cloud_mode';
+
+	/**
+	 * 自定义网关地址 option 名。
+	 */
+	public const OPTION_BASE_URL = 'wpmind_cloud_base_url';
+
+	/**
+	 * 混用模式：全托管优先（优先走心思 AI，异常可回退自备 Key）。
+	 */
+	public const MODE_PRIMARY = 'primary';
+
+	/**
+	 * 混用模式：自备 Key 优先，心思 AI 作为熔断/缺省备援。
+	 */
+	public const MODE_FALLBACK = 'fallback';
+
+	/**
+	 * 混用模式：仅补齐缺失能力（常规文本走自备 Key，视觉/图像/高阶推理走心思 AI）。
+	 */
+	public const MODE_CAPABILITY = 'capability';
+
+	/**
 	 * 本地回退令牌 option 名。
 	 */
 	public const OPTION_TOKEN = 'wpmind_cloud_token';
@@ -53,7 +78,7 @@ final class WenpaiCloud {
 	/**
 	 * 获取官方网关 Base URL（去除结尾斜杠）。
 	 *
-	 * 优先级：常量 WPMIND_CLOUD_BASE_URL > filter wpmind_cloud_base_url > 默认地址。
+	 * 优先级：常量 WPMIND_CLOUD_BASE_URL > option wpmind_cloud_base_url > filter wpmind_cloud_base_url > 默认地址。
 	 *
 	 * @return string
 	 */
@@ -65,12 +90,55 @@ final class WenpaiCloud {
 			}
 		}
 
-		$filtered = apply_filters( 'wpmind_cloud_base_url', self::DEFAULT_BASE_URL );
-		$url      = is_string( $filtered ) && '' !== trim( $filtered )
-			? trim( $filtered )
+		$option_url = get_option( self::OPTION_BASE_URL, '' );
+		$default    = is_string( $option_url ) && '' !== trim( $option_url )
+			? trim( $option_url )
 			: self::DEFAULT_BASE_URL;
 
+		$filtered = apply_filters( 'wpmind_cloud_base_url', $default );
+		$url      = is_string( $filtered ) && '' !== trim( $filtered )
+			? trim( $filtered )
+			: $default;
+
 		return rtrim( $url, '/' );
+	}
+
+	/**
+	 * 获取心思 AI 与自备 Key 的混用路由模式。
+	 *
+	 * @return string primary|fallback|capability
+	 */
+	public static function routing_mode(): string {
+		$raw = get_option( self::OPTION_MODE, self::MODE_PRIMARY );
+		$raw = is_string( $raw ) ? sanitize_key( $raw ) : self::MODE_PRIMARY;
+
+		if ( in_array( $raw, [ self::MODE_PRIMARY, self::MODE_FALLBACK, self::MODE_CAPABILITY ], true ) ) {
+			return $raw;
+		}
+
+		return self::MODE_PRIMARY;
+	}
+
+	/**
+	 * 获取三种混用模式的展示文案。
+	 *
+	 * @return array<string, array{label: string, desc: string}>
+	 */
+	public static function mode_options(): array {
+		return [
+			self::MODE_PRIMARY    => [
+				'label' => __( '全托管优先', 'wpmind' ),
+				'desc'  => __( '优先走心思 AI，免维护第三方 Key；异常时自动回退已配自备 Key。', 'wpmind' ),
+			],
+			self::MODE_FALLBACK   => [
+				'label' => __( '自备 Key 优先 · 心思备援', 'wpmind' ),
+				'desc'  => __( '平时用你自备的 Key，仅在主 Key 熔断、限流或欠费时由心思 AI 自动顶上不断服。', 'wpmind' ),
+			],
+			self::MODE_CAPABILITY => [
+				'label' => __( '仅补齐缺失能力', 'wpmind' ),
+				'desc'  => __( '常规文本走自备 Key，视觉理解、图像生成与深度推理自动交由心思 AI 处理。', 'wpmind' ),
+			],
+		];
 	}
 
 	/**
@@ -167,12 +235,14 @@ final class WenpaiCloud {
 	 *
 	 * @return array{
 	 *     enabled: bool,
+	 *     mode: string,
 	 *     bound: bool,
 	 *     managed_by_suite: bool,
 	 *     site_uuid: string,
 	 *     credits_balance: ?int,
 	 *     credits_used_month: int,
 	 *     credits_limit_month: ?int,
+	 *     starter_credits: int,
 	 *     unit_label: string,
 	 *     base_url: string,
 	 *     bind_url: string,
@@ -243,14 +313,18 @@ final class WenpaiCloud {
 			? trim( $binding['manage_url'] )
 			: $default_bind_url;
 
+		$starter_credits = (int) apply_filters( 'wpmind_cloud_starter_credits', 500 );
+
 		return [
 			'enabled'             => self::is_enabled(),
+			'mode'                => self::routing_mode(),
 			'bound'               => $bound,
 			'managed_by_suite'    => $managed_by_suite,
 			'site_uuid'           => $site_uuid,
 			'credits_balance'     => $credits_balance,
 			'credits_used_month'  => $credits_used_month,
 			'credits_limit_month' => $credits_limit_month,
+			'starter_credits'     => max( 0, $starter_credits ),
 			'unit_label'          => self::unit_label(),
 			'base_url'            => self::base_url(),
 			'bind_url'            => $bind_url,
