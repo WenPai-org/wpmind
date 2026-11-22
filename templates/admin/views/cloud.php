@@ -352,6 +352,8 @@ use WPMind\Provider\WenpaiCloud;
 						<?php
 						if ( $is_token_const ) {
 							esc_html_e( '当前由 wp-config.php 常量 WPMIND_CLOUD_TOKEN 锁定。', 'wpmind' );
+						} elseif ( $cloud_bound ) {
+							esc_html_e( '当前站点已完成授权，无需重复填写；如需更换令牌可输入新值后保存，或点击下方「解除绑定」重置。', 'wpmind' );
 						} else {
 							esc_html_e( '常规站点点击下方「前往文派云授权」即可自动回写，安装文派叶子后会自动切换为套件托管。', 'wpmind' );
 						}

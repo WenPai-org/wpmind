@@ -662,6 +662,24 @@ final class WenpaiCloud {
 	}
 
 	/**
+	 * 从官方网关响应头解析本次请求实扣的心思点数。
+	 *
+	 * @param mixed $headers HTTP 响应头集合.
+	 * @return int 本次实扣点数（无对应响应头时返回 0）.
+	 */
+	public static function extract_charged_credits( $headers ): int {
+		$map = self::normalize_headers( $headers );
+
+		foreach ( [ 'x-mind-credits-charged', 'x-wpmind-credits-charged' ] as $ckey ) {
+			if ( array_key_exists( $ckey, $map ) && is_numeric( $map[ $ckey ] ) ) {
+				return max( 0, (int) $map[ $ckey ] );
+			}
+		}
+
+		return 0;
+	}
+
+	/**
 	 * 主动向官方网关 GET /account 查询当前心思点数余额与连通性，不扣费并刷新本地缓存。
 	 *
 	 * @param string|null $override_token    可选临时测试令牌（不落库）.

@@ -118,8 +118,11 @@ class EmbeddingService extends AbstractService {
 					);
 				}
 
+				$charged_credits = 0;
 				if ( \WPMind\Provider\WenpaiCloud::PROVIDER_ID === $try_provider ) {
-					\WPMind\Provider\WenpaiCloud::update_balance_from_headers( wp_remote_retrieve_headers( $response ) );
+					$resp_headers = wp_remote_retrieve_headers( $response );
+					\WPMind\Provider\WenpaiCloud::update_balance_from_headers( $resp_headers );
+					$charged_credits = \WPMind\Provider\WenpaiCloud::extract_charged_credits( $resp_headers );
 				}
 
 				$status_code = wp_remote_retrieve_response_code( $response );
@@ -166,7 +169,8 @@ class EmbeddingService extends AbstractService {
 					0,
 					$latency_ms,
 					$context,
-					\WPMind\Provider\WenpaiCloud::payer_for( $try_provider )
+					\WPMind\Provider\WenpaiCloud::payer_for( $try_provider ),
+					$charged_credits
 				);
 
 				do_action( 'wpmind_after_request', 'embed', $embeddings, compact( 'texts', 'options' ), $usage );

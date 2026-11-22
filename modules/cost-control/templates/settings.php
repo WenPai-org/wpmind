@@ -7,6 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
+use WPMind\Admin\AdminIcons;
 use WPMind\Modules\CostControl\BudgetChecker;
 use WPMind\Modules\CostControl\BudgetManager;
 use WPMind\Modules\CostControl\UsageTracker;
@@ -210,23 +211,36 @@ use WPMind\Modules\CostControl\UsageTracker;
 						<?php
 						foreach ( $wpmind_providers as $provider => $data ) :
 							$provider      = (string) $provider;
-							$currency      = UsageTracker::get_currency( $provider );
+							$is_cloud      = 'wenpai_cloud' === $provider;
+							$currency      = $is_cloud ? __( '心思点数', 'wpmind' ) : UsageTracker::get_currency( $provider );
 							$total_cost    = (float) ( $data['total_cost'] ?? 0 );
+							$total_credits = (int) ( $data['total_credits'] ?? 0 );
 							$request_count = (int) ( $data['request_count'] ?? 0 );
 							$total_tokens  = (int) ( $data['total_input_tokens'] ?? 0 ) + (int) ( $data['total_output_tokens'] ?? 0 );
 							$logo          = WPMIND_PLUGIN_DIR . 'assets/images/providers/' . $provider . '.svg';
+							$cost_display  = $is_cloud
+								? ( $total_credits > 0
+									? sprintf(
+										/* translators: %s: Mind Credits consumed */
+										__( '%s 点数', 'wpmind' ),
+										number_format_i18n( $total_credits )
+									)
+									: __( '点数计费', 'wpmind' ) )
+								: UsageTracker::format_cost( $total_cost, $currency );
 							?>
 							<tr>
 								<td>
 									<div class="t">
 										<?php if ( file_exists( $logo ) ) : ?>
 											<img class="wpmind-logo" src="<?php echo esc_url( WPMIND_PLUGIN_URL . 'assets/images/providers/' . $provider . '.svg' ); ?>" alt="" width="14" height="14">
+										<?php elseif ( $is_cloud && class_exists( AdminIcons::class ) ) : ?>
+											<?php echo AdminIcons::svg( 'cloud', 'wpmind-logo' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- trusted plugin SVG. ?>
 										<?php endif; ?>
 										<?php echo esc_html( UsageTracker::get_provider_display_name( $provider ) ); ?>
 									</div>
 									<div class="d"><?php echo esc_html( $currency ); ?></div>
 								</td>
-								<td class="num"><?php echo esc_html( UsageTracker::format_cost( $total_cost, $currency ) ); ?></td>
+								<td class="num"><?php echo esc_html( $cost_display ); ?></td>
 								<td class="num"><?php echo esc_html( number_format( $request_count ) ); ?></td>
 								<td class="num"><?php echo esc_html( UsageTracker::format_tokens( $total_tokens ) ); ?></td>
 							</tr>

@@ -123,12 +123,14 @@ final class ProviderClient {
 			);
 		}
 
-		$status  = (int) wp_remote_retrieve_response_code( $response );
-		$raw     = (string) wp_remote_retrieve_body( $response );
-		$headers = array();
-		$raw_h   = wp_remote_retrieve_headers( $response );
+		$status          = (int) wp_remote_retrieve_response_code( $response );
+		$raw             = (string) wp_remote_retrieve_body( $response );
+		$headers         = array();
+		$raw_h           = wp_remote_retrieve_headers( $response );
+		$charged_credits = 0;
 		if ( WenpaiCloud::PROVIDER_ID === $provider ) {
 			WenpaiCloud::update_balance_from_headers( $raw_h );
+			$charged_credits = WenpaiCloud::extract_charged_credits( $raw_h );
 		}
 		if ( is_array( $raw_h ) ) {
 			$headers = $raw_h;
@@ -175,7 +177,8 @@ final class ProviderClient {
 				$data,
 				(string) ( $args['model'] ?? '' ),
 				$latency,
-				(string) ( $args['context'] ?? '' )
+				(string) ( $args['context'] ?? '' ),
+				$charged_credits
 			);
 		}
 
@@ -251,8 +254,9 @@ final class ProviderClient {
 	 * @param string               $model_hint Fallback model name.
 	 * @param int                  $latency    Latency in ms.
 	 * @param string               $context    Request context.
+	 * @param int                  $credits    Official cloud credits charged.
 	 */
-	private function fire_usage( string $provider, array $data, string $model_hint, int $latency, string $context = '' ): void {
+	private function fire_usage( string $provider, array $data, string $model_hint, int $latency, string $context = '', int $credits = 0 ): void {
 		$usage = $data['usage'] ?? null;
 		if ( ! is_array( $usage ) ) {
 			return;
@@ -261,7 +265,7 @@ final class ProviderClient {
 		$output = (int) ( $usage['completion_tokens'] ?? $usage['output_tokens'] ?? 0 );
 		$input  = max( 0, $input );
 		$output = max( 0, $output );
-		if ( 0 === $input && 0 === $output ) {
+		if ( 0 === $input && 0 === $output && $credits <= 0 ) {
 			return;
 		}
 		$model = (string) ( $data['model'] ?? $model_hint );
@@ -276,7 +280,8 @@ final class ProviderClient {
 			$output,
 			$latency,
 			$context,
-			WenpaiCloud::payer_for( $provider )
+			WenpaiCloud::payer_for( $provider ),
+			max( 0, $credits )
 		);
 	}
 }

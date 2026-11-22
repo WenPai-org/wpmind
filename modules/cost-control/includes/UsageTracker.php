@@ -269,6 +269,7 @@ class UsageTracker {
 					'total_input_tokens'  => 0,
 					'total_output_tokens' => 0,
 					'total_cost'          => 0,
+					'total_credits'       => 0,
 					'request_count'       => 0,
 					'models'              => [],
 				];
@@ -304,6 +305,7 @@ class UsageTracker {
 			$stats['providers'][ $provider ]['total_input_tokens']  += $input_tokens;
 			$stats['providers'][ $provider ]['total_output_tokens'] += $output_tokens;
 			$stats['providers'][ $provider ]['total_cost']          += $cost;
+			$stats['providers'][ $provider ]['total_credits']        = (int) ( $stats['providers'][ $provider ]['total_credits'] ?? 0 ) + $credits;
 			++$stats['providers'][ $provider ]['request_count'];
 
 			// Update model stats.

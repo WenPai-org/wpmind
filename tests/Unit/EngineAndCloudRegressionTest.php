@@ -343,11 +343,12 @@ final class EngineAndCloudRegressionTest extends TestCase {
 
 		$usage_events = $GLOBALS['wpmind_test_actions']['wpmind_usage_record'] ?? [];
 		self::assertCount( 1, $usage_events );
-		self::assertCount( 7, $usage_events[0] );
+		self::assertCount( 8, $usage_events[0] );
 		self::assertSame( 'openai', $usage_events[0][0] );
 		self::assertSame( 'gpt-4o-mini', $usage_events[0][1] );
 		self::assertSame( 'bisheng_draft', $usage_events[0][5] );
 		self::assertSame( 'byok', $usage_events[0][6] );
+		self::assertSame( 0, $usage_events[0][7] );
 	}
 
 	/**
@@ -861,5 +862,83 @@ final class EngineAndCloudRegressionTest extends TestCase {
 		update_option( 'wpmind_failover_order', [ 'zhipu', 'qwen' ] );
 		self::assertSame( 'zhipu', $router->route() );
 		self::assertSame( [ 'zhipu', 'qwen' ], $router->get_failover_chain() );
+	}
+
+	/**
+	 * 10. 已有 BYOK 手动顺序时心思 AI 混用模式仍按预期生效，且支持解析实扣点数响应头与累计统计。
+	 */
+	public function test_cloud_mode_precedence_with_byok_manual_priority_and_charged_credits(): void {
+		$this->seed_endpoints(
+			[
+				'qwen'  => [
+					'enabled' => true,
+					'api_key' => 'sk-qwen-test-key',
+					'models'  => [ 'qwen-plus' ],
+				],
+				'zhipu' => [
+					'enabled' => true,
+					'api_key' => 'sk-zhipu-test-key',
+					'models'  => [ 'glm-4-flash' ],
+				],
+			]
+		);
+		update_option( WenpaiCloud::OPTION_ENABLED, '1' );
+		WenpaiCloud::save_standalone_token( self::FAKE_CLOUD_TOKEN );
+		update_option( 'wpmind_failover_order', [ 'openai', 'qwen', 'zhipu' ] );
+
+		$router_ref = new \ReflectionProperty( \WPMind\Routing\IntelligentRouter::class, 'instance' );
+		$router_ref->setAccessible( true );
+		$router_ref->setValue( null, null );
+		$router = \WPMind\Routing\IntelligentRouter::instance();
+
+		// 10a. 手动列表未包含 wenpai_cloud：全托管优先（primary）应把 wenpai_cloud 排第一，BYOK 按手动顺序紧随其后.
+		update_option( WenpaiCloud::OPTION_MODE, WenpaiCloud::MODE_PRIMARY );
+		self::assertSame( 'wenpai_cloud', $router->route() );
+		self::assertSame( [ 'wenpai_cloud', 'qwen', 'zhipu' ], $router->get_failover_chain() );
+
+		// 10b. 自备优先（fallback）：BYOK 按手动顺序优先，wenpai_cloud 放末尾备援.
+		update_option( WenpaiCloud::OPTION_MODE, WenpaiCloud::MODE_FALLBACK );
+		self::assertSame( 'qwen', $router->route() );
+		self::assertSame( [ 'qwen', 'zhipu', 'wenpai_cloud' ], $router->get_failover_chain() );
+
+		// 10c. 按能力补充（capability）：常规文本走 BYOK 手动顺序，视觉/推理走 wenpai_cloud.
+		update_option( WenpaiCloud::OPTION_MODE, WenpaiCloud::MODE_CAPABILITY );
+		self::assertSame( 'qwen', $router->route() );
+		$vision_ctx = \WPMind\Routing\RoutingContext::create()->with_model_type( 'vision' );
+		self::assertSame( 'wenpai_cloud', $router->route( $vision_ctx ) );
+		self::assertSame( [ 'wenpai_cloud', 'qwen', 'zhipu' ], $router->get_failover_chain( $vision_ctx ) );
+
+		// 10d. 若手动顺序显式包含 wenpai_cloud，则严格遵循手动顺序.
+		update_option( WenpaiCloud::OPTION_MODE, WenpaiCloud::MODE_PRIMARY );
+		update_option( 'wpmind_failover_order', [ 'zhipu', 'wenpai_cloud', 'qwen' ] );
+		self::assertSame( 'zhipu', $router->route() );
+		self::assertSame( [ 'zhipu', 'wenpai_cloud', 'qwen' ], $router->get_failover_chain() );
+
+		// 10e. X-Mind-Credits-Charged 解析与 UsageTracker total_credits 统计.
+		self::assertSame(
+			3,
+			WenpaiCloud::extract_charged_credits(
+				[
+					'X-Mind-Credits-Remaining' => '497',
+					'X-Mind-Credits-Charged'   => '3',
+				]
+			)
+		);
+		self::assertSame( 0, WenpaiCloud::extract_charged_credits( [] ) );
+
+		delete_option( 'wpmind_usage_stats' );
+		\WPMind\Modules\CostControl\UsageTracker::record(
+			'wenpai_cloud',
+			'glm-5.3-flash',
+			20,
+			50,
+			120,
+			'default',
+			'wenpai_cloud',
+			3
+		);
+		$stats = \WPMind\Modules\CostControl\UsageTracker::get_stats();
+		self::assertSame( 3, $stats['providers']['wenpai_cloud']['total_credits'] ?? 0 );
+		self::assertSame( 3, $stats['total']['credits'] ?? 0 );
 	}
 }

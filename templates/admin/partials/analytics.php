@@ -34,7 +34,7 @@ use WPMind\Modules\CostControl\UsageTracker;
 		if ( file_exists( $svg ) ) {
 			return '<img class="wpmind-logo" src="' . esc_url( WPMIND_PLUGIN_URL . 'assets/images/providers/' . $pid . '.svg' ) . '" alt="" width="14" height="14">';
 		}
-		return AdminIcons::svg( 'robot' );
+		return AdminIcons::svg( 'wenpai_cloud' === $pid ? 'cloud' : 'robot', 'wpmind-logo' );
 	};
 
 	$active_providers = 0;
@@ -324,14 +324,29 @@ use WPMind\Modules\CostControl\UsageTracker;
 							</tr>
 						</thead>
 						<tbody>
-							<?php foreach ( $usage_stats['providers'] as $provider_id => $provider_stats ) : ?>
+							<?php
+							foreach ( $usage_stats['providers'] as $provider_id => $provider_stats ) :
+								$provider_id   = (string) $provider_id;
+								$is_cloud_row  = 'wenpai_cloud' === $provider_id;
+								$row_currency  = $is_cloud_row ? __( '心思点数', 'wpmind' ) : UsageTracker::get_currency( $provider_id );
+								$row_credits   = (int) ( $provider_stats['total_credits'] ?? 0 );
+								$row_cost_text = $is_cloud_row
+									? ( $row_credits > 0
+										? sprintf(
+											/* translators: %s: Mind Credits consumed */
+											__( '%s 点数', 'wpmind' ),
+											number_format_i18n( $row_credits )
+										)
+										: __( '点数计费', 'wpmind' ) )
+									: UsageTracker::format_cost( (float) ( $provider_stats['total_cost'] ?? 0 ), $row_currency );
+								?>
 								<tr>
 									<td>
-										<div class="t"><?php echo $wpmind_mark( (string) $provider_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php echo esc_html( UsageTracker::get_provider_display_name( (string) $provider_id ) ); ?></div>
-										<div class="d"><?php echo esc_html( UsageTracker::get_currency( (string) $provider_id ) ); ?></div>
+										<div class="t"><?php echo $wpmind_mark( $provider_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php echo esc_html( UsageTracker::get_provider_display_name( $provider_id ) ); ?></div>
+										<div class="d"><?php echo esc_html( $row_currency ); ?></div>
 									</td>
 									<td class="num"><?php echo esc_html( UsageTracker::format_tokens( (int) ( $provider_stats['total_input_tokens'] ?? 0 ) + (int) ( $provider_stats['total_output_tokens'] ?? 0 ) ) ); ?></td>
-									<td class="num"><?php echo esc_html( UsageTracker::format_cost( (float) ( $provider_stats['total_cost'] ?? 0 ), UsageTracker::get_currency( (string) $provider_id ) ) ); ?></td>
+									<td class="num"><?php echo esc_html( $row_cost_text ); ?></td>
 									<td class="num"><?php echo esc_html( (string) ( $provider_stats['request_count'] ?? 0 ) ); ?></td>
 								</tr>
 							<?php endforeach; ?>

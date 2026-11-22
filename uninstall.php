@@ -31,6 +31,7 @@ function wpmind_cleanup_site_data(): void {
 		'wpmind_usage_history',
 		'wpmind_budget_settings',
 		'wpmind_routing_settings',
+		'wpmind_failover_order',
 		'wpmind_installed_version',
 		// endpoint schema v2 迁移.
 		'wpmind_endpoint_schema_version',

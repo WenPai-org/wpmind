@@ -226,19 +226,13 @@ class IntelligentRouter {
 			$candidates = $this->providers;
 		}
 
-		// 手动优先级启用时，严格按手动顺序命中首个可用候选项（避免与「优先级与排名」状态冲突）.
-		$manual_priority = $this->get_manual_priority();
-		if ( ! empty( $manual_priority ) ) {
-			foreach ( $manual_priority as $pid ) {
-				if ( isset( $candidates[ $pid ] ) ) {
-					return $pid;
-				}
-			}
-		}
+		// 手动优先级启用时，先检查手动列表是否显式包含心思 AI.
+		$manual_priority  = $this->get_manual_priority();
+		$cloud_id         = \WPMind\Provider\WenpaiCloud::PROVIDER_ID;
+		$manual_has_cloud = in_array( $cloud_id, $manual_priority, true );
 
-		// 心思 AI 与自备 Key 混用策略：无显式首选且无手动优先级强制覆盖时生效.
-		$cloud_id = \WPMind\Provider\WenpaiCloud::PROVIDER_ID;
-		if ( isset( $candidates[ $cloud_id ] ) && empty( $manual_priority ) ) {
+		// 心思 AI 与自备 Key 混用策略：只要手动优先级未显式排布 wenpai_cloud，即优先按混用模式生效.
+		if ( isset( $candidates[ $cloud_id ] ) && ! $manual_has_cloud ) {
 			$cloud_mode = \WPMind\Provider\WenpaiCloud::routing_mode();
 			$byok_only  = $candidates;
 			unset( $byok_only[ $cloud_id ] );
@@ -257,6 +251,15 @@ class IntelligentRouter {
 				}
 				if ( ! empty( $byok_only ) ) {
 					$candidates = $byok_only;
+				}
+			}
+		}
+
+		// 手动优先级启用时，严格按手动顺序命中首个可用候选项（避免与「优先级与排名」状态冲突）.
+		if ( ! empty( $manual_priority ) ) {
+			foreach ( $manual_priority as $pid ) {
+				if ( isset( $candidates[ $pid ] ) ) {
+					return $pid;
 				}
 			}
 		}
@@ -299,9 +302,10 @@ class IntelligentRouter {
 			$ranked = $ordered;
 		}
 
-		// 按心思 AI 混用模式调整故障转移链位置（仅在未启用手动优先级时生效）.
-		$cloud_id = \WPMind\Provider\WenpaiCloud::PROVIDER_ID;
-		if ( in_array( $cloud_id, $ranked, true ) && empty( $manual_priority ) ) {
+		// 按心思 AI 混用模式调整故障转移链位置（手动优先级未显式排布 wenpai_cloud 时生效）.
+		$cloud_id         = \WPMind\Provider\WenpaiCloud::PROVIDER_ID;
+		$manual_has_cloud = in_array( $cloud_id, $manual_priority, true );
+		if ( in_array( $cloud_id, $ranked, true ) && ! $manual_has_cloud ) {
 			$cloud_mode = \WPMind\Provider\WenpaiCloud::routing_mode();
 			$without    = array_values( array_diff( $ranked, [ $cloud_id ] ) );
 			if ( \WPMind\Provider\WenpaiCloud::MODE_PRIMARY === $cloud_mode ) {
