@@ -24,7 +24,7 @@ module.exports = async (config) => {
 	await page.fill('#user_login', user);
 	await page.fill('#user_pass', pass);
 	await Promise.all([
-		page.waitForURL(/\/wp-admin\//, { timeout: 60_000 }),
+		page.waitForURL(/\/wp-admin\//, { timeout: 60_000, waitUntil: 'domcontentloaded' }),
 		page.click('#wp-submit'),
 	]);
 	await page.context().storageState({ path: storageState });

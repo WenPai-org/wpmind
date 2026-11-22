@@ -174,7 +174,7 @@ use WPMind\Admin\SuiteIntegration;
 	<form method="post" action="options.php" id="wpmind-settings-form">
 		<?php settings_fields( 'wpmind_settings' ); ?>
 
-		<div class="wenpai-stack" data-wenpai-mode-scope="<?php echo esc_attr( $mode ); ?>">
+		<div class="wenpai-stack">
 			<?php
 			// ---- 文本服务 Provider 卡（渐进式披露：已配置置顶，未配置默认折叠收纳） ----
 			$byok_endpoints = array_filter(
