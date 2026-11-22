@@ -274,4 +274,37 @@ final class SuiteIntegrationTest extends TestCase {
 		}
 		$this->assertArrayNotHasKey( 'unknown_provider', $sanitized );
 	}
+
+	public function test_ecosystem_integrations_filters_only_active_entries(): void {
+		$cb = static function ( array $items ): array {
+			$items[] = [
+				'slug'         => 'wpslug',
+				'name'         => '文派别名（WPSlug）',
+				'desc'         => '语义拼音与翻译',
+				'feature'      => '语义拼音',
+				'icon'         => 'globe',
+				'version'      => '1.3.3',
+				'settings_url' => 'https://example.com/wpslug',
+				'requests'     => 12,
+				'tokens'       => 3400,
+				'active'       => true,
+			];
+			$items[] = [
+				'slug'   => 'inactive-plugin',
+				'name'   => '未启用联动插件',
+				'active' => false,
+			];
+			return $items;
+		};
+
+		$GLOBALS['wpmind_test_filters']['wpmind_ecosystem_integrations'] = $cb;
+		$list = SuiteIntegration::ecosystem_integrations();
+
+		$this->assertCount( 1, $list );
+		$this->assertSame( 'wpslug', $list[0]['slug'] );
+		$this->assertSame( '文派别名（WPSlug）', $list[0]['name'] );
+		$this->assertSame( 12, $list[0]['requests'] );
+		$this->assertSame( 3400, $list[0]['tokens'] );
+		$this->assertTrue( $list[0]['active'] );
+	}
 }

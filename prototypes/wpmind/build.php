@@ -208,7 +208,34 @@ namespace {
 	function add_filter() {}
 	function do_action() {}
 	function apply_filters( $tag, $val ) {
-		unset( $tag );
+		if ( 'wpmind_ecosystem_integrations' === $tag ) {
+			return [
+				[
+					'slug'         => 'wpslug',
+					'name'         => '文派别名（WPSlug）',
+					'desc'         => '文章、分类与媒体别名转换已接入文派心思，复用站点路由与预算。',
+					'feature'      => '语义拼音 / AI 翻译',
+					'icon'         => 'globe',
+					'version'      => '1.3.3',
+					'settings_url' => 'services.html',
+					'requests'     => 110,
+					'tokens'       => 70000,
+					'active'       => true,
+				],
+				[
+					'slug'         => 'bisheng-html',
+					'name'         => '笔笙 HTML（Bisheng）',
+					'desc'         => '页面与代码生成已连接文派心思公共接口。',
+					'feature'      => 'AI 页面生成',
+					'icon'         => 'sparkle',
+					'version'      => '0.6.0',
+					'settings_url' => 'services.html',
+					'requests'     => 48,
+					'tokens'       => 142000,
+					'active'       => true,
+				],
+			];
+		}
 		return $val;
 	}
 	function register_setting() {}

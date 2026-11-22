@@ -471,6 +471,250 @@ final class SuiteIntegration {
 	}
 
 	/**
+	 * Detect installed & active WenPai ecosystem plugins that have enabled WPMind integration.
+	 *
+	 * Ecosystem plugins may also self-register or enrich entries via the
+	 * `wpmind_ecosystem_integrations` filter. Only entries with `active => true` are returned.
+	 *
+	 * @return array<int, array{
+	 *     slug: string,
+	 *     name: string,
+	 *     desc: string,
+	 *     feature: string,
+	 *     icon: string,
+	 *     version: string,
+	 *     settings_url: string,
+	 *     requests: int,
+	 *     tokens: int,
+	 *     active: bool
+	 * }>
+	 */
+	public static function ecosystem_integrations(): array {
+		$by_caller = [];
+		if ( class_exists( UsageTracker::class ) ) {
+			$ctx_stats = UsageTracker::get_context_stats();
+			foreach ( $ctx_stats as $ctx_key => $row ) {
+				$caller = (string) ( $row['caller_plugin'] ?? '' );
+				if ( '' === $caller ) {
+					$caller = (string) $ctx_key;
+				}
+				if ( '' === $caller ) {
+					continue;
+				}
+				if ( ! isset( $by_caller[ $caller ] ) ) {
+					$by_caller[ $caller ] = [
+						'requests' => 0,
+						'tokens'   => 0,
+					];
+				}
+				$by_caller[ $caller ]['requests'] += (int) ( $row['requests'] ?? 0 );
+				$by_caller[ $caller ]['tokens']   += (int) ( $row['input_tokens'] ?? 0 ) + (int) ( $row['output_tokens'] ?? 0 );
+			}
+		}
+
+		$menu_url = static function ( string $slug ): string {
+			if ( class_exists( 'Wenpai_Admin_Menu', false ) ) {
+				return (string) \Wenpai_Admin_Menu::url( $slug );
+			}
+			return '';
+		};
+
+		$items = [];
+
+		// 1. 文派别名（WPSlug）.
+		if ( defined( 'WPSLUG_VERSION' ) || class_exists( 'WPSlug_Settings', false ) ) {
+			$opts      = get_option( 'wpslug_options', [] );
+			$opts      = is_array( $opts ) ? $opts : [];
+			$mode      = (string) ( $opts['conversion_mode'] ?? 'pinyin' );
+			$service   = (string) ( $opts['translation_service'] ?? 'none' );
+			$pt_modes  = is_array( $opts['post_type_modes'] ?? null ) ? $opts['post_type_modes'] : [];
+			$features  = [];
+			$ai_modes  = [ 'semantic_pinyin', 'seo_slug', 'ai' ];
+			$has_pt_ai = false;
+			foreach ( $pt_modes as $pt_mode ) {
+				if ( in_array( (string) $pt_mode, $ai_modes, true ) ) {
+					$has_pt_ai = true;
+					break;
+				}
+			}
+			if ( in_array( $mode, $ai_modes, true ) || $has_pt_ai ) {
+				$features[] = __( '语义拼音', 'wpmind' );
+			}
+			if ( 'wpmind' === $service ) {
+				$features[] = __( 'AI 翻译', 'wpmind' );
+			}
+			$slug_stats = $by_caller['wpslug'] ?? [
+				'requests' => 0,
+				'tokens'   => 0,
+			];
+			if ( ! empty( $features ) || $slug_stats['requests'] > 0 ) {
+				$items['wpslug'] = [
+					'slug'         => 'wpslug',
+					'name'         => __( '文派别名（WPSlug）', 'wpmind' ),
+					'desc'         => __( '文章、分类与媒体别名转换已接入文派心思，复用站点路由与预算。', 'wpmind' ),
+					'feature'      => ! empty( $features ) ? implode( ' / ', $features ) : __( 'AI 别名转换', 'wpmind' ),
+					'icon'         => 'globe',
+					'version'      => defined( 'WPSLUG_VERSION' ) ? (string) constant( 'WPSLUG_VERSION' ) : '',
+					'settings_url' => $menu_url( 'wpslug' ),
+					'requests'     => (int) $slug_stats['requests'],
+					'tokens'       => (int) $slug_stats['tokens'],
+					'active'       => true,
+				];
+			}
+		}
+
+		// 2. 笔笙 HTML（Bisheng HTML）.
+		if ( defined( 'BISHENG_HTML_VERSION' ) || class_exists( 'BishengHtml_Settings', false ) ) {
+			$bh_cb    = [ 'BishengHtml_AI', 'wpmind_available' ];
+			$bh_ready = is_callable( $bh_cb )
+				? (bool) call_user_func( $bh_cb )
+				: ( function_exists( 'wpmind_is_available' ) && wpmind_is_available() );
+			$bh_req   = (int) ( $by_caller['bisheng']['requests'] ?? 0 ) + (int) ( $by_caller['bisheng-html']['requests'] ?? 0 );
+			$bh_tok   = (int) ( $by_caller['bisheng']['tokens'] ?? 0 ) + (int) ( $by_caller['bisheng-html']['tokens'] ?? 0 );
+			if ( $bh_ready || $bh_req > 0 ) {
+				$items['bisheng-html'] = [
+					'slug'         => 'bisheng-html',
+					'name'         => __( '笔笙 HTML（Bisheng）', 'wpmind' ),
+					'desc'         => __( '页面与代码生成已连接文派心思公共接口。', 'wpmind' ),
+					'feature'      => __( 'AI 页面生成', 'wpmind' ),
+					'icon'         => 'sparkle',
+					'version'      => defined( 'BISHENG_HTML_VERSION' ) ? (string) constant( 'BISHENG_HTML_VERSION' ) : '',
+					'settings_url' => $menu_url( 'bisheng-html' ),
+					'requests'     => $bh_req,
+					'tokens'       => $bh_tok,
+					'active'       => true,
+				];
+			}
+		}
+
+		// 3. 文派文档（WPDocs）.
+		if ( defined( 'WPDOCS_VERSION' ) || class_exists( '\\WPDocs\\Plugin', false ) ) {
+			$docs_wired = ( function_exists( 'has_filter' ) && ( false !== has_filter( 'wpmind_llms_txt_sections' ) || false !== has_filter( 'wpmind_raw_markdown_for_post' ) ) );
+			$docs_stats = $by_caller['wpdocs'] ?? [
+				'requests' => 0,
+				'tokens'   => 0,
+			];
+			if ( $docs_wired || $docs_stats['requests'] > 0 ) {
+				$items['wpdocs'] = [
+					'slug'         => 'wpdocs',
+					'name'         => __( '文派文档（WPDocs）', 'wpmind' ),
+					'desc'         => __( '文档库已联动文派心思 GEO（llms.txt / Markdown Feed）与 AI 能力。', 'wpmind' ),
+					'feature'      => __( 'GEO / 文档 AI', 'wpmind' ),
+					'icon'         => 'doc',
+					'version'      => defined( 'WPDOCS_VERSION' ) ? (string) constant( 'WPDOCS_VERSION' ) : '',
+					'settings_url' => $menu_url( 'wpdocs' ),
+					'requests'     => (int) $docs_stats['requests'],
+					'tokens'       => (int) $docs_stats['tokens'],
+					'active'       => true,
+				];
+			}
+		}
+
+		// 4. 文派智储（WPSSS）.
+		if ( defined( 'WPSSS_VERSION' ) ) {
+			$sss_wired = function_exists( 'has_filter' ) && false !== has_filter( 'wpsss_ci_audit_text' );
+			$sss_stats = $by_caller['wpsss'] ?? [
+				'requests' => 0,
+				'tokens'   => 0,
+			];
+			if ( $sss_wired || $sss_stats['requests'] > 0 ) {
+				$items['wpsss'] = [
+					'slug'         => 'wpsss',
+					'name'         => __( '文派智储（WPSSS）', 'wpmind' ),
+					'desc'         => __( '云端媒体与内容安全审核已联动文派心思。', 'wpmind' ),
+					'feature'      => __( '内容审核 / 媒体 AI', 'wpmind' ),
+					'icon'         => 'cloud',
+					'version'      => (string) constant( 'WPSSS_VERSION' ),
+					'settings_url' => $menu_url( 'wpsss' ),
+					'requests'     => (int) $sss_stats['requests'],
+					'tokens'       => (int) $sss_stats['tokens'],
+					'active'       => true,
+				];
+			}
+		}
+
+		// 5. 文派合规（WPICP）.
+		if ( defined( 'WPICP_VERSION' ) ) {
+			$icp_opts  = get_option( 'wpicp_settings', [] );
+			$icp_opts  = is_array( $icp_opts ) ? $icp_opts : [];
+			$icp_ai    = ! empty( $icp_opts['ai_review_enabled'] ) || 'wpmind' === (string) ( $icp_opts['ai_engine'] ?? '' );
+			$icp_stats = $by_caller['wpicp'] ?? [
+				'requests' => 0,
+				'tokens'   => 0,
+			];
+			if ( $icp_ai || $icp_stats['requests'] > 0 ) {
+				$items['wpicp'] = [
+					'slug'         => 'wpicp',
+					'name'         => __( '文派合规（WPICP）', 'wpmind' ),
+					'desc'         => __( '广告法极限词与合规复核已启用文派心思语义判定。', 'wpmind' ),
+					'feature'      => __( '合规语义复核', 'wpmind' ),
+					'icon'         => 'lock',
+					'version'      => (string) constant( 'WPICP_VERSION' ),
+					'settings_url' => $menu_url( 'wpicp' ),
+					'requests'     => (int) $icp_stats['requests'],
+					'tokens'       => (int) $icp_stats['tokens'],
+					'active'       => true,
+				];
+			}
+		}
+
+		// 6. 文派评论（WPComments）.
+		if ( defined( 'WPCOMMENTS_VERSION' ) ) {
+			$cmt_stats = $by_caller['wpcomments'] ?? [
+				'requests' => 0,
+				'tokens'   => 0,
+			];
+			if ( $cmt_stats['requests'] > 0 ) {
+				$items['wpcomments'] = [
+					'slug'         => 'wpcomments',
+					'name'         => __( '文派评论（WPComments）', 'wpmind' ),
+					'desc'         => __( '评论辅助回复与内容过滤已接入文派心思。', 'wpmind' ),
+					'feature'      => __( '评论 AI 辅助', 'wpmind' ),
+					'icon'         => 'feedback',
+					'version'      => (string) constant( 'WPCOMMENTS_VERSION' ),
+					'settings_url' => $menu_url( 'wpcomments' ),
+					'requests'     => (int) $cmt_stats['requests'],
+					'tokens'       => (int) $cmt_stats['tokens'],
+					'active'       => true,
+				];
+			}
+		}
+
+		if ( function_exists( 'apply_filters' ) ) {
+			$filtered = apply_filters( 'wpmind_ecosystem_integrations', array_values( $items ), $by_caller );
+			if ( is_array( $filtered ) ) {
+				$items = $filtered;
+			}
+		}
+
+		$normalized = [];
+		foreach ( $items as $entry ) {
+			if ( ! is_array( $entry ) || empty( $entry['active'] ) || empty( $entry['name'] ) ) {
+				continue;
+			}
+			$slug         = sanitize_key( (string) ( $entry['slug'] ?? '' ) );
+			$caller_stat  = '' !== $slug && isset( $by_caller[ $slug ] ) ? $by_caller[ $slug ] : [
+				'requests' => 0,
+				'tokens'   => 0,
+			];
+			$normalized[] = [
+				'slug'         => $slug,
+				'name'         => (string) $entry['name'],
+				'desc'         => (string) ( $entry['desc'] ?? '' ),
+				'feature'      => (string) ( $entry['feature'] ?? '' ),
+				'icon'         => (string) ( $entry['icon'] ?? 'package' ),
+				'version'      => (string) ( $entry['version'] ?? '' ),
+				'settings_url' => (string) ( $entry['settings_url'] ?? '' ),
+				'requests'     => isset( $entry['requests'] ) ? (int) $entry['requests'] : (int) $caller_stat['requests'],
+				'tokens'       => isset( $entry['tokens'] ) ? (int) $entry['tokens'] : (int) $caller_stat['tokens'],
+				'active'       => true,
+			];
+		}
+
+		return $normalized;
+	}
+
+	/**
 	 * Format an integer safely with or without WordPress i18n helper.
 	 *
 	 * @param int $number Integer to format.
