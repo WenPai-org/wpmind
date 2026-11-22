@@ -267,6 +267,27 @@ final class AdminPage {
 			]
 		);
 
+		// 智能路由独立参数表单（仅保存超时与默认服务，避免覆盖端点列表）.
+		register_setting(
+			'wpmind_routing_settings',
+			'wpmind_request_timeout',
+			[
+				'type'              => 'integer',
+				'sanitize_callback' => [ $this, 'sanitize_timeout' ],
+				'default'           => 60,
+			]
+		);
+
+		register_setting(
+			'wpmind_routing_settings',
+			'wpmind_default_provider',
+			[
+				'type'              => 'string',
+				'sanitize_callback' => [ $this, 'sanitize_default_provider' ],
+				'default'           => '',
+			]
+		);
+
 		// 图像服务设置
 		register_setting(
 			'wpmind_image_settings',

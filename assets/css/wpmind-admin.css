@@ -474,6 +474,92 @@
 	gap: var(--wenpai-space-3);
 }
 
+/* ---- 智能路由页（按 2026-11-16 过审原型 routing.html） ---- */
+.wpmind-rt__bar {
+	display: flex;
+	align-items: center;
+	gap: var(--wenpai-space-3);
+	flex-wrap: wrap;
+	margin: 0 0 var(--wenpai-space-4);
+}
+
+.wpmind-rt__bar-label {
+	margin-inline-start: auto;
+	font-size: var(--wenpai-text-meta);
+	line-height: var(--wenpai-leading-meta);
+	font-weight: var(--wenpai-weight-regular);
+	color: var(--wenpai-ink);
+	white-space: nowrap;
+}
+
+.wpmind-rt__bar .meta {
+	margin: 0;
+}
+
+.wpmind-rt__sub {
+	font-size: var(--wenpai-text-title);
+	line-height: var(--wenpai-leading-title);
+	font-weight: var(--wenpai-weight-regular);
+	color: var(--wenpai-ink);
+	margin: 0 0 var(--wenpai-space-2);
+}
+
+.wpmind-rt__sub--gap {
+	margin-top: var(--wenpai-space-5);
+}
+
+.wpmind-rt__chain {
+	display: grid;
+}
+
+.wpmind-rt__citem {
+	display: flex;
+	align-items: center;
+	gap: var(--wenpai-space-3);
+	padding: var(--wenpai-space-3) 0;
+	border-top: 1px solid var(--wenpai-line-soft);
+}
+
+.wpmind-rt__citem:first-child {
+	border-top: 0;
+	padding-top: var(--wenpai-space-1);
+}
+
+.wpmind-rt__cnum {
+	color: var(--wenpai-ink-3);
+	font-size: var(--wenpai-text-meta);
+	font-variant-numeric: tabular-nums;
+	min-width: 1rem;
+	flex: none;
+}
+
+.wpmind-rt__cname {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--wenpai-space-2);
+	font-size: var(--wenpai-text-body);
+	color: var(--wenpai-ink);
+}
+
+.wpmind-rt__cname img,
+.wpmind-rt__cname .wenpai-ico {
+	width: 14px;
+	height: 14px;
+	object-fit: contain;
+	flex: none;
+}
+
+.wpmind-rt__cside {
+	margin-inline-start: auto;
+	flex: none;
+}
+
+.wpmind-rt__scores {
+	margin-top: var(--wenpai-space-4);
+	padding-top: var(--wenpai-space-4);
+	border-top: 1px solid var(--wenpai-line-soft);
+}
+
 /* ---- 兜底轻提示容器（kit wenpaiToast 不可用时使用） ---- */
 .wpmind-notice {
 	margin-bottom: var(--wenpai-space-4);
