@@ -12,14 +12,17 @@ from pathlib import Path
 
 PLUGIN_SLUG = "wpmind"
 MAIN_FILE = "wpmind.php"
-RUNTIME_ROOTS = ('assets/', 'includes/', 'languages/', 'templates/')
-RUNTIME_FILES = {'wpmind.php', 'readme.txt'}
+RUNTIME_ROOTS = ('assets/', 'includes/', 'languages/', 'lib/wenpai-admin-ui/', 'modules/', 'templates/')
+RUNTIME_FILES = {'wpmind.php', 'uninstall.php', 'readme.txt'}
 FORBIDDEN_PREFIXES = (
     "lib/plugin-update-checker/",
     "lib/updatepulse-updater/",
     "tests/",
     "docs/",
+    "prototypes/",
     "scripts/",
+    "eng/",
+    "tools/",
     ".forgejo/",
     ".github/",
     "node_modules/",

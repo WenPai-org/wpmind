@@ -14,7 +14,7 @@ env:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: linux-arm64
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -173,7 +173,19 @@ jobs:
             --exclude="/vendor" \
             --exclude="tests" \
             --exclude="docs" \
-            --exclude="lib" \
+            --exclude="lib/plugin-update-checker" \
+            --exclude="lib/updatepulse-updater" \
+            --exclude="prototypes" \
+            --exclude="scripts" \
+            --exclude="eng" \
+            --exclude="tools" \
+            --exclude="deploy.sh" \
+            --exclude="playwright.config.js" \
+            --exclude="test-results" \
+            --exclude=".wp-env.json" \
+            --exclude=".pre-commit-config.yaml" \
+            --exclude=".gitleaks*" \
+            --exclude=".phpunit*" \
             --exclude="phpunit.xml*" \
             --exclude="phpcs.xml*" \
             --exclude="phpstan.neon*" \
