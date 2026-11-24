@@ -45,6 +45,7 @@ test("GEO 关闭时 /llms.txt 404；用 UI 开启后 200、text/plain、不 301�
 	expect(r.status()).toBe(200);
 	expect(r.headers()["content-type"]).toContain("text/plain");
 	expect(r.headers()["x-wpmind-llms-txt"]).toBe("1");
+	expect(r.headers()["x-robots-tag"] ?? "").not.toContain("noindex");
 	expect(await r.text()).toMatch(/^# /);
 	expect(await status("/llms.txt/")).toBe(200);
 	expect(await status("/?wpmind_llms_txt=1")).toBe(200);

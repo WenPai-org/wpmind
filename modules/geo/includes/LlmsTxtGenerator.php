@@ -167,7 +167,7 @@ class LlmsTxtGenerator {
 		status_header( 200 );
 		header( 'Content-Type: text/plain; charset=utf-8' );
 		header( 'X-Content-Type-Options: nosniff' );
-		header( 'X-Robots-Tag: noindex' );
+		// Do not emit X-Robots-Tag: noindex on /llms.txt (breaks GEO crawler discovery).
 		header( 'X-WPMind-Llms-Txt: 1' );
 		header( 'Link: <' . esc_url_raw( self::get_public_url() ) . '>; rel="canonical"' );
 
