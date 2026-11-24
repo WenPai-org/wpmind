@@ -15,6 +15,7 @@ namespace WPMind\Modules\AutoMeta;
 
 use WP_Post;
 use WP_Error;
+use WPMind\API\PublicAPI;
 
 /**
  * Class MetaGenerator
@@ -64,6 +65,9 @@ final class MetaGenerator {
 		if ( ! in_array( $post->post_type, $this->get_supported_types(), true ) ) {
 			return;
 		}
+		if ( ! PublicAPI::instance()->is_available() ) {
+			return;
+		}
 		if ( wp_next_scheduled( 'wpmind_generate_auto_meta', [ $post->ID ] ) ) {
 			return;
 		}
@@ -83,6 +87,9 @@ final class MetaGenerator {
 			return;
 		}
 		if ( ! in_array( $after->post_type, $this->get_supported_types(), true ) ) {
+			return;
+		}
+		if ( ! PublicAPI::instance()->is_available() ) {
 			return;
 		}
 		$old_hash = get_post_meta( $post_id, '_wpmind_auto_meta_hash', true );
@@ -187,8 +194,11 @@ final class MetaGenerator {
 			return;
 		}
 
-		// Preflight: skip AI call if no features are enabled.
+		// Preflight: skip AI call if no features are enabled or no AI provider is available.
 		if ( ! $this->has_enabled_features() ) {
+			return;
+		}
+		if ( ! PublicAPI::instance()->is_available() ) {
 			return;
 		}
 

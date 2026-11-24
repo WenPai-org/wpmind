@@ -96,7 +96,14 @@ class ChatService extends AbstractService {
 			}
 		}
 
-		if ( ! empty( $failover_chain ) && $failover_chain[0] !== $provider ) {
+		if ( empty( $failover_chain ) ) {
+			return new WP_Error(
+				'wpmind_no_available_provider',
+				__( '没有可用的 AI 服务商，请先配置并启用至少一个服务商', 'wpmind' )
+			);
+		}
+
+		if ( $failover_chain[0] !== $provider ) {
 			do_action( 'wpmind_provider_failover', $provider, $failover_chain[0], $context, 'preferred_unavailable' );
 		}
 
@@ -257,6 +264,17 @@ class ChatService extends AbstractService {
 		if ( is_wp_error( $result ) ) {
 			do_action( 'wpmind_error', $result, 'chat', $args );
 			return $result;
+		}
+
+		if ( ! is_array( $result ) ) {
+			$fallback_error = $last_error instanceof WP_Error
+				? $last_error
+				: new WP_Error(
+					'wpmind_no_available_provider',
+					__( '没有可用的 AI 服务商，或请求已超出预算时间', 'wpmind' )
+				);
+			do_action( 'wpmind_error', $fallback_error, 'chat', $args );
+			return $fallback_error;
 		}
 
 		$result = apply_filters( 'wpmind_chat_response', $result, $args, $context );
