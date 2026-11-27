@@ -177,7 +177,7 @@ if ( class_exists( 'Wenpai_Admin_Shell', false ) ) {
 			'version'       => $wpmind_display['brand'] . ' v' . WPMIND_VERSION,
 			'links'         => $wpmind_footer_links,
 			'new_tab_label' => __( '（在新标签页打开）', 'wpmind' ),
-			'whitelabel'    => ! empty( $wpmind_display['is_whitelabel'] ),
+			'whitelabel'    => ! empty( $wpmind_display['whitelabel'] ),
 			'feedback'      => [
 				'category_id'    => 15,
 				'tags'           => [ 'wpmind', 'bug' ],
