@@ -1,0 +1,21 @@
+# FeiCode Software Factory v2 可复用自动发版工作流（wpmind）
+name: FeiCode Factory Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    uses: WenPai-org/ci-workflows/.forgejo/workflows/reusable-wp-plugin-release.yml@main
+    with:
+      runs_on: ubuntu-latest
+      plugin_slug: wpmind
+      include_paths: "assets includes languages lib modules templates wpmind.php uninstall.php readme.txt"
+      publish_package: true
+    secrets:
+      RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+      BRIDGE_WEBHOOK_URL: ${{ secrets.BRIDGE_WEBHOOK_URL }}
+      BRIDGE_WEBHOOK_SECRET: ${{ secrets.BRIDGE_WEBHOOK_SECRET }}
+      MM_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK_URL }}
