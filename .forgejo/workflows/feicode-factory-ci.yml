@@ -1,0 +1,19 @@
+# FeiCode Software Factory v2 复用 CI 工作流（wpmind）
+name: FeiCode Factory CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  secret-scan:
+    uses: WenPai-org/ci-workflows/.forgejo/workflows/reusable-gitleaks.yml@main
+    with:
+      runs_on: ubuntu-latest
+
+  wp-plugin-ci:
+    uses: WenPai-org/ci-workflows/.forgejo/workflows/reusable-wp-plugin-ci.yml@main
+    with:
+      runs_on: ubuntu-latest
